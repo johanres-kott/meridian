@@ -20,6 +20,7 @@ export default function App() {
   const [time, setTime] = useState(new Date());
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [lastSeenAt, setLastSeenAt] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -31,6 +32,23 @@ export default function App() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!session) return;
+    async function trackVisit() {
+      const userId = session.user.id;
+      const { data } = await supabase
+        .from("user_prefs")
+        .select("last_seen_at")
+        .eq("user_id", userId)
+        .single();
+      setLastSeenAt(data?.last_seen_at || null);
+      await supabase
+        .from("user_prefs")
+        .upsert({ user_id: userId, last_seen_at: new Date().toISOString() });
+    }
+    trackVisit();
+  }, [session]);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -91,7 +109,7 @@ export default function App() {
 
       {/* Content - full width with padding */}
       <div style={{ padding: "24px 32px" }}>
-        {tab === "markets" && <Markets />}
+        {tab === "markets" && <Markets lastSeenAt={lastSeenAt} />}
         {tab === "commodities" && <Commodities />}
         {tab === "portfolio" && <Portfolio />}
         {tab === "analysis" && <GapAnalysis />}

@@ -1,21 +1,5 @@
 import { useState, useEffect } from "react";
 
-const MOCK_INDICES = [
-  { symbol: "SPX", name: "S&P 500", region: "Americas", price: 5203.58, change: -0.94, changeAbs: -49.21 },
-  { symbol: "NDX", name: "Nasdaq 100", region: "Americas", price: 18124.32, change: -1.42, changeAbs: -261.03 },
-  { symbol: "DJI", name: "Dow Jones", region: "Americas", price: 38596.98, change: -0.83, changeAbs: -322.11 },
-  { symbol: "SX5E", name: "Euro Stoxx 50", region: "Europe", price: 4821.44, change: -2.87, changeAbs: -142.61 },
-  { symbol: "DAX", name: "DAX", region: "Europe", price: 17832.11, change: -3.44, changeAbs: -635.22 },
-  { symbol: "UKX", name: "FTSE 100", region: "Europe", price: 7682.33, change: -1.12, changeAbs: -86.94 },
-  { symbol: "CAC", name: "CAC 40", region: "Europe", price: 7941.22, change: -2.21, changeAbs: -179.43 },
-  { symbol: "NKY", name: "Nikkei 225", region: "Asia Pacific", price: 38441.54, change: 0.31, changeAbs: 118.82 },
-  { symbol: "HSI", name: "Hang Seng", region: "Asia Pacific", price: 17284.54, change: -1.08, changeAbs: -188.22 },
-  { symbol: "SENSEX", name: "BSE Sensex", region: "Asia Pacific", price: 72643.44, change: 0.22, changeAbs: 158.93 },
-  { symbol: "KOSPI", name: "KOSPI", region: "Asia Pacific", price: 2614.23, change: -0.44, changeAbs: -11.62 },
-  { symbol: "OMXS30", name: "OMX Stockholm 30", region: "Nordic", price: 2518.78, change: -1.74, changeAbs: -44.58 },
-  { symbol: "OMXH25", name: "OMX Helsinki 25", region: "Nordic", price: 4821.33, change: -0.92, changeAbs: -44.77 },
-];
-
 const MOCK_COMPANIES = [
   { ticker: "ERIC B", name: "Ericsson", sector: "Telecom Equipment", marketCap: 238, ev: 261, ebitdaMargin: 9.2, peerMedianMargin: 18.4, peForward: 14.2, peerPE: 22.1, roic: 8.1, debtEbitda: 1.2, stake: 7.3, upside: 48, status: "Active" },
   { ticker: "UBS", name: "UBS Group", sector: "Investment Banking", marketCap: 892, ev: 1240, ebitdaMargin: 22.1, peerMedianMargin: 28.7, peForward: 9.8, peerPE: 13.4, roic: 11.2, debtEbitda: 2.8, stake: 3.1, upside: 37, status: "Active" },
@@ -53,10 +37,32 @@ export default function App() {
   const [tab, setTab] = useState("markets");
   const [selected, setSelected] = useState(null);
   const [time, setTime] = useState(new Date());
+  const [indices, setIndices] = useState([]);
+  const [indicesLoading, setIndicesLoading] = useState(true);
+  const [indicesError, setIndicesError] = useState(null);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    async function fetchIndices() {
+      try {
+        setIndicesLoading(true);
+        const res = await fetch("/api/indices");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setIndices(data);
+      } catch (err) {
+        setIndicesError(err.message);
+      } finally {
+        setIndicesLoading(false);
+      }
+    }
+    fetchIndices();
+    const interval = setInterval(fetchIndices, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   const tabs = [
@@ -77,6 +83,7 @@ export default function App() {
         .tab-btn { background: none; border: none; cursor: pointer; padding: 10px 14px; font-size: 13px; font-family: inherit; color: #787b86; border-bottom: 2px solid transparent; transition: all 0.15s; }
         .tab-btn.active { color: #131722; border-bottom-color: #2962ff; font-weight: 500; }
         .tab-btn:hover { color: #131722; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
       `}</style>
 
       {/* Topbar */}
@@ -99,8 +106,8 @@ export default function App() {
             {time.toLocaleTimeString("sv-SE")} CET
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
-            <span style={{ fontSize: 11, color: "#787b86" }}>Live</span>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: indicesLoading ? "#f0a500" : indicesError ? "#f23645" : "#089981", animation: indicesLoading ? "pulse 1s infinite" : "none" }} />
+            <span style={{ fontSize: 11, color: "#787b86" }}>{indicesLoading ? "Loading..." : indicesError ? "Error" : "Live"}</span>
           </div>
         </div>
       </div>
@@ -114,11 +121,24 @@ export default function App() {
               <h1 style={{ fontSize: 18, fontWeight: 500, color: "#131722" }}>Global Indices</h1>
               <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
                 {time.toLocaleDateString("sv-SE", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                {!indicesLoading && !indicesError && <span style={{ marginLeft: 12, color: "#089981" }}>· Live data via Finnhub</span>}
               </p>
             </div>
 
-            {regions.map(region => {
-              const items = MOCK_INDICES.filter(i => i.region === region);
+            {indicesLoading && (
+              <div style={{ padding: "60px 0", textAlign: "center", color: "#787b86", fontSize: 13 }}>
+                Hämtar marknadsdata...
+              </div>
+            )}
+
+            {indicesError && (
+              <div style={{ padding: "20px", background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "#f23645", fontSize: 13 }}>
+                Kunde inte hämta data: {indicesError}
+              </div>
+            )}
+
+            {!indicesLoading && !indicesError && regions.map(region => {
+              const items = indices.filter(i => i.region === region);
               if (!items.length) return null;
               return (
                 <div key={region} style={{ marginBottom: 28 }}>
@@ -139,19 +159,19 @@ export default function App() {
                           <td style={{ padding: "8px 10px", fontWeight: 500, color: "#131722", fontFamily: "'IBM Plex Mono', monospace", fontSize: 12 }}>{idx.symbol}</td>
                           <td style={{ padding: "8px 10px", color: "#131722" }}>{idx.name}</td>
                           <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
-                            {idx.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {idx.price > 0 ? idx.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
                           </td>
                           <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                            <Chg value={idx.change} />
+                            {idx.price > 0 ? <Chg value={idx.change} /> : "—"}
                           </td>
                           <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: idx.changeAbs >= 0 ? "#089981" : "#f23645" }}>
-                            {idx.changeAbs >= 0 ? "+" : ""}{idx.changeAbs.toFixed(2)}
+                            {idx.price > 0 ? `${idx.changeAbs >= 0 ? "+" : ""}${idx.changeAbs.toFixed(2)}` : "—"}
                           </td>
                           <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#787b86", fontSize: 12 }}>
-                            {(idx.price * 1.008).toFixed(2)}
+                            {idx.high > 0 ? idx.high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
                           </td>
                           <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#787b86", fontSize: 12 }}>
-                            {(idx.price * 0.991).toFixed(2)}
+                            {idx.low > 0 ? idx.low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
                           </td>
                         </tr>
                       ))}
@@ -201,12 +221,7 @@ export default function App() {
                       <td style={{ padding: "10px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{co.stake}%</td>
                       <td style={{ padding: "10px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: co.upside > 40 ? "#089981" : "#131722", fontWeight: 500 }}>+{co.upside}%</td>
                       <td style={{ padding: "10px 10px" }}>
-                        <span style={{
-                          fontSize: 11, padding: "2px 8px", borderRadius: 3,
-                          background: co.status === "Active" ? "#e8f5e9" : "#f5f5f5",
-                          color: co.status === "Active" ? "#089981" : "#787b86",
-                          fontWeight: 500
-                        }}>{co.status}</span>
+                        <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 3, background: co.status === "Active" ? "#e8f5e9" : "#f5f5f5", color: co.status === "Active" ? "#089981" : "#787b86", fontWeight: 500 }}>{co.status}</span>
                       </td>
                     </tr>
                     {selected?.ticker === co.ticker && (
@@ -229,7 +244,7 @@ export default function App() {
                           <div style={{ marginTop: 12, background: "#ffffff", border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px", borderLeft: "3px solid #2962ff" }}>
                             <div style={{ fontSize: 11, color: "#787b86", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Value creation thesis</div>
                             <p style={{ fontSize: 13, color: "#131722", lineHeight: 1.6 }}>
-                              Margin gap of <strong>{(co.peerMedianMargin - co.ebitdaMargin).toFixed(1)}pp</strong> vs sector median suggests operational underperformance.
+                              Margin gap of <strong>{(co.peerMedianMargin - co.ebitdaMargin).toFixed(1)}pp</strong> vs sector median.
                               Trading at <strong>{co.peForward}x</strong> forward P/E vs peer group at <strong>{co.peerPE}x</strong> — a {(((co.peForward / co.peerPE) - 1) * -100).toFixed(0)}% valuation discount.
                               Estimated upside of <strong style={{ color: "#089981" }}>+{co.upside}%</strong> if margins normalize over 3 years.
                               {co.debtEbitda > 2.5 ? " Leverage is elevated — capital structure optimization likely required." : " Balance sheet is manageable, execution is the key lever."}

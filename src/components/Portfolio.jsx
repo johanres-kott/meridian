@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
+import PdfImportModal from "./PdfImportModal.jsx";
 import CompanyView from "./CompanyView.jsx";
 
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Avstår"];
@@ -123,6 +124,7 @@ function CompanyCard({ item, onUpdate, onDelete, onSelect }) {
 export default function Portfolio() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showImport, setShowImport] = useState(false);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => { load(); }, []);
@@ -152,6 +154,19 @@ export default function Portfolio() {
 
   if (loading) return <div style={{ color: "#787b86", fontSize: 13 }}>Laddar...</div>;
 
+  async function importHoldings(holdings) {
+    const { data: { user } } = await supabase.auth.getUser();
+    const rows = holdings.map(h => ({
+      ticker: h.ticker, name: h.name, user_id: user.id,
+      status: "Bevakar", shares: h.shares, gav: h.gav,
+    }));
+    const { data, error } = await supabase.from("watchlist").insert(rows).select();
+    if (!error && data) {
+      setItems(prev => [...prev, ...data]);
+    }
+    return { data, error };
+  }
+
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
     return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
@@ -159,9 +174,22 @@ export default function Portfolio() {
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Bevakningslista</div>
-        <div style={{ fontSize: 12, color: "#787b86" }}>{items.length} bolag</div>
+      {showImport && (
+        <PdfImportModal
+          onClose={() => setShowImport(false)}
+          existingTickers={items.map(i => i.ticker)}
+          onImport={importHoldings}
+        />
+      )}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+        <div>
+          <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Bevakningslista</div>
+          <div style={{ fontSize: 12, color: "#787b86" }}>{items.length} bolag</div>
+        </div>
+        <button onClick={() => setShowImport(true)}
+          style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+          Importera PDF
+        </button>
       </div>
       <AddCompanyBar onAdd={addCompany} />
       {items.length === 0 ? (

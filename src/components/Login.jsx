@@ -4,7 +4,7 @@ import { supabase } from "../supabase.js";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState("login"); // "login" | "magic"
+  const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -33,23 +33,35 @@ export default function Login() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#f8f9fd", display: "flex",
-      alignItems: "center", justifyContent: "center",
+      minHeight: "100vh",
+      background: "#f8f9fd",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
       fontFamily: "'IBM Plex Sans', sans-serif",
     }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono&display=swap');`}</style>
 
-      <div style={{ width: 380, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 40 }}>
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-          <div style={{ width: 28, height: 28, background: "#2962ff", borderRadius: 5 }} />
-          <span style={{ fontSize: 18, fontWeight: 600, letterSpacing: "0.02em" }}>Meridian</span>
-        </div>
+      {/* Logo above card */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
+        <div style={{ width: 32, height: 32, background: "#2962ff", borderRadius: 6 }} />
+        <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.02em", color: "#131722" }}>Meridian</span>
+      </div>
 
-        <h1 style={{ fontSize: 16, fontWeight: 500, marginBottom: 4 }}>
+      {/* Card */}
+      <div style={{
+        width: 400,
+        background: "#fff",
+        border: "1px solid #e0e3eb",
+        borderRadius: 8,
+        padding: "40px 40px 32px",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.04)",
+      }}>
+        <h1 style={{ fontSize: 16, fontWeight: 500, marginBottom: 4, color: "#131722" }}>
           {mode === "login" ? "Logga in" : "Skicka inloggningslänk"}
         </h1>
-        <p style={{ fontSize: 12, color: "#787b86", marginBottom: 24 }}>
+        <p style={{ fontSize: 12, color: "#787b86", marginBottom: 28 }}>
           {mode === "login" ? "Ange dina uppgifter för att fortsätta" : "Vi skickar en länk till din e-post"}
         </p>
 
@@ -58,7 +70,6 @@ export default function Login() {
             {message}
           </div>
         )}
-
         {error && (
           <div style={{ padding: "12px 14px", background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, fontSize: 13, color: "#f23645", marginBottom: 16 }}>
             {error}
@@ -66,42 +77,42 @@ export default function Login() {
         )}
 
         <form onSubmit={mode === "login" ? handleLogin : handleMagicLink}>
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6 }}>E-POST</label>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6, letterSpacing: "0.06em" }}>E-POST</label>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)} required
               placeholder="din@email.com"
-              style={{ width: "100%", padding: "10px 12px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none" }}
+              style={{ width: "100%", padding: "10px 12px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none", color: "#131722" }}
             />
           </div>
 
           {mode === "login" && (
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6 }}>LÖSENORD</label>
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6, letterSpacing: "0.06em" }}>LÖSENORD</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)} required
                 placeholder="••••••••"
-                style={{ width: "100%", padding: "10px 12px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none" }}
+                style={{ width: "100%", padding: "10px 12px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none", color: "#131722" }}
               />
             </div>
           )}
 
-          {mode === "magic" && <div style={{ marginBottom: 20 }} />}
+          {mode === "magic" && <div style={{ marginBottom: 24 }} />}
 
           <button
             type="submit" disabled={loading}
-            style={{ width: "100%", padding: "11px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}
+            style={{ width: "100%", padding: "11px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, fontSize: 13, fontWeight: 500, cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}
           >
             {loading ? "Laddar..." : mode === "login" ? "Logga in" : "Skicka länk"}
           </button>
         </form>
 
-        <div style={{ marginTop: 20, textAlign: "center" }}>
+        <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid #f0f3fa", paddingTop: 20 }}>
           <button
             onClick={() => { setMode(mode === "login" ? "magic" : "login"); setError(null); setMessage(null); }}
             style={{ fontSize: 12, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
           >
-            {mode === "login" ? "Logga in med e-postlänk istället" : "Logga in med lösenord istället"}
+            {mode === "login" ? "Logga in med e-postlänk istället →" : "← Logga in med lösenord istället"}
           </button>
         </div>
       </div>

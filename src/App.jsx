@@ -57,7 +57,8 @@ export default function App() {
         .tab-btn:hover { color: #131722; }
       `}</style>
 
-      <div style={{ borderBottom: "1px solid #e0e3eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", height: 46, position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
+      {/* Topbar */}
+      <div style={{ borderBottom: "1px solid #e0e3eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", height: 46, position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <div style={{ width: 20, height: 20, background: "#2962ff", borderRadius: 4 }} />
@@ -88,7 +89,8 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ padding: "20px 24px", maxWidth: 1400, margin: "0 auto" }}>
+      {/* Content - full width with padding */}
+      <div style={{ padding: "24px 32px" }}>
         {tab === "markets" && <Markets />}
         {tab === "commodities" && <Commodities />}
         {tab === "portfolio" && <Portfolio />}

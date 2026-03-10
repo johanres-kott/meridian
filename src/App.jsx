@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase.js";
 import Login from "./components/Login.jsx";
 import Markets from "./components/Markets.jsx";
@@ -6,10 +6,11 @@ import Portfolio from "./components/Portfolio.jsx";
 import GapAnalysis from "./components/GapAnalysis.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
 import Commodities from "./components/Commodities.jsx";
+import ChatPanel from "./components/ChatPanel.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
-  { id: "commodities", label: "Råvaror" },
+  { id: "commodities", label: "Marknader" },
   { id: "portfolio", label: "Portfolio" },
   { id: "analysis", label: "Gap Analysis" },
   { id: "search", label: "Company Search" },
@@ -22,6 +23,8 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [lastSeenAt, setLastSeenAt] = useState(null);
   const [preferences, setPreferences] = useState({});
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatContextRef = useRef({});
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -68,6 +71,37 @@ export default function App() {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    if (!chatOpen || !session) return;
+    async function loadContext() {
+      try {
+        const [indicesRes, commoditiesRes, watchlistRes] = await Promise.all([
+          fetch("/api/indices").then(r => r.json()).catch(() => []),
+          fetch("/api/commodities").then(r => r.json()).catch(() => []),
+          supabase.from("watchlist").select("*").order("created_at"),
+        ]);
+        const watchlist = watchlistRes.data || [];
+        const portfolio = await Promise.all(
+          watchlist.slice(0, 10).map(async (item) => {
+            try {
+              const r = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
+              const d = await r.json();
+              return { ticker: item.ticker, name: d.name, price: d.price, currency: d.currency, changePercent: d.changePercent };
+            } catch { return null; }
+          })
+        );
+        chatContextRef.current = {
+          portfolio: portfolio.filter(Boolean),
+          indices: indicesRes.filter(i => i.price > 0),
+          commodities: commoditiesRes.filter(c => c.price > 0),
+        };
+      } catch (err) {
+        console.error("Chat context load error:", err);
+      }
+    }
+    loadContext();
+  }, [chatOpen, session]);
+
   if (authLoading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'IBM Plex Sans', sans-serif", color: "#787b86" }}>
@@ -112,6 +146,12 @@ export default function App() {
             <span style={{ fontSize: 11, color: "#787b86" }}>Live</span>
           </div>
           <button
+            onClick={() => setChatOpen(!chatOpen)}
+            style={{ fontSize: 11, color: chatOpen ? "#2962ff" : "#787b86", background: chatOpen ? "#f0f3fa" : "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            AI
+          </button>
+          <button
             onClick={() => supabase.auth.signOut()}
             style={{ fontSize: 11, color: "#787b86", background: "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
           >
@@ -120,13 +160,16 @@ export default function App() {
         </div>
       </div>
 
-      {/* Content - full width with padding */}
-      <div style={{ padding: "24px 32px" }}>
-        {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} />}
-        {tab === "commodities" && <Commodities />}
-        {tab === "portfolio" && <Portfolio />}
-        {tab === "analysis" && <GapAnalysis />}
-        {tab === "search" && <CompanySearch />}
+      {/* Content + Chat */}
+      <div style={{ display: "flex", height: "calc(100vh - 46px)" }}>
+        <div style={{ flex: 1, overflow: "auto", padding: "24px 32px" }}>
+          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} />}
+          {tab === "commodities" && <Commodities />}
+          {tab === "portfolio" && <Portfolio />}
+          {tab === "analysis" && <GapAnalysis />}
+          {tab === "search" && <CompanySearch />}
+        </div>
+        <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />
       </div>
     </div>
   );

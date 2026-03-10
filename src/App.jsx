@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { supabase } from "./supabase.js";
+import Login from "./components/Login.jsx";
 import Markets from "./components/Markets.jsx";
 import Portfolio from "./components/Portfolio.jsx";
 import GapAnalysis from "./components/GapAnalysis.jsx";
@@ -16,11 +18,34 @@ const TABS = [
 export default function App() {
   const [tab, setTab] = useState("markets");
   const [time, setTime] = useState(new Date());
+  const [session, setSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setAuthLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'IBM Plex Sans', sans-serif", color: "#787b86" }}>
+        Laddar...
+      </div>
+    );
+  }
+
+  if (!session) return <Login />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#ffffff", color: "#131722", fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
@@ -30,10 +55,8 @@ export default function App() {
         .tab-btn { background: none; border: none; cursor: pointer; padding: 10px 14px; font-size: 13px; font-family: inherit; color: #787b86; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
         .tab-btn.active { color: #131722; border-bottom-color: #2962ff; font-weight: 500; }
         .tab-btn:hover { color: #131722; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
       `}</style>
 
-      {/* Topbar */}
       <div style={{ borderBottom: "1px solid #e0e3eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", height: 46, position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -48,7 +71,7 @@ export default function App() {
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
           <span style={{ fontSize: 12, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>
             {time.toLocaleTimeString("sv-SE")} CET
           </span>
@@ -56,6 +79,12 @@ export default function App() {
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
             <span style={{ fontSize: 11, color: "#787b86" }}>Live</span>
           </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            style={{ fontSize: 11, color: "#787b86", background: "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            Logga ut
+          </button>
         </div>
       </div>
 

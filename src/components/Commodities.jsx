@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Chg } from "./shared.jsx";
+import { Chg } from "./SharedComponents.jsx";
 
 const COMMODITY_GROUPS = [
   {

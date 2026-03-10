@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
-import { StatCard, fmt } from "./shared.jsx";
+import { fmt } from "./shared.js"
+import { StatCard } from "./SharedComponents.jsx";
 
 const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
 

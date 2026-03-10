@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PORTFOLIO } from "./shared.jsx";
+import { PORTFOLIO } from "./shared.js";
 
 export default function GapAnalysis() {
   const [portfolioData, setPortfolioData] = useState({});

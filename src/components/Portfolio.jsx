@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { PORTFOLIO, MiniBar, Pill, fmt } from "./shared.jsx";
+import { PORTFOLIO, fmt } from "./shared.js"
+import { MiniBar, Pill } from "./SharedComponents.jsx";
 
 export default function Portfolio() {
   const [portfolioData, setPortfolioData] = useState({});

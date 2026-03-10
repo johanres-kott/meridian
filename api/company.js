@@ -29,6 +29,9 @@ async function getYahooPriceV8(ticker) {
     const data = await r.json();
     const meta = data?.chart?.result?.[0]?.meta;
     if (!meta || !meta.regularMarketPrice) return null;
+    const prevClose = meta.chartPreviousClose ?? meta.previousClose ?? meta.regularMarketPrice;
+    const changeAbs = meta.regularMarketPrice - prevClose;
+    const changePercent = prevClose > 0 ? parseFloat(((changeAbs / prevClose) * 100).toFixed(2)) : 0;
     return {
       name: meta.longName ?? meta.shortName ?? ticker,
       price: meta.regularMarketPrice,
@@ -36,6 +39,8 @@ async function getYahooPriceV8(ticker) {
       marketCap: 0,
       week52High: meta.fiftyTwoWeekHigh ?? 0,
       week52Low: meta.fiftyTwoWeekLow ?? 0,
+      changePercent,
+      changeAbs: parseFloat(changeAbs.toFixed(2)),
     };
   } catch {
     return null;
@@ -142,6 +147,8 @@ export default async function handler(req, res) {
       sector: fmpData?.sector ?? fundamentals?.sector ?? "—",
       industry: fundamentals?.industry ?? "—",
       price: priceData?.price ?? 0,
+      changePercent: priceData?.changePercent ?? 0,
+      changeAbs: priceData?.changeAbs ?? 0,
       currency: priceData?.currency ?? "USD",
       marketCap: fmpData?.marketCap ?? priceData?.marketCap ?? 0,
       peForward: fmpData?.peForward ?? fundamentals?.peForward ?? 0,

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { REGIONS } from "./shared.js"
 import { Chg } from "./SharedComponents.jsx";
+import SedanSist from "./SedanSist.jsx";
 
-export default function Markets() {
+export default function Markets({ lastSeenAt }) {
   const [indices, setIndices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,6 +34,7 @@ export default function Markets() {
 
   return (
     <div>
+      <SedanSist lastSeenAt={lastSeenAt} />
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <h1 style={{ fontSize: 18, fontWeight: 500 }}>Global Indices</h1>

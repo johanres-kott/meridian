@@ -59,10 +59,11 @@ export default function CompanySearch() {
   }, []);
 
   const selectSuggestion = (s) => {
-    setQuery(s.ticker);
+    const normalized = s.ticker.replace(/ /g, "-");
+    setQuery(normalized);
     setSuggestions([]);
     setShowSuggestions(false);
-    fetchCompany(s.ticker);
+    fetchCompany(normalized);
   };
 
   const handleKeyDown = (e) => {

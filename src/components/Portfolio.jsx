@@ -3,14 +3,31 @@ import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
 import CompanyView from "./CompanyView.jsx";
 
-const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Avstår"];
+const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
   Bevakar: { bg: "#f0f3fa", color: "#787b86" },
   Analyserar: { bg: "#fff8e1", color: "#e65100" },
   Intressant: { bg: "#e8f5e9", color: "#1b5e20" },
+  Äger: { bg: "#e3f2fd", color: "#1565c0" },
   Avstår: { bg: "#fce4ec", color: "#880e4f" },
 };
+
+const FLAG_MAP = {
+  ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
+  OL: "\u{1F1F3}\u{1F1F4}", HK: "\u{1F1ED}\u{1F1F0}", L: "\u{1F1EC}\u{1F1E7}",
+  PA: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}", AS: "\u{1F1F3}\u{1F1F1}",
+  SW: "\u{1F1E8}\u{1F1ED}", T: "\u{1F1EF}\u{1F1F5}", TO: "\u{1F1E8}\u{1F1E6}",
+};
+
+function getFlag(ticker) {
+  if (!ticker) return "";
+  const parts = ticker.split(".");
+  if (parts.length > 1) {
+    return FLAG_MAP[parts[parts.length - 1]] || "\u{1F1FA}\u{1F1F8}";
+  }
+  return "\u{1F1FA}\u{1F1F8}";
+}
 
 async function fetchPrice(ticker) {
   try {
@@ -72,7 +89,7 @@ function AddCompanyBar({ onAdd }) {
   );
 }
 
-function CompanyCard({ item, onUpdate, onDelete, onSelect }) {
+function CompanyRow({ item, onUpdate, onSelect }) {
   const [price, setPrice] = useState(null);
 
   useEffect(() => {
@@ -84,40 +101,43 @@ function CompanyCard({ item, onUpdate, onDelete, onSelect }) {
   const pl = (item.gav && item.shares && price?.price) ? ((price.price - item.gav) * item.shares) : null;
   const plPct = (item.gav && price?.price) ? ((price.price - item.gav) / item.gav * 100) : null;
 
+  const tdBase = { padding: "10px 14px", borderBottom: "1px solid #f0f3fa" };
+
   return (
-    <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, marginBottom: 10, overflow: "hidden" }}>
-      <div style={{ display: "flex", alignItems: "center", padding: "14px 18px", cursor: "pointer", gap: 12 }} onClick={() => onSelect(item)}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{item.name || item.ticker}</div>
-          <div style={{ fontSize: 11, color: "#787b86", fontFamily: "monospace" }}>{item.ticker}</div>
-        </div>
-
-        <div onClick={e => e.stopPropagation()}>
-          <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
-            style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
-            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        <div style={{ textAlign: "right", minWidth: 90 }}>
-          {price ? (
-            <>
-              <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              <div style={{ fontSize: 11, color: chgColor }}>{chg > 0 ? "+" : ""}{chg?.toFixed(2)}%</div>
-            </>
-          ) : <div style={{ fontSize: 11, color: "#c0c3cb" }}>Hamtar...</div>}
-        </div>
-
-        {pl !== null && (
-          <div style={{ textAlign: "right", minWidth: 80 }}>
+    <tr
+      onClick={() => onSelect(item)}
+      style={{ cursor: "pointer" }}
+      onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+      onMouseLeave={e => e.currentTarget.style.background = ""}
+    >
+      <td style={{ ...tdBase, width: 36 }}>{getFlag(item.ticker)}</td>
+      <td style={tdBase}>
+        <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{item.name || item.ticker}</div>
+        <div style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</div>
+      </td>
+      <td style={tdBase} onClick={e => e.stopPropagation()}>
+        <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
+          style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
+          {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </td>
+      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+        {price ? (
+          <>
+            <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            {chg != null && <div style={{ fontSize: 11, color: chgColor }}>{chg > 0 ? "+" : ""}{chg.toFixed(2)}%</div>}
+          </>
+        ) : <span style={{ color: "#c0c3cb", fontSize: 11 }}>Hämtar...</span>}
+      </td>
+      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap", paddingRight: 18 }}>
+        {pl !== null ? (
+          <>
             <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })}</div>
             <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
-          </div>
-        )}
-
-        <div style={{ fontSize: 10, color: "#787b86" }}>&rsaquo;</div>
-      </div>
-    </div>
+          </>
+        ) : null}
+      </td>
+    </tr>
   );
 }
 
@@ -172,6 +192,8 @@ export default function Portfolio() {
     return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
   }
 
+  const hasAnyPL = items.some(i => i.gav && i.shares);
+
   return (
     <div>
       {showImport && (
@@ -194,10 +216,30 @@ export default function Portfolio() {
       <AddCompanyBar onAdd={addCompany} />
       {items.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "#787b86", fontSize: 13 }}>
-          Inga bolag annu - sok efter ett bolag ovan for att lagga till
+          Inga bolag ännu — sök efter ett bolag ovan för att lägga till
         </div>
       ) : (
-        items.map(item => <CompanyCard key={item.id} item={item} onUpdate={updateItem} onDelete={deleteItem} onSelect={setSelected} />)
+        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                {["", "Bolag", "Status", "Kurs", ...(hasAnyPL ? ["P&L"] : [])].map(h => (
+                  <th key={h || "flag"} style={{
+                    padding: "8px 14px",
+                    textAlign: h === "Kurs" || h === "P&L" ? "right" : "left",
+                    fontSize: 11, fontWeight: 500, color: "#787b86",
+                    borderBottom: "1px solid #e0e3eb",
+                  }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(item => (
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} />
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

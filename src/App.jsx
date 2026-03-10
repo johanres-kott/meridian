@@ -8,7 +8,7 @@ import CompanySearch from "./components/CompanySearch.jsx";
 import Commodities from "./components/Commodities.jsx";
 
 const TABS = [
-  { id: "markets", label: "Global Markets" },
+  { id: "markets", label: "Översikt" },
   { id: "commodities", label: "Råvaror" },
   { id: "portfolio", label: "Portfolio" },
   { id: "analysis", label: "Gap Analysis" },

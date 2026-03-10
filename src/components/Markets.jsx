@@ -37,7 +37,7 @@ export default function Markets({ lastSeenAt }) {
       <SedanSist lastSeenAt={lastSeenAt} />
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
-          <h1 style={{ fontSize: 18, fontWeight: 500 }}>Global Indices</h1>
+          <h2 style={{ fontSize: 15, fontWeight: 500 }}>Global Indices</h2>
           <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
             {today}
             {!loading && !error && <span style={{ marginLeft: 12, color: "#089981" }}>· Yahoo Finance</span>}

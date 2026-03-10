@@ -1,6 +1,6 @@
 const FMP_KEY = "DZJzkZrPZXSCrJPErOadzWJ8JzfbsYmq";
 const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
-const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+const UA = "Mozilla/5.0";
 
 async function getYahooCrumb() {
   try {
@@ -167,3 +167,5 @@ export default async function handler(req, res) {
     res.status(500).json({ error: err.message });
   }
 }
+
+// force redeploy Tue Mar 10 12:37:10 UTC 2026

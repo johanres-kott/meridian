@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { REGIONS, Chg } from "./shared.js";
+import { REGIONS, Chg } from "./shared.jsx";
 
 export default function Markets() {
   const [indices, setIndices] = useState([]);

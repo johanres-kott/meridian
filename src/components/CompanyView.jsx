@@ -15,10 +15,11 @@ const STATUS_COLORS = {
   Bevakar: { bg: "#f0f3fa", color: "#787b86" },
   Analyserar: { bg: "#fff8e1", color: "#e65100" },
   Intressant: { bg: "#e8f5e9", color: "#1b5e20" },
+  "Äger": { bg: "#e3f2fd", color: "#1565c0" },
   "Avstår": { bg: "#fce4ec", color: "#880e4f" },
 };
 
-const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Avstår"];
+const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 function PriceChart({ ticker }) {
   const [range, setRange] = useState("3m");

@@ -8,20 +8,29 @@ const YAHOO_HEADERS = {
   "Referer": "https://finance.yahoo.com",
 };
 
-async function getYahooV7(ticker) {
+// Price data via v7
+async function getYahooPrice(ticker) {
   try {
-    const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=regularMarketPrice,regularMarketChangePercent,regularMarketChange,marketCap,forwardPE,trailingPE,currency,shortName,longName,sector,industry,fiftyTwoWeekHigh,fiftyTwoWeekLow,ebitdaMargins,operatingMargins,grossMargins,returnOnEquity,debtToEquity,revenueGrowth,targetMeanPrice,recommendationKey`;
+    const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=regularMarketPrice,marketCap,currency,shortName,longName,fiftyTwoWeekHigh,fiftyTwoWeekLow`;
     const r = await fetch(url, { headers: YAHOO_HEADERS });
     const data = await r.json();
     const q = data?.quoteResponse?.result?.[0];
     if (!q || !q.regularMarketPrice) return null;
-    return parseYahooQuote(q, ticker);
+    return {
+      name: q.longName ?? q.shortName ?? ticker,
+      price: q.regularMarketPrice ?? 0,
+      currency: q.currency ?? "USD",
+      marketCap: q.marketCap ? Math.round(q.marketCap / 1e9) : 0,
+      week52High: q.fiftyTwoWeekHigh ?? 0,
+      week52Low: q.fiftyTwoWeekLow ?? 0,
+    };
   } catch {
     return null;
   }
 }
 
-async function getYahooV8(ticker) {
+// Price fallback via v8 chart
+async function getYahooPriceV8(ticker) {
   try {
     const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5d`;
     const r = await fetch(url, { headers: YAHOO_HEADERS });
@@ -30,21 +39,9 @@ async function getYahooV8(ticker) {
     if (!meta || !meta.regularMarketPrice) return null;
     return {
       name: meta.longName ?? meta.shortName ?? ticker,
-      sector: "—",
-      industry: "—",
       price: meta.regularMarketPrice,
       currency: meta.currency ?? "USD",
       marketCap: 0,
-      peForward: 0,
-      peTrailing: 0,
-      ebitdaMargin: 0,
-      operatingMargin: 0,
-      grossMargin: 0,
-      roic: 0,
-      debtEbitda: 0,
-      revenueGrowth: 0,
-      targetPrice: 0,
-      recommendation: "—",
       week52High: meta.fiftyTwoWeekHigh ?? 0,
       week52Low: meta.fiftyTwoWeekLow ?? 0,
     };
@@ -53,30 +50,39 @@ async function getYahooV8(ticker) {
   }
 }
 
-function parseYahooQuote(q, ticker) {
-  return {
-    name: q.longName ?? q.shortName ?? ticker,
-    sector: q.sector ?? "—",
-    industry: q.industry ?? "—",
-    price: q.regularMarketPrice ?? 0,
-    currency: q.currency ?? "USD",
-    marketCap: q.marketCap ? Math.round(q.marketCap / 1e9) : 0,
-    peForward: q.forwardPE ? parseFloat(q.forwardPE.toFixed(1)) : 0,
-    peTrailing: q.trailingPE ? parseFloat(q.trailingPE.toFixed(1)) : 0,
-    ebitdaMargin: q.ebitdaMargins ? parseFloat((q.ebitdaMargins * 100).toFixed(1)) : 0,
-    operatingMargin: q.operatingMargins ? parseFloat((q.operatingMargins * 100).toFixed(1)) : 0,
-    grossMargin: q.grossMargins ? parseFloat((q.grossMargins * 100).toFixed(1)) : 0,
-    roic: q.returnOnEquity ? parseFloat((q.returnOnEquity * 100).toFixed(1)) : 0,
-    debtEbitda: q.debtToEquity ? parseFloat((q.debtToEquity / 100).toFixed(1)) : 0,
-    revenueGrowth: q.revenueGrowth ? parseFloat((q.revenueGrowth * 100).toFixed(1)) : 0,
-    targetPrice: q.targetMeanPrice ?? 0,
-    recommendation: q.recommendationKey ?? "—",
-    week52High: q.fiftyTwoWeekHigh ?? 0,
-    week52Low: q.fiftyTwoWeekLow ?? 0,
-  };
+// Fundamentals via v10 quoteSummary — works for European tickers
+async function getYahooFundamentals(ticker) {
+  try {
+    const modules = "financialData,defaultKeyStatistics,summaryDetail,assetProfile";
+    const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?modules=${modules}`;
+    const r = await fetch(url, { headers: YAHOO_HEADERS });
+    const data = await r.json();
+    const result = data?.quoteSummary?.result?.[0];
+    if (!result) return null;
+    const fd = result.financialData ?? {};
+    const ks = result.defaultKeyStatistics ?? {};
+    const sd = result.summaryDetail ?? {};
+    const ap = result.assetProfile ?? {};
+    return {
+      sector: ap.sector ?? "—",
+      industry: ap.industry ?? "—",
+      ebitdaMargin: fd.ebitdaMargins?.raw ? parseFloat((fd.ebitdaMargins.raw * 100).toFixed(1)) : 0,
+      operatingMargin: fd.operatingMargins?.raw ? parseFloat((fd.operatingMargins.raw * 100).toFixed(1)) : 0,
+      grossMargin: fd.grossMargins?.raw ? parseFloat((fd.grossMargins.raw * 100).toFixed(1)) : 0,
+      roic: fd.returnOnEquity?.raw ? parseFloat((fd.returnOnEquity.raw * 100).toFixed(1)) : 0,
+      revenueGrowth: fd.revenueGrowth?.raw ? parseFloat((fd.revenueGrowth.raw * 100).toFixed(1)) : 0,
+      debtEbitda: fd.debtToEquity?.raw ? parseFloat((fd.debtToEquity.raw / 100).toFixed(1)) : 0,
+      peForward: sd.forwardPE?.raw ? parseFloat(sd.forwardPE.raw.toFixed(1)) : 0,
+      peTrailing: ks.trailingPE?.raw ? parseFloat(ks.trailingPE.raw.toFixed(1)) : 0,
+      targetPrice: fd.targetMeanPrice?.raw ?? 0,
+      recommendation: fd.recommendationKey ?? "—",
+    };
+  } catch {
+    return null;
+  }
 }
 
-// FMP only for US tickers (no exchange suffix like .ST, .L, .AS)
+// FMP only for US tickers
 async function getFMPData(ticker) {
   if (ticker.includes(".")) return null;
   try {
@@ -129,40 +135,41 @@ export default async function handler(req, res) {
   if (!ticker) return res.status(400).json({ error: "ticker required" });
 
   try {
-    const [yahooData, fmpData, news] = await Promise.all([
-      getYahooV7(ticker).then(d => d ?? getYahooV8(ticker)),
+    const [priceData, fundamentals, fmpData, news] = await Promise.all([
+      getYahooPrice(ticker).then(d => d ?? getYahooPriceV8(ticker)),
+      getYahooFundamentals(ticker),
       getFMPData(ticker),
       getFinnhubNews(ticker),
     ]);
 
-    if (!yahooData && !fmpData) {
+    if (!priceData && !fundamentals && !fmpData) {
       return res.status(404).json({ error: `Ingen data hittades för ${ticker}` });
     }
 
     const result = {
       ticker,
-      name: fmpData?.name ?? yahooData?.name ?? ticker,
-      sector: fmpData?.sector ?? yahooData?.sector ?? "—",
-      industry: yahooData?.industry ?? "—",
-      price: yahooData?.price ?? 0,
-      currency: yahooData?.currency ?? "USD",
-      marketCap: fmpData?.marketCap ?? yahooData?.marketCap ?? 0,
-      peForward: fmpData?.peForward ?? yahooData?.peForward ?? 0,
-      peTrailing: yahooData?.peTrailing ?? 0,
-      ebitdaMargin: yahooData?.ebitdaMargin ?? 0,
-      operatingMargin: yahooData?.operatingMargin ?? 0,
-      grossMargin: yahooData?.grossMargin ?? 0,
-      roic: fmpData?.roic ?? yahooData?.roic ?? 0,
-      debtEbitda: fmpData?.debtEbitda ?? yahooData?.debtEbitda ?? 0,
-      revenueGrowth: yahooData?.revenueGrowth ?? 0,
-      targetPrice: yahooData?.targetPrice ?? 0,
-      recommendation: yahooData?.recommendation ?? "—",
-      week52High: yahooData?.week52High ?? 0,
-      week52Low: yahooData?.week52Low ?? 0,
+      name: fmpData?.name ?? priceData?.name ?? ticker,
+      sector: fmpData?.sector ?? fundamentals?.sector ?? "—",
+      industry: fundamentals?.industry ?? "—",
+      price: priceData?.price ?? 0,
+      currency: priceData?.currency ?? "USD",
+      marketCap: fmpData?.marketCap ?? priceData?.marketCap ?? 0,
+      peForward: fmpData?.peForward ?? fundamentals?.peForward ?? 0,
+      peTrailing: fundamentals?.peTrailing ?? 0,
+      ebitdaMargin: fundamentals?.ebitdaMargin ?? 0,
+      operatingMargin: fundamentals?.operatingMargin ?? 0,
+      grossMargin: fundamentals?.grossMargin ?? 0,
+      roic: fmpData?.roic ?? fundamentals?.roic ?? 0,
+      debtEbitda: fmpData?.debtEbitda ?? fundamentals?.debtEbitda ?? 0,
+      revenueGrowth: fundamentals?.revenueGrowth ?? 0,
+      targetPrice: fundamentals?.targetPrice ?? 0,
+      recommendation: fundamentals?.recommendation ?? "—",
+      week52High: priceData?.week52High ?? 0,
+      week52Low: priceData?.week52Low ?? 0,
       news,
       sources: {
         quote: "Yahoo Finance",
-        fundamentals: fmpData?.name ? "FMP + Yahoo Finance" : "Yahoo Finance",
+        fundamentals: fmpData?.name ? "FMP + Yahoo Finance" : "Yahoo Finance v10",
         news: "Finnhub",
       },
     };

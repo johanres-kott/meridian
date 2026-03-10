@@ -2,47 +2,36 @@ export default async function handler(req, res) {
   const ticker = req.query.ticker ?? "ERIC-B.ST";
   const results = {};
 
-  // Test crumb fetch
   try {
+    // Get crumb
     const cookieRes = await fetch("https://fc.yahoo.com", {
       headers: { "User-Agent": "Mozilla/5.0" },
       redirect: "follow",
     });
-    results.cookie_status = cookieRes.status;
     const cookies = cookieRes.headers.get("set-cookie") ?? "";
-    results.has_cookies = cookies.length > 0;
-
     const crumbRes = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
       headers: { "User-Agent": "Mozilla/5.0", "Cookie": cookies },
     });
-    results.crumb_status = crumbRes.status;
-    results.crumb = await crumbRes.text();
-  } catch (e) {
-    results.crumb_error = e.message;
-  }
+    const crumb = await crumbRes.text();
+    results.crumb = crumb;
 
-  // Test v7 price
-  try {
-    const r = await fetch(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`, {
-      headers: { "User-Agent": "Mozilla/5.0", "Referer": "https://finance.yahoo.com" },
+    // Test v10 with crumb
+    const modules = "financialData,defaultKeyStatistics,summaryDetail,assetProfile";
+    const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
+    const r = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0", "Referer": "https://finance.yahoo.com", "Cookie": cookies },
     });
-    results.v7_status = r.status;
-    const d = await r.json();
-    results.v7_price = d?.quoteResponse?.result?.[0]?.regularMarketPrice ?? "null";
+    results.v10_status = r.status;
+    const data = await r.json();
+    results.v10_result = data?.quoteSummary?.result?.[0] ? "HAS_DATA" : "NULL";
+    results.v10_error = data?.quoteSummary?.error ?? null;
+    if (data?.quoteSummary?.result?.[0]) {
+      const fd = data.quoteSummary.result[0].financialData ?? {};
+      results.ebitdaMargin = fd.ebitdaMargins?.raw ?? "missing";
+      results.operatingMargin = fd.operatingMargins?.raw ?? "missing";
+    }
   } catch (e) {
-    results.v7_error = e.message;
-  }
-
-  // Test v8 price
-  try {
-    const r = await fetch(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`, {
-      headers: { "User-Agent": "Mozilla/5.0", "Referer": "https://finance.yahoo.com" },
-    });
-    results.v8_status = r.status;
-    const d = await r.json();
-    results.v8_price = d?.chart?.result?.[0]?.meta?.regularMarketPrice ?? "null";
-  } catch (e) {
-    results.v8_error = e.message;
+    results.error = e.message;
   }
 
   res.status(200).json(results);

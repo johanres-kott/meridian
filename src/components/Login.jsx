@@ -34,6 +34,9 @@ export default function Login() {
   return (
     <div style={{
       minHeight: "100vh",
+      width: "100%",
+      position: "fixed",
+      top: 0, left: 0,
       background: "#f8f9fd",
       display: "flex",
       flexDirection: "column",
@@ -51,7 +54,7 @@ export default function Login() {
 
       {/* Card */}
       <div style={{
-        width: 400,
+        width: "min(400px, 90vw)",
         background: "#fff",
         border: "1px solid #e0e3eb",
         borderRadius: 8,

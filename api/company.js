@@ -1,21 +1,59 @@
 const FMP_KEY = "DZJzkZrPZXSCrJPErOadzWJ8JzfbsYmq";
 const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
 
-async function getYahooQuote(ticker) {
-  // v7 quote endpoint - more reliable from server environments
-  const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=regularMarketPrice,regularMarketChangePercent,regularMarketChange,marketCap,forwardPE,trailingPE,epsForward,currency,shortName,longName,sector,industry,fiftyTwoWeekHigh,fiftyTwoWeekLow,ebitdaMargins,operatingMargins,grossMargins,returnOnEquity,debtToEquity,revenueGrowth,targetMeanPrice,recommendationKey`;
-  const r = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-      "Accept": "application/json",
-      "Accept-Language": "en-US,en;q=0.9",
-      "Referer": "https://finance.yahoo.com",
-    },
-  });
-  const data = await r.json();
-  const q = data?.quoteResponse?.result?.[0];
-  if (!q) return null;
+const YAHOO_HEADERS = {
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+  "Accept": "application/json",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Referer": "https://finance.yahoo.com",
+};
 
+async function getYahooV7(ticker) {
+  try {
+    const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=regularMarketPrice,regularMarketChangePercent,regularMarketChange,marketCap,forwardPE,trailingPE,currency,shortName,longName,sector,industry,fiftyTwoWeekHigh,fiftyTwoWeekLow,ebitdaMargins,operatingMargins,grossMargins,returnOnEquity,debtToEquity,revenueGrowth,targetMeanPrice,recommendationKey`;
+    const r = await fetch(url, { headers: YAHOO_HEADERS });
+    const data = await r.json();
+    const q = data?.quoteResponse?.result?.[0];
+    if (!q || !q.regularMarketPrice) return null;
+    return parseYahooQuote(q, ticker);
+  } catch {
+    return null;
+  }
+}
+
+async function getYahooV8(ticker) {
+  try {
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5d`;
+    const r = await fetch(url, { headers: YAHOO_HEADERS });
+    const data = await r.json();
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!meta || !meta.regularMarketPrice) return null;
+    return {
+      name: meta.longName ?? meta.shortName ?? ticker,
+      sector: "—",
+      industry: "—",
+      price: meta.regularMarketPrice,
+      currency: meta.currency ?? "USD",
+      marketCap: 0,
+      peForward: 0,
+      peTrailing: 0,
+      ebitdaMargin: 0,
+      operatingMargin: 0,
+      grossMargin: 0,
+      roic: 0,
+      debtEbitda: 0,
+      revenueGrowth: 0,
+      targetPrice: 0,
+      recommendation: "—",
+      week52High: meta.fiftyTwoWeekHigh ?? 0,
+      week52Low: meta.fiftyTwoWeekLow ?? 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function parseYahooQuote(q, ticker) {
   return {
     name: q.longName ?? q.shortName ?? ticker,
     sector: q.sector ?? "—",
@@ -38,7 +76,9 @@ async function getYahooQuote(ticker) {
   };
 }
 
+// FMP only for US tickers (no exchange suffix like .ST, .L, .AS)
 async function getFMPData(ticker) {
+  if (ticker.includes(".")) return null;
   try {
     const [profileRes, ratioRes] = await Promise.all([
       fetch(`https://financialmodelingprep.com/api/v3/profile/${ticker}?apikey=${FMP_KEY}`),
@@ -63,7 +103,7 @@ async function getFMPData(ticker) {
 
 async function getFinnhubNews(ticker) {
   try {
-    const baseTicker = ticker.split(".")[0].replace("-", ".");
+    const baseTicker = ticker.includes(".") ? ticker.split(".")[0] : ticker;
     const today = new Date().toISOString().split("T")[0];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
     const url = `https://finnhub.io/api/v1/company-news?symbol=${baseTicker}&from=${weekAgo}&to=${today}&token=${FINNHUB_KEY}`;
@@ -83,15 +123,15 @@ async function getFinnhubNews(ticker) {
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "s-maxage=300"); // cache 5 min
+  res.setHeader("Cache-Control", "s-maxage=300");
 
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: "ticker required" });
 
   try {
     const [yahooData, fmpData, news] = await Promise.all([
-      getYahooQuote(ticker),
-      getFMPData(ticker.split(".")[0]), // FMP uses base ticker without exchange
+      getYahooV7(ticker).then(d => d ?? getYahooV8(ticker)),
+      getFMPData(ticker),
       getFinnhubNews(ticker),
     ]);
 
@@ -131,5 +171,4 @@ export default async function handler(req, res) {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-
 }

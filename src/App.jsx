@@ -9,7 +9,7 @@ import Commodities from "./components/Commodities.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
-  { id: "commodities", label: "Råvaror" },
+  { id: "commodities", label: "Marknader" },
   { id: "portfolio", label: "Portfolio" },
   { id: "analysis", label: "Gap Analysis" },
   { id: "search", label: "Company Search" },

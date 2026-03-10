@@ -21,6 +21,7 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [lastSeenAt, setLastSeenAt] = useState(null);
+  const [preferences, setPreferences] = useState({});
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -39,16 +40,28 @@ export default function App() {
       const userId = session.user.id;
       const { data } = await supabase
         .from("user_prefs")
-        .select("last_seen_at")
+        .select("last_seen_at, preferences")
         .eq("user_id", userId)
         .single();
       setLastSeenAt(data?.last_seen_at || null);
+      setPreferences(data?.preferences || {});
       await supabase
         .from("user_prefs")
         .upsert({ user_id: userId, last_seen_at: new Date().toISOString() });
     }
     trackVisit();
   }, [session]);
+
+  async function updatePreferences(newPrefs) {
+    const merged = { ...preferences, ...newPrefs };
+    setPreferences(merged);
+    if (session) {
+      await supabase
+        .from("user_prefs")
+        .update({ preferences: merged })
+        .eq("user_id", session.user.id);
+    }
+  }
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -109,7 +122,7 @@ export default function App() {
 
       {/* Content - full width with padding */}
       <div style={{ padding: "24px 32px" }}>
-        {tab === "markets" && <Markets lastSeenAt={lastSeenAt} />}
+        {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} />}
         {tab === "commodities" && <Commodities />}
         {tab === "portfolio" && <Portfolio />}
         {tab === "analysis" && <GapAnalysis />}

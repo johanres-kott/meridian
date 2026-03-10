@@ -3,7 +3,7 @@ import { REGIONS } from "./shared.js"
 import { Chg } from "./SharedComponents.jsx";
 import SedanSist from "./SedanSist.jsx";
 
-export default function Markets({ lastSeenAt }) {
+export default function Markets({ lastSeenAt, preferences, onUpdatePreferences }) {
   const [indices, setIndices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,7 +34,7 @@ export default function Markets({ lastSeenAt }) {
 
   return (
     <div>
-      <SedanSist lastSeenAt={lastSeenAt} />
+      <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} />
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 500 }}>Global Indices</h2>

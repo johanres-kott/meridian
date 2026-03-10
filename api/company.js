@@ -1,22 +1,25 @@
 const FMP_KEY = "DZJzkZrPZXSCrJPErOadzWJ8JzfbsYmq";
 const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
-
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 async function getYahooCrumb() {
-  const cookieRes = await fetch("https://fc.yahoo.com", {
-    headers: { "User-Agent": UA },
-    redirect: "follow",
-  });
-  const cookies = cookieRes.headers.get("set-cookie") ?? "";
-  const crumbRes = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
-    headers: { "User-Agent": UA, "Cookie": cookies },
-  });
-  const crumb = await crumbRes.text();
-  return { crumb, cookies };
+  try {
+    const cookieRes = await fetch("https://fc.yahoo.com", {
+      headers: { "User-Agent": UA },
+      redirect: "follow",
+    });
+    const cookies = cookieRes.headers.get("set-cookie") ?? "";
+    const crumbRes = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
+      headers: { "User-Agent": UA, "Cookie": cookies },
+    });
+    const crumb = await crumbRes.text();
+    if (!crumb || crumb.length < 3) return null;
+    return { crumb, cookies };
+  } catch {
+    return null;
+  }
 }
 
-// v8 chart — works from Vercel, gives price + 52w
 async function getYahooPriceV8(ticker) {
   try {
     const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=5d`;
@@ -39,17 +42,14 @@ async function getYahooPriceV8(ticker) {
   }
 }
 
-// v10 quoteSummary with crumb — gives fundamentals for all exchanges
-async function getYahooFundamentals(ticker, crumb, cookies) {
+async function getYahooFundamentals(ticker, crumbData) {
+  if (!crumbData) return null;
   try {
+    const { crumb, cookies } = crumbData;
     const modules = "financialData,defaultKeyStatistics,summaryDetail,assetProfile";
     const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
     const r = await fetch(url, {
-      headers: {
-        "User-Agent": UA,
-        "Referer": "https://finance.yahoo.com",
-        "Cookie": cookies,
-      },
+      headers: { "User-Agent": UA, "Referer": "https://finance.yahoo.com", "Cookie": cookies },
     });
     const data = await r.json();
     const result = data?.quoteSummary?.result?.[0];
@@ -77,7 +77,6 @@ async function getYahooFundamentals(ticker, crumb, cookies) {
   }
 }
 
-// FMP only for US tickers (no exchange suffix)
 async function getFMPData(ticker) {
   if (ticker.includes(".")) return null;
   try {
@@ -124,11 +123,11 @@ export default async function handler(req, res) {
   if (!ticker) return res.status(400).json({ error: "ticker required" });
 
   try {
-    const { crumb, cookies } = await getYahooCrumb();
+    const crumbData = await getYahooCrumb();
 
     const [priceData, fundamentals, fmpData, news] = await Promise.all([
       getYahooPriceV8(ticker),
-      getYahooFundamentals(ticker, crumb, cookies),
+      getYahooFundamentals(ticker, crumbData),
       getFMPData(ticker),
       getFinnhubNews(ticker),
     ]);

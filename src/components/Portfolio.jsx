@@ -89,7 +89,7 @@ function AddCompanyBar({ onAdd }) {
   );
 }
 
-function CompanyRow({ item, onUpdate, onSelect }) {
+function CompanyRow({ item, onUpdate, onSelect, onDelete }) {
   const [price, setPrice] = useState(null);
 
   useEffect(() => {
@@ -138,13 +138,24 @@ function CompanyRow({ item, onUpdate, onSelect }) {
           </>
         ) : null}
       </td>
-      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap", paddingRight: 18 }}>
+      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
         {pl !== null ? (
           <>
             <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {price?.currency || ""}</div>
             <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
           </>
         ) : null}
+      </td>
+      <td style={{ ...tdBase, textAlign: "center", width: 36 }} onClick={e => e.stopPropagation()}>
+        <button
+          onClick={() => { if (window.confirm(`Ta bort ${item.name || item.ticker} från portföljen?`)) onDelete(item.id); }}
+          title="Ta bort"
+          style={{ background: "none", border: "none", cursor: "pointer", color: "#c0c3cb", fontSize: 14, padding: "2px 6px", lineHeight: 1 }}
+          onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
+          onMouseLeave={e => e.currentTarget.style.color = "#c0c3cb"}
+        >
+          ×
+        </button>
       </td>
     </tr>
   );
@@ -237,7 +248,7 @@ export default function Portfolio() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["", "Bolag", "Status", "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : [])].map(h => (
+                {["", "Bolag", "Status", "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
                     padding: "8px 14px",
                     textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
@@ -249,7 +260,7 @@ export default function Portfolio() {
             </thead>
             <tbody>
               {items.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} />
               ))}
             </tbody>
           </table>

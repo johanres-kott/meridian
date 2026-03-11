@@ -58,6 +58,19 @@ export default function PortfolioSummary({ userId }) {
 
         // Portfolio value (only "Äger" with shares), grouped by currency
         const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);
+
+        // Fetch missing FX rates from Yahoo Finance
+        const holdingCurrencies = [...new Set(holdings.map(h => h.currency || "SEK"))];
+        const missingCurrencies = holdingCurrencies.filter(c => !fxToSek[c]);
+        if (missingCurrencies.length > 0) {
+          await Promise.all(missingCurrencies.map(async (cur) => {
+            try {
+              const res = await fetch(`/api/company?ticker=${encodeURIComponent(cur + "SEK=X")}`);
+              const d = await res.json();
+              if (d.price > 0) fxToSek[cur] = d.price;
+            } catch {}
+          }));
+        }
         const byCurrency = {};
         for (const h of holdings) {
           const cur = h.currency || "SEK";

@@ -1,0 +1,202 @@
+import { useState, useEffect } from "react";
+import { supabase } from "../supabase.js";
+import { Chg } from "./SharedComponents.jsx";
+
+function getDateDaysAgo(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split("T")[0];
+}
+
+function calcWeeklyChange(points, currentPrice) {
+  if (!points || points.length === 0 || !currentPrice) return null;
+  const weekAgo = getDateDaysAgo(7);
+  // Find closest point to 7 days ago
+  const ref = [...points].reverse().find(p => p.date <= weekAgo);
+  if (!ref || !ref.close) return null;
+  return ((currentPrice - ref.close) / ref.close) * 100;
+}
+
+export default function WeeklySummary({ userId, preferences = {} }) {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [indicesRes, commoditiesRes, watchlistRes] = await Promise.all([
+          fetch("/api/indices").then(r => r.json()).catch(() => []),
+          fetch("/api/commodities").then(r => r.json()).catch(() => []),
+          userId
+            ? supabase.from("watchlist").select("*").eq("user_id", userId).order("created_at")
+            : Promise.resolve({ data: [] }),
+        ]);
+
+        const allIndices = (indicesRes || []).filter(i => i.price > 0);
+        const allCommodities = (commoditiesRes || []).filter(c => c.price > 0);
+        const watchlist = watchlistRes.data || [];
+
+        // Pick which indices/commodities to show
+        const pinnedIndices = preferences.pinned_indices || [];
+        const pinnedCommodities = preferences.pinned_commodities || [];
+
+        const selectedIndices = pinnedIndices.length > 0
+          ? pinnedIndices.map(sym => allIndices.find(i => i.symbol === sym)).filter(Boolean)
+          : [...allIndices].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 5);
+
+        const selectedCommodities = pinnedCommodities.length > 0
+          ? pinnedCommodities.map(sym => allCommodities.find(c => (c.display || c.symbol) === sym)).filter(Boolean)
+          : [...allCommodities].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 5);
+
+        // Fetch weekly chart data for indices (use Yahoo tickers)
+        const indexTickers = {
+          OMXS30: "^OMX", SPX: "^GSPC", IXIC: "^IXIC", DJI: "^DJI",
+          SX5E: "^STOXX50E", DAX: "^GDAXI", FTSE: "^FTSE", CAC: "^FCHI",
+          N225: "^N225", HSI: "^HSI", SENSEX: "^BSESN", KOSPI: "^KS11",
+          OMXHPI: "^OMXHPI", OMXC25: "^OMXC25",
+        };
+
+        const indicesWithWeekly = await Promise.all(
+          selectedIndices.map(async (idx) => {
+            const yahooTicker = indexTickers[idx.symbol];
+            if (!yahooTicker) return { ...idx, weeklyChange: null };
+            try {
+              const res = await fetch(`/api/chart?ticker=${encodeURIComponent(yahooTicker)}&range=1m`);
+              const chart = await res.json();
+              const weeklyChange = calcWeeklyChange(chart.points, idx.price);
+              return { ...idx, weeklyChange };
+            } catch {
+              return { ...idx, weeklyChange: null };
+            }
+          })
+        );
+
+        // Fetch weekly data for portfolio companies
+        const portfolioWithWeekly = await Promise.all(
+          watchlist.slice(0, 10).map(async (item) => {
+            try {
+              const [companyRes, chartRes] = await Promise.all([
+                fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`).then(r => r.json()),
+                fetch(`/api/chart?ticker=${encodeURIComponent(item.ticker)}&range=1m`).then(r => r.json()),
+              ]);
+              const weeklyChange = calcWeeklyChange(chartRes.points, companyRes.price);
+              return {
+                ticker: item.ticker,
+                name: item.name || companyRes.name || item.ticker,
+                price: companyRes.price,
+                weeklyChange,
+              };
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        const validPortfolio = portfolioWithWeekly
+          .filter(p => p && p.weeklyChange !== null)
+          .sort((a, b) => Math.abs(b.weeklyChange) - Math.abs(a.weeklyChange))
+          .slice(0, 5);
+
+        setData({
+          indices: indicesWithWeekly,
+          commodities: selectedCommodities,
+          portfolio: validPortfolio,
+        });
+      } catch (err) {
+        console.error("WeeklySummary load error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, [userId, preferences.pinned_indices, preferences.pinned_commodities]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: "20px 24px", marginBottom: 24, background: "#f8f9fd", border: "1px solid #e0e3eb", borderRadius: 8, color: "#787b86", fontSize: 12 }}>
+        Laddar veckosammanfattning...
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const sectionHeader = { fontSize: 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 10 };
+  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: "1px solid #f0f3fa" };
+  const tickerStyle = { fontSize: 12, fontWeight: 500, color: "#131722" };
+  const subtext = { fontSize: 11, color: "#787b86" };
+  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+
+  return (
+    <div style={{ marginBottom: 24, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ padding: "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Senaste veckan</span>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: data.portfolio.length > 0 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 0 }}>
+        {/* Index weekly */}
+        <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+          <div style={sectionHeader}>Index</div>
+          {data.indices.map(idx => (
+            <div key={idx.symbol} style={listItem}>
+              <div>
+                <div style={tickerStyle}>{idx.name}</div>
+                <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
+              </div>
+              <div style={{ textAlign: "right", ...mono }}>
+                {idx.weeklyChange !== null ? (
+                  <>
+                    <div style={{ fontSize: 12 }}><Chg value={parseFloat(idx.weeklyChange.toFixed(2))} /></div>
+                    <div style={{ fontSize: 10, color: "#b2b5be" }}>vecka</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 12 }}><Chg value={idx.change} /></div>
+                    <div style={{ fontSize: 10, color: "#b2b5be" }}>idag</div>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Commodities weekly */}
+        <div style={{ padding: "16px 20px", borderRight: data.portfolio.length > 0 ? "1px solid #f0f3fa" : "none" }}>
+          <div style={sectionHeader}>Ravaror & FX</div>
+          {data.commodities.map(c => (
+            <div key={c.symbol} style={listItem}>
+              <div>
+                <div style={tickerStyle}>{c.name}</div>
+                <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>
+              </div>
+              <div style={{ textAlign: "right", ...mono }}>
+                <div style={{ fontSize: 12 }}><Chg value={c.change} /></div>
+                <div style={{ fontSize: 10, color: "#b2b5be" }}>idag</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Portfolio weekly */}
+        {data.portfolio.length > 0 && (
+          <div style={{ padding: "16px 20px" }}>
+            <div style={sectionHeader}>Din portfolj</div>
+            {data.portfolio.map(item => (
+              <div key={item.ticker} style={listItem}>
+                <div>
+                  <div style={tickerStyle}>{item.name}</div>
+                  <div style={{ ...subtext, ...mono }}>{item.ticker}</div>
+                </div>
+                <div style={{ textAlign: "right", ...mono }}>
+                  <div style={{ fontSize: 12 }}><Chg value={parseFloat(item.weeklyChange.toFixed(2))} /></div>
+                  <div style={{ fontSize: 10, color: "#b2b5be" }}>vecka</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

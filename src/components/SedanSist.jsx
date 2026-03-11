@@ -261,7 +261,8 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
                   <div style={tickerStyle}>{idx.name}</div>
                   <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
                 </div>
-                <div style={{ ...mono, fontSize: 12 }}>
+                <div style={{ ...mono, fontSize: 12, textAlign: "right" }}>
+                  <div style={{ fontWeight: 500, color: "#131722" }}>{idx.price?.toLocaleString("sv-SE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</div>
                   <Chg value={idx.change} />
                 </div>
               </div>
@@ -291,7 +292,8 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
                   <div style={tickerStyle}>{c.name}</div>
                   <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>
                 </div>
-                <div style={{ ...mono, fontSize: 12 }}>
+                <div style={{ ...mono, fontSize: 12, textAlign: "right" }}>
+                  <div style={{ fontWeight: 500, color: "#131722" }}>{c.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {c.unit || ""}</div>
                   <Chg value={c.change} />
                 </div>
               </div>

@@ -150,7 +150,9 @@ export default function Portfolio() {
   useEffect(() => { load(); }, []);
 
   async function load() {
-    const { data } = await supabase.from("watchlist").select("*").order("created_at");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from("watchlist").select("*").eq("user_id", user.id).order("created_at");
     setItems(data || []);
     setLoading(false);
   }
@@ -162,13 +164,15 @@ export default function Portfolio() {
   }
 
   async function updateItem(id, updates) {
-    await supabase.from("watchlist").update(updates).eq("id", id);
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("watchlist").update(updates).eq("id", id).eq("user_id", user.id);
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
     if (selected && selected.id === id) setSelected(prev => ({ ...prev, ...updates }));
   }
 
   async function deleteItem(id) {
-    await supabase.from("watchlist").delete().eq("id", id);
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("watchlist").delete().eq("id", id).eq("user_id", user.id);
     setItems(prev => prev.filter(i => i.id !== id));
   }
 

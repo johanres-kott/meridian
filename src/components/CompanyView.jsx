@@ -270,10 +270,10 @@ export default function CompanyView({ item, onBack, onUpdate }) {
               {company.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span style={{ fontSize: 13, color: "#787b86" }}>{company.currency}</span>
-            {company.marketCap > 0 && <span style={{ fontSize: 12, color: "#787b86" }}>Mkt Cap: {company.marketCap}B</span>}
+            {company.marketCap > 0 && <span style={{ fontSize: 12, color: "#787b86" }}>Mkt Cap: {company.marketCap}B {company.currency}</span>}
             {pl !== null && (
               <span style={{ fontSize: 13, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645", marginLeft: 8 }}>
-                P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} ({plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%)
+                P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {company.currency} ({plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%)
               </span>
             )}
           </div>

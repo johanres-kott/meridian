@@ -161,13 +161,13 @@ export default function CompanySearch() {
               <div style={{ fontSize: 24, fontWeight: 300, marginTop: 4, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {result.price?.toFixed(2)}
                 <span style={{ fontSize: 13, color: "#787b86", marginLeft: 8 }}>{result.currency}</span>
-                {result.marketCap > 0 && <span style={{ fontSize: 13, color: "#787b86", marginLeft: 16 }}>Mkt Cap: {result.marketCap}B</span>}
+                {result.marketCap > 0 && <span style={{ fontSize: 13, color: "#787b86", marginLeft: 16 }}>Mkt Cap: {result.marketCap}B {result.currency}</span>}
               </div>
             </div>
             {result.week52High > 0 && (
               <div style={{ textAlign: "right", fontSize: 12, color: "#787b86" }}>
-                <div>52v Högt: <span style={{ color: "#089981", fontFamily: "'IBM Plex Mono', monospace" }}>{result.week52High.toFixed(2)}</span></div>
-                <div style={{ marginTop: 4 }}>52v Lågt: <span style={{ color: "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>{result.week52Low.toFixed(2)}</span></div>
+                <div>52v Högt: <span style={{ color: "#089981", fontFamily: "'IBM Plex Mono', monospace" }}>{result.week52High.toFixed(2)} {result.currency}</span></div>
+                <div style={{ marginTop: 4 }}>52v Lågt: <span style={{ color: "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>{result.week52Low.toFixed(2)} {result.currency}</span></div>
               </div>
             )}
           </div>

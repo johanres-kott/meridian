@@ -91,8 +91,8 @@ export default function Commodities() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
-                  {["Symbol", "Name", "Price", "Change %", "Change", "High", "Low"].map(h => (
-                    <th key={h} style={{ padding: "6px 10px", textAlign: ["Symbol","Name"].includes(h) ? "left" : "right", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb" }}>{h}</th>
+                  {["Symbol", "Name", "Price", "Valuta", "Change %", "Change", "High", "Low"].map(h => (
+                    <th key={h} style={{ padding: "6px 10px", textAlign: ["Symbol","Name","Valuta"].includes(h) ? "left" : "right", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -103,6 +103,9 @@ export default function Commodities() {
                     <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa" }}>{idx.name}</td>
                     <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, borderBottom: "1px solid #f0f3fa" }}>
                       {idx.price > 0 ? idx.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "\u2014"}
+                    </td>
+                    <td style={{ padding: "8px 10px", fontSize: 11, color: "#787b86", borderBottom: "1px solid #f0f3fa" }}>
+                      {idx.currency || ""}
                     </td>
                     <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", borderBottom: "1px solid #f0f3fa" }}>
                       {idx.price > 0 ? <Chg value={idx.change} /> : "\u2014"}

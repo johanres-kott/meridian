@@ -44,14 +44,22 @@ export default function PortfolioSummary({ userId }) {
           })
         );
 
-        // Portfolio value (only "Äger" with shares)
+        // Portfolio value (only "Äger" with shares), grouped by currency
         const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);
-        const totalValue = holdings.reduce((sum, i) => sum + i.price * i.shares, 0);
-        const dailyChange = holdings.reduce((sum, i) => {
-          const prevPrice = i.price / (1 + i.changePercent / 100);
-          return sum + (i.price - prevPrice) * i.shares;
-        }, 0);
-        const dailyChangePct = totalValue > 0 ? (dailyChange / (totalValue - dailyChange)) * 100 : 0;
+        const byCurrency = {};
+        for (const h of holdings) {
+          const cur = h.currency || "SEK";
+          if (!byCurrency[cur]) byCurrency[cur] = { value: 0, dailyChange: 0 };
+          byCurrency[cur].value += h.price * h.shares;
+          const prevPrice = h.price / (1 + h.changePercent / 100);
+          byCurrency[cur].dailyChange += (h.price - prevPrice) * h.shares;
+        }
+        const currencyGroups = Object.entries(byCurrency).map(([currency, { value, dailyChange }]) => ({
+          currency,
+          value,
+          dailyChange,
+          dailyChangePct: value > 0 ? (dailyChange / (value - dailyChange)) * 100 : 0,
+        }));
 
         // Status counts
         const statusCounts = {};
@@ -66,10 +74,7 @@ export default function PortfolioSummary({ userId }) {
           .slice(0, 5);
 
         setData({
-          totalValue,
-          dailyChange,
-          dailyChangePct,
-          currency: holdings[0]?.currency || "SEK",
+          currencyGroups,
           statusCounts,
           totalCount: watchlist.length,
           movers,
@@ -107,16 +112,20 @@ export default function PortfolioSummary({ userId }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: data.hasHoldings ? "1fr 1fr 1fr" : "1fr 1fr", gap: 0 }}>
-        {/* Holdings value */}
+        {/* Holdings value by currency */}
         {data.hasHoldings && (
           <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
             <div style={sectionHeader}>Innehav</div>
-            <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "#131722" }}>
-              {data.totalValue.toLocaleString("sv-SE", { maximumFractionDigits: 0 })}
-            </div>
-            <div style={{ ...mono, fontSize: 12, marginTop: 4, color: data.dailyChange >= 0 ? "#089981" : "#f23645" }}>
-              {data.dailyChange >= 0 ? "+" : ""}{data.dailyChange.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} idag ({data.dailyChangePct >= 0 ? "+" : ""}{data.dailyChangePct.toFixed(2)}%)
-            </div>
+            {data.currencyGroups.map((g, i) => (
+              <div key={g.currency} style={{ marginBottom: i < data.currencyGroups.length - 1 ? 12 : 0 }}>
+                <div style={{ ...mono, fontSize: data.currencyGroups.length === 1 ? 20 : 16, fontWeight: 500, color: "#131722" }}>
+                  {g.value.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {g.currency}
+                </div>
+                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "#089981" : "#f23645" }}>
+                  {g.dailyChange >= 0 ? "+" : ""}{g.dailyChange.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {g.currency} idag ({g.dailyChangePct >= 0 ? "+" : ""}{g.dailyChangePct.toFixed(2)}%)
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -126,16 +135,16 @@ export default function PortfolioSummary({ userId }) {
           {Object.entries(data.statusCounts).map(([status, count]) => (
             <div key={status} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" }}>
               <span style={{ fontSize: 12, color: STATUS_COLORS[status] || "#787b86", fontWeight: 500 }}>{status}</span>
-              <span style={{ ...mono, fontSize: 12, color: "#131722" }}>{count}</span>
+              <span style={{ ...mono, fontSize: 12, color: "#131722" }}>{count} st</span>
             </div>
           ))}
         </div>
 
         {/* Top movers today */}
         <div style={{ padding: "16px 20px" }}>
-          <div style={sectionHeader}>Storst rorelser idag</div>
+          <div style={sectionHeader}>Största rörelser idag</div>
           {data.movers.length === 0 ? (
-            <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga rorelser</div>
+            <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga rörelser</div>
           ) : (
             data.movers.map(item => (
               <div key={item.ticker} style={listItem}>

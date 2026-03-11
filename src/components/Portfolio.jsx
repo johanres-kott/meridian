@@ -89,7 +89,7 @@ function AddCompanyBar({ onAdd }) {
   );
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete }) {
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {} }) {
   const [price, setPrice] = useState(null);
 
   useEffect(() => {
@@ -99,8 +99,13 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete }) {
   const chg = price?.changePercent;
   const chgColor = chg > 0 ? "#089981" : chg < 0 ? "#f23645" : "#787b86";
   const totalValue = (item.shares && price?.price) ? (price.price * item.shares) : null;
-  const pl = (item.gav && item.shares && price?.price) ? ((price.price - item.gav) * item.shares) : null;
-  const plPct = (item.gav && price?.price) ? ((price.price - item.gav) / item.gav * 100) : null;
+
+  // P&L: GAV from Avanza is in SEK, so convert current price to SEK first
+  const currency = price?.currency || "SEK";
+  const fxRate = fxRates[currency] || null;
+  const priceSek = (price?.price && fxRate) ? price.price * fxRate : null;
+  const pl = (item.gav && item.shares && priceSek) ? ((priceSek - item.gav) * item.shares) : null;
+  const plPct = (item.gav && priceSek) ? ((priceSek - item.gav) / item.gav * 100) : null;
 
   const tdBase = { padding: "10px 14px", borderBottom: "1px solid #f0f3fa" };
 
@@ -133,15 +138,24 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete }) {
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
         {totalValue !== null ? (
           <>
-            <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{totalValue.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {price?.currency || ""}</div>
-            <div style={{ fontSize: 11, color: "#787b86" }}>{item.shares} st</div>
+            {currency !== "SEK" && fxRate ? (
+              <>
+                <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{(totalValue * fxRate).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
+                <div style={{ fontSize: 11, color: "#787b86" }}>{item.shares} st à {price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {currency}</div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{totalValue.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {currency}</div>
+                <div style={{ fontSize: 11, color: "#787b86" }}>{item.shares} st</div>
+              </>
+            )}
           </>
         ) : null}
       </td>
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
         {pl !== null ? (
           <>
-            <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {price?.currency || ""}</div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
             <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
           </>
         ) : null}
@@ -166,8 +180,9 @@ export default function Portfolio() {
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [fxRates, setFxRates] = useState({ SEK: 1 });
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); loadFxRates(); }, []);
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -175,6 +190,20 @@ export default function Portfolio() {
     const { data } = await supabase.from("watchlist").select("*").eq("user_id", user.id).order("created_at");
     setItems(data || []);
     setLoading(false);
+  }
+
+  async function loadFxRates() {
+    try {
+      const res = await fetch("/api/commodities");
+      const data = await res.json();
+      const rates = { SEK: 1 };
+      for (const c of data) {
+        if (c.display === "USD/SEK" && c.price > 0) rates.USD = c.price;
+        if (c.display === "EUR/SEK" && c.price > 0) rates.EUR = c.price;
+        if (c.display === "GBP/SEK" && c.price > 0) rates.GBP = c.price;
+      }
+      setFxRates(rates);
+    } catch {}
   }
 
   async function addCompany({ ticker, name }) {
@@ -260,7 +289,7 @@ export default function Portfolio() {
             </thead>
             <tbody>
               {items.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} />
               ))}
             </tbody>
           </table>

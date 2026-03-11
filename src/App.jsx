@@ -11,7 +11,7 @@ import ChatPanel from "./components/ChatPanel.jsx";
 const TABS = [
   { id: "markets", label: "Översikt" },
   { id: "commodities", label: "Marknader" },
-  { id: "portfolio", label: "Portfolio" },
+  { id: "portfolio", label: "Portfölj" },
   { id: "analysis", label: "Gap Analysis" },
   { id: "search", label: "Company Search" },
 ];

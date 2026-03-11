@@ -31,17 +31,37 @@ function groupByY(items, tolerance = 3) {
   return rows;
 }
 
-// Find which page contains "Depåinnehav" and only parse that page
-async function findHoldingsPage(pdf) {
+// Find which pages contain "Depåinnehav" holdings data.
+// The holdings table can span multiple pages, so we find the first page
+// with the header and continue through subsequent pages until we hit a
+// different section or run out of pages.
+async function findHoldingsPages(pdf) {
+  const pages = [];
+  let foundStart = false;
+
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
     const text = content.items.map((item) => item.str).join(" ").toLowerCase();
-    if (text.includes("depåinnehav") || text.includes("depainnehav")) {
-      return i;
+
+    if (!foundStart) {
+      if (text.includes("depåinnehav") || text.includes("depainnehav")) {
+        foundStart = true;
+        pages.push(i);
+      }
+    } else {
+      // Continue adding pages until we hit a clearly different section
+      // (e.g., "Transaktioner", "Insättningar", "Uttag") or end of document.
+      // If the page still has stock-like data (numbers, "st |"), include it.
+      const isSectionBreak =
+        (text.includes("transaktioner") || text.includes("insättningar") || text.includes("uttag")) &&
+        !text.includes("innehav");
+      if (isSectionBreak) break;
+      pages.push(i);
     }
   }
-  return -1;
+
+  return pages;
 }
 
 // Avanza "Kontobesked" PDF — each holding is three rows on the Depåinnehav page:
@@ -52,22 +72,33 @@ async function findHoldingsPage(pdf) {
 export async function parseAvanzaPdf(arrayBuffer) {
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-  const holdingsPageNum = await findHoldingsPage(pdf);
-  if (holdingsPageNum === -1) {
+  const holdingsPageNums = await findHoldingsPages(pdf);
+  if (holdingsPageNums.length === 0) {
     throw new Error("Kunde inte hitta 'Depåinnehav'-sidan i PDF:en.");
   }
 
-  const page = await pdf.getPage(holdingsPageNum);
-  const content = await page.getTextContent();
-  const items = content.items
-    .map((item) => ({
-      text: item.str.trim(),
-      x: Math.round(item.transform[4]),
-      y: Math.round(item.transform[5]),
-    }))
-    .filter((i) => i.text);
+  // Collect text items from all holdings pages.
+  // For multi-page tables, we offset Y coordinates so that rows from
+  // later pages sort after rows from earlier pages.
+  const allItems = [];
+  const PAGE_HEIGHT_OFFSET = 2000; // large enough to separate pages
 
-  const rows = groupByY(items);
+  for (let pageIdx = 0; pageIdx < holdingsPageNums.length; pageIdx++) {
+    const page = await pdf.getPage(holdingsPageNums[pageIdx]);
+    const content = await page.getTextContent();
+    const items = content.items
+      .map((item) => ({
+        text: item.str.trim(),
+        x: Math.round(item.transform[4]),
+        // Offset Y so later pages come after earlier pages in sorted order.
+        // PDF Y is bottom-up, so we subtract the offset to push later pages lower.
+        y: Math.round(item.transform[5]) - pageIdx * PAGE_HEIGHT_OFFSET,
+      }))
+      .filter((i) => i.text);
+    allItems.push(...items);
+  }
+
+  const rows = groupByY(allItems);
 
   // Find header row: "Innehav" + "Anskaffningsvärde"
   const headerIdx = rows.findIndex((row) => {
@@ -90,6 +121,13 @@ export async function parseAvanzaPdf(arrayBuffer) {
     // Stop at "Totalt värde"
     if (rowText.toLowerCase().includes("totalt v")) break;
 
+    // Skip repeated header rows on subsequent pages
+    const rowTextLower = rowText.toLowerCase();
+    if (rowTextLower.includes("innehav") && rowTextLower.includes("anskaffning")) {
+      i++;
+      continue;
+    }
+
     // Name row: left-aligned text, not a number, not a "st |" detail row
     const firstItem = row.items[0];
     const isNameRow =
@@ -107,8 +145,8 @@ export async function parseAvanzaPdf(arrayBuffer) {
       // Detail row: "492 st | Kurs 4,68 USD"
       const detailRow = dataRows[i + 2];
       const detailText = detailRow.items.map((it) => it.text).join(" ");
-      const detailMatch = detailText.match(/(\d+)\s*st\s*\|/i);
-      const antal = detailMatch ? parseInt(detailMatch[1], 10) : null;
+      const detailMatch = detailText.match(/(\d[\d\s]*)\s*st\s*\|/i);
+      const antal = detailMatch ? parseInt(detailMatch[1].replace(/\s/g, ""), 10) : null;
 
       // First number in values row = anskaffningsvärde (total cost)
       let anskaffningsVarde = null;

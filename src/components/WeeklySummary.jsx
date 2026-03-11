@@ -163,7 +163,7 @@ export default function WeeklySummary({ userId, preferences = {} }) {
 
         {/* Commodities weekly */}
         <div style={{ padding: "16px 20px", borderRight: data.portfolio.length > 0 ? "1px solid #f0f3fa" : "none" }}>
-          <div style={sectionHeader}>Ravaror & FX</div>
+          <div style={sectionHeader}>Råvaror & FX</div>
           {data.commodities.map(c => (
             <div key={c.symbol} style={listItem}>
               <div>

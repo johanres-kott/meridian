@@ -12,7 +12,7 @@ const TABS = [
   { id: "markets", label: "Översikt" },
   { id: "commodities", label: "Marknader" },
   { id: "portfolio", label: "Portfölj" },
-  { id: "analysis", label: "Gap Analysis" },
+  { id: "analysis", label: "Nyckeltal" },
   { id: "search", label: "Company Search" },
 ];
 
@@ -240,8 +240,8 @@ export default function App() {
         <div style={{ flex: 1, overflow: "auto", padding: "24px 32px" }}>
           {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} />}
           {tab === "commodities" && <Commodities />}
-          {tab === "portfolio" && <Portfolio />}
-          {tab === "analysis" && <GapAnalysis />}
+          {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} />}
+          {tab === "analysis" && <GapAnalysis preferences={preferences} />}
           {tab === "search" && <CompanySearch />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />

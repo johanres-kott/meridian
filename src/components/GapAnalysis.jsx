@@ -1,116 +1,235 @@
 import { useState, useEffect } from "react";
-import { PORTFOLIO } from "./shared.js";
+import { supabase } from "../supabase.js";
+import { fmt } from "./shared.js";
 
-export default function GapAnalysis() {
-  const [portfolioData, setPortfolioData] = useState({});
-  const [loading, setLoading] = useState(false);
+const FLAG_MAP = {
+  ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
+  OL: "\u{1F1F3}\u{1F1F4}", HK: "\u{1F1ED}\u{1F1F0}", L: "\u{1F1EC}\u{1F1E7}",
+  PA: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}", AS: "\u{1F1F3}\u{1F1F1}",
+  SW: "\u{1F1E8}\u{1F1ED}", T: "\u{1F1EF}\u{1F1F5}", TO: "\u{1F1E8}\u{1F1E6}",
+};
+
+function getFlag(ticker) {
+  if (!ticker) return "";
+  const parts = ticker.split(".");
+  if (parts.length > 1) return FLAG_MAP[parts[parts.length - 1]] || "\u{1F1FA}\u{1F1F8}";
+  return "\u{1F1FA}\u{1F1F8}";
+}
+
+const COLUMNS = [
+  { key: "name", label: "Bolag", align: "left" },
+  { key: "price", label: "Kurs", align: "right", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
+  { key: "changePercent", label: "\u0394 Idag", align: "right", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "#787b86" },
+  { key: "peForward", label: "P/E Fwd", align: "right", fmt: v => fmt(v, "x") },
+  { key: "peTrailing", label: "P/E Trail", align: "right", fmt: v => fmt(v, "x") },
+  { key: "ebitdaMargin", label: "EBITDA %", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  { key: "operatingMargin", label: "Ror.marg", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  { key: "grossMargin", label: "Brutto %", align: "right", fmt: v => fmt(v, "%") },
+  { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
+  { key: "roic", label: "ROIC", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
+];
+
+export default function GapAnalysis({ preferences = {} }) {
+  const [items, setItems] = useState([]);
+  const [companyData, setCompanyData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState(null);
+  const [sortAsc, setSortAsc] = useState(true);
+  const [activeGroup, setActiveGroup] = useState(null);
+
+  const groups = preferences.groups || [];
 
   useEffect(() => {
-    if (Object.keys(portfolioData).length > 0) return;
-    setLoading(true);
-    Promise.all(
-      PORTFOLIO.map(co =>
-        fetch(`/api/company?ticker=${co.ticker}`)
-          .then(r => r.json())
-          .then(d => ({ ticker: co.ticker, data: d }))
-          .catch(() => ({ ticker: co.ticker, data: null }))
-      )
-    ).then(results => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from("watchlist").select("*").eq("user_id", user.id).order("created_at");
+      setItems(data || []);
+
+      // Fetch company data for all items
+      const results = await Promise.all(
+        (data || []).map(async (item) => {
+          try {
+            const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
+            const d = await res.json();
+            return { ticker: item.ticker, data: d };
+          } catch {
+            return { ticker: item.ticker, data: null };
+          }
+        })
+      );
       const map = {};
-      results.forEach(({ ticker, data }) => { map[ticker] = data; });
-      setPortfolioData(map);
+      results.forEach(({ ticker, data: d }) => { if (d) map[ticker] = d; });
+      setCompanyData(map);
       setLoading(false);
-    });
+    }
+    load();
   }, []);
+
+  function handleSort(key) {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortKey(key);
+      setSortAsc(key === "name");
+    }
+  }
+
+  // Filter items by active group
+  const filteredItems = activeGroup
+    ? items.filter(item => {
+        const group = groups.find(g => g.name === activeGroup);
+        return group && (group.members || []).includes(item.id);
+      })
+    : items;
+
+  const sorted = [...filteredItems];
+  if (sortKey) {
+    sorted.sort((a, b) => {
+      let va, vb;
+      if (sortKey === "name") {
+        va = (a.name || a.ticker || "").toLowerCase();
+        vb = (b.name || b.ticker || "").toLowerCase();
+      } else {
+        va = companyData[a.ticker]?.[sortKey] ?? null;
+        vb = companyData[b.ticker]?.[sortKey] ?? null;
+      }
+      if (va === null && vb === null) return 0;
+      if (va === null) return 1;
+      if (vb === null) return -1;
+      if (typeof va === "string") return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      return sortAsc ? va - vb : vb - va;
+    });
+  }
+
+  const thStyle = (col) => ({
+    padding: "8px 10px",
+    textAlign: col.align,
+    fontSize: 11,
+    fontWeight: 500,
+    color: sortKey === col.key ? "#2962ff" : "#787b86",
+    borderBottom: "1px solid #e0e3eb",
+    cursor: "pointer",
+    userSelect: "none",
+    whiteSpace: "nowrap",
+  });
+
+  const tdStyle = (col) => ({
+    padding: "8px 10px",
+    textAlign: col.align,
+    fontFamily: col.align === "right" ? "'IBM Plex Mono', monospace" : "inherit",
+    fontSize: 12,
+    borderBottom: "1px solid #f0f3fa",
+  });
 
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 18, fontWeight: 500 }}>Gap Analysis</h1>
-        <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>EBITDA-margingap och värderingsgap vs sektormedianer</p>
+        <h1 style={{ fontSize: 18, fontWeight: 500 }}>Nyckeltal</h1>
+        <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
+          Fundamentala nyckeltal f&ouml;r {filteredItems.length} bolag{activeGroup ? ` i ${activeGroup}` : ""}
+        </p>
       </div>
 
-      {loading && <div style={{ padding: "40px 0", textAlign: "center", color: "#787b86" }}>Laddar data...</div>}
+      {/* Group filter bar */}
+      {groups.length > 0 && !loading && items.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          <button
+            onClick={() => setActiveGroup(null)}
+            style={{
+              fontSize: 12, padding: "5px 12px", borderRadius: 14,
+              border: activeGroup === null ? "1px solid #2962ff" : "1px solid #e0e3eb",
+              background: activeGroup === null ? "#f0f3fa" : "#fff",
+              color: activeGroup === null ? "#2962ff" : "#787b86",
+              cursor: "pointer", fontFamily: "inherit", fontWeight: activeGroup === null ? 500 : 400,
+            }}
+          >
+            Alla ({items.length})
+          </button>
+          {groups.map(g => {
+            const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
+            const isActive = activeGroup === g.name;
+            return (
+              <button
+                key={g.name}
+                onClick={() => setActiveGroup(isActive ? null : g.name)}
+                style={{
+                  fontSize: 12, padding: "5px 12px", borderRadius: 14,
+                  border: isActive ? "1px solid #2962ff" : "1px solid #e0e3eb",
+                  background: isActive ? "#f0f3fa" : "#fff",
+                  color: isActive ? "#2962ff" : "#787b86",
+                  cursor: "pointer", fontFamily: "inherit", fontWeight: isActive ? 500 : 400,
+                }}
+              >
+                {g.name} ({count})
+              </button>
+            );
+          })}
+        </div>
+      )}
 
-      {!loading && (
-        <>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-            {[
-              { title: "EBITDA Margin vs Peer Median", dataKey: "ebitdaMargin", peerKey: "peerMedianMargin", max: 35, unit: "%" },
-              { title: "P/E Forward vs Peer Median", dataKey: "peForward", peerKey: "peerPE", max: 30, unit: "x" },
-            ].map(chart => (
-              <div key={chart.title} style={{ border: "1px solid #e0e3eb", borderRadius: 4, padding: "16px 20px" }}>
-                <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 16 }}>{chart.title}</div>
-                {PORTFOLIO.map(co => {
-                  const val = portfolioData[co.ticker]?.[chart.dataKey] ?? 0;
-                  const peer = co[chart.peerKey];
-                  const vPct = (val / chart.max) * 100;
-                  const pPct = (peer / chart.max) * 100;
-                  return (
-                    <div key={co.ticker} style={{ marginBottom: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                        <span style={{ fontSize: 11, fontWeight: 500 }}>{co.flag} {co.name}</span>
-                        <span style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>
-                          {val
-                            ? <span style={{ color: val < peer ? "#f23645" : "#089981" }}>{val}{chart.unit}</span>
-                            : <span style={{ color: "#b2b5be" }}>—</span>}
-                          <span style={{ color: "#b2b5be" }}> / {peer}{chart.unit}</span>
-                        </span>
-                      </div>
-                      <div style={{ height: 5, background: "#f0f3fa", borderRadius: 3, position: "relative" }}>
-                        {val > 0 && <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${vPct}%`, background: val < peer ? "#f23645" : "#089981", borderRadius: 3, opacity: 0.7 }} />}
-                        <div style={{ position: "absolute", top: -2, left: `calc(${pPct}% - 1px)`, width: 2, height: 9, background: "#2962ff", borderRadius: 1 }} />
-                      </div>
-                    </div>
-                  );
-                })}
-                <div style={{ display: "flex", gap: 16, marginTop: 12, fontSize: 11, color: "#787b86" }}>
-                  <span><span style={{ display: "inline-block", width: 8, height: 3, background: "#f23645", borderRadius: 1, marginRight: 4, verticalAlign: "middle", opacity: 0.7 }} />Bolag</span>
-                  <span><span style={{ display: "inline-block", width: 2, height: 10, background: "#2962ff", borderRadius: 1, marginRight: 4, verticalAlign: "middle" }} />Peer median</span>
-                </div>
-              </div>
-            ))}
-          </div>
+      {loading ? (
+        <div style={{ padding: "40px 0", textAlign: "center", color: "#787b86" }}>Laddar nyckeltal...</div>
+      ) : items.length === 0 ? (
+        <div style={{ padding: "60px 0", textAlign: "center", color: "#787b86", fontSize: 13 }}>
+          Inga bolag i watchlisten &mdash; l&auml;gg till bolag p&aring; Portf&ouml;lj-sidan
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <div style={{ padding: "60px 0", textAlign: "center", color: "#787b86", fontSize: 13 }}>
+          Inga bolag i &ldquo;{activeGroup}&rdquo;
+        </div>
+      ) : (
+        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
+            <thead>
+              <tr>
+                <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
+                {COLUMNS.map(col => (
+                  <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)}>
+                    {col.label}
+                    {sortKey === col.key && <span style={{ marginLeft: 4 }}>{sortAsc ? "\u25B2" : "\u25BC"}</span>}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map(item => {
+                const d = companyData[item.ticker] || {};
+                return (
+                  <tr key={item.id}
+                    onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+                    onMouseLeave={e => e.currentTarget.style.background = ""}
+                  >
+                    <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa", width: 30 }}>{getFlag(item.ticker)}</td>
+                    {COLUMNS.map(col => {
+                      const val = col.key === "name" ? null : d[col.key];
+                      const colorFn = col.color;
+                      const cellColor = colorFn ? colorFn(val) : null;
 
-          <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, padding: "16px 20px" }}>
-            <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 16 }}>Uppsiderankning · 3-årshorisont</div>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  {["#", "", "Bolag", "Margingap", "PE-rabatt", "Uppskattad uppsida"].map(h => (
-                    <th key={h} style={{ padding: "6px 10px", textAlign: ["#","","Bolag"].includes(h) ? "left" : "right", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[...PORTFOLIO].sort((a, b) => b.upside - a.upside).map((co, i) => {
-                  const live = portfolioData[co.ticker];
-                  return (
-                    <tr key={co.ticker}>
-                      <td style={{ padding: "8px 10px", color: "#b2b5be", fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, borderBottom: "1px solid #f0f3fa" }}>{i + 1}</td>
-                      <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa" }}>{co.flag}</td>
-                      <td style={{ padding: "8px 10px", fontWeight: 500, borderBottom: "1px solid #f0f3fa" }}>{co.name}</td>
-                      <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#f23645", borderBottom: "1px solid #f0f3fa" }}>
-                        {live?.ebitdaMargin ? `${(live.ebitdaMargin - co.peerMedianMargin).toFixed(1)}pp` : "—"}
-                      </td>
-                      <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#f23645", borderBottom: "1px solid #f0f3fa" }}>
-                        {live?.peForward ? `${(((live.peForward / co.peerPE) - 1) * 100).toFixed(0)}%` : "—"}
-                      </td>
-                      <td style={{ padding: "8px 10px", textAlign: "right", borderBottom: "1px solid #f0f3fa" }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10 }}>
-                          <div style={{ width: 80, height: 4, background: "#f0f3fa", borderRadius: 2 }}>
-                            <div style={{ height: "100%", width: `${(co.upside / 55) * 100}%`, background: "#089981", borderRadius: 2 }} />
-                          </div>
-                          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, color: "#089981", minWidth: 40, textAlign: "right" }}>+{co.upside}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </>
+                      if (col.key === "name") {
+                        return (
+                          <td key={col.key} style={{ ...tdStyle(col), fontWeight: 500 }}>
+                            <div style={{ color: "#131722" }}>{item.name || item.ticker}</div>
+                            <div style={{ fontSize: 10, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</div>
+                          </td>
+                        );
+                      }
+
+                      const formatted = col.fmt ? col.fmt(val, d) : (val ?? "\u2014");
+
+                      return (
+                        <td key={col.key} style={{ ...tdStyle(col), color: cellColor || "#131722" }}>
+                          {formatted}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

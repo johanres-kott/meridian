@@ -31,18 +31,30 @@ export default function PortfolioSummary({ userId }) {
           return;
         }
 
-        // Fetch prices for all items (parallel, max 20)
-        const priced = await Promise.all(
-          watchlist.slice(0, 20).map(async (item) => {
-            try {
-              const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
-              const d = await res.json();
-              return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
-            } catch {
-              return { ...item, price: 0, changePercent: 0 };
-            }
-          })
-        );
+        // Fetch prices + FX rates in parallel
+        const [pricedResults, commoditiesRes] = await Promise.all([
+          Promise.all(
+            watchlist.slice(0, 20).map(async (item) => {
+              try {
+                const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
+                const d = await res.json();
+                return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
+              } catch {
+                return { ...item, price: 0, changePercent: 0 };
+              }
+            })
+          ),
+          fetch("/api/commodities").then(r => r.json()).catch(() => []),
+        ]);
+        const priced = pricedResults;
+
+        // Build FX rates to SEK from commodities API
+        const fxToSek = { SEK: 1 };
+        for (const c of commoditiesRes) {
+          if (c.display === "USD/SEK" && c.price > 0) fxToSek.USD = c.price;
+          if (c.display === "EUR/SEK" && c.price > 0) fxToSek.EUR = c.price;
+          if (c.display === "GBP/SEK" && c.price > 0) fxToSek.GBP = c.price;
+        }
 
         // Portfolio value (only "Äger" with shares), grouped by currency
         const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);
@@ -61,6 +73,19 @@ export default function PortfolioSummary({ userId }) {
           dailyChangePct: value > 0 ? (dailyChange / (value - dailyChange)) * 100 : 0,
         }));
 
+        // Calculate total in SEK if multiple currencies
+        let totalSek = null;
+        let dailyChangeSek = null;
+        const hasMultipleCurrencies = currencyGroups.length > 1;
+        const allConvertible = currencyGroups.every(g => fxToSek[g.currency] != null);
+        if (hasMultipleCurrencies && allConvertible) {
+          totalSek = currencyGroups.reduce((sum, g) => sum + g.value * fxToSek[g.currency], 0);
+          dailyChangeSek = currencyGroups.reduce((sum, g) => sum + g.dailyChange * fxToSek[g.currency], 0);
+        } else if (currencyGroups.length === 1 && currencyGroups[0].currency !== "SEK" && fxToSek[currencyGroups[0].currency]) {
+          totalSek = currencyGroups[0].value * fxToSek[currencyGroups[0].currency];
+          dailyChangeSek = currencyGroups[0].dailyChange * fxToSek[currencyGroups[0].currency];
+        }
+
         // Status counts
         const statusCounts = {};
         for (const item of watchlist) {
@@ -75,6 +100,9 @@ export default function PortfolioSummary({ userId }) {
 
         setData({
           currencyGroups,
+          totalSek,
+          dailyChangeSek,
+          dailyChangeSekPct: totalSek > 0 ? (dailyChangeSek / (totalSek - dailyChangeSek)) * 100 : 0,
           statusCounts,
           totalCount: watchlist.length,
           movers,
@@ -116,9 +144,20 @@ export default function PortfolioSummary({ userId }) {
         {data.hasHoldings && (
           <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
             <div style={sectionHeader}>Innehav</div>
+            {data.totalSek !== null && (
+              <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: "1px solid #f0f3fa" }}>
+                <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "#131722" }}>
+                  {data.totalSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
+                </div>
+                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: data.dailyChangeSek >= 0 ? "#089981" : "#f23645" }}>
+                  {data.dailyChangeSek >= 0 ? "+" : ""}{data.dailyChangeSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK idag ({data.dailyChangeSekPct >= 0 ? "+" : ""}{data.dailyChangeSekPct.toFixed(2)}%)
+                </div>
+                <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 4 }}>Omräknat till SEK</div>
+              </div>
+            )}
             {data.currencyGroups.map((g, i) => (
-              <div key={g.currency} style={{ marginBottom: i < data.currencyGroups.length - 1 ? 12 : 0 }}>
-                <div style={{ ...mono, fontSize: data.currencyGroups.length === 1 ? 20 : 16, fontWeight: 500, color: "#131722" }}>
+              <div key={g.currency} style={{ marginBottom: i < data.currencyGroups.length - 1 ? 8 : 0 }}>
+                <div style={{ ...mono, fontSize: 14, fontWeight: 500, color: "#131722" }}>
                   {g.value.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {g.currency}
                 </div>
                 <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "#089981" : "#f23645" }}>

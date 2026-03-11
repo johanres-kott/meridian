@@ -24,7 +24,9 @@ export default function App() {
   const [lastSeenAt, setLastSeenAt] = useState(null);
   const [preferences, setPreferences] = useState({});
   const [chatOpen, setChatOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const chatContextRef = useRef({});
+  const profileRef = useRef(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,13 +74,22 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!profileOpen) return;
+    function handleClick(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [profileOpen]);
+
+  useEffect(() => {
     if (!chatOpen || !session) return;
     async function loadContext() {
       try {
         const [indicesRes, commoditiesRes, watchlistRes] = await Promise.all([
           fetch("/api/indices").then(r => r.json()).catch(() => []),
           fetch("/api/commodities").then(r => r.json()).catch(() => []),
-          supabase.from("watchlist").select("*").order("created_at"),
+          supabase.from("watchlist").select("*").eq("user_id", session.user.id).order("created_at"),
         ]);
         const watchlist = watchlistRes.data || [];
         const portfolio = await Promise.all(
@@ -151,19 +162,40 @@ export default function App() {
           >
             AI
           </button>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            style={{ fontSize: 11, color: "#787b86", background: "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
-          >
-            Logga ut
-          </button>
+          <div ref={profileRef} style={{ position: "relative" }}>
+            <button
+              onClick={() => setProfileOpen(!profileOpen)}
+              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: profileOpen ? "#2962ff" : "#787b86", background: profileOpen ? "#f0f3fa" : "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
+            >
+              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#2962ff", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
+                {(session.user.email?.[0] || "?").toUpperCase()}
+              </div>
+              {session.user.email?.split("@")[0]}
+            </button>
+            {profileOpen && (
+              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 220, zIndex: 100 }}>
+                <div style={{ padding: "4px 16px 12px", borderBottom: "1px solid #f0f3fa" }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>{session.user.email?.split("@")[0]}</div>
+                  <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{session.user.email}</div>
+                </div>
+                <button
+                  onClick={() => supabase.auth.signOut()}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                >
+                  Logga ut
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Content + Chat */}
       <div style={{ display: "flex", height: "calc(100vh - 46px)" }}>
         <div style={{ flex: 1, overflow: "auto", padding: "24px 32px" }}>
-          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} />}
+          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} />}
           {tab === "commodities" && <Commodities />}
           {tab === "portfolio" && <Portfolio />}
           {tab === "analysis" && <GapAnalysis />}

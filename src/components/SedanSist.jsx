@@ -89,7 +89,7 @@ function Picker({ items, selected, onSave, onCancel }) {
   );
 }
 
-export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences }) {
+export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences, userId }) {
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [data, setData] = useState(null);
@@ -102,7 +102,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
     async function load() {
       try {
         const [watchlistRes, indicesRes, commoditiesRes] = await Promise.all([
-          supabase.from("watchlist").select("*").order("created_at"),
+          supabase.from("watchlist").select("*").eq("user_id", userId).order("created_at"),
           fetch("/api/indices").then(r => r.json()),
           fetch("/api/commodities").then(r => r.json()),
         ]);

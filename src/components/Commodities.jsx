@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { REGIONS } from "./shared.js";
 import { Chg } from "./SharedComponents.jsx";
+import MarketDetailView from "./MarketDetailView.jsx";
 
 const COMMODITY_GROUPS = ["Precious Metals", "Energy", "Industrial Metals", "Agriculture", "FX vs SEK"];
 
@@ -11,6 +12,7 @@ export default function Commodities() {
   const [commodities, setCommodities] = useState([]);
   const [comLoading, setComLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [selected, setSelected] = useState(null);
 
   async function fetchIndices() {
     try {
@@ -50,6 +52,10 @@ export default function Commodities() {
     const t2 = setInterval(fetchCommodities, 120000);
     return () => { clearInterval(t1); clearInterval(t2); };
   }, []);
+
+  if (selected) {
+    return <MarketDetailView item={selected} onBack={() => setSelected(null)} />;
+  }
 
   const today = new Date().toLocaleDateString("sv-SE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
@@ -98,7 +104,9 @@ export default function Commodities() {
               </thead>
               <tbody>
                 {items.map(idx => (
-                  <tr key={idx.symbol} style={{ cursor: "default" }}>
+                  <tr key={idx.symbol} onClick={() => setSelected(idx)} style={{ cursor: "pointer" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+                    onMouseLeave={e => e.currentTarget.style.background = ""}>
                     <td style={{ padding: "8px 10px", fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, borderBottom: "1px solid #f0f3fa" }}>{idx.symbol}</td>
                     <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa" }}>{idx.name}</td>
                     <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, borderBottom: "1px solid #f0f3fa" }}>
@@ -151,7 +159,9 @@ export default function Commodities() {
                 </thead>
                 <tbody>
                   {group.items.map(item => (
-                    <tr key={item.display}>
+                    <tr key={item.display} onClick={() => setSelected(item)} style={{ cursor: "pointer" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+                      onMouseLeave={e => e.currentTarget.style.background = ""}>
                       <td style={{ padding: "8px 12px", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: 12, borderBottom: "1px solid #f0f3fa", color: "#2962ff" }}>{item.display}</td>
                       <td style={{ padding: "8px 12px", borderBottom: "1px solid #f0f3fa" }}>{item.name}</td>
                       <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, borderBottom: "1px solid #f0f3fa" }}>

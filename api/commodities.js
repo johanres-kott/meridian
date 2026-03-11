@@ -57,7 +57,8 @@ export default async function handler(req, res) {
         const changeAbs = (rawPrice - prev) * f;
         return {
           ...item,
-          conv: undefined,
+          yahooSymbol: item.symbol,
+          conv: item.conv || 1,
           price: parseFloat(price.toPrecision(6)),
           change: parseFloat(change.toFixed(2)),
           changeAbs: parseFloat(changeAbs.toPrecision(4)),

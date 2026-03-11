@@ -36,6 +36,7 @@ export default async function handler(req, res) {
 
         return {
           symbol: display,
+          yahooSymbol: decodeURIComponent(symbol),
           name,
           region,
           price,

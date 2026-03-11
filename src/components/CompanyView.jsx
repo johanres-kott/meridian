@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
-import { StatCard } from "./SharedComponents.jsx";
-
-const RANGES = [
-  { id: "1m", label: "1M" },
-  { id: "3m", label: "3M" },
-  { id: "1y", label: "1Y" },
-  { id: "5y", label: "5Y" },
-];
+import { StatCard, PriceChart } from "./SharedComponents.jsx";
 
 const STATUS_COLORS = {
   Bevakar: { bg: "#f0f3fa", color: "#787b86" },
@@ -20,100 +12,6 @@ const STATUS_COLORS = {
 };
 
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
-
-function PriceChart({ ticker }) {
-  const [range, setRange] = useState("3m");
-  const [points, setPoints] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/api/chart?ticker=${encodeURIComponent(ticker)}&range=${range}`)
-      .then(r => r.json())
-      .then(d => { setPoints(d.points || []); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [ticker, range]);
-
-  const first = points[0]?.close;
-  const last = points[points.length - 1]?.close;
-  const isUp = last >= first;
-  const color = isUp ? "#089981" : "#f23645";
-
-  return (
-    <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "20px 20px 12px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Kursutveckling</div>
-        <div style={{ display: "flex", gap: 4 }}>
-          {RANGES.map(r => (
-            <button key={r.id} onClick={() => setRange(r.id)}
-              style={{
-                fontSize: 11, padding: "4px 10px", borderRadius: 3, border: "none", cursor: "pointer",
-                fontFamily: "inherit", fontWeight: 500,
-                background: range === r.id ? "#2962ff" : "#f0f3fa",
-                color: range === r.id ? "#fff" : "#787b86",
-              }}>
-              {r.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {loading ? (
-        <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", color: "#787b86", fontSize: 12 }}>
-          Laddar graf...
-        </div>
-      ) : points.length === 0 ? (
-        <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", color: "#787b86", fontSize: 12 }}>
-          Ingen kursdata tillganglig
-        </div>
-      ) : (
-        <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={points} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.15} />
-                <stop offset="100%" stopColor={color} stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="date"
-              tick={{ fontSize: 10, fill: "#b2b5be" }}
-              tickLine={false}
-              axisLine={{ stroke: "#e0e3eb" }}
-              tickFormatter={d => {
-                const [y, m, day] = d.split("-");
-                return range === "5y" || range === "1y" ? `${m}/${y.slice(2)}` : `${day}/${m}`;
-              }}
-              minTickGap={40}
-            />
-            <YAxis
-              domain={["auto", "auto"]}
-              tick={{ fontSize: 10, fill: "#b2b5be" }}
-              tickLine={false}
-              axisLine={false}
-              width={55}
-              tickFormatter={v => v.toLocaleString("sv-SE")}
-            />
-            <Tooltip
-              contentStyle={{ fontSize: 12, borderRadius: 4, border: "1px solid #e0e3eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-              formatter={v => [v.toLocaleString("sv-SE", { minimumFractionDigits: 2 }), "Kurs"]}
-              labelFormatter={d => d}
-            />
-            <Area type="monotone" dataKey="close" stroke={color} strokeWidth={1.5} fill="url(#chartGrad)" dot={false} />
-          </AreaChart>
-        </ResponsiveContainer>
-      )}
-
-      {points.length > 1 && (
-        <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11, color: "#787b86" }}>
-          <span>Period: <span style={{ color, fontWeight: 500 }}>{isUp ? "+" : ""}{((last - first) / first * 100).toFixed(1)}%</span></span>
-          <span>Hog: <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.close)).toLocaleString("sv-SE", { minimumFractionDigits: 2 })}</span></span>
-          <span>Lag: <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.close)).toLocaleString("sv-SE", { minimumFractionDigits: 2 })}</span></span>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function NotesSection({ item, onUpdate }) {
   const [notes, setNotes] = useState(item.notes || "");

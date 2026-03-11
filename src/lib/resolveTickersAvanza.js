@@ -31,30 +31,42 @@ async function searchFinnhub(query) {
   );
 }
 
+// Swedish/Nordic stocks often end with a share class letter: A, B, C, D, R
+const SHARE_CLASSES = new Set(["A", "B", "C", "D", "R"]);
+
 export async function resolveTicker(securityName) {
   try {
-    // Try full name first
+    const words = securityName.split(/\s+/);
+    const lastWord = words[words.length - 1];
+    const hasShareClass = words.length > 1 && SHARE_CLASSES.has(lastWord.toUpperCase());
+
+    // If name ends with a share class (e.g., "K2A KNAUST & ANDERSSON FASTIGHETER B"),
+    // try "first word + class" first — this gives the most specific match.
+    if (hasShareClass && words.length > 2) {
+      let results = await searchFinnhub(`${words[0]} ${lastWord}`);
+      let match = pickBestMatch(results);
+      if (match) return match;
+    }
+
+    // Try full name
     let results = await searchFinnhub(securityName);
     let match = pickBestMatch(results);
     if (match) return match;
 
     // If no results (possibly name too long), try progressively shorter queries
-    const words = securityName.split(/\s+/);
     if (words.length > 3) {
-      // Try first 3 words (e.g., "K2A KNAUST ANDERSSON" → finds K2A)
       results = await searchFinnhub(words.slice(0, 3).join(" "));
       match = pickBestMatch(results);
       if (match) return match;
     }
 
     if (words.length > 2) {
-      // Try first 2 words
       results = await searchFinnhub(words.slice(0, 2).join(" "));
       match = pickBestMatch(results);
       if (match) return match;
     }
 
-    // Try first word + last word (often the share class, e.g., "K2A B")
+    // Try first word + last word as final fallback
     if (words.length > 2) {
       results = await searchFinnhub(`${words[0]} ${words[words.length - 1]}`);
       match = pickBestMatch(results);

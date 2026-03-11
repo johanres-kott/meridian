@@ -25,6 +25,8 @@ export default function App() {
   const [preferences, setPreferences] = useState({});
   const [chatOpen, setChatOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
   const chatContextRef = useRef({});
   const profileRef = useRef(null);
 
@@ -66,6 +68,22 @@ export default function App() {
         .update({ preferences: merged })
         .eq("user_id", session.user.id);
     }
+  }
+
+  const displayName = preferences.display_name || session?.user?.email?.split("@")[0] || "";
+  const displayInitial = (preferences.display_name?.[0] || session?.user?.email?.[0] || "?").toUpperCase();
+
+  function startEditingName() {
+    setNameInput(preferences.display_name || "");
+    setEditingName(true);
+  }
+
+  function saveDisplayName() {
+    const trimmed = nameInput.trim();
+    if (trimmed) {
+      updatePreferences({ display_name: trimmed });
+    }
+    setEditingName(false);
   }
 
   useEffect(() => {
@@ -164,19 +182,44 @@ export default function App() {
           </button>
           <div ref={profileRef} style={{ position: "relative" }}>
             <button
-              onClick={() => setProfileOpen(!profileOpen)}
+              onClick={() => { setProfileOpen(!profileOpen); setEditingName(false); }}
               style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: profileOpen ? "#2962ff" : "#787b86", background: profileOpen ? "#f0f3fa" : "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
             >
               <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#2962ff", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
-                {(session.user.email?.[0] || "?").toUpperCase()}
+                {displayInitial}
               </div>
-              {session.user.email?.split("@")[0]}
+              {displayName}
             </button>
             {profileOpen && (
-              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 220, zIndex: 100 }}>
-                <div style={{ padding: "4px 16px 12px", borderBottom: "1px solid #f0f3fa" }}>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>{session.user.email?.split("@")[0]}</div>
-                  <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{session.user.email}</div>
+              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 240, zIndex: 100 }}>
+                <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid #f0f3fa" }}>
+                  {editingName ? (
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <input
+                        value={nameInput}
+                        onChange={e => setNameInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") saveDisplayName(); if (e.key === "Escape") setEditingName(false); }}
+                        autoFocus
+                        placeholder="Ditt namn"
+                        style={{ flex: 1, padding: "4px 8px", border: "1px solid #2962ff", borderRadius: 3, fontSize: 13, fontFamily: "inherit", outline: "none" }}
+                      />
+                      <button onClick={saveDisplayName} style={{ padding: "4px 10px", fontSize: 11, background: "#2962ff", color: "#fff", border: "none", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}>Spara</button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>{displayName}</div>
+                        <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{session.user.email}</div>
+                      </div>
+                      <button
+                        onClick={startEditingName}
+                        title="Byt namn"
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#787b86", padding: "2px 6px" }}
+                      >
+                        ✏
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={() => supabase.auth.signOut()}
@@ -195,7 +238,7 @@ export default function App() {
       {/* Content + Chat */}
       <div style={{ display: "flex", height: "calc(100vh - 46px)" }}>
         <div style={{ flex: 1, overflow: "auto", padding: "24px 32px" }}>
-          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} />}
+          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} />}
           {tab === "commodities" && <Commodities />}
           {tab === "portfolio" && <Portfolio />}
           {tab === "analysis" && <GapAnalysis />}

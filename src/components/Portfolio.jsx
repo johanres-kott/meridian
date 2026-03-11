@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
 import CompanyView from "./CompanyView.jsx";
@@ -89,8 +89,53 @@ function AddCompanyBar({ onAdd }) {
   );
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {} }) {
+function GroupTagPopover({ item, groups, onToggle, onClose }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) onClose();
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [onClose]);
+
+  if (!groups.length) return (
+    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 16px", zIndex: 200, minWidth: 180, marginTop: 4 }}>
+      <div style={{ fontSize: 12, color: "#787b86" }}>Inga grupper skapade</div>
+    </div>
+  );
+
+  return (
+    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "6px 0", zIndex: 200, minWidth: 180, marginTop: 4 }}>
+      {groups.map(g => {
+        const isMember = (g.members || []).includes(item.id);
+        return (
+          <div key={g.name} onClick={() => onToggle(g.name, item.id)}
+            style={{ padding: "8px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}
+            onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+            onMouseLeave={e => e.currentTarget.style.background = ""}
+          >
+            <div style={{
+              width: 16, height: 16, borderRadius: 3,
+              border: isMember ? "none" : "1px solid #c0c3cb",
+              background: isMember ? "#2962ff" : "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontSize: 11, fontWeight: 600,
+            }}>
+              {isMember ? "\u2713" : ""}
+            </div>
+            <span style={{ color: "#131722" }}>{g.name}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup }) {
   const [price, setPrice] = useState(null);
+  const [tagOpen, setTagOpen] = useState(false);
 
   useEffect(() => {
     fetchPrice(item.ticker).then(d => { if (d && d.price) setPrice(d); });
@@ -107,6 +152,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {} }) {
   const pl = (item.gav && item.shares && priceSek) ? ((priceSek - item.gav) * item.shares) : null;
   const plPct = (item.gav && priceSek) ? ((priceSek - item.gav) / item.gav * 100) : null;
 
+  const itemGroups = groups.filter(g => (g.members || []).includes(item.id));
   const tdBase = { padding: "10px 14px", borderBottom: "1px solid #f0f3fa" };
 
   return (
@@ -126,6 +172,18 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {} }) {
           style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
           {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
+      </td>
+      <td style={{ ...tdBase, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center", position: "relative" }}>
+          {itemGroups.map(g => (
+            <span key={g.name} style={{ fontSize: 10, padding: "2px 7px", borderRadius: 10, background: "#f0f3fa", color: "#787b86", whiteSpace: "nowrap" }}>{g.name}</span>
+          ))}
+          <button onClick={() => setTagOpen(!tagOpen)}
+            style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "#787b86", lineHeight: 1.4 }}
+            title="Hantera grupper"
+          >+</button>
+          {tagOpen && <GroupTagPopover item={item} groups={groups} onToggle={onToggleGroup} onClose={() => setTagOpen(false)} />}
+        </div>
       </td>
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
         {price ? (
@@ -175,12 +233,17 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {} }) {
   );
 }
 
-export default function Portfolio() {
+export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
   const [selected, setSelected] = useState(null);
   const [fxRates, setFxRates] = useState({ SEK: 1 });
+  const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
+  const [creatingGroup, setCreatingGroup] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+
+  const groups = preferences.groups || [];
 
   useEffect(() => { load(); loadFxRates(); }, []);
 
@@ -209,7 +272,13 @@ export default function Portfolio() {
   async function addCompany({ ticker, name }) {
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase.from("watchlist").insert({ ticker, name, user_id: user.id, status: "Bevakar" }).select().single();
-    if (!error) setItems(prev => [...prev, data]);
+    if (!error) {
+      setItems(prev => [...prev, data]);
+      // Auto-add to active group if one is selected
+      if (activeGroup && data) {
+        toggleGroupMember(activeGroup, data.id);
+      }
+    }
   }
 
   async function updateItem(id, updates) {
@@ -223,6 +292,54 @@ export default function Portfolio() {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("watchlist").delete().eq("id", id).eq("user_id", user.id);
     setItems(prev => prev.filter(i => i.id !== id));
+    // Remove from all groups
+    const updated = groups.map(g => ({
+      ...g,
+      members: (g.members || []).filter(m => m !== id),
+    }));
+    if (JSON.stringify(updated) !== JSON.stringify(groups)) {
+      onUpdatePreferences({ groups: updated });
+    }
+  }
+
+  function createGroup() {
+    const name = newGroupName.trim();
+    if (!name) return;
+    if (groups.some(g => g.name === name)) return;
+    const updated = [...groups, { name, members: [] }];
+    onUpdatePreferences({ groups: updated });
+    setNewGroupName("");
+    setCreatingGroup(false);
+    setActiveGroup(name);
+  }
+
+  function deleteGroup(name) {
+    if (!window.confirm(`Ta bort gruppen "${name}"?`)) return;
+    const updated = groups.filter(g => g.name !== name);
+    onUpdatePreferences({ groups: updated });
+    if (activeGroup === name) setActiveGroup(null);
+  }
+
+  function renameGroup(oldName, newName) {
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === oldName) return;
+    if (groups.some(g => g.name === trimmed)) return;
+    const updated = groups.map(g => g.name === oldName ? { ...g, name: trimmed } : g);
+    onUpdatePreferences({ groups: updated });
+    if (activeGroup === oldName) setActiveGroup(trimmed);
+  }
+
+  function toggleGroupMember(groupName, itemId) {
+    const updated = groups.map(g => {
+      if (g.name !== groupName) return g;
+      const members = g.members || [];
+      if (members.includes(itemId)) {
+        return { ...g, members: members.filter(m => m !== itemId) };
+      } else {
+        return { ...g, members: [...members, itemId] };
+      }
+    });
+    onUpdatePreferences({ groups: updated });
   }
 
   if (loading) return <div style={{ color: "#787b86", fontSize: 13 }}>Laddar...</div>;
@@ -236,6 +353,15 @@ export default function Portfolio() {
     const { data, error } = await supabase.from("watchlist").insert(rows).select();
     if (!error && data) {
       setItems(prev => [...prev, ...data]);
+      // Auto-add imported items to active group
+      if (activeGroup) {
+        const newIds = data.map(d => d.id);
+        const updated = groups.map(g => {
+          if (g.name !== activeGroup) return g;
+          return { ...g, members: [...(g.members || []), ...newIds] };
+        });
+        onUpdatePreferences({ groups: updated });
+      }
     }
     return { data, error };
   }
@@ -245,8 +371,16 @@ export default function Portfolio() {
     return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
   }
 
-  const hasAnyShares = items.some(i => i.shares);
-  const hasAnyPL = items.some(i => i.gav && i.shares);
+  // Filter items by active group
+  const filteredItems = activeGroup
+    ? items.filter(item => {
+        const group = groups.find(g => g.name === activeGroup);
+        return group && (group.members || []).includes(item.id);
+      })
+    : items;
+
+  const hasAnyShares = filteredItems.some(i => i.shares);
+  const hasAnyPL = filteredItems.some(i => i.gav && i.shares);
 
   return (
     <div>
@@ -260,24 +394,97 @@ export default function Portfolio() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Portfölj</div>
-          <div style={{ fontSize: 12, color: "#787b86" }}>{items.length} bolag</div>
+          <div style={{ fontSize: 12, color: "#787b86" }}>
+            {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
+          </div>
         </div>
         <button onClick={() => setShowImport(true)}
           style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
           Importera PDF
         </button>
       </div>
+
+      {/* Group filter bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+        <button
+          onClick={() => setActiveGroup(null)}
+          style={{
+            fontSize: 12, padding: "5px 12px", borderRadius: 14,
+            border: activeGroup === null ? "1px solid #2962ff" : "1px solid #e0e3eb",
+            background: activeGroup === null ? "#f0f3fa" : "#fff",
+            color: activeGroup === null ? "#2962ff" : "#787b86",
+            cursor: "pointer", fontFamily: "inherit", fontWeight: activeGroup === null ? 500 : 400,
+          }}
+        >
+          Alla ({items.length})
+        </button>
+        {groups.map(g => {
+          const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
+          const isActive = activeGroup === g.name;
+          return (
+            <div key={g.name} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <button
+                onClick={() => setActiveGroup(isActive ? null : g.name)}
+                style={{
+                  fontSize: 12, padding: "5px 12px", borderRadius: 14,
+                  border: isActive ? "1px solid #2962ff" : "1px solid #e0e3eb",
+                  background: isActive ? "#f0f3fa" : "#fff",
+                  color: isActive ? "#2962ff" : "#787b86",
+                  cursor: "pointer", fontFamily: "inherit", fontWeight: isActive ? 500 : 400,
+                }}
+              >
+                {g.name} ({count})
+              </button>
+              {isActive && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); deleteGroup(g.name); }}
+                  title="Ta bort grupp"
+                  style={{ marginLeft: 2, fontSize: 11, color: "#c0c3cb", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
+                  onMouseLeave={e => e.currentTarget.style.color = "#c0c3cb"}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          );
+        })}
+        {creatingGroup ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <input
+              value={newGroupName}
+              onChange={e => setNewGroupName(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") createGroup(); if (e.key === "Escape") { setCreatingGroup(false); setNewGroupName(""); } }}
+              autoFocus
+              placeholder="Gruppnamn..."
+              style={{ fontSize: 12, padding: "4px 10px", border: "1px solid #2962ff", borderRadius: 14, outline: "none", fontFamily: "inherit", width: 140 }}
+            />
+            <button onClick={createGroup} style={{ fontSize: 11, padding: "4px 8px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontFamily: "inherit" }}>OK</button>
+            <button onClick={() => { setCreatingGroup(false); setNewGroupName(""); }} style={{ fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer" }}>Avbryt</button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setCreatingGroup(true)}
+            style={{ fontSize: 12, padding: "5px 12px", borderRadius: 14, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "#787b86", fontFamily: "inherit" }}
+          >
+            + Ny grupp
+          </button>
+        )}
+      </div>
+
       <AddCompanyBar onAdd={addCompany} />
-      {items.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "#787b86", fontSize: 13 }}>
-          Inga bolag ännu — sök efter ett bolag ovan för att lägga till
+          {activeGroup
+            ? `Inga bolag i "${activeGroup}" — klicka + på en rad för att lägga till`
+            : "Inga bolag ännu — sök efter ett bolag ovan för att lägga till"}
         </div>
       ) : (
         <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["", "Bolag", "Status", "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                {["", "Bolag", "Status", "Grupper", "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
                     padding: "8px 14px",
                     textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
@@ -288,8 +495,8 @@ export default function Portfolio() {
               </tr>
             </thead>
             <tbody>
-              {items.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} />
+              {filteredItems.map(item => (
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} />
               ))}
             </tbody>
           </table>

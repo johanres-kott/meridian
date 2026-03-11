@@ -98,6 +98,7 @@ function CompanyRow({ item, onUpdate, onSelect }) {
 
   const chg = price?.changePercent;
   const chgColor = chg > 0 ? "#089981" : chg < 0 ? "#f23645" : "#787b86";
+  const totalValue = (item.shares && price?.price) ? (price.price * item.shares) : null;
   const pl = (item.gav && item.shares && price?.price) ? ((price.price - item.gav) * item.shares) : null;
   const plPct = (item.gav && price?.price) ? ((price.price - item.gav) / item.gav * 100) : null;
 
@@ -128,6 +129,14 @@ function CompanyRow({ item, onUpdate, onSelect }) {
             {chg != null && <div style={{ fontSize: 11, color: chgColor }}>{chg > 0 ? "+" : ""}{chg.toFixed(2)}%</div>}
           </>
         ) : <span style={{ color: "#c0c3cb", fontSize: 11 }}>Hämtar...</span>}
+      </td>
+      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+        {totalValue !== null ? (
+          <>
+            <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{totalValue.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {price?.currency || ""}</div>
+            <div style={{ fontSize: 11, color: "#787b86" }}>{item.shares} st</div>
+          </>
+        ) : null}
       </td>
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap", paddingRight: 18 }}>
         {pl !== null ? (
@@ -196,6 +205,7 @@ export default function Portfolio() {
     return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
   }
 
+  const hasAnyShares = items.some(i => i.shares);
   const hasAnyPL = items.some(i => i.gav && i.shares);
 
   return (
@@ -209,7 +219,7 @@ export default function Portfolio() {
       )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
-          <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Bevakningslista</div>
+          <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Portfölj</div>
           <div style={{ fontSize: 12, color: "#787b86" }}>{items.length} bolag</div>
         </div>
         <button onClick={() => setShowImport(true)}
@@ -227,10 +237,10 @@ export default function Portfolio() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["", "Bolag", "Status", "Kurs", ...(hasAnyPL ? ["P&L"] : [])].map(h => (
+                {["", "Bolag", "Status", "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : [])].map(h => (
                   <th key={h || "flag"} style={{
                     padding: "8px 14px",
-                    textAlign: h === "Kurs" || h === "P&L" ? "right" : "left",
+                    textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
                     fontSize: 11, fontWeight: 500, color: "#787b86",
                     borderBottom: "1px solid #e0e3eb",
                   }}>{h}</th>

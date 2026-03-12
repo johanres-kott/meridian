@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "messages required" });
   }
 
-  let systemPrompt = `Du är en finansassistent i appen Thesian. Svara på svenska, kort och koncist. Du har tillgång till användarens portfölj och marknadsdata.`;
+  let systemPrompt = `Du är en finansassistent i appen Thesion. Svara på svenska, kort och koncist. Du har tillgång till användarens portfölj och marknadsdata.`;
 
   if (context) {
     const parts = [];

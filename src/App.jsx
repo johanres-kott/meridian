@@ -156,7 +156,7 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <div style={{ width: 20, height: 20, background: "#2962ff", borderRadius: 4 }} />
-            <span style={{ fontWeight: 600, fontSize: 14, letterSpacing: "0.02em" }}>Thesian</span>
+            <span style={{ fontWeight: 600, fontSize: 14, letterSpacing: "0.02em" }}>Thesion</span>
           </div>
           <div style={{ display: "flex" }}>
             {TABS.map(t => (

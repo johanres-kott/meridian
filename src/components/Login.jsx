@@ -44,12 +44,12 @@ export default function Login() {
       justifyContent: "center",
       fontFamily: "'IBM Plex Sans', sans-serif",
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono&family=Plus+Jakarta+Sans:wght@700&display=swap');`}</style>
 
       {/* Logo above card */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
         <div style={{ width: 32, height: 32, background: "#2962ff", borderRadius: 6 }} />
-        <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.02em", color: "#131722" }}>Thesion</span>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 24, fontWeight: 700, letterSpacing: "-0.5px", color: "#131722" }}>Thesion</span>
       </div>
 
       {/* Card */}

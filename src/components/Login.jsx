@@ -49,7 +49,7 @@ export default function Login() {
       {/* Logo above card */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
         <div style={{ width: 32, height: 32, background: "#2962ff", borderRadius: 6 }} />
-        <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.02em", color: "#131722" }}>Meridian</span>
+        <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.02em", color: "#131722" }}>Thesian</span>
       </div>
 
       {/* Card */}

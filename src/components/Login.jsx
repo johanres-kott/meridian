@@ -48,7 +48,21 @@ export default function Login() {
 
       {/* Logo above card */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-        <div style={{ width: 32, height: 32, background: "#2962ff", borderRadius: 6 }} />
+        <svg width="36" height="36" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="56" height="56" rx="12" fill="#3B6AE6"/>
+          <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white"/>
+          <polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85"/>
+          <circle cx="38" cy="17" r="1.5" fill="#3B6AE6"/>
+          <polygon points="32,18 34,24 28,32 26,24" fill="white"/>
+          <polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white"/>
+          <polygon points="12,36 8,28 10,26 14,32" fill="white"/>
+          <line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+          <polygon points="22,44 20,48 24,48 26,44" fill="white"/>
+          <polygon points="28,42 27,48 31,48 30,42" fill="white"/>
+          <line x1="38" y1="22" x2="37" y2="23.5" stroke="#3B6AE6" strokeWidth="0.8"/>
+          <line x1="40" y1="22" x2="39.5" y2="23.5" stroke="#3B6AE6" strokeWidth="0.8"/>
+          <line x1="42" y1="22" x2="41" y2="23.5" stroke="#3B6AE6" strokeWidth="0.8"/>
+        </svg>
         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 24, fontWeight: 700, letterSpacing: "-0.5px", color: "#131722" }}>Thesion</span>
       </div>
 

@@ -144,7 +144,7 @@ export default function App() {
   return (
     <div style={{ minHeight: "100vh", background: "#ffffff", color: "#131722", fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .tab-btn { background: none; border: none; cursor: pointer; padding: 10px 14px; font-size: 13px; font-family: inherit; color: #787b86; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
         .tab-btn.active { color: #131722; border-bottom-color: #2962ff; font-weight: 500; }
@@ -156,7 +156,7 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <div style={{ width: 20, height: 20, background: "#2962ff", borderRadius: 4 }} />
-            <span style={{ fontWeight: 600, fontSize: 14, letterSpacing: "0.02em" }}>Thesion</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px" }}>Thesion</span>
           </div>
           <div style={{ display: "flex" }}>
             {TABS.map(t => (

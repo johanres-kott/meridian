@@ -114,7 +114,10 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
             <div style={{ fontSize: 13, color: "#131722" }}>Skapar grupp...</div>
           </div>
-        ) : (
+        ) : (() => {
+          const hasValues = selected.holdings.some(h => h.valueMSEK != null);
+          const totalWeight = selected.holdings.reduce((s, h) => s + (h.weight || 0), 0);
+          return (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
               <button
@@ -128,14 +131,15 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
               </div>
             </div>
             <div style={{ fontSize: 12, color: "#787b86", marginBottom: 16 }}>
-              {selected.holdings.length} noterade innehav
+              {selected.holdings.length} noterade innehav{totalWeight > 0 ? ` — ${totalWeight.toFixed(1).replace(".0", "")}% av totala tillgångar` : ""}
             </div>
 
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 20 }}>
               <thead>
                 <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
                   <th style={{ ...thStyle, textAlign: "left" }}>Bolag</th>
-                  <th style={{ ...thStyle, textAlign: "left" }}>Ticker</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>Vikt</th>
+                  {hasValues && <th style={{ ...thStyle, textAlign: "right" }}>Värde</th>}
                   <th style={{ ...thStyle, textAlign: "left" }}>Status</th>
                 </tr>
               </thead>
@@ -144,8 +148,18 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                   const exists = existingTickers.has(h.ticker.toUpperCase());
                   return (
                     <tr key={idx} style={{ borderBottom: "1px solid #f0f3fa" }}>
-                      <td style={{ ...tdStyle, color: "#131722" }}>{h.name}</td>
-                      <td style={{ ...tdStyle, fontFamily: "monospace", fontSize: 11, color: "#787b86" }}>{h.ticker}</td>
+                      <td style={{ ...tdStyle, color: "#131722" }}>
+                        <div>{h.name}</div>
+                        <div style={{ fontFamily: "monospace", fontSize: 10, color: "#787b86" }}>{h.ticker}</div>
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: "right", color: "#131722", fontVariantNumeric: "tabular-nums" }}>
+                        {h.weight != null ? `${h.weight}%` : "–"}
+                      </td>
+                      {hasValues && (
+                        <td style={{ ...tdStyle, textAlign: "right", color: "#131722", fontVariantNumeric: "tabular-nums" }}>
+                          {h.valueMSEK != null ? `${h.valueMSEK.toLocaleString("sv-SE")} Mkr` : "–"}
+                        </td>
+                      )}
                       <td style={tdStyle}>
                         {exists ? (
                           <span style={{ color: "#1b5e20", fontSize: 11 }}>Finns i portfölj</span>
@@ -179,7 +193,8 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
               </button>
             </div>
           </>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

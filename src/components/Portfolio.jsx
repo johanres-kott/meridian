@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
+import InvestmentCompanyModal from "./InvestmentCompanyModal.jsx";
 import CompanyView from "./CompanyView.jsx";
 
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
@@ -237,6 +238,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
+  const [showInvestmentCo, setShowInvestmentCo] = useState(false);
   const [selected, setSelected] = useState(null);
   const [fxRates, setFxRates] = useState({ SEK: 1 });
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
@@ -391,6 +393,16 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           onImport={importHoldings}
         />
       )}
+      {showInvestmentCo && (
+        <InvestmentCompanyModal
+          onClose={() => setShowInvestmentCo(false)}
+          existingItems={items}
+          onImport={importHoldings}
+          groups={groups}
+          onUpdatePreferences={onUpdatePreferences}
+          onSetActiveGroup={setActiveGroup}
+        />
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Portfölj</div>
@@ -398,10 +410,16 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
           </div>
         </div>
-        <button onClick={() => setShowImport(true)}
-          style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
-          Importera PDF
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => setShowInvestmentCo(true)}
+            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+            Investmentbolag
+          </button>
+          <button onClick={() => setShowImport(true)}
+            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+            Importera PDF
+          </button>
+        </div>
       </div>
 
       {/* Group filter bar */}

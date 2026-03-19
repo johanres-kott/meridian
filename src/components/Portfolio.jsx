@@ -49,7 +49,7 @@ function AddCompanyBar({ onAdd }) {
     if (query.length < 2) { setResults([]); return; }
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         const filtered = (data.result || []).filter(r => r.type === "Common Stock").slice(0, 6);
         setResults(filtered);

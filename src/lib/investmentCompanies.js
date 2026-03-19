@@ -53,7 +53,7 @@ export const INVESTMENT_COMPANIES = [
       { name: "Avanza", ticker: "AZA.ST", weight: 50, valueMSEK: 5260 },
       { name: "Apotea", ticker: "APOTEA.ST", weight: 1, valueMSEK: 76 },
       { name: "Seafire", ticker: "SEAF.ST", weight: 1, valueMSEK: 68 },
-      { name: "Klarna", ticker: "KLAR.ST", weight: 1, valueMSEK: 64 },
+      { name: "Klarna", ticker: "KLAR", weight: 1, valueMSEK: 64 },
     ],
   },
 ];

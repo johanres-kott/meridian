@@ -37,7 +37,7 @@ const AVAILABLE_COMMODITIES = [
   { symbol: "GBP/SEK", name: "Pundet" },
 ];
 
-function Picker({ items, selected, onSave, onCancel }) {
+function Picker({ items, selected, onSave, onCancel, isMobile }) {
   const [checked, setChecked] = useState(new Set(selected));
 
   function toggle(symbol) {
@@ -49,7 +49,7 @@ function Picker({ items, selected, onSave, onCancel }) {
 
   return (
     <div style={{ padding: "12px 0" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px 16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2px 8px" : "2px 16px" }}>
         {items.map(item => (
           <label key={item.symbol} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 0", cursor: "pointer", fontSize: 12 }}>
             <input
@@ -89,7 +89,7 @@ function Picker({ items, selected, onSave, onCancel }) {
   );
 }
 
-export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences, userId }) {
+export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences, userId, isMobile }) {
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [data, setData] = useState(null);
@@ -193,17 +193,17 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
   const lastDate = new Date(lastSeenAt);
   const formattedDate = lastDate.toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
 
-  const sectionHeader = { fontSize: 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" };
-  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: "1px solid #f0f3fa" };
-  const tickerStyle = { fontSize: 12, fontWeight: 500, color: "#131722" };
-  const subtext = { fontSize: 11, color: "#787b86" };
+  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10, display: "flex", justifyContent: "space-between", alignItems: "center" };
+  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid #f0f3fa" };
+  const tickerStyle = { fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "#131722" };
+  const subtext = { fontSize: isMobile ? 10 : 11, color: "#787b86" };
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
   const editBtn = { fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textTransform: "none", letterSpacing: "normal", fontWeight: 400 };
 
   return (
     <div style={{ marginBottom: 28, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Sedan sist</span>
           <span style={{ fontSize: 11, color: "#787b86" }}>sedan {formattedDate}</span>
@@ -217,10 +217,10 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
       </div>
 
       {/* Content grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr 1fr", gap: 0 }}>
 
         {/* Portfolio movers */}
-        <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}><span>Din portfolj</span></div>
           {data.movers.length === 0 ? (
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga bolag i bevakning</div>
@@ -240,7 +240,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         </div>
 
         {/* Market highlights */}
-        <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>
             <span>Marknader{pinnedIndices.length > 0 ? "" : " (topp 4)"}</span>
             <button style={editBtn} onClick={() => { setEditingIndices(!editingIndices); setEditingCommodities(false); }}>
@@ -253,6 +253,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
               selected={pinnedIndices}
               onSave={(syms) => { onUpdatePreferences({ pinned_indices: syms }); setEditingIndices(false); }}
               onCancel={() => setEditingIndices(false)}
+              isMobile={isMobile}
             />
           ) : (
             displayIndices.map(idx => (
@@ -271,7 +272,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         </div>
 
         {/* Commodity highlights */}
-        <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>
             <span>Ravaror & FX{pinnedCommodities.length > 0 ? "" : " (topp 4)"}</span>
             <button style={editBtn} onClick={() => { setEditingCommodities(!editingCommodities); setEditingIndices(false); }}>
@@ -284,6 +285,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
               selected={pinnedCommodities}
               onSave={(syms) => { onUpdatePreferences({ pinned_commodities: syms }); setEditingCommodities(false); }}
               onCancel={() => setEditingCommodities(false)}
+              isMobile={isMobile}
             />
           ) : (
             displayCommodities.map(c => (
@@ -302,7 +304,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         </div>
 
         {/* News */}
-        <div style={{ padding: "16px 20px" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
           <div style={sectionHeader}><span>Nyheter</span></div>
           {data.news.length === 0 ? (
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga nyheter</div>

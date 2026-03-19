@@ -17,7 +17,7 @@ function calcWeeklyChange(points, currentPrice) {
   return ((currentPrice - ref.close) / ref.close) * 100;
 }
 
-export default function WeeklySummary({ userId, preferences = {} }) {
+export default function WeeklySummary({ userId, preferences = {}, isMobile }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
@@ -122,21 +122,21 @@ export default function WeeklySummary({ userId, preferences = {} }) {
 
   if (!data) return null;
 
-  const sectionHeader = { fontSize: 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 10 };
-  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: "1px solid #f0f3fa" };
-  const tickerStyle = { fontSize: 12, fontWeight: 500, color: "#131722" };
-  const subtext = { fontSize: 11, color: "#787b86" };
+  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10 };
+  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid #f0f3fa" };
+  const tickerStyle = { fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "#131722" };
+  const subtext = { fontSize: isMobile ? 10 : 11, color: "#787b86" };
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
   return (
     <div style={{ marginBottom: 24, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ padding: "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
+      <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Senaste veckan</span>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: data.portfolio.length > 0 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : (data.portfolio.length > 0 ? "1fr 1fr 1fr" : "1fr 1fr"), gap: 0 }}>
         {/* Index weekly */}
-        <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>Index</div>
           {data.indices.map(idx => (
             <div key={idx.symbol} style={listItem}>
@@ -162,7 +162,7 @@ export default function WeeklySummary({ userId, preferences = {} }) {
         </div>
 
         {/* Commodities weekly */}
-        <div style={{ padding: "16px 20px", borderRight: data.portfolio.length > 0 ? "1px solid #f0f3fa" : "none" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : (data.portfolio.length > 0 ? "1px solid #f0f3fa" : "none"), borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>Råvaror & FX</div>
           {data.commodities.map(c => (
             <div key={c.symbol} style={listItem}>
@@ -180,7 +180,7 @@ export default function WeeklySummary({ userId, preferences = {} }) {
 
         {/* Portfolio weekly */}
         {data.portfolio.length > 0 && (
-          <div style={{ padding: "16px 20px" }}>
+          <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
             <div style={sectionHeader}>Din portfolj</div>
             {data.portfolio.map(item => (
               <div key={item.ticker} style={listItem}>

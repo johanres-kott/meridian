@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
 
@@ -12,6 +13,7 @@ function formatValue(msek) {
 }
 
 export default function InvestmentCompanyModal({ onClose, existingItems, onImport, groups, onUpdatePreferences, onSetActiveGroup }) {
+  const isMobile = useIsMobile();
   const [selected, setSelected] = useState(null);
   const [groupName, setGroupName] = useState("");
   const [importing, setImporting] = useState(false);
@@ -88,7 +90,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
-      <div style={{ background: "#fff", borderRadius: 8, padding: 28, width: 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
+      <div style={{ background: "#fff", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
 
         {error && (
           <div style={{ background: "#fff5f5", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>

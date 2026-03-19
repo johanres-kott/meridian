@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const STATUS_COLORS = {
   Bevakar: { bg: "#f0f3fa", color: "#787b86" },
@@ -113,6 +114,7 @@ function NotesSection({ item, onUpdate }) {
 }
 
 export default function CompanyView({ item, onBack, onUpdate }) {
+  const isMobile = useIsMobile();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -183,16 +185,16 @@ export default function CompanyView({ item, onBack, onUpdate }) {
       ) : !company ? (
         <div style={{ color: "#f23645", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Kunde inte ladda data for {item.ticker}</div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: isMobile ? 16 : 20, alignItems: "start" }}>
           {/* Left column */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {/* Chart */}
             <PriceChart ticker={item.ticker} />
 
             {/* Key metrics */}
-            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 20 }}>
+            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 14 }}>Nyckeltal</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
                 <StatCard label="P/E Forward" value={fmt(company.peForward, "x")} />
                 <StatCard label="P/E Trailing" value={fmt(company.peTrailing, "x")} />
                 <StatCard label="EBITDA-marginal" value={fmt(company.ebitdaMargin, "%")} neg={company.ebitdaMargin < 0} />

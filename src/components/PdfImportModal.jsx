@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
 import { parseAvanzaPdf } from "../lib/parsePdf.js";
 import { resolveAllTickers } from "../lib/resolveTickersAvanza.js";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const PHASES = { upload: "upload", parsing: "parsing", resolving: "resolving", preview: "preview", importing: "importing" };
 
 export default function PdfImportModal({ onClose, onImport, existingTickers }) {
+  const isMobile = useIsMobile();
   const [phase, setPhase] = useState(PHASES.upload);
   const [error, setError] = useState(null);
   const [progress, setProgress] = useState("");
@@ -80,7 +82,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
-      <div style={{ background: "#fff", borderRadius: 8, padding: 28, width: 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
+      <div style={{ background: "#fff", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
         <div style={{ fontWeight: 600, fontSize: 16, color: "#131722", marginBottom: 20 }}>Importera portfölj från PDF</div>
 
         {error && (

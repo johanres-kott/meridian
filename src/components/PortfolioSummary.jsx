@@ -10,7 +10,7 @@ const STATUS_COLORS = {
   Avstår: "#880e4f",
 };
 
-export default function PortfolioSummary({ userId }) {
+export default function PortfolioSummary({ userId, isMobile }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
@@ -141,21 +141,21 @@ export default function PortfolioSummary({ userId }) {
 
   if (!data || data.empty) return null;
 
-  const sectionHeader = { fontSize: 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 10 };
-  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: "1px solid #f0f3fa" };
+  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10 };
+  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid #f0f3fa" };
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
   return (
     <div style={{ marginBottom: 24, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ padding: "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
+      <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Din portfolj</span>
         <span style={{ fontSize: 11, color: "#787b86", marginLeft: 8 }}>{data.totalCount} bolag</span>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: data.hasHoldings ? "1fr 1fr 1fr" : "1fr 1fr", gap: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : (data.hasHoldings ? "1fr 1fr 1fr" : "1fr 1fr"), gap: 0 }}>
         {/* Holdings value by currency */}
         {data.hasHoldings && (
-          <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+          <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
             <div style={sectionHeader}>Innehav</div>
             {data.totalSek !== null && (
               <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: "1px solid #f0f3fa" }}>
@@ -182,7 +182,7 @@ export default function PortfolioSummary({ userId }) {
         )}
 
         {/* Status distribution */}
-        <div style={{ padding: "16px 20px", borderRight: "1px solid #f0f3fa" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>Status</div>
           {Object.entries(data.statusCounts).map(([status, count]) => (
             <div key={status} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" }}>
@@ -193,7 +193,7 @@ export default function PortfolioSummary({ userId }) {
         </div>
 
         {/* Top movers today */}
-        <div style={{ padding: "16px 20px" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
           <div style={sectionHeader}>Största rörelser idag</div>
           {data.movers.length === 0 ? (
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga rörelser</div>

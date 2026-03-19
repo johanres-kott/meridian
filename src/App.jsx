@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase.js";
+import { useIsMobile } from "./hooks/useIsMobile.js";
 import Login from "./components/Login.jsx";
 import Markets from "./components/Markets.jsx";
 import Portfolio from "./components/Portfolio.jsx";
@@ -18,6 +19,7 @@ const TABS = [
 ];
 
 export default function App() {
+  const isMobile = useIsMobile();
   const [tab, setTab] = useState("markets");
   const [time, setTime] = useState(new Date());
   const [session, setSession] = useState(null);
@@ -155,8 +157,8 @@ export default function App() {
       `}</style>
 
       {/* Topbar */}
-      <div style={{ borderBottom: "1px solid #e0e3eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", height: 46, position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+      <div style={{ borderBottom: "1px solid #e0e3eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 12px" : "0 32px", height: 46, position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 32, flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <svg width="22" height="22" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="56" height="56" rx="12" fill="#3B6AE6"/>
@@ -175,22 +177,26 @@ export default function App() {
             </svg>
             <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px" }}>Thesion</span>
           </div>
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", overflow: "auto", msOverflowStyle: "none", scrollbarWidth: "none" }}>
             {TABS.map(t => (
-              <button key={t.id} className={`tab-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)}>
+              <button key={t.id} className={`tab-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)} style={isMobile ? { padding: "10px 10px", fontSize: 12 } : undefined}>
                 {t.label}
               </button>
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-          <span style={{ fontSize: 12, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>
-            {time.toLocaleTimeString("sv-SE")} CET
-          </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
-            <span style={{ fontSize: 11, color: "#787b86" }}>Live</span>
-          </div>
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 16, flexShrink: 0 }}>
+          {!isMobile && (
+            <>
+              <span style={{ fontSize: 12, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>
+                {time.toLocaleTimeString("sv-SE")} CET
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
+                <span style={{ fontSize: 11, color: "#787b86" }}>Live</span>
+              </div>
+            </>
+          )}
           <button
             onClick={() => setChatOpen(!chatOpen)}
             style={{ fontSize: 11, color: chatOpen ? "#2962ff" : "#787b86", background: chatOpen ? "#f0f3fa" : "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
@@ -205,7 +211,7 @@ export default function App() {
               <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#2962ff", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
                 {displayInitial}
               </div>
-              {displayName}
+              {!isMobile && displayName}
             </button>
             {profileOpen && (
               <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 240, zIndex: 100 }}>
@@ -254,7 +260,7 @@ export default function App() {
 
       {/* Content + Chat */}
       <div style={{ display: "flex", height: "calc(100vh - 46px)" }}>
-        <div style={{ flex: 1, overflow: "auto", padding: "24px 32px" }}>
+        <div style={{ flex: 1, overflow: "auto", padding: isMobile ? "16px 12px" : "24px 32px" }}>
           {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} />}
           {tab === "commodities" && <Commodities />}
           {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} />}

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
+
+const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
 
 function formatValue(msek) {
   if (msek >= 1000) {
@@ -14,6 +16,18 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
   const [groupName, setGroupName] = useState("");
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState(null);
+  const [companies, setCompanies] = useState(INVESTMENT_COMPANIES);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(SCRAPER_API)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) setCompanies(data);
+      })
+      .catch(() => {}) // Fall back to static data
+      .finally(() => setLoading(false));
+  }, []);
 
   const existingTickers = new Set((existingItems || []).map(i => i.ticker.toUpperCase()));
   const groupNames = new Set((groups || []).map(g => g.name));
@@ -85,10 +99,13 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
         {!selected ? (
           <>
             <div style={{ fontWeight: 600, fontSize: 16, color: "#131722", marginBottom: 4 }}>Skapa grupp från investmentbolag</div>
-            <div style={{ fontSize: 12, color: "#787b86", marginBottom: 20 }}>Välj ett investmentbolag för att skapa en grupp med deras noterade innehav.</div>
+            <div style={{ fontSize: 12, color: "#787b86", marginBottom: 20 }}>
+              Välj ett investmentbolag för att skapa en grupp med deras noterade innehav.
+              {loading && " Hämtar data..."}
+            </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {INVESTMENT_COMPANIES.map(company => (
+              {companies.map(company => (
                 <button
                   key={company.id}
                   onClick={() => selectCompany(company)}

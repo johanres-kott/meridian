@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
 import InvestmentCompanyModal from "./InvestmentCompanyModal.jsx";
+import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import CompanyView from "./CompanyView.jsx";
 
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
@@ -134,7 +135,15 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
   );
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup }) {
+function formatHoldingValue(msek) {
+  if (msek >= 1000) {
+    const mdkr = msek / 1000;
+    return `${mdkr % 1 === 0 ? mdkr.toFixed(0) : mdkr.toFixed(1)} Mdkr`;
+  }
+  return `${msek.toLocaleString("sv-SE")} Mkr`;
+}
+
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false }) {
   const [price, setPrice] = useState(null);
   const [tagOpen, setTagOpen] = useState(false);
 
@@ -186,6 +195,16 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
           {tagOpen && <GroupTagPopover item={item} groups={groups} onToggle={onToggleGroup} onClose={() => setTagOpen(false)} />}
         </div>
       </td>
+      {showInvestmentCols && (
+        <td style={{ ...tdBase, textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: "#131722" }}>
+          {investmentHolding?.weight != null ? `${investmentHolding.weight}%` : "–"}
+        </td>
+      )}
+      {showInvestmentCols && (
+        <td style={{ ...tdBase, textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: "#131722" }}>
+          {investmentHolding?.valueMSEK != null ? formatHoldingValue(investmentHolding.valueMSEK) : "–"}
+        </td>
+      )}
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
         {price ? (
           <>
@@ -384,6 +403,14 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const hasAnyShares = filteredItems.some(i => i.shares);
   const hasAnyPL = filteredItems.some(i => i.gav && i.shares);
 
+  // Match active group to an investment company for weight/value columns
+  const activeInvestmentCo = activeGroup
+    ? INVESTMENT_COMPANIES.find(c => c.name === activeGroup)
+    : null;
+  const holdingByTicker = activeInvestmentCo
+    ? Object.fromEntries(activeInvestmentCo.holdings.map(h => [h.ticker.toUpperCase(), h]))
+    : {};
+
   return (
     <div>
       {showImport && (
@@ -502,10 +529,10 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["", "Bolag", "Status", "Grupper", "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                {["", "Bolag", "Status", "Grupper", ...(activeInvestmentCo ? ["Vikt", "Innehav"] : []), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
                     padding: "8px 14px",
-                    textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
+                    textAlign: ["Kurs", "Värde", "P&L", "Vikt", "Innehav"].includes(h) ? "right" : "left",
                     fontSize: 11, fontWeight: 500, color: "#787b86",
                     borderBottom: "1px solid #e0e3eb",
                   }}>{h}</th>
@@ -514,7 +541,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} showInvestmentCols={!!activeInvestmentCo} investmentHolding={holdingByTicker[item.ticker.toUpperCase()] || null} />
               ))}
             </tbody>
           </table>

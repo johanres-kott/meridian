@@ -5,6 +5,7 @@ import InvestmentCompanyModal from "./InvestmentCompanyModal.jsx";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import CompanyView from "./CompanyView.jsx";
 
+const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
@@ -262,11 +263,17 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const [fxRates, setFxRates] = useState({ SEK: 1 });
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
   const [creatingGroup, setCreatingGroup] = useState(false);
+  const [investmentCompanies, setInvestmentCompanies] = useState(INVESTMENT_COMPANIES);
   const [newGroupName, setNewGroupName] = useState("");
 
   const groups = preferences.groups || [];
 
-  useEffect(() => { load(); loadFxRates(); }, []);
+  useEffect(() => {
+    load(); loadFxRates();
+    fetch(SCRAPER_API).then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) setInvestmentCompanies(data);
+    }).catch(() => {});
+  }, []);
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -405,7 +412,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
 
   // Match active group to an investment company for weight/value columns
   const activeInvestmentCo = activeGroup
-    ? INVESTMENT_COMPANIES.find(c => c.name === activeGroup)
+    ? investmentCompanies.find(c => c.name === activeGroup)
     : null;
   const holdingByTicker = activeInvestmentCo
     ? Object.fromEntries(activeInvestmentCo.holdings.map(h => [h.ticker.toUpperCase(), h]))

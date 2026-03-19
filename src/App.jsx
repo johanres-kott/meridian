@@ -7,6 +7,7 @@ import GapAnalysis from "./components/GapAnalysis.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
 import Commodities from "./components/Commodities.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
+import Privacy from "./components/Privacy.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -24,6 +25,7 @@ export default function App() {
   const [lastSeenAt, setLastSeenAt] = useState(null);
   const [preferences, setPreferences] = useState({});
   const [chatOpen, setChatOpen] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
@@ -139,7 +141,8 @@ export default function App() {
     );
   }
 
-  if (!session) return <Login />;
+  if (showPrivacy) return <Privacy onBack={() => setShowPrivacy(false)} />;
+  if (!session) return <Login onShowPrivacy={() => setShowPrivacy(true)} />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#ffffff", color: "#131722", fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>

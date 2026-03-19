@@ -1,5 +1,5 @@
-const FMP_KEY = "DZJzkZrPZXSCrJPErOadzWJ8JzfbsYmq";
-const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
+const FMP_KEY = process.env.FMP_KEY;
+const FINNHUB_KEY = process.env.FINNHUB_KEY;
 const UA = "Mozilla/5.0";
 
 async function getYahooCrumb() {

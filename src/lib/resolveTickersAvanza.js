@@ -1,5 +1,3 @@
-const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
-
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function makeMatch(r) {
@@ -27,7 +25,7 @@ function pickBestMatch(results, { excludePref = false } = {}) {
 
 async function searchFinnhub(query) {
   const res = await fetch(
-    `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${FINNHUB_KEY}`
+    `/api/search?q=${encodeURIComponent(query)}`
   );
   const data = await res.json();
   if (data.error) return []; // e.g., "q too long"

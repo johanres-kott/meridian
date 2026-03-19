@@ -49,4 +49,9 @@ function vercelApiPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), vercelApiPlugin()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: [],
+  },
 })

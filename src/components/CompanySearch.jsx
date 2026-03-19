@@ -2,8 +2,6 @@ import { useState, useCallback, useRef } from "react";
 import { fmt } from "./shared.js"
 import { StatCard } from "./SharedComponents.jsx";
 
-const FINNHUB_KEY = "d6nuva9r01qse5qn7jvgd6nuva9r01qse5qn7k00";
-
 export default function CompanySearch() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -19,7 +17,7 @@ export default function CompanySearch() {
     if (q.length < 2) { setSuggestions([]); return; }
     setSuggestLoading(true);
     try {
-      const r = await fetch(`https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${FINNHUB_KEY}`);
+      const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
       const d = await r.json();
       const results = (d.result ?? [])
         .filter(s => s.type === "Common Stock" || s.type === "EQS")

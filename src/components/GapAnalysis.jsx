@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const FLAG_MAP = {
   ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
@@ -31,6 +32,7 @@ const COLUMNS = [
 ];
 
 export default function GapAnalysis({ preferences = {} }) {
+  const isMobile = useIsMobile();
   const [items, setItems] = useState([]);
   const [companyData, setCompanyData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -181,7 +183,7 @@ export default function GapAnalysis({ preferences = {} }) {
         </div>
       ) : (
         <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : 900 }}>
             <thead>
               <tr>
                 <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>

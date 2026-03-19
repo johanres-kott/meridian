@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef } from "react";
 import { fmt } from "./shared.js"
 import { StatCard } from "./SharedComponents.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function CompanySearch() {
+  const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -83,7 +85,7 @@ export default function CompanySearch() {
 
       {/* Search box */}
       <div style={{ position: "relative", marginBottom: 24 }}>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 8 }}>
           <div style={{ flex: 1, position: "relative" }}>
             <input
               value={query}
@@ -145,7 +147,7 @@ export default function CompanySearch() {
       )}
 
       {result && (
-        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, padding: 24 }}>
+        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, padding: isMobile ? 12 : 24 }}>
           {/* Header */}
           <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
@@ -171,7 +173,7 @@ export default function CompanySearch() {
           </div>
 
           {/* Metrics grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
             <StatCard label="P/E Forward" value={fmt(result.peForward, "x")} />
             <StatCard label="P/E Trailing" value={fmt(result.peTrailing, "x")} />
             <StatCard label="EBITDA Margin" value={fmt(result.ebitdaMargin, "%")} neg={result.ebitdaMargin < 0} />

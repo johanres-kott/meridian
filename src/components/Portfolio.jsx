@@ -4,6 +4,7 @@ import PdfImportModal from "./PdfImportModal.jsx";
 import InvestmentCompanyModal from "./InvestmentCompanyModal.jsx";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import CompanyView from "./CompanyView.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
@@ -42,7 +43,7 @@ async function fetchPrice(ticker) {
   }
 }
 
-function AddCompanyBar({ onAdd }) {
+function AddCompanyBar({ onAdd, isMobile }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
@@ -72,7 +73,7 @@ function AddCompanyBar({ onAdd }) {
         value={query}
         onChange={e => setQuery(e.target.value)}
         placeholder="Lägg till bolag — sök på namn eller ticker..."
-        style={{ width: "100%", padding: "10px 14px", border: "1px solid #e0e3eb", borderRadius: 6, fontSize: 13, fontFamily: "inherit", outline: "none", color: "#131722", background: "#fff" }}
+        style={{ width: "100%", maxWidth: isMobile ? "100%" : undefined, boxSizing: isMobile ? "border-box" : undefined, padding: "10px 14px", border: "1px solid #e0e3eb", borderRadius: 6, fontSize: 13, fontFamily: "inherit", outline: "none", color: "#131722", background: "#fff" }}
       />
       {results.length > 0 && (
         <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", zIndex: 100, marginTop: 4 }}>
@@ -144,7 +145,7 @@ function formatHoldingValue(msek) {
   return `${msek.toLocaleString("sv-SE")} Mkr`;
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true }) {
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false }) {
   const [price, setPrice] = useState(null);
   const [tagOpen, setTagOpen] = useState(false);
 
@@ -164,7 +165,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
   const plPct = (item.gav && priceSek) ? ((priceSek - item.gav) / item.gav * 100) : null;
 
   const itemGroups = groups.filter(g => (g.members || []).includes(item.id));
-  const tdBase = { padding: "10px 14px", borderBottom: "1px solid #f0f3fa" };
+  const tdBase = { padding: isMobile ? "6px 8px" : "10px 14px", borderBottom: "1px solid #f0f3fa" };
 
   return (
     <tr
@@ -180,24 +181,37 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
       </td>
       {showStatus && (
         <td style={tdBase} onClick={e => e.stopPropagation()}>
-          <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
-            style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
-            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          {isMobile ? (
+            <div
+              title={item.status}
+              style={{
+                width: 10, height: 10, borderRadius: "50%",
+                background: STATUS_COLORS[item.status]?.color || "#787b86",
+                margin: "0 auto",
+              }}
+            />
+          ) : (
+            <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
+              style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
+              {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          )}
         </td>
       )}
-      <td style={{ ...tdBase, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center", position: "relative" }}>
-          {itemGroups.map(g => (
-            <span key={g.name} style={{ fontSize: 10, padding: "2px 7px", borderRadius: 10, background: "#f0f3fa", color: "#787b86", whiteSpace: "nowrap" }}>{g.name}</span>
-          ))}
-          <button onClick={() => setTagOpen(!tagOpen)}
-            style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "#787b86", lineHeight: 1.4 }}
-            title="Hantera grupper"
-          >+</button>
-          {tagOpen && <GroupTagPopover item={item} groups={groups} onToggle={onToggleGroup} onClose={() => setTagOpen(false)} />}
-        </div>
-      </td>
+      {!isMobile && (
+        <td style={{ ...tdBase, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center", position: "relative" }}>
+            {itemGroups.map(g => (
+              <span key={g.name} style={{ fontSize: 10, padding: "2px 7px", borderRadius: 10, background: "#f0f3fa", color: "#787b86", whiteSpace: "nowrap" }}>{g.name}</span>
+            ))}
+            <button onClick={() => setTagOpen(!tagOpen)}
+              style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "#787b86", lineHeight: 1.4 }}
+              title="Hantera grupper"
+            >+</button>
+            {tagOpen && <GroupTagPopover item={item} groups={groups} onToggle={onToggleGroup} onClose={() => setTagOpen(false)} />}
+          </div>
+        </td>
+      )}
       {showInvestmentCols && (
         <td style={{ ...tdBase, textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: "#131722" }}>
           {investmentHolding?.weight != null ? `${investmentHolding.weight}%` : "–"}
@@ -257,6 +271,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
 }
 
 export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
+  const isMobile = useIsMobile();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
@@ -444,27 +459,27 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           onSetActiveGroup={setActiveGroup}
         />
       )}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 20, gap: isMobile ? 12 : 0 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Portfölj</div>
           <div style={{ fontSize: 12, color: "#787b86" }}>
             {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexDirection: isMobile ? "column" : "row" }}>
           <button onClick={() => setShowInvestmentCo(true)}
-            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
             Investmentbolag
           </button>
           <button onClick={() => setShowImport(true)}
-            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
             Importera portfölj
           </button>
         </div>
       </div>
 
       {/* Group filter bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : undefined, WebkitOverflowScrolling: isMobile ? "touch" : undefined }}>
         <button
           onClick={() => setActiveGroup(null)}
           style={{
@@ -567,7 +582,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
         )}
       </div>
 
-      <AddCompanyBar onAdd={addCompany} />
+      <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
       {filteredItems.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "#787b86", fontSize: 13 }}>
           {activeGroup
@@ -575,13 +590,13 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             : "Inga bolag ännu — sök efter ett bolag ovan för att lägga till"}
         </div>
       ) : (
-        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden", overflowX: isMobile ? "auto" : "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : undefined }}>
             <thead>
               <tr>
-                {["", "Bolag", ...(!activeInvestmentCo ? ["Status"] : []), "Grupper", ...(activeInvestmentCo ? ["Vikt", "Innehav"] : []), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                {["", "Bolag", ...(!activeInvestmentCo ? ["Status"] : []), ...(isMobile ? [] : ["Grupper"]), ...(activeInvestmentCo ? ["Vikt", "Innehav"] : []), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
-                    padding: "8px 14px",
+                    padding: isMobile ? "6px 8px" : "8px 14px",
                     textAlign: ["Kurs", "Värde", "P&L", "Vikt", "Innehav"].includes(h) ? "right" : "left",
                     fontSize: 11, fontWeight: 500, color: "#787b86",
                     borderBottom: "1px solid #e0e3eb",
@@ -591,7 +606,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} showInvestmentCols={!!activeInvestmentCo} showStatus={!activeInvestmentCo} investmentHolding={holdingByTicker[item.ticker.toUpperCase()] || null} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} showInvestmentCols={!!activeInvestmentCo} showStatus={!activeInvestmentCo} investmentHolding={holdingByTicker[item.ticker.toUpperCase()] || null} isMobile={isMobile} />
               ))}
             </tbody>
           </table>

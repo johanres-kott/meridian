@@ -144,7 +144,7 @@ function formatHoldingValue(msek) {
   return `${msek.toLocaleString("sv-SE")} Mkr`;
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false }) {
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true }) {
   const [price, setPrice] = useState(null);
   const [tagOpen, setTagOpen] = useState(false);
 
@@ -178,12 +178,14 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
         <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{item.name || item.ticker}</div>
         <div style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</div>
       </td>
-      <td style={tdBase} onClick={e => e.stopPropagation()}>
-        <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
-          style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
-          {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-      </td>
+      {showStatus && (
+        <td style={tdBase} onClick={e => e.stopPropagation()}>
+          <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
+            style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
+            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </td>
+      )}
       <td style={{ ...tdBase, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center", position: "relative" }}>
           {itemGroups.map(g => (
@@ -410,6 +412,11 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const hasAnyShares = filteredItems.some(i => i.shares);
   const hasAnyPL = filteredItems.some(i => i.gav && i.shares);
 
+  // Split groups into user groups and investment company groups
+  const investmentCoNames = new Set(investmentCompanies.map(c => c.name));
+  const userGroups = groups.filter(g => !investmentCoNames.has(g.name));
+  const investmentGroups = groups.filter(g => investmentCoNames.has(g.name));
+
   // Match active group to an investment company for weight/value columns
   const activeInvestmentCo = activeGroup
     ? investmentCompanies.find(c => c.name === activeGroup)
@@ -451,7 +458,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           </button>
           <button onClick={() => setShowImport(true)}
             style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
-            Importera PDF
+            Importera portfölj
           </button>
         </div>
       </div>
@@ -470,7 +477,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
         >
           Alla ({items.length})
         </button>
-        {groups.map(g => {
+        {userGroups.map(g => {
           const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
           const isActive = activeGroup === g.name;
           return (
@@ -522,6 +529,42 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             + Ny grupp
           </button>
         )}
+        {investmentGroups.length > 0 && (
+          <>
+            <div style={{ width: 1, height: 20, background: "#e0e3eb", margin: "0 4px" }} />
+            {investmentGroups.map(g => {
+              const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
+              const isActive = activeGroup === g.name;
+              return (
+                <div key={g.name} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <button
+                    onClick={() => setActiveGroup(isActive ? null : g.name)}
+                    style={{
+                      fontSize: 12, padding: "5px 12px", borderRadius: 14,
+                      border: isActive ? "1px solid #2962ff" : "1px solid #e0e3eb",
+                      background: isActive ? "#f0f3fa" : "#fff",
+                      color: isActive ? "#2962ff" : "#787b86",
+                      cursor: "pointer", fontFamily: "inherit", fontWeight: isActive ? 500 : 400,
+                    }}
+                  >
+                    {g.name} ({count})
+                  </button>
+                  {isActive && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); deleteGroup(g.name); }}
+                      title="Ta bort grupp"
+                      style={{ marginLeft: 2, fontSize: 11, color: "#c0c3cb", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
+                      onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
+                      onMouseLeave={e => e.currentTarget.style.color = "#c0c3cb"}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        )}
       </div>
 
       <AddCompanyBar onAdd={addCompany} />
@@ -536,7 +579,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["", "Bolag", "Status", "Grupper", ...(activeInvestmentCo ? ["Vikt", "Innehav"] : []), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                {["", "Bolag", ...(!activeInvestmentCo ? ["Status"] : []), "Grupper", ...(activeInvestmentCo ? ["Vikt", "Innehav"] : []), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
                     padding: "8px 14px",
                     textAlign: ["Kurs", "Värde", "P&L", "Vikt", "Innehav"].includes(h) ? "right" : "left",
@@ -548,7 +591,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} showInvestmentCols={!!activeInvestmentCo} investmentHolding={holdingByTicker[item.ticker.toUpperCase()] || null} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} showInvestmentCols={!!activeInvestmentCo} showStatus={!activeInvestmentCo} investmentHolding={holdingByTicker[item.ticker.toUpperCase()] || null} />
               ))}
             </tbody>
           </table>

@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 
+function formatValue(msek) {
+  if (msek >= 1000) {
+    const mdkr = msek / 1000;
+    return `${mdkr % 1 === 0 ? mdkr.toFixed(0) : mdkr.toFixed(1)} Mdkr`;
+  }
+  return `${msek.toLocaleString("sv-SE")} Mkr`;
+}
+
 export default function InvestmentCompanyModal({ onClose, existingItems, onImport, groups, onUpdatePreferences, onSetActiveGroup }) {
   const [selected, setSelected] = useState(null);
   const [groupName, setGroupName] = useState("");
@@ -157,7 +165,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                       </td>
                       {hasValues && (
                         <td style={{ ...tdStyle, textAlign: "right", color: "#131722", fontVariantNumeric: "tabular-nums" }}>
-                          {h.valueMSEK != null ? `${h.valueMSEK.toLocaleString("sv-SE")} Mkr` : "–"}
+                          {h.valueMSEK != null ? formatValue(h.valueMSEK) : "–"}
                         </td>
                       )}
                       <td style={tdStyle}>

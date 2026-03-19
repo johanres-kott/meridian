@@ -1,5 +1,10 @@
+import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  setCors(req, res);
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (rateLimit(req, res)) return;
 
   const symbols = [
     { symbol: "%5EGSPC", display: "SPX", name: "S&P 500", region: "Americas" },

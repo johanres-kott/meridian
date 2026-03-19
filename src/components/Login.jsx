@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabase.js";
 
-export default function Login() {
+export default function Login({ onShowPrivacy }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState("login");
@@ -133,6 +133,15 @@ export default function Login() {
           </button>
         </div>
       </div>
+
+      {onShowPrivacy && (
+        <button
+          onClick={onShowPrivacy}
+          style={{ marginTop: 16, fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          Integritetspolicy
+        </button>
+      )}
     </div>
   );
 }

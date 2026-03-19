@@ -1,8 +1,12 @@
+import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
+
 const FINNHUB_KEY = process.env.FINNHUB_KEY;
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  setCors(req, res);
   if (req.method === "OPTIONS") return res.status(200).end();
+  if (rateLimit(req, res)) return;
 
   const q = req.query.q;
   if (!q || q.length < 2) {

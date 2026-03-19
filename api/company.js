@@ -1,3 +1,6 @@
+import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
+
 const FMP_KEY = process.env.FMP_KEY;
 const FINNHUB_KEY = process.env.FINNHUB_KEY;
 const UA = "Mozilla/5.0";
@@ -121,7 +124,9 @@ async function getFinnhubNews(ticker) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  setCors(req, res);
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (rateLimit(req, res)) return;
   res.setHeader("Cache-Control", "s-maxage=300");
 
   const { ticker } = req.query;

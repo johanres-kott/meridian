@@ -22,6 +22,8 @@ const INVESTMENT_COMPANY_TICKERS = new Set([
   "INVE-B.ST", "INDU-C.ST", "ORES.ST", "LATO-B.ST",
   "LUND-B.ST", "SVOL-B.ST", "CREAS.ST", "BURE.ST",
   "KINV-B.ST", "TREL-B.ST", "HAVSFR.ST",
+  "RATOS-B.ST", "ELAN-B.ST", "NAXS.ST", "VNV.ST",
+  "BRK-B", "BRK-A", // Berkshire Hathaway
 ]);
 
 /**

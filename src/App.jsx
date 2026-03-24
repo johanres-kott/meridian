@@ -332,7 +332,7 @@ export default function App() {
           {tab === "commodities" && <Commodities deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "analysis" && <GapAnalysis preferences={preferences} onNavigate={navigate} />}
-          {tab === "search" && <CompanySearch />}
+          {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "investment" && <InvestmentCompanies />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />

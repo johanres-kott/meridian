@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { fmt } from "./shared.js"
 import { StatCard } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function CompanySearch() {
+export default function CompanySearch({ deepLink, onClearDeepLink }) {
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -57,6 +57,16 @@ export default function CompanySearch() {
       setSuggestLoading(false);
     }
   }, [enrichSuggestions]);
+
+  // Handle deep link from other pages
+  useEffect(() => {
+    if (deepLink?.ticker) {
+      const ticker = deepLink.ticker;
+      setQuery(ticker);
+      fetchCompany(ticker);
+      onClearDeepLink?.();
+    }
+  }, [deepLink]);
 
   const handleInput = (e) => {
     const val = e.target.value;

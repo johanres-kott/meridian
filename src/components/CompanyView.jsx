@@ -123,6 +123,18 @@ function getMetricOrder(investorType) {
   return orders[investorType] || ["peForward", "peTrailing", "ebitdaMargin", "operatingMargin", "grossMargin", "roic", "debtEbitda", "revenueGrowth", "dividendYield"];
 }
 
+const METRIC_TIPS = {
+  peForward: "Aktiekursen delat med förväntad vinst per aktie. Lägre = billigare.",
+  peTrailing: "Aktiekursen delat med senaste årets vinst per aktie.",
+  ebitdaMargin: "Vinst före räntor, skatt och avskrivningar som andel av omsättningen.",
+  operatingMargin: "Rörelseresultat delat med omsättning. Visar hur mycket som blir vinst.",
+  grossMargin: "Omsättning minus varukostnad, delat med omsättning. Högre = bättre.",
+  roic: "Avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar.",
+  debtEbitda: "Nettoskuld delat med EBITDA. Över 3x anses högt belånat.",
+  revenueGrowth: "Omsättningstillväxt jämfört med föregående år.",
+  dividendYield: "Årlig utdelning delat med aktiekursen. Högre = mer tillbaka varje år.",
+};
+
 const METRIC_LABELS = {
   peForward: "P/E Forward",
   peTrailing: "P/E Trailing",
@@ -229,7 +241,9 @@ export default function CompanyView({ item, onBack, onUpdate, investorType }) {
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 14 }}>Nyckeltal</div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
                 {getMetricOrder(investorType).map(key => (
-                  <StatCard key={key} label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} />
+                  <div key={key} title={METRIC_TIPS[key] || ""} style={{ cursor: METRIC_TIPS[key] ? "help" : "default" }}>
+                    <StatCard label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} />
+                  </div>
                 ))}
               </div>
             </div>

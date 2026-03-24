@@ -428,7 +428,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
 
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
-    return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} investorType={preferences.investorProfile?.investorType} />;
+    return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} investorType={preferences.investorProfile?.investorType} investorProfile={preferences.investorProfile} />;
   }
 
   // Filter items by active group

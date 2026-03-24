@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { matchStock, getStockRisk, riskLabel } from "../lib/profileMatcher.js";
 import QuarterlyChart from "./QuarterlyChart.jsx";
 
 const STATUS_COLORS = {
@@ -158,7 +159,58 @@ function isNeg(key, value) {
   return value < 0;
 }
 
-export default function CompanyView({ item, onBack, onUpdate, investorType }) {
+function ProfileInsight({ ticker, company, investorProfile }) {
+  if (!investorProfile) return null;
+
+  const { tags, warnings, score } = matchStock(ticker, investorProfile);
+  const risk = getStockRisk(ticker);
+  const riskText = riskLabel(risk);
+  const hasDiv = company?.dividendYield > 0;
+  const allItems = [];
+
+  // Risk
+  if (riskText) {
+    const riskColor = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
+    allItems.push({ icon: "◉", color: riskColor, text: riskText });
+  }
+
+  // Dividend
+  if (hasDiv) {
+    allItems.push({ icon: "💰", color: "#089981", text: `Direktavkastning ${company.dividendYield.toFixed(1)}%` });
+  } else {
+    allItems.push({ icon: "–", color: "#787b86", text: "Ingen utdelning" });
+  }
+
+  // Sector
+  if (company?.sector && company.sector !== "—") {
+    allItems.push({ icon: "🏢", color: "#787b86", text: company.sector });
+  }
+
+  // Profile tags
+  tags.forEach(t => allItems.push({ icon: "✓", color: "#089981", text: t }));
+  warnings.forEach(w => allItems.push({ icon: "⚠", color: "#e65100", text: w }));
+
+  return (
+    <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 16 }}>
+      <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {allItems.map((item, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+            <span style={{ color: item.color, fontSize: 12, width: 16, textAlign: "center", flexShrink: 0 }}>{item.icon}</span>
+            <span style={{ color: "#131722" }}>{item.text}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 10, padding: "8px 10px", background: score >= 60 ? "#e8f5e9" : score >= 40 ? "#fff8e1" : "#fff5f5", borderRadius: 4 }}>
+        <div style={{ fontSize: 11, fontWeight: 500, color: score >= 60 ? "#089981" : score >= 40 ? "#e65100" : "#c62828" }}>
+          {score >= 60 ? "Matchar din profil" : score >= 40 ? "Delvis matchning" : "Avviker från din profil"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CompanyView({ item, onBack, onUpdate, investorType, investorProfile }) {
   const isMobile = useIsMobile();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -302,8 +354,11 @@ export default function CompanyView({ item, onBack, onUpdate, investorType }) {
             )}
           </div>
 
-          {/* Right column: Notes + GAV */}
-          <NotesSection item={item} onUpdate={onUpdate} />
+          {/* Right column: Profile insight + Notes + GAV */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <ProfileInsight ticker={item.ticker} company={company} investorProfile={investorProfile} />
+            <NotesSection item={item} onUpdate={onUpdate} />
+          </div>
         </div>
       )}
     </div>

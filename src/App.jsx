@@ -283,7 +283,7 @@ export default function App() {
       {/* Content + Chat */}
       <div style={{ display: "flex", height: isMobile ? "calc(100vh - 82px)" : "calc(100vh - 42px)" }}>
         <div style={{ flex: 1, overflow: "auto", padding: isMobile ? "16px 12px" : "24px 32px" }}>
-          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} />}
+          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} onNavigate={setTab} />}
           {tab === "commodities" && <Commodities />}
           {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} />}
           {tab === "analysis" && <GapAnalysis preferences={preferences} />}

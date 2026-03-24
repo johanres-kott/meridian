@@ -284,7 +284,9 @@ export default function InvestmentCompanies() {
   const [selectedId, setSelectedId] = useState("investor");
   const company = COMPANIES.find(c => c.id === selectedId);
 
+  const fullTicker = `${company.ticker}.${company.exchange}`;
   const { data: leadershipData } = useFetch(`/api/leadership?id=${selectedId}`);
+  const { data: companyData } = useFetch(`/api/company?ticker=${encodeURIComponent(fullTicker)}`);
 
   return (
     <div>
@@ -331,7 +333,20 @@ export default function InvestmentCompanies() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {companyData?.price != null && (
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#131722" }}>
+                {companyData.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span style={{ fontSize: 12, color: "#787b86", marginLeft: 4 }}>{companyData.currency}</span>
+              </div>
+              {companyData.changePercent != null && (
+                <div style={{ fontSize: 12, fontWeight: 500, color: companyData.changePercent >= 0 ? "#089981" : "#f23645" }}>
+                  {companyData.changePercent >= 0 ? "+" : ""}{companyData.changePercent.toFixed(2)}%
+                </div>
+              )}
+            </div>
+          )}
           {leadershipData && (
             <Badge
               text={leadershipData.source === "live" ? "● Live data" : "Cached data"}

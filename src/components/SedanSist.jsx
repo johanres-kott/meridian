@@ -89,7 +89,7 @@ function Picker({ items, selected, onSave, onCancel, isMobile }) {
   );
 }
 
-export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences, userId, isMobile }) {
+export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences, userId, isMobile, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [data, setData] = useState(null);
@@ -226,7 +226,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga bolag i bevakning</div>
           ) : (
             data.movers.slice(0, 5).map(c => (
-              <div key={c.ticker} style={listItem}>
+              <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio")}>
                 <div>
                   <div style={tickerStyle}>{c.name}</div>
                   <div style={{ ...subtext, ...mono }}>{c.ticker}</div>
@@ -257,7 +257,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             />
           ) : (
             displayIndices.map(idx => (
-              <div key={idx.symbol} style={listItem}>
+              <div key={idx.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities")}>
                 <div>
                   <div style={tickerStyle}>{idx.name}</div>
                   <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
@@ -289,7 +289,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             />
           ) : (
             displayCommodities.map(c => (
-              <div key={c.symbol} style={listItem}>
+              <div key={c.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities")}>
                 <div>
                   <div style={tickerStyle}>{c.name}</div>
                   <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>

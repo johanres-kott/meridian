@@ -4,7 +4,7 @@ import PortfolioSummary from "./PortfolioSummary.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
 
-export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName }) {
+export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
   const isMobile = useIsMobile();
 
   return (
@@ -14,7 +14,7 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
           Hej, {displayName}!
         </h1>
       </div>
-      <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} />
+      <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       <PortfolioSummary userId={userId} isMobile={isMobile} />
       <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} />
       <UpcomingEarnings userId={userId} isMobile={isMobile} />

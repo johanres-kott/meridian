@@ -34,6 +34,23 @@ export default async function handler(req, res) {
         `${c.name} (${c.display}): ${c.price} ${c.unit}, ${c.change > 0 ? "+" : ""}${c.change}%`
       ).join("\n"));
     }
+    if (context.investorProfile) {
+      const p = context.investorProfile;
+      const typeMap = { value: "Värdeinvesterare", growth: "Tillväxtinvesterare", dividend: "Utdelningsinvesterare", index: "Indexinvesterare", mixed: "Blandat" };
+      const riskMap = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" };
+      const focusMap = { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" };
+      const geoMap = { nordic: "Norden", global: "Globalt", both: "Blandat" };
+      const interestLabels = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat & Livsmedel", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
+      const profileParts = [
+        typeMap[p.investorType],
+        riskMap[p.riskProfile],
+        focusMap[p.focus],
+        geoMap[p.geography] ? `Fokus: ${geoMap[p.geography]}` : null,
+        p.interests?.length > 0 ? `Intressen: ${p.interests.map(i => interestLabels[i] || i).join(", ")}` : null,
+      ].filter(Boolean);
+      parts.push("INVESTERARPROFIL:\n" + profileParts.join(", "));
+    }
+
     if (parts.length > 0) {
       systemPrompt += "\n\nAktuell marknadsdata:\n" + parts.join("\n\n");
     }

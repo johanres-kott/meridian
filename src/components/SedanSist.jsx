@@ -110,7 +110,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         const watchlist = watchlistRes.data || [];
 
         const companyResults = await Promise.all(
-          watchlist.slice(0, 20).map(async (item) => {
+          watchlist.slice(0, 10).map(async (item) => {
             try {
               const [companyRes, chartRes] = await Promise.all([
                 fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`).then(r => r.json()),

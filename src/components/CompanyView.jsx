@@ -3,7 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { matchStock, getRiskFromBeta, riskLabel, betaDescription } from "../lib/profileMatcher.js";
+import { matchStock, getRisk, riskLabel, betaDescription } from "../lib/profileMatcher.js";
 import QuarterlyChart from "./QuarterlyChart.jsx";
 
 const STATUS_COLORS = {
@@ -166,17 +166,23 @@ function ProfileInsight({ ticker, company, investorProfile }) {
     beta: company?.beta,
     dividendYield: company?.dividendYield,
     revenueGrowth: company?.revenueGrowth,
+    marketCap: company?.marketCap,
   };
   const { tags, warnings, score } = matchStock(ticker, investorProfile, companyData);
-  const risk = getRiskFromBeta(company?.beta);
+  const risk = getRisk(company?.beta, company?.marketCap);
   const riskText = riskLabel(risk);
   const hasDiv = company?.dividendYield > 0;
   const allItems = [];
 
   // Beta / Risk
-  if (company?.beta != null) {
+  if (risk) {
     const riskColor = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
-    allItems.push({ icon: "◉", color: riskColor, text: betaDescription(company.beta) });
+    if (company?.beta != null) {
+      allItems.push({ icon: "◉", color: riskColor, text: betaDescription(company.beta) });
+    } else {
+      // Fallback: market cap based
+      allItems.push({ icon: "◉", color: riskColor, text: `${riskText} (baserat på börsvärde)` });
+    }
   }
 
   // Dividend

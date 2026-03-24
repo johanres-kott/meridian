@@ -18,22 +18,36 @@ function getFlag(ticker) {
   return "\u{1F1FA}\u{1F1F8}";
 }
 
-const COLUMNS = [
-  { key: "name", label: "Bolag", align: "left" },
-  { key: "price", label: "Kurs", align: "right", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
-  { key: "changePercent", label: "\u0394 Idag", align: "right", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "#787b86" },
-  { key: "peForward", label: "P/E Fwd", align: "right", fmt: v => fmt(v, "x") },
-  { key: "peTrailing", label: "P/E Trail", align: "right", fmt: v => fmt(v, "x") },
-  { key: "ebitdaMargin", label: "EBITDA %", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "operatingMargin", label: "Ror.marg", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "grossMargin", label: "Brutto %", align: "right", fmt: v => fmt(v, "%") },
-  { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
-  { key: "roic", label: "ROIC", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
-];
+const ALL_COLUMNS = {
+  name: { key: "name", label: "Bolag", align: "left" },
+  price: { key: "price", label: "Kurs", align: "right", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
+  changePercent: { key: "changePercent", label: "\u0394 Idag", align: "right", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "#787b86" },
+  peForward: { key: "peForward", label: "P/E Fwd", align: "right", fmt: v => fmt(v, "x") },
+  peTrailing: { key: "peTrailing", label: "P/E Trail", align: "right", fmt: v => fmt(v, "x") },
+  ebitdaMargin: { key: "ebitdaMargin", label: "EBITDA %", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  operatingMargin: { key: "operatingMargin", label: "Ror.marg", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  grossMargin: { key: "grossMargin", label: "Brutto %", align: "right", fmt: v => fmt(v, "%") },
+  revenueGrowth: { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
+  roic: { key: "roic", label: "ROIC", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  debtEbitda: { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
+  dividendYield: { key: "dividendYield", label: "Utdelning", align: "right", fmt: v => fmt(v, "%"), color: v => v > 3 ? "#089981" : null },
+};
+
+const COLUMN_ORDERS = {
+  value: ["name", "price", "changePercent", "peForward", "peTrailing", "debtEbitda", "grossMargin", "roic", "operatingMargin", "ebitdaMargin", "revenueGrowth", "dividendYield"],
+  growth: ["name", "price", "changePercent", "revenueGrowth", "roic", "operatingMargin", "peForward", "ebitdaMargin", "grossMargin", "peTrailing", "debtEbitda", "dividendYield"],
+  dividend: ["name", "price", "changePercent", "dividendYield", "peForward", "grossMargin", "debtEbitda", "roic", "operatingMargin", "ebitdaMargin", "peTrailing", "revenueGrowth"],
+  default: ["name", "price", "changePercent", "peForward", "peTrailing", "ebitdaMargin", "operatingMargin", "grossMargin", "revenueGrowth", "roic", "debtEbitda", "dividendYield"],
+};
+
+function getColumns(investorType) {
+  const order = COLUMN_ORDERS[investorType] || COLUMN_ORDERS.default;
+  return order.map(key => ALL_COLUMNS[key]).filter(Boolean);
+}
 
 export default function GapAnalysis({ preferences = {} }) {
   const isMobile = useIsMobile();
+  const columns = getColumns(preferences.investorProfile?.investorType);
   const [items, setItems] = useState([]);
   const [companyData, setCompanyData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -226,7 +240,7 @@ export default function GapAnalysis({ preferences = {} }) {
               <tr>
                 <th style={{ padding: "8px 10px", textAlign: "center", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
                 <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
-                {COLUMNS.map(col => (
+                {columns.map(col => (
                   <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)}>
                     {col.label}
                     {sortKey === col.key && <span style={{ marginLeft: 4 }}>{sortAsc ? "\u25B2" : "\u25BC"}</span>}
@@ -252,7 +266,7 @@ export default function GapAnalysis({ preferences = {} }) {
                       />
                     </td>
                     <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa", width: 30 }}>{getFlag(item.ticker)}</td>
-                    {COLUMNS.map(col => {
+                    {columns.map(col => {
                       const val = col.key === "name" ? null : d[col.key];
                       const colorFn = col.color;
                       const cellColor = colorFn ? colorFn(val) : null;

@@ -1,11 +1,22 @@
+import { useState, useEffect } from "react";
+import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
+import InterestSuggestions from "./InterestSuggestions.jsx";
 
 export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
   const isMobile = useIsMobile();
+  const [tickers, setTickers] = useState([]);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from("watchlist").select("ticker").eq("user_id", userId).then(({ data }) => {
+      setTickers((data || []).map(d => d.ticker));
+    });
+  }, [userId]);
 
   return (
     <div>
@@ -28,6 +39,14 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
       <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} onNavigate={onNavigate} />
       <UpcomingEarnings userId={userId} isMobile={isMobile} />
+      {preferences.investorProfile?.interests?.length > 0 && (
+        <InterestSuggestions
+          interests={preferences.investorProfile.interests}
+          existingTickers={tickers}
+          isMobile={isMobile}
+          onNavigate={onNavigate}
+        />
+      )}
     </div>
   );
 }

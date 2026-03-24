@@ -3,7 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { matchStock, getRisk, riskLabel, betaDescription } from "../lib/profileMatcher.js";
+import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 import QuarterlyChart from "./QuarterlyChart.jsx";
 
 const STATUS_COLORS = {
@@ -169,7 +169,7 @@ function ProfileInsight({ ticker, company, investorProfile }) {
     marketCap: company?.marketCap,
   };
   const { tags, warnings, score } = matchStock(ticker, investorProfile, companyData);
-  const risk = getRisk(company?.beta, company?.marketCap);
+  const risk = getRisk(company?.beta, company?.marketCap, ticker);
   const riskText = riskLabel(risk);
   const hasDiv = company?.dividendYield > 0;
   const allItems = [];
@@ -177,10 +177,11 @@ function ProfileInsight({ ticker, company, investorProfile }) {
   // Beta / Risk
   if (risk) {
     const riskColor = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
-    if (company?.beta != null) {
+    if (isInvestmentCompany(ticker)) {
+      allItems.push({ icon: "◉", color: riskColor, text: `${riskText} — diversifierat investmentbolag` });
+    } else if (company?.beta != null) {
       allItems.push({ icon: "◉", color: riskColor, text: betaDescription(company.beta) });
     } else {
-      // Fallback: market cap based
       allItems.push({ icon: "◉", color: riskColor, text: `${riskText} (baserat på börsvärde)` });
     }
   }
@@ -193,7 +194,9 @@ function ProfileInsight({ ticker, company, investorProfile }) {
   }
 
   // Sector
-  if (company?.sector && company.sector !== "—") {
+  if (isInvestmentCompany(ticker)) {
+    allItems.push({ icon: "🏢", color: "#2962ff", text: "Investmentbolag — diversifierad portfölj" });
+  } else if (company?.sector && company.sector !== "—") {
     allItems.push({ icon: "🏢", color: "#787b86", text: company.sector });
   }
 

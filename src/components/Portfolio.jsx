@@ -1,13 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
-import InvestmentCompanyModal from "./InvestmentCompanyModal.jsx";
-import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import CompanyView from "./CompanyView.jsx";
-import InvestmentCompanyView from "./InvestmentCompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-
-const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
@@ -276,23 +271,15 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
-  const [showInvestmentCo, setShowInvestmentCo] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [selectedInvestmentCo, setSelectedInvestmentCo] = useState(null);
   const [fxRates, setFxRates] = useState({ SEK: 1 });
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
   const [creatingGroup, setCreatingGroup] = useState(false);
-  const [investmentCompanies, setInvestmentCompanies] = useState(INVESTMENT_COMPANIES);
   const [newGroupName, setNewGroupName] = useState("");
 
   const groups = preferences.groups || [];
 
-  useEffect(() => {
-    load(); loadFxRates();
-    fetch(SCRAPER_API).then(r => r.json()).then(data => {
-      if (Array.isArray(data) && data.length > 0) setInvestmentCompanies(data);
-    }).catch(() => {});
-  }, []);
+  useEffect(() => { load(); loadFxRates(); }, []);
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -415,21 +402,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
 
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
-    return <CompanyView item={freshItem} onBack={() => {
-      if (selectedInvestmentCo) setSelected(null);
-      else setSelected(null);
-    }} onUpdate={updateItem} />;
-  }
-
-  if (selectedInvestmentCo) {
-    const coData = investmentCompanies.find(c => c.name === selectedInvestmentCo);
-    return <InvestmentCompanyView
-      companyName={selectedInvestmentCo}
-      holdings={coData?.holdings || []}
-      existingItems={items}
-      onBack={() => setSelectedInvestmentCo(null)}
-      onSelectStock={(item) => setSelected(item)}
-    />;
+    return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
   }
 
   // Filter items by active group
@@ -443,19 +416,6 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const hasAnyShares = filteredItems.some(i => i.shares);
   const hasAnyPL = filteredItems.some(i => i.gav && i.shares);
 
-  // Split groups into user groups and investment company groups
-  const investmentCoNames = new Set(investmentCompanies.map(c => c.name));
-  const userGroups = groups.filter(g => !investmentCoNames.has(g.name));
-  const investmentGroups = groups.filter(g => investmentCoNames.has(g.name));
-
-  // Match active group to an investment company for weight/value columns
-  const activeInvestmentCo = activeGroup
-    ? investmentCompanies.find(c => c.name === activeGroup)
-    : null;
-  const holdingByTicker = activeInvestmentCo
-    ? Object.fromEntries(activeInvestmentCo.holdings.map(h => [h.ticker.toUpperCase(), h]))
-    : {};
-
   return (
     <div>
       {showImport && (
@@ -465,16 +425,6 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           onImport={importHoldings}
         />
       )}
-      {showInvestmentCo && (
-        <InvestmentCompanyModal
-          onClose={() => setShowInvestmentCo(false)}
-          existingItems={items}
-          onImport={importHoldings}
-          groups={groups}
-          onUpdatePreferences={onUpdatePreferences}
-          onSetActiveGroup={setActiveGroup}
-        />
-      )}
       <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 20, gap: isMobile ? 12 : 0 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "#131722", marginBottom: 4 }}>Portfölj</div>
@@ -482,16 +432,10 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8, flexDirection: isMobile ? "column" : "row" }}>
-          <button onClick={() => setShowInvestmentCo(true)}
-            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
-            Investmentbolag
-          </button>
-          <button onClick={() => setShowImport(true)}
-            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
-            Importera portfölj
-          </button>
-        </div>
+        <button onClick={() => setShowImport(true)}
+          style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
+          Importera portfölj
+        </button>
       </div>
 
       {/* Group filter bar */}
@@ -508,7 +452,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
         >
           Alla ({items.length})
         </button>
-        {userGroups.map(g => {
+        {groups.map(g => {
           const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
           const isActive = activeGroup === g.name;
           return (
@@ -560,30 +504,6 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             + Ny grupp
           </button>
         )}
-        {investmentGroups.length > 0 && (
-          <>
-            <div style={{ width: 1, height: 20, background: "#e0e3eb", margin: "0 4px" }} />
-            {investmentGroups.map(g => {
-              const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
-              return (
-                <div key={g.name} style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <button
-                    onClick={() => setSelectedInvestmentCo(g.name)}
-                    style={{
-                      fontSize: 12, padding: "5px 12px", borderRadius: 14,
-                      border: "1px solid #e0e3eb",
-                      background: "#fff",
-                      color: "#787b86",
-                      cursor: "pointer", fontFamily: "inherit",
-                    }}
-                  >
-                    {g.name} ({count}) →
-                  </button>
-                </div>
-              );
-            })}
-          </>
-        )}
       </div>
 
       <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
@@ -598,10 +518,10 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : undefined }}>
             <thead>
               <tr>
-                {["", "Bolag", ...(!activeInvestmentCo ? ["Status"] : []), ...(isMobile ? [] : ["Grupper"]), ...(activeInvestmentCo ? ["Vikt", "Innehav"] : []), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                {["", "Bolag", "Status", ...(isMobile ? [] : ["Grupper"]), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
                     padding: isMobile ? "6px 8px" : "8px 14px",
-                    textAlign: ["Kurs", "Värde", "P&L", "Vikt", "Innehav"].includes(h) ? "right" : "left",
+                    textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
                     fontSize: 11, fontWeight: 500, color: "#787b86",
                     borderBottom: "1px solid #e0e3eb",
                   }}>{h}</th>
@@ -610,7 +530,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} showInvestmentCols={!!activeInvestmentCo} showStatus={!activeInvestmentCo} investmentHolding={holdingByTicker[item.ticker.toUpperCase()] || null} isMobile={isMobile} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} />
               ))}
             </tbody>
           </table>

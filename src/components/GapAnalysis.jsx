@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import CompareView from "./CompareView.jsx";
 
 const FLAG_MAP = {
   ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
@@ -39,6 +40,8 @@ export default function GapAnalysis({ preferences = {} }) {
   const [sortKey, setSortKey] = useState(null);
   const [sortAsc, setSortAsc] = useState(true);
   const [activeGroup, setActiveGroup] = useState(null);
+  const [selectedForCompare, setSelectedForCompare] = useState(new Set());
+  const [compareMode, setCompareMode] = useState(false);
 
   const groups = preferences.groups || [];
 
@@ -105,6 +108,29 @@ export default function GapAnalysis({ preferences = {} }) {
     });
   }
 
+  function toggleCompare(ticker) {
+    setSelectedForCompare(prev => {
+      const next = new Set(prev);
+      if (next.has(ticker)) next.delete(ticker);
+      else if (next.size < 4) next.add(ticker);
+      return next;
+    });
+  }
+
+  if (compareMode) {
+    const compareCompanies = [...selectedForCompare].map(ticker => {
+      const item = items.find(i => i.ticker === ticker);
+      const d = companyData[ticker] || {};
+      return { ticker, name: item?.name || ticker, ...d };
+    });
+    return (
+      <CompareView
+        companies={compareCompanies}
+        onBack={() => setCompareMode(false)}
+      />
+    );
+  }
+
   const thStyle = (col) => ({
     padding: "8px 10px",
     textAlign: col.align,
@@ -132,6 +158,18 @@ export default function GapAnalysis({ preferences = {} }) {
         <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
           Fundamentala nyckeltal f&ouml;r {filteredItems.length} bolag{activeGroup ? ` i ${activeGroup}` : ""}
         </p>
+        {selectedForCompare.size >= 2 && (
+          <button
+            onClick={() => setCompareMode(true)}
+            style={{
+              marginTop: 8, fontSize: 12, padding: "6px 16px", borderRadius: 4,
+              border: "none", background: "#2962ff", color: "#fff",
+              cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
+            }}
+          >
+            J&auml;mf&ouml;r ({selectedForCompare.size})
+          </button>
+        )}
       </div>
 
       {/* Group filter bar */}
@@ -186,6 +224,7 @@ export default function GapAnalysis({ preferences = {} }) {
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : 900 }}>
             <thead>
               <tr>
+                <th style={{ padding: "8px 10px", textAlign: "center", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
                 <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
                 {COLUMNS.map(col => (
                   <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)}>
@@ -203,6 +242,15 @@ export default function GapAnalysis({ preferences = {} }) {
                     onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
                     onMouseLeave={e => e.currentTarget.style.background = ""}
                   >
+                    <td style={{ padding: "8px 4px 8px 10px", borderBottom: "1px solid #f0f3fa", width: 30, textAlign: "center" }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedForCompare.has(item.ticker)}
+                        onChange={() => toggleCompare(item.ticker)}
+                        disabled={!selectedForCompare.has(item.ticker) && selectedForCompare.size >= 4}
+                        style={{ cursor: "pointer", accentColor: "#2962ff" }}
+                      />
+                    </td>
                     <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa", width: 30 }}>{getFlag(item.ticker)}</td>
                     {COLUMNS.map(col => {
                       const val = col.key === "name" ? null : d[col.key];

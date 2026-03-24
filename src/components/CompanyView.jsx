@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import QuarterlyChart from "./QuarterlyChart.jsx";
 
 const STATUS_COLORS = {
   Bevakar: { bg: "#f0f3fa", color: "#787b86" },
@@ -205,6 +206,9 @@ export default function CompanyView({ item, onBack, onUpdate }) {
                 <StatCard label="Tillvaxt" value={fmt(company.revenueGrowth, "%")} neg={company.revenueGrowth < 0} />
               </div>
             </div>
+
+            {/* Quarterly financials */}
+            <QuarterlyChart ticker={item.ticker} />
 
             {/* Analyst targets */}
             {(company.targetPrice > 0 || company.recommendation !== "—") && (

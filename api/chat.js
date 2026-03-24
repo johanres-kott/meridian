@@ -17,6 +17,29 @@ export default async function handler(req, res) {
 
   let systemPrompt = `Du är en finansassistent i appen Thesion. Svara på svenska, kort och koncist. Du har tillgång till användarens portfölj och marknadsdata.`;
 
+  // Add profile-specific AI instructions
+  if (context?.investorProfile) {
+    const p = context.investorProfile;
+    const profileInstructions = {
+      value: "Användaren är värdeinvesterare. Fokusera på P/E-tal, substansvärde, skuldsättning och säkerhetsmarginal. Ge konservativa förslag med fokus på fundamenta.",
+      growth: "Användaren är tillväxtinvesterare. Fokusera på omsättningstillväxt, ROIC, skalbarhet och marknadspotential. Var positiv till bolag med stark tillväxt även om P/E är högt.",
+      dividend: "Användaren är utdelningsinvesterare. Fokusera på direktavkastning, utdelningshistorik, utdelningsandel och stabila kassaflöden. Prioritera bolag med lång utdelningshistorik.",
+      index: "Användaren är indexinvesterare. Fokusera på bred marknadsexponering, avgifter och diversifiering. Ge råd om allokering snarare än enskilda aktier.",
+      mixed: "Användaren blandar strategier. Ge balanserade förslag som kombinerar värde, tillväxt och utdelning.",
+    };
+    const riskInstructions = {
+      low: "Användaren har låg risktolerans — undvik spekulativa bolag, small caps och högt belånade bolag.",
+      medium: "Användaren har medel risktolerans — balansera stabila och mer riskfyllda förslag.",
+      high: "Användaren har hög risktolerans — kan inkludera small caps, tillväxtbolag och mer spekulativa idéer.",
+    };
+    systemPrompt += "\n\n" + (profileInstructions[p.investorType] || "");
+    systemPrompt += " " + (riskInstructions[p.riskProfile] || "");
+    if (p.interests?.length > 0) {
+      const interestLabels = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat & Livsmedel", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
+      systemPrompt += ` Användaren är intresserad av: ${p.interests.map(i => interestLabels[i] || i).join(", ")}.`;
+    }
+  }
+
   if (context) {
     const parts = [];
     if (context.portfolio?.length > 0) {

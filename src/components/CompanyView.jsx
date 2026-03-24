@@ -114,7 +114,39 @@ function NotesSection({ item, onUpdate }) {
   );
 }
 
-export default function CompanyView({ item, onBack, onUpdate }) {
+function getMetricOrder(investorType) {
+  const orders = {
+    value: ["peForward", "peTrailing", "debtEbitda", "grossMargin", "roic", "operatingMargin", "dividendYield", "revenueGrowth"],
+    growth: ["revenueGrowth", "roic", "operatingMargin", "peForward", "ebitdaMargin", "grossMargin", "dividendYield", "debtEbitda"],
+    dividend: ["dividendYield", "peForward", "grossMargin", "debtEbitda", "roic", "operatingMargin", "ebitdaMargin", "revenueGrowth"],
+  };
+  return orders[investorType] || ["peForward", "peTrailing", "ebitdaMargin", "operatingMargin", "grossMargin", "roic", "debtEbitda", "revenueGrowth", "dividendYield"];
+}
+
+const METRIC_LABELS = {
+  peForward: "P/E Forward",
+  peTrailing: "P/E Trailing",
+  ebitdaMargin: "EBITDA-marginal",
+  operatingMargin: "Rör.marginal",
+  grossMargin: "Bruttomarginal",
+  roic: "ROIC / ROE",
+  debtEbitda: "Nettoskuld/EBITDA",
+  revenueGrowth: "Tillväxt",
+  dividendYield: "Direktavkastning",
+};
+
+const METRIC_FMT = {
+  peForward: "x", peTrailing: "x", ebitdaMargin: "%", operatingMargin: "%",
+  grossMargin: "%", roic: "%", debtEbitda: "x", revenueGrowth: "%", dividendYield: "%",
+};
+
+function isNeg(key, value) {
+  if (key === "debtEbitda") return value > 3;
+  if (key === "dividendYield") return false;
+  return value < 0;
+}
+
+export default function CompanyView({ item, onBack, onUpdate, investorType }) {
   const isMobile = useIsMobile();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -196,14 +228,9 @@ export default function CompanyView({ item, onBack, onUpdate }) {
             <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 14 }}>Nyckeltal</div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
-                <StatCard label="P/E Forward" value={fmt(company.peForward, "x")} />
-                <StatCard label="P/E Trailing" value={fmt(company.peTrailing, "x")} />
-                <StatCard label="EBITDA-marginal" value={fmt(company.ebitdaMargin, "%")} neg={company.ebitdaMargin < 0} />
-                <StatCard label="Ror.marginal" value={fmt(company.operatingMargin, "%")} neg={company.operatingMargin < 0} />
-                <StatCard label="Bruttomarginal" value={fmt(company.grossMargin, "%")} />
-                <StatCard label="ROIC / ROE" value={fmt(company.roic, "%")} neg={company.roic < 0} />
-                <StatCard label="Nettoskuld/EBITDA" value={fmt(company.debtEbitda, "x")} neg={company.debtEbitda > 3} />
-                <StatCard label="Tillvaxt" value={fmt(company.revenueGrowth, "%")} neg={company.revenueGrowth < 0} />
+                {getMetricOrder(investorType).map(key => (
+                  <StatCard key={key} label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} />
+                ))}
               </div>
             </div>
 

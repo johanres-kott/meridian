@@ -77,6 +77,7 @@ async function getYahooFundamentals(ticker, crumbData) {
       debtEbitda: fd.debtToEquity?.raw ? parseFloat((fd.debtToEquity.raw / 100).toFixed(1)) : 0,
       peForward: sd.forwardPE?.raw ? parseFloat(sd.forwardPE.raw.toFixed(1)) : 0,
       peTrailing: ks.trailingPE?.raw ? parseFloat(ks.trailingPE.raw.toFixed(1)) : 0,
+      dividendYield: sd.dividendYield?.raw ? parseFloat((sd.dividendYield.raw * 100).toFixed(2)) : 0,
       targetPrice: fd.targetMeanPrice?.raw ?? 0,
       recommendation: fd.recommendationKey ?? "—",
     };
@@ -164,6 +165,7 @@ export default async function handler(req, res) {
       roic: fmpData?.roic ?? fundamentals?.roic ?? 0,
       debtEbitda: fmpData?.debtEbitda ?? fundamentals?.debtEbitda ?? 0,
       revenueGrowth: fundamentals?.revenueGrowth ?? 0,
+      dividendYield: fundamentals?.dividendYield ?? 0,
       targetPrice: fundamentals?.targetPrice ?? 0,
       recommendation: fundamentals?.recommendation ?? "—",
       week52High: priceData?.week52High ?? 0,

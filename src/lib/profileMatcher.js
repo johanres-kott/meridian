@@ -17,16 +17,32 @@ export function getRiskFromBeta(beta) {
   return "high";
 }
 
+// Swedish investment company tickers — diversified by nature, always low risk
+const INVESTMENT_COMPANY_TICKERS = new Set([
+  "INVE-B.ST", "INDU-C.ST", "ORES.ST", "LATO-B.ST",
+  "LUND-B.ST", "SVOL-B.ST", "CREAS.ST", "BURE.ST",
+  "KINV-B.ST", "TREL-B.ST", "HAVSFR.ST",
+]);
+
 /**
  * Classify risk with fallback to market cap when beta is unavailable.
- * marketCap in billions.
+ * marketCap in billions. ticker is optional for investment company override.
  */
-export function getRisk(beta, marketCapB) {
+export function getRisk(beta, marketCapB, ticker) {
+  // Investment companies are diversified — always low risk
+  if (ticker && INVESTMENT_COMPANY_TICKERS.has(ticker.toUpperCase())) return "low";
   if (beta != null) return getRiskFromBeta(beta);
   if (marketCapB == null) return null;
   if (marketCapB >= 50) return "low";      // Large cap (>50B SEK)
   if (marketCapB >= 10) return "medium";   // Mid cap (10-50B SEK)
   return "high";                            // Small cap (<10B SEK)
+}
+
+/**
+ * Check if a ticker is a known investment company
+ */
+export function isInvestmentCompany(ticker) {
+  return INVESTMENT_COMPANY_TICKERS.has(ticker?.toUpperCase());
 }
 
 /**
@@ -65,8 +81,8 @@ export function matchStock(ticker, profile = {}, companyData = {}) {
   const warnings = [];
   let score = 50; // neutral baseline
 
-  // Risk matching via Beta (fallback to market cap)
-  const stockRisk = getRisk(beta, marketCap);
+  // Risk matching via Beta (fallback to market cap, investment company override)
+  const stockRisk = getRisk(beta, marketCap, ticker);
 
   if (stockRisk && riskProfile) {
     if (stockRisk === riskProfile) {

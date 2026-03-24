@@ -18,6 +18,18 @@ export function getRiskFromBeta(beta) {
 }
 
 /**
+ * Classify risk with fallback to market cap when beta is unavailable.
+ * marketCap in billions.
+ */
+export function getRisk(beta, marketCapB) {
+  if (beta != null) return getRiskFromBeta(beta);
+  if (marketCapB == null) return null;
+  if (marketCapB >= 50) return "low";      // Large cap (>50B SEK)
+  if (marketCapB >= 10) return "medium";   // Mid cap (10-50B SEK)
+  return "high";                            // Small cap (<10B SEK)
+}
+
+/**
  * Risk label in Swedish
  */
 export function riskLabel(risk) {
@@ -48,13 +60,13 @@ export function betaDescription(beta) {
  */
 export function matchStock(ticker, profile = {}, companyData = {}) {
   const { investorType, riskProfile, focus } = profile;
-  const { beta, dividendYield, revenueGrowth } = companyData;
+  const { beta, dividendYield, revenueGrowth, marketCap } = companyData;
   const tags = [];
   const warnings = [];
   let score = 50; // neutral baseline
 
-  // Risk matching via Beta
-  const stockRisk = getRiskFromBeta(beta);
+  // Risk matching via Beta (fallback to market cap)
+  const stockRisk = getRisk(beta, marketCap);
 
   if (stockRisk && riskProfile) {
     if (stockRisk === riskProfile) {

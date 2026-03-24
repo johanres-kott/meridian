@@ -178,7 +178,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
           <span style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>
           {investorProfile && price && (() => {
             const { tags, warnings } = matchStock(item.ticker, investorProfile, {
-              beta: price.beta, dividendYield: price.dividendYield, revenueGrowth: price.revenueGrowth,
+              beta: price.beta, dividendYield: price.dividendYield, revenueGrowth: price.revenueGrowth, marketCap: price.marketCap,
             });
             return (
               <>

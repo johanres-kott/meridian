@@ -156,7 +156,7 @@ export default function InterestSuggestions({ interests, existingTickers, isMobi
             {items.map(item => (
               <div
                 key={item.ticker}
-                onClick={() => onNavigate?.("search")}
+                onClick={() => onNavigate?.("portfolio", { ticker: item.ticker })}
                 style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   padding: "10px 12px", borderRadius: 6, border: "1px solid #f0f3fa",

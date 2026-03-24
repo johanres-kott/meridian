@@ -112,25 +112,12 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         const companyResults = await Promise.all(
           watchlist.slice(0, 10).map(async (item) => {
             try {
-              const [companyRes, chartRes] = await Promise.all([
-                fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`).then(r => r.json()),
-                fetch(`/api/chart?ticker=${encodeURIComponent(item.ticker)}&range=1m`).then(r => r.json()),
-              ]);
-
-              const points = chartRes?.points || [];
-              const lastSeenDate = lastSeenAt.split("T")[0];
-              const refPoint = [...points].reverse().find(p => p.date <= lastSeenDate);
-              const currentPrice = companyRes?.price || 0;
-              const refPrice = refPoint?.close || 0;
-              const changeSinceLast = refPrice > 0
-                ? ((currentPrice - refPrice) / refPrice) * 100
-                : null;
-
+              const companyRes = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`).then(r => r.json());
               return {
                 ticker: item.ticker,
                 name: item.name || companyRes?.name || item.ticker,
-                price: currentPrice,
-                changeSinceLast,
+                price: companyRes?.price || 0,
+                changeSinceLast: companyRes?.changePercent || 0,
                 changeToday: companyRes?.changePercent || 0,
                 news: (companyRes?.news || []).map(n => ({ ...n, ticker: item.ticker, companyName: item.name })),
               };

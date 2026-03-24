@@ -249,6 +249,71 @@ function ProfileInsight({ ticker, company, investorProfile }) {
   );
 }
 
+const SCRAPER_API = "https://thesion-scraper.vercel.app";
+
+function InsiderSection({ ticker }) {
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!ticker || !ticker.toUpperCase().endsWith(".ST")) {
+      setLoading(false);
+      return;
+    }
+    fetch(`${SCRAPER_API}/api/insider?ticker=${encodeURIComponent(ticker)}`)
+      .then(r => r.json())
+      .then(d => { setTransactions(d.transactions || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [ticker]);
+
+  if (loading) return null;
+  if (transactions.length === 0) return null;
+
+  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+
+  return (
+    <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 20 }}>
+      <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>
+        Insiderhandel
+      </div>
+      {transactions.slice(0, 10).map((t, i) => {
+        const isBuy = t.type?.toLowerCase().includes("förv") || t.type?.toLowerCase().includes("acq");
+        const value = t.value || (t.volume && t.price ? Math.round(t.volume * t.price) : null);
+        return (
+          <div key={i} style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            padding: "8px 0", borderBottom: i < Math.min(transactions.length, 10) - 1 ? "1px solid #f0f3fa" : "none",
+          }}>
+            <div>
+              <div style={{ fontSize: 12, color: "#131722" }}>
+                <span style={{ fontWeight: 500 }}>{t.person}</span>
+                {t.position && <span style={{ color: "#787b86", fontSize: 11 }}> · {t.position}</span>}
+              </div>
+              <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>
+                <span style={{
+                  color: isBuy ? "#089981" : "#f23645",
+                  fontWeight: 500,
+                }}>
+                  {isBuy ? "Köp" : "Sälj"}
+                </span>
+                {" · "}
+                {t.volume?.toLocaleString("sv-SE")} aktier
+                {value ? ` · ${value.toLocaleString("sv-SE")} ${t.currency || "SEK"}` : ""}
+              </div>
+            </div>
+            <div style={{ fontSize: 11, color: "#b2b5be", ...mono, whiteSpace: "nowrap" }}>
+              {t.date}
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 8 }}>
+        Källa: Finansinspektionens insynsregister
+      </div>
+    </div>
+  );
+}
+
 export default function CompanyView({ item, onBack, onUpdate, investorType, investorProfile }) {
   const isMobile = useIsMobile();
   const [company, setCompany] = useState(null);
@@ -391,6 +456,9 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
                 ))}
               </div>
             )}
+
+            {/* Insider transactions */}
+            <InsiderSection ticker={item.ticker} />
           </div>
 
           {/* Right column: Profile insight + Notes + GAV */}

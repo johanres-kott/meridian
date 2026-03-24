@@ -1,68 +1,60 @@
 // Profile matching logic for stocks vs investor profile.
-// Used to tag stocks and filter suggestions.
+// Uses Beta (from Yahoo Finance) as the primary risk indicator.
+//
+// Beta measures a stock's volatility relative to the market:
+//   Beta < 0.8  = Low risk (less volatile than the market)
+//   Beta 0.8-1.2 = Medium risk (similar to the market)
+//   Beta > 1.2  = High risk (more volatile than the market)
 
-// Risk classification by market cap and volatility characteristics
-const RISK_TIER = {
-  // Large cap, stable = low risk
-  low: new Set([
-    "ABB.ST", "AZN.ST", "ATCO-A.ST", "VOLV-B.ST", "SEB-A.ST", "SHB-A.ST",
-    "SAND.ST", "ERIC-B.ST", "HM-B.ST", "SWED-A.ST", "INVE-B.ST", "AAPL",
-    "MSFT", "JNJ", "PG", "KO", "NDAQ", "AXFO.ST", "CAST.ST", "SECU-B.ST",
-  ]),
-  // Mid cap, moderate = medium risk
-  medium: new Set([
-    "SAAB-B.ST", "EPI-A.ST", "SOBI.ST", "EQT.ST", "SKF-B.ST", "ALFA.ST",
-    "HEX-B.ST", "AZA.ST", "HUSQ-B.ST", "ELUX-B.ST", "BILI-A.ST", "SHOT.ST",
-    "FABG.ST", "SAGA-B.ST", "NIBE-B.ST", "AAK.ST", "NWG.ST", "BOLI.ST",
-  ]),
-  // Small cap, volatile = high risk
-  high: new Set([
-    "SINCH.ST", "EMBRAC-B.ST", "STAR-B.ST", "PNDX-B.ST", "OVZON.ST",
-    "STENF.ST", "SCST.ST", "SEAF.ST", "BAHN-B.ST", "EOLU-B.ST",
-    "TSLA", "COIN", "NVDA", "QLINEA.ST",
-  ]),
-};
+/**
+ * Classify risk based on Beta value.
+ * Returns "low" | "medium" | "high" | null
+ */
+export function getRiskFromBeta(beta) {
+  if (beta == null) return null;
+  if (beta < 0.8) return "low";
+  if (beta <= 1.2) return "medium";
+  return "high";
+}
 
-// Sector mapping for interest matching
-const SECTOR_MAP = {
-  tech: ["Technology", "Communication Services", "Teknik", "Teknologi"],
-  finance: ["Financial Services", "Finans", "Finansiella tjänster"],
-  industry: ["Industrials", "Industri", "Industrivaror"],
-  healthcare: ["Healthcare", "Hälsovård"],
-  realestate: ["Real Estate", "Fastigheter"],
-  energy: ["Energy", "Energi"],
-  food: ["Consumer Defensive", "Dagligvaror", "Konsumentvaror"],
-  fashion: ["Consumer Cyclical", "Sällanköpsvaror"],
-};
+/**
+ * Risk label in Swedish
+ */
+export function riskLabel(risk) {
+  if (risk === "low") return "Låg risk";
+  if (risk === "medium") return "Medel risk";
+  if (risk === "high") return "Hög risk";
+  return null;
+}
 
-// Known dividend stocks (yield > 3%)
-const HIGH_DIVIDEND = new Set([
-  "SEB-A.ST", "SHB-A.ST", "SWED-A.ST", "VOLV-B.ST", "SKF-B.ST",
-  "HM-B.ST", "CAST.ST", "AXFO.ST", "SAND.ST", "SECU-B.ST",
-  "INVE-B.ST", "INDU-C.ST", "LATO-B.ST",
-]);
-
-// Known growth stocks (revenue growth > 15%)
-const HIGH_GROWTH = new Set([
-  "SAAB-B.ST", "EQT.ST", "NVDA", "AAPL", "MSFT", "SINCH.ST",
-  "AZA.ST", "SOBI.ST", "TSLA", "COIN",
-]);
+/**
+ * Get beta description in Swedish
+ */
+export function betaDescription(beta) {
+  if (beta == null) return "Beta ej tillgängligt";
+  if (beta < 0.5) return `Beta ${beta.toFixed(2)} — Mycket stabil, rör sig mindre än marknaden`;
+  if (beta < 0.8) return `Beta ${beta.toFixed(2)} — Stabil, lägre volatilitet än marknaden`;
+  if (beta <= 1.0) return `Beta ${beta.toFixed(2)} — Nära marknaden`;
+  if (beta <= 1.2) return `Beta ${beta.toFixed(2)} — Något mer volatil än marknaden`;
+  if (beta <= 1.5) return `Beta ${beta.toFixed(2)} — Hög volatilitet`;
+  return `Beta ${beta.toFixed(2)} — Mycket hög volatilitet`;
+}
 
 /**
  * Match a stock against an investor profile.
- * Returns { score, tags, warnings } where:
- * - score: 0-100 (how well it matches)
- * - tags: string[] (positive match reasons)
- * - warnings: string[] (potential concerns)
+ * companyData should include { beta, dividendYield, revenueGrowth } from /api/company.
+ *
+ * Returns { score, tags, warnings }
  */
-export function matchStock(ticker, { investorType, riskProfile, focus, interests } = {}) {
-  const t = ticker.toUpperCase();
+export function matchStock(ticker, profile = {}, companyData = {}) {
+  const { investorType, riskProfile, focus } = profile;
+  const { beta, dividendYield, revenueGrowth } = companyData;
   const tags = [];
   const warnings = [];
   let score = 50; // neutral baseline
 
-  // Risk matching
-  const stockRisk = RISK_TIER.low.has(t) ? "low" : RISK_TIER.medium.has(t) ? "medium" : RISK_TIER.high.has(t) ? "high" : null;
+  // Risk matching via Beta
+  const stockRisk = getRiskFromBeta(beta);
 
   if (stockRisk && riskProfile) {
     if (stockRisk === riskProfile) {
@@ -77,28 +69,32 @@ export function matchStock(ticker, { investorType, riskProfile, focus, interests
     }
   }
 
-  // Strategy matching
-  if (investorType === "dividend" && HIGH_DIVIDEND.has(t)) {
+  // Dividend matching (yield > 3%)
+  const isHighDividend = dividendYield != null && dividendYield > 3;
+  if (investorType === "dividend" && isHighDividend) {
     score += 20;
     tags.push("Utdelningsaktie");
   }
-  if (investorType === "growth" && HIGH_GROWTH.has(t)) {
+  if (focus === "dividends" && isHighDividend) {
+    score += 10;
+    if (!tags.includes("Utdelningsaktie")) tags.push("Bra utdelning");
+  }
+
+  // Growth matching (revenue growth > 15%)
+  const isHighGrowth = revenueGrowth != null && revenueGrowth > 15;
+  if (investorType === "growth" && isHighGrowth) {
     score += 20;
     tags.push("Tillväxtaktie");
   }
-  if (investorType === "value" && RISK_TIER.low.has(t)) {
+  if (focus === "appreciation" && isHighGrowth) {
     score += 10;
-    tags.push("Stabil värdeaktie");
+    if (!tags.includes("Tillväxtaktie")) tags.push("Tillväxtpotential");
   }
 
-  // Focus matching
-  if (focus === "dividends" && HIGH_DIVIDEND.has(t)) {
+  // Value matching (low beta + reasonable valuation)
+  if (investorType === "value" && stockRisk === "low") {
     score += 10;
-    tags.push("Bra utdelning");
-  }
-  if (focus === "appreciation" && HIGH_GROWTH.has(t)) {
-    score += 10;
-    tags.push("Tillväxtpotential");
+    tags.push("Stabil värdeaktie");
   }
 
   // Clamp score
@@ -108,24 +104,11 @@ export function matchStock(ticker, { investorType, riskProfile, focus, interests
 }
 
 /**
- * Get the risk tier for a stock.
- * Returns "low" | "medium" | "high" | null
+ * Legacy function for compatibility — when no companyData is available,
+ * returns null risk (no tags/warnings for risk).
  */
 export function getStockRisk(ticker) {
-  const t = ticker.toUpperCase();
-  if (RISK_TIER.low.has(t)) return "low";
-  if (RISK_TIER.medium.has(t)) return "medium";
-  if (RISK_TIER.high.has(t)) return "high";
-  return null;
-}
-
-/**
- * Risk label in Swedish
- */
-export function riskLabel(risk) {
-  if (risk === "low") return "Låg risk";
-  if (risk === "medium") return "Medel risk";
-  if (risk === "high") return "Hög risk";
+  // Without beta data, we can't determine risk
   return null;
 }
 
@@ -140,22 +123,14 @@ export const LEGEND = [
 ];
 
 /**
- * Filter and sort suggestions based on full profile
+ * Filter and sort suggestions based on full profile.
+ * Note: Without beta data in suggestions, risk filtering is skipped.
  */
 export function filterSuggestionsByProfile(suggestions, profile = {}) {
-  const { riskProfile, investorType } = profile;
-
   return suggestions
     .map(s => {
-      const match = matchStock(s.ticker, profile);
+      const match = matchStock(s.ticker, profile, {});
       return { ...s, ...match };
-    })
-    .filter(s => {
-      // Filter out high-risk for low-risk profiles
-      if (riskProfile === "low" && RISK_TIER.high.has(s.ticker.toUpperCase())) return false;
-      // Filter out low-risk for high-risk profiles (they want excitement)
-      if (riskProfile === "high" && RISK_TIER.low.has(s.ticker.toUpperCase()) && investorType === "growth") return false;
-      return true;
     })
     .sort((a, b) => b.score - a.score);
 }

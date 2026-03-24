@@ -3,7 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { matchStock, getStockRisk, riskLabel } from "../lib/profileMatcher.js";
+import { matchStock, getRiskFromBeta, riskLabel, betaDescription } from "../lib/profileMatcher.js";
 import QuarterlyChart from "./QuarterlyChart.jsx";
 
 const STATUS_COLORS = {
@@ -162,16 +162,21 @@ function isNeg(key, value) {
 function ProfileInsight({ ticker, company, investorProfile }) {
   if (!investorProfile) return null;
 
-  const { tags, warnings, score } = matchStock(ticker, investorProfile);
-  const risk = getStockRisk(ticker);
+  const companyData = {
+    beta: company?.beta,
+    dividendYield: company?.dividendYield,
+    revenueGrowth: company?.revenueGrowth,
+  };
+  const { tags, warnings, score } = matchStock(ticker, investorProfile, companyData);
+  const risk = getRiskFromBeta(company?.beta);
   const riskText = riskLabel(risk);
   const hasDiv = company?.dividendYield > 0;
   const allItems = [];
 
-  // Risk
-  if (riskText) {
+  // Beta / Risk
+  if (company?.beta != null) {
     const riskColor = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
-    allItems.push({ icon: "◉", color: riskColor, text: riskText });
+    allItems.push({ icon: "◉", color: riskColor, text: betaDescription(company.beta) });
   }
 
   // Dividend
@@ -207,24 +212,27 @@ function ProfileInsight({ ticker, company, investorProfile }) {
         </div>
       </div>
       <details style={{ marginTop: 10 }}>
-        <summary style={{ fontSize: 10, color: "#b2b5be", cursor: "pointer", userSelect: "none" }}>Hur vi bedömer risk</summary>
+        <summary style={{ fontSize: 10, color: "#b2b5be", cursor: "pointer", userSelect: "none" }}>Hur vi bedömer risk (Beta)</summary>
         <div style={{ marginTop: 6, fontSize: 10, color: "#787b86", lineHeight: 1.6 }}>
+          <div style={{ marginBottom: 4 }}>
+            <strong>Beta</strong> mäter en akties volatilitet jämfört med marknaden (index). Beta 1.0 = samma som marknaden.
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#089981", fontSize: 11, width: 14, textAlign: "center" }}>◉</span>
-              <strong>Låg risk</strong> — Stora, stabila bolag (Large Cap). T.ex. ABB, AstraZeneca, Volvo, SEB.
+              <strong>Låg risk</strong> — Beta &lt; 0.8. Aktien rör sig mindre än marknaden. Stabilare kursutveckling.
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#ff9800", fontSize: 11, width: 14, textAlign: "center" }}>◉</span>
-              <strong>Medel risk</strong> — Medelstora bolag (Mid Cap). T.ex. Saab, Epiroc, Avanza, Husqvarna.
+              <strong>Medel risk</strong> — Beta 0.8–1.2. Följer marknaden relativt nära.
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#f23645", fontSize: 11, width: 14, textAlign: "center" }}>◉</span>
-              <strong>Hög risk</strong> — Små eller volatila bolag (Small Cap). T.ex. Sinch, Embracer, Ovzon.
+              <strong>Hög risk</strong> — Beta &gt; 1.2. Större kurssvängningar än marknaden.
             </div>
           </div>
           <div style={{ marginTop: 6, color: "#b2b5be" }}>
-            Baseras på börsvärde och historisk kursvolatilitet. Utgör inte finansiell rådgivning.
+            Beta beräknas från 5 års kurshistorik mot S&P 500 (källa: Yahoo Finance). Utgör inte finansiell rådgivning.
           </div>
         </div>
       </details>

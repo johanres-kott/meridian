@@ -176,8 +176,10 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
         <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{item.name || item.ticker}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <span style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>
-          {investorProfile && (() => {
-            const { tags, warnings } = matchStock(item.ticker, investorProfile);
+          {investorProfile && price && (() => {
+            const { tags, warnings } = matchStock(item.ticker, investorProfile, {
+              beta: price.beta, dividendYield: price.dividendYield, revenueGrowth: price.revenueGrowth,
+            });
             return (
               <>
                 {tags.slice(0, 1).map(t => (

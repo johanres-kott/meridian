@@ -7,6 +7,7 @@ import GapAnalysis from "./components/GapAnalysis.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
 import Commodities from "./components/Commodities.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
+import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -14,6 +15,7 @@ const TABS = [
   { id: "portfolio", label: "Portfolio" },
   { id: "analysis", label: "Gap Analysis" },
   { id: "search", label: "Company Search" },
+  { id: "investment", label: "Investmentbolag" },
 ];
 
 export default function App() {
@@ -168,6 +170,7 @@ export default function App() {
           {tab === "portfolio" && <Portfolio />}
           {tab === "analysis" && <GapAnalysis />}
           {tab === "search" && <CompanySearch />}
+          {tab === "investment" && <InvestmentCompanies />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />
       </div>

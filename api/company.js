@@ -78,6 +78,7 @@ async function getYahooFundamentals(ticker, crumbData) {
       peForward: sd.forwardPE?.raw ? parseFloat(sd.forwardPE.raw.toFixed(1)) : 0,
       peTrailing: ks.trailingPE?.raw ? parseFloat(ks.trailingPE.raw.toFixed(1)) : 0,
       dividendYield: sd.dividendYield?.raw ? parseFloat((sd.dividendYield.raw * 100).toFixed(2)) : 0,
+      beta: sd.beta?.raw ? parseFloat(sd.beta.raw.toFixed(2)) : ks.beta?.raw ? parseFloat(ks.beta.raw.toFixed(2)) : null,
       targetPrice: fd.targetMeanPrice?.raw ?? 0,
       recommendation: fd.recommendationKey ?? "—",
     };

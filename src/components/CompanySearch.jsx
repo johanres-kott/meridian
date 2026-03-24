@@ -1,9 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js"
-import { StatCard } from "./SharedComponents.jsx";
+import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 
-export default function CompanySearch({ deepLink, onClearDeepLink }) {
+export default function CompanySearch({ deepLink, onClearDeepLink, preferences = {} }) {
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -13,6 +15,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
   const [suggestLoading, setSuggestLoading] = useState(false);
   const [error, setError] = useState(null);
   const [enriched, setEnriched] = useState({});
+  const [added, setAdded] = useState(false);
   const debounceRef = useRef(null);
   const enrichRef = useRef(0);
 
@@ -79,18 +82,35 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
     setLoading(true);
     setError(null);
     setResult(null);
+    setAdded(false);
     setShowSuggestions(false);
     try {
       const r = await fetch(`/api/company?ticker=${ticker}`);
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       setResult(d);
+      // Check if already in portfolio
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from("watchlist").select("id").eq("user_id", user.id).eq("ticker", ticker).limit(1);
+        if (data?.length > 0) setAdded(true);
+      }
     } catch (e) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
   }, []);
+
+  async function addToPortfolio() {
+    if (!result) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error: err } = await supabase.from("watchlist").insert({
+      ticker: result.ticker, name: result.name, user_id: user.id, status: "Bevakar",
+    });
+    if (!err) setAdded(true);
+  }
 
   const selectSuggestion = (s) => {
     const normalized = s.ticker.replace(/ /g, "-");
@@ -230,12 +250,21 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
                 {result.marketCap > 0 && <span style={{ fontSize: 13, color: "#787b86", marginLeft: 16 }}>Mkt Cap: {result.marketCap}B {result.currency}</span>}
               </div>
             </div>
-            {result.week52High > 0 && (
-              <div style={{ textAlign: "right", fontSize: 12, color: "#787b86" }}>
-                <div>52v Högt: <span style={{ color: "#089981", fontFamily: "'IBM Plex Mono', monospace" }}>{result.week52High.toFixed(2)} {result.currency}</span></div>
-                <div style={{ marginTop: 4 }}>52v Lågt: <span style={{ color: "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>{result.week52Low.toFixed(2)} {result.currency}</span></div>
-              </div>
-            )}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+              {added ? (
+                <span style={{ fontSize: 12, color: "#089981", fontWeight: 500 }}>✓ I din portfölj</span>
+              ) : (
+                <button onClick={addToPortfolio}
+                  style={{ padding: "7px 16px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 500 }}>
+                  + Lägg till i portfölj
+                </button>
+              )}
+              {result.week52High > 0 && (
+                <div style={{ textAlign: "right", fontSize: 12, color: "#787b86" }}>
+                  <span>52v: <span style={{ color: "#f23645" }}>{result.week52Low?.toFixed(0)}</span> – <span style={{ color: "#089981" }}>{result.week52High.toFixed(0)}</span> {result.currency}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Metrics grid */}
@@ -248,6 +277,44 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
             <StatCard label="ROIC / ROE" value={fmt(result.roic, "%")} neg={result.roic < 0} />
             <StatCard label="Net Debt/EBITDA" value={fmt(result.debtEbitda, "x")} neg={result.debtEbitda > 3} />
             <StatCard label="Revenue Growth" value={fmt(result.revenueGrowth, "%")} neg={result.revenueGrowth < 0} />
+          </div>
+
+          {/* Profile insight + Chart */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 20 }}>
+            {preferences.investorProfile && (() => {
+              const profile = preferences.investorProfile;
+              const companyData = { beta: result.beta, dividendYield: result.dividendYield, revenueGrowth: result.revenueGrowth, marketCap: result.marketCap };
+              const { tags, warnings, score } = matchStock(result.ticker, profile, companyData);
+              const risk = getRisk(result.beta, result.marketCap, result.ticker);
+              const items = [];
+              if (risk) {
+                const rc = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
+                items.push({ icon: "◉", color: rc, text: isInvestmentCompany(result.ticker) ? `${riskLabel(risk)} — diversifierat investmentbolag` : result.beta != null ? betaDescription(result.beta) : `${riskLabel(risk)} (baserat på börsvärde)` });
+              }
+              if (result.dividendYield > 0) items.push({ icon: "💰", color: "#089981", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
+              else items.push({ icon: "–", color: "#787b86", text: "Ingen utdelning" });
+              tags.forEach(t => items.push({ icon: "✓", color: "#089981", text: t }));
+              warnings.forEach(w => items.push({ icon: "⚠", color: "#e65100", text: w }));
+              return (
+                <div style={{ border: "1px solid #e0e3eb", borderRadius: 6, padding: 16 }}>
+                  <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {items.map((it, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                        <span style={{ color: it.color, fontSize: 12, width: 16, textAlign: "center", flexShrink: 0 }}>{it.icon}</span>
+                        <span style={{ color: "#131722" }}>{it.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 10, padding: "8px 10px", background: score >= 60 ? "#e8f5e9" : score >= 40 ? "#fff8e1" : "#fff5f5", borderRadius: 4 }}>
+                    <div style={{ fontSize: 11, fontWeight: 500, color: score >= 60 ? "#089981" : score >= 40 ? "#e65100" : "#c62828" }}>
+                      {score >= 60 ? "Matchar din profil" : score >= 40 ? "Delvis matchning" : "Avviker från din profil"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+            <PriceChart ticker={result.ticker} />
           </div>
 
           {/* Analyst */}

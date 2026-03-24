@@ -280,6 +280,7 @@ export default function App() {
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                       {[
                         { value: preferences.investorProfile.investorType, map: { value: "Värde", growth: "Tillväxt", dividend: "Utdelning", index: "Index", mixed: "Blandat" } },
+                        { value: preferences.investorProfile.experience, map: { beginner: "Nybörjare", intermediate: "Lite erfarenhet", advanced: "Erfaren" } },
                         { value: preferences.investorProfile.riskProfile, map: { low: "Låg risk", medium: "Medel risk", high: "Hög risk" } },
                         { value: preferences.investorProfile.focus, map: { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" } },
                         { value: preferences.investorProfile.geography, map: { nordic: "Norden", global: "Globalt", both: "Blandat geo" } },

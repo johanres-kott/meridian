@@ -15,6 +15,16 @@ const STEPS = [
     ],
   },
   {
+    id: "experience",
+    title: "Hur erfaren är du som investerare?",
+    subtitle: "Detta hjälper oss anpassa språk och förklaringar.",
+    options: [
+      { value: "beginner", label: "Nybörjare", desc: "Ny till aktier och investeringar. Vill ha enkla förklaringar" },
+      { value: "intermediate", label: "Har lite erfarenhet", desc: "Förstår grunderna men vill lära mig mer" },
+      { value: "advanced", label: "Erfaren", desc: "God kunskap om marknaden. Vill ha djupgående analys" },
+    ],
+  },
+  {
     id: "riskProfile",
     title: "Hur ser din riskprofil ut?",
     subtitle: "Hur mycket svängningar klarar du av?",

@@ -32,7 +32,13 @@ export default async function handler(req, res) {
       medium: "Användaren har medel risktolerans — balansera stabila och mer riskfyllda förslag.",
       high: "Användaren har hög risktolerans — kan inkludera small caps, tillväxtbolag och mer spekulativa idéer.",
     };
-    systemPrompt += "\n\n" + (profileInstructions[p.investorType] || "");
+    const experienceInstructions = {
+      beginner: "VIKTIGT: Användaren är nybörjare. Förklara allt med enkla ord. Undvik facktermer eller förklara dem direkt. Använd vardagliga liknelser. Ge korta, tydliga svar. Säg 'aktiekursen' istället för 'kursen', 'företagets vinst' istället för 'nettoresultat'.",
+      intermediate: "Användaren har grundläggande kunskap. Du kan använda vanliga finanstermer (P/E, utdelning, marginal) men förklara mer avancerade begrepp kortfattat.",
+      advanced: "Användaren är erfaren. Använd facktermer fritt. Ge djupgående analys med nyckeltal, trender och jämförelser.",
+    };
+    systemPrompt += "\n\n" + (experienceInstructions[p.experience] || "");
+    systemPrompt += "\n" + (profileInstructions[p.investorType] || "");
     systemPrompt += " " + (riskInstructions[p.riskProfile] || "");
     if (p.interests?.length > 0) {
       const interestLabels = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat & Livsmedel", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };

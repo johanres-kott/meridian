@@ -10,6 +10,7 @@ import Commodities from "./components/Commodities.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
+import OnboardingModal from "./components/OnboardingModal.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -135,6 +136,7 @@ export default function App() {
           portfolio: portfolio.filter(Boolean),
           indices: indicesRes.filter(i => i.price > 0),
           commodities: commoditiesRes.filter(c => c.price > 0),
+          investorProfile: preferences.investorProfile || null,
         };
       } catch (err) {
         console.error("Chat context load error:", err);
@@ -272,6 +274,37 @@ export default function App() {
                     </div>
                   )}
                 </div>
+                {preferences.investorProfile && (
+                  <div style={{ padding: "10px 16px", borderBottom: "1px solid #f0f3fa" }}>
+                    <div style={{ fontSize: 10, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 6 }}>Din investerarprofil</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {[
+                        { value: preferences.investorProfile.investorType, map: { value: "Värde", growth: "Tillväxt", dividend: "Utdelning", index: "Index", mixed: "Blandat" } },
+                        { value: preferences.investorProfile.riskProfile, map: { low: "Låg risk", medium: "Medel risk", high: "Hög risk" } },
+                        { value: preferences.investorProfile.focus, map: { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" } },
+                        { value: preferences.investorProfile.geography, map: { nordic: "Norden", global: "Globalt", both: "Blandat geo" } },
+                      ].filter(t => t.value && t.map[t.value]).map((t, i) => (
+                        <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "#f0f3fa", color: "#2962ff", fontWeight: 500 }}>
+                          {t.map[t.value]}
+                        </span>
+                      ))}
+                    </div>
+                    {preferences.investorProfile.interests?.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+                        {preferences.investorProfile.interests.map(i => {
+                          const labels = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
+                          return <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "#e8f5e9", color: "#1b5e20", fontWeight: 500 }}>{labels[i] || i}</span>;
+                        })}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => { updatePreferences({ investorProfile: null }); setProfileOpen(false); }}
+                      style={{ fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginTop: 6 }}
+                    >
+                      Ändra profil →
+                    </button>
+                  </div>
+                )}
                 <button
                   onClick={() => supabase.auth.signOut()}
                   style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
@@ -285,6 +318,11 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* Onboarding modal for new users */}
+      {!preferences.investorProfile && (
+        <OnboardingModal onComplete={(profile) => updatePreferences({ investorProfile: profile })} />
+      )}
 
       {/* Content + Chat */}
       <div style={{ display: "flex", height: isMobile ? "calc(100vh - 82px)" : "calc(100vh - 42px)" }}>

@@ -4,6 +4,7 @@ import PdfImportModal from "./PdfImportModal.jsx";
 import InvestmentCompanyModal from "./InvestmentCompanyModal.jsx";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import CompanyView from "./CompanyView.jsx";
+import InvestmentCompanyView from "./InvestmentCompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
@@ -277,6 +278,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const [showImport, setShowImport] = useState(false);
   const [showInvestmentCo, setShowInvestmentCo] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [selectedInvestmentCo, setSelectedInvestmentCo] = useState(null);
   const [fxRates, setFxRates] = useState({ SEK: 1 });
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
   const [creatingGroup, setCreatingGroup] = useState(false);
@@ -413,7 +415,21 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
 
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
-    return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
+    return <CompanyView item={freshItem} onBack={() => {
+      if (selectedInvestmentCo) setSelected(null);
+      else setSelected(null);
+    }} onUpdate={updateItem} />;
+  }
+
+  if (selectedInvestmentCo) {
+    const coData = investmentCompanies.find(c => c.name === selectedInvestmentCo);
+    return <InvestmentCompanyView
+      companyName={selectedInvestmentCo}
+      holdings={coData?.holdings || []}
+      existingItems={items}
+      onBack={() => setSelectedInvestmentCo(null)}
+      onSelectStock={(item) => setSelected(item)}
+    />;
   }
 
   // Filter items by active group
@@ -549,32 +565,20 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
             <div style={{ width: 1, height: 20, background: "#e0e3eb", margin: "0 4px" }} />
             {investmentGroups.map(g => {
               const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
-              const isActive = activeGroup === g.name;
               return (
                 <div key={g.name} style={{ position: "relative", display: "flex", alignItems: "center" }}>
                   <button
-                    onClick={() => setActiveGroup(isActive ? null : g.name)}
+                    onClick={() => setSelectedInvestmentCo(g.name)}
                     style={{
                       fontSize: 12, padding: "5px 12px", borderRadius: 14,
-                      border: isActive ? "1px solid #2962ff" : "1px solid #e0e3eb",
-                      background: isActive ? "#f0f3fa" : "#fff",
-                      color: isActive ? "#2962ff" : "#787b86",
-                      cursor: "pointer", fontFamily: "inherit", fontWeight: isActive ? 500 : 400,
+                      border: "1px solid #e0e3eb",
+                      background: "#fff",
+                      color: "#787b86",
+                      cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
-                    {g.name} ({count})
+                    {g.name} ({count}) →
                   </button>
-                  {isActive && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); deleteGroup(g.name); }}
-                      title="Ta bort grupp"
-                      style={{ marginLeft: 2, fontSize: 11, color: "#c0c3cb", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
-                      onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
-                      onMouseLeave={e => e.currentTarget.style.color = "#c0c3cb"}
-                    >
-                      ×
-                    </button>
-                  )}
                 </div>
               );
             })}

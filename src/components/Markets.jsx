@@ -42,6 +42,7 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
       {preferences.investorProfile?.interests?.length > 0 && (
         <InterestSuggestions
           interests={preferences.investorProfile.interests}
+          profile={preferences.investorProfile}
           existingTickers={tickers}
           isMobile={isMobile}
           onNavigate={onNavigate}

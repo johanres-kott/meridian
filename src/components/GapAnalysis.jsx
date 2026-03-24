@@ -45,7 +45,7 @@ function getColumns(investorType) {
   return order.map(key => ALL_COLUMNS[key]).filter(Boolean);
 }
 
-export default function GapAnalysis({ preferences = {} }) {
+export default function GapAnalysis({ preferences = {}, onNavigate }) {
   const isMobile = useIsMobile();
   const columns = getColumns(preferences.investorProfile?.investorType);
   const [items, setItems] = useState([]);
@@ -254,10 +254,12 @@ export default function GapAnalysis({ preferences = {} }) {
                 const d = companyData[item.ticker] || {};
                 return (
                   <tr key={item.id}
+                    onClick={() => onNavigate?.("portfolio", { ticker: item.ticker })}
+                    style={{ cursor: onNavigate ? "pointer" : "default" }}
                     onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
                     onMouseLeave={e => e.currentTarget.style.background = ""}
                   >
-                    <td style={{ padding: "8px 4px 8px 10px", borderBottom: "1px solid #f0f3fa", width: 30, textAlign: "center" }}>
+                    <td style={{ padding: "8px 4px 8px 10px", borderBottom: "1px solid #f0f3fa", width: 30, textAlign: "center" }} onClick={e => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selectedForCompare.has(item.ticker)}

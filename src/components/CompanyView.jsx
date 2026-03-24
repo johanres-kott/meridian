@@ -206,6 +206,28 @@ function ProfileInsight({ ticker, company, investorProfile }) {
           {score >= 60 ? "Matchar din profil" : score >= 40 ? "Delvis matchning" : "Avviker från din profil"}
         </div>
       </div>
+      <details style={{ marginTop: 10 }}>
+        <summary style={{ fontSize: 10, color: "#b2b5be", cursor: "pointer", userSelect: "none" }}>Hur vi bedömer risk</summary>
+        <div style={{ marginTop: 6, fontSize: 10, color: "#787b86", lineHeight: 1.6 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#089981", fontSize: 11, width: 14, textAlign: "center" }}>◉</span>
+              <strong>Låg risk</strong> — Stora, stabila bolag (Large Cap). T.ex. ABB, AstraZeneca, Volvo, SEB.
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#ff9800", fontSize: 11, width: 14, textAlign: "center" }}>◉</span>
+              <strong>Medel risk</strong> — Medelstora bolag (Mid Cap). T.ex. Saab, Epiroc, Avanza, Husqvarna.
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#f23645", fontSize: 11, width: 14, textAlign: "center" }}>◉</span>
+              <strong>Hög risk</strong> — Små eller volatila bolag (Small Cap). T.ex. Sinch, Embracer, Ovzon.
+            </div>
+          </div>
+          <div style={{ marginTop: 6, color: "#b2b5be" }}>
+            Baseras på börsvärde och historisk kursvolatilitet. Utgör inte finansiell rådgivning.
+          </div>
+        </div>
+      </details>
     </div>
   );
 }

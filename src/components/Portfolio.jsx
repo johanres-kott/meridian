@@ -266,7 +266,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
   );
 }
 
-export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
+export default function Portfolio({ preferences = {}, onUpdatePreferences, deepLink, onClearDeepLink }) {
   const isMobile = useIsMobile();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -280,6 +280,16 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences }) {
   const groups = preferences.groups || [];
 
   useEffect(() => { load(); loadFxRates(); }, []);
+
+  // Handle deep link from Översikt
+  useEffect(() => {
+    if (!deepLink?.ticker || loading || items.length === 0) return;
+    const match = items.find(i => i.ticker.toUpperCase() === deepLink.ticker.toUpperCase());
+    if (match) {
+      setSelected(match);
+      onClearDeepLink?.();
+    }
+  }, [deepLink, loading, items]);
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();

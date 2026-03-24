@@ -17,7 +17,7 @@ function calcWeeklyChange(points, currentPrice) {
   return ((currentPrice - ref.close) / ref.close) * 100;
 }
 
-export default function WeeklySummary({ userId, preferences = {}, isMobile }) {
+export default function WeeklySummary({ userId, preferences = {}, isMobile, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
@@ -139,7 +139,7 @@ export default function WeeklySummary({ userId, preferences = {}, isMobile }) {
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>Index</div>
           {data.indices.map(idx => (
-            <div key={idx.symbol} style={listItem}>
+            <div key={idx.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities", { symbol: idx.symbol })}>
               <div>
                 <div style={tickerStyle}>{idx.name}</div>
                 <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
@@ -165,7 +165,7 @@ export default function WeeklySummary({ userId, preferences = {}, isMobile }) {
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : (data.portfolio.length > 0 ? "1px solid #f0f3fa" : "none"), borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
           <div style={sectionHeader}>Råvaror & FX</div>
           {data.commodities.map(c => (
-            <div key={c.symbol} style={listItem}>
+            <div key={c.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities", { symbol: c.display || c.symbol })}>
               <div>
                 <div style={tickerStyle}>{c.name}</div>
                 <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>
@@ -183,7 +183,7 @@ export default function WeeklySummary({ userId, preferences = {}, isMobile }) {
           <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
             <div style={sectionHeader}>Din portfolj</div>
             {data.portfolio.map(item => (
-              <div key={item.ticker} style={listItem}>
+              <div key={item.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { ticker: item.ticker })}>
                 <div>
                   <div style={tickerStyle}>{item.name}</div>
                   <div style={{ ...subtext, ...mono }}>{item.ticker}</div>

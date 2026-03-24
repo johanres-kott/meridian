@@ -10,7 +10,7 @@ const STATUS_COLORS = {
   Avstår: "#880e4f",
 };
 
-export default function PortfolioSummary({ userId, isMobile }) {
+export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
@@ -199,7 +199,7 @@ export default function PortfolioSummary({ userId, isMobile }) {
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga rörelser</div>
           ) : (
             data.movers.map(item => (
-              <div key={item.ticker} style={listItem}>
+              <div key={item.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { ticker: item.ticker })}>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 500, color: "#131722" }}>{item.name || item.ticker}</div>
                   <div style={{ fontSize: 10, color: "#787b86", ...mono }}>{item.ticker}</div>

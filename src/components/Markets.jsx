@@ -15,8 +15,8 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
         </h1>
       </div>
       <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
-      <PortfolioSummary userId={userId} isMobile={isMobile} />
-      <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} />
+      <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
+      <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} onNavigate={onNavigate} />
       <UpcomingEarnings userId={userId} isMobile={isMobile} />
     </div>
   );

@@ -13,11 +13,11 @@ import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
-  { id: "commodities", label: "Marknader" },
   { id: "portfolio", label: "Portfölj" },
-  { id: "analysis", label: "Nyckeltal" },
-  { id: "search", label: "Company Search" },
   { id: "investment", label: "Investmentbolag" },
+  { id: "analysis", label: "Analys" },
+  { id: "commodities", label: "Marknader" },
+  { id: "search", label: "Sök" },
 ];
 
 export default function App() {

@@ -226,7 +226,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga bolag i bevakning</div>
           ) : (
             data.movers.slice(0, 5).map(c => (
-              <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio")}>
+              <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { ticker: c.ticker })}>
                 <div>
                   <div style={tickerStyle}>{c.name}</div>
                   <div style={{ ...subtext, ...mono }}>{c.ticker}</div>
@@ -257,7 +257,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             />
           ) : (
             displayIndices.map(idx => (
-              <div key={idx.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities")}>
+              <div key={idx.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities", { symbol: idx.symbol })}>
                 <div>
                   <div style={tickerStyle}>{idx.name}</div>
                   <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
@@ -289,7 +289,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             />
           ) : (
             displayCommodities.map(c => (
-              <div key={c.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities")}>
+              <div key={c.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities", { symbol: c.display || c.symbol })}>
                 <div>
                   <div style={tickerStyle}>{c.name}</div>
                   <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>

@@ -5,7 +5,7 @@ import MarketDetailView from "./MarketDetailView.jsx";
 
 const COMMODITY_GROUPS = ["Precious Metals", "Energy", "Industrial Metals", "Agriculture", "FX vs SEK"];
 
-export default function Commodities() {
+export default function Commodities({ deepLink, onClearDeepLink }) {
   const [indices, setIndices] = useState([]);
   const [idxLoading, setIdxLoading] = useState(true);
   const [idxError, setIdxError] = useState(null);
@@ -13,6 +13,20 @@ export default function Commodities() {
   const [comLoading, setComLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [selected, setSelected] = useState(null);
+
+  // Handle deep link from Översikt
+  useEffect(() => {
+    if (!deepLink || (idxLoading && comLoading)) return;
+    const sym = deepLink.symbol;
+    if (!sym) return;
+    const match = [...indices, ...commodities].find(item =>
+      (item.symbol === sym) || (item.display === sym) || (item.name === sym)
+    );
+    if (match) {
+      setSelected(match);
+      onClearDeepLink?.();
+    }
+  }, [deepLink, idxLoading, comLoading, indices, commodities]);
 
   async function fetchIndices() {
     try {

@@ -442,10 +442,26 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
           </div>
         </div>
-        <button onClick={() => setShowImport(true)}
-          style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
-          Importera portfölj
-        </button>
+        <div style={{ display: "flex", gap: 8, flexDirection: isMobile ? "column" : "row" }}>
+          <button onClick={() => {
+            const rows = [["Bolag", "Ticker", "Status", "Antal", "GAV", "Kurs", "Valuta"].join(";")];
+            items.forEach(i => {
+              rows.push([i.name || "", i.ticker, i.status || "", i.shares || "", i.gav || "", "", ""].join(";"));
+            });
+            const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = "thesion-portfolj.csv"; a.click();
+            URL.revokeObjectURL(url);
+          }}
+            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
+            Exportera CSV
+          </button>
+          <button onClick={() => setShowImport(true)}
+            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
+            Importera portfölj
+          </button>
+        </div>
       </div>
 
       {/* Group filter bar */}

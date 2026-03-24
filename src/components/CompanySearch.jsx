@@ -12,11 +12,32 @@ export default function CompanySearch() {
   const [loading, setLoading] = useState(false);
   const [suggestLoading, setSuggestLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [enriched, setEnriched] = useState({});
   const debounceRef = useRef(null);
+  const enrichRef = useRef(0);
+
+  // Fetch enriched data for top N suggestion tickers in parallel
+  const enrichSuggestions = useCallback(async (tickers) => {
+    const batch = ++enrichRef.current;
+    const top = tickers.slice(0, 4);
+    const results = await Promise.allSettled(
+      top.map(t =>
+        fetch(`/api/company?ticker=${encodeURIComponent(t)}`)
+          .then(r => r.json())
+          .then(d => d.error ? null : d)
+      )
+    );
+    if (enrichRef.current !== batch) return; // stale
+    const map = {};
+    results.forEach((r, i) => {
+      if (r.status === "fulfilled" && r.value) map[top[i]] = r.value;
+    });
+    setEnriched(prev => ({ ...prev, ...map }));
+  }, []);
 
   // Name search via Finnhub symbol lookup
   const searchSuggestions = useCallback(async (q) => {
-    if (q.length < 2) { setSuggestions([]); return; }
+    if (q.length < 2) { setSuggestions([]); setEnriched({}); return; }
     setSuggestLoading(true);
     try {
       const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
@@ -27,12 +48,15 @@ export default function CompanySearch() {
         .map(s => ({ ticker: s.symbol, name: s.description, exchange: s.displaySymbol }));
       setSuggestions(results);
       setShowSuggestions(true);
+      // Auto-enrich top results
+      const tickers = results.map(s => s.ticker.replace(/ /g, "-"));
+      enrichSuggestions(tickers);
     } catch {
       setSuggestions([]);
     } finally {
       setSuggestLoading(false);
     }
-  }, []);
+  }, [enrichSuggestions]);
 
   const handleInput = (e) => {
     const val = e.target.value;
@@ -121,21 +145,53 @@ export default function CompanySearch() {
             background: "#fff", border: "1px solid #e0e3eb", borderRadius: 4,
             boxShadow: "0 4px 16px rgba(0,0,0,0.08)", zIndex: 100, marginTop: 4,
           }}>
-            {suggestions.map(s => (
-              <div
-                key={s.ticker}
-                onClick={() => selectSuggestion(s)}
-                style={{ padding: "10px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f0f3fa" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-              >
-                <div>
-                  <span style={{ fontWeight: 500, fontSize: 13 }}>{s.name}</span>
-                  <span style={{ fontSize: 11, color: "#787b86", marginLeft: 8 }}>{s.exchange}</span>
+            {suggestions.map(s => {
+              const key = s.ticker.replace(/ /g, "-");
+              const e = enriched[key];
+              const changeColor = e ? (e.changePercent >= 0 ? "#089981" : "#f23645") : "#787b86";
+              return (
+                <div
+                  key={s.ticker}
+                  onClick={() => selectSuggestion(s)}
+                  style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid #f0f3fa" }}
+                  onMouseEnter={ev => ev.currentTarget.style.background = "#f8f9fd"}
+                  onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}
+                >
+                  {/* Top row: name, exchange, ticker */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <span style={{ fontWeight: 500, fontSize: 13 }}>{s.name}</span>
+                      <span style={{ fontSize: 11, color: "#787b86", marginLeft: 8 }}>{s.exchange}</span>
+                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "#2962ff", flexShrink: 0, marginLeft: 8 }}>{s.ticker}</span>
+                  </div>
+                  {/* Bottom row: enriched data */}
+                  {e ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 5, flexWrap: "wrap" }}>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, fontWeight: 500, color: "#131722" }}>
+                        {e.price?.toFixed(2)} <span style={{ fontSize: 11, fontWeight: 400, color: "#787b86" }}>{e.currency}</span>
+                      </span>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, fontWeight: 500, color: changeColor }}>
+                        {e.changePercent >= 0 ? "+" : ""}{e.changePercent?.toFixed(2)}%
+                      </span>
+                      {e.sector && e.sector !== "—" && (
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "#f0f3fa", color: "#787b86" }}>{e.sector}</span>
+                      )}
+                      {e.peForward > 0 && (
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "#f0f3fa", color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>P/E {e.peForward}x</span>
+                      )}
+                      {e.marketCap > 0 && (
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "#f0f3fa", color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>MCap {e.marketCap}B</span>
+                      )}
+                    </div>
+                  ) : (
+                    enrichRef.current > 0 && (
+                      <div style={{ marginTop: 4, fontSize: 10, color: "#b2b5be" }}>Laddar...</div>
+                    )
+                  )}
                 </div>
-                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "#2962ff" }}>{s.ticker}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

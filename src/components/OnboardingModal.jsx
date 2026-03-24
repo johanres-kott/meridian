@@ -69,14 +69,14 @@ const STEPS = [
 
 export default function OnboardingModal({ onComplete }) {
   const isMobile = useIsMobile();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1); // -1 = welcome screen
   const [answers, setAnswers] = useState({});
 
-  const current = STEPS[step];
+  const current = step >= 0 ? STEPS[step] : null;
   const isLast = step === STEPS.length - 1;
-  const canProceed = current.multi
-    ? (answers[current.id] || []).length > 0
-    : !!answers[current.id];
+  const canProceed = current
+    ? (current.multi ? (answers[current.id] || []).length > 0 : !!answers[current.id])
+    : false;
 
   function selectOption(value) {
     if (current.multi) {
@@ -104,6 +104,32 @@ export default function OnboardingModal({ onComplete }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300 }}>
       <div style={{ background: "#fff", borderRadius: 12, padding: isMobile ? 20 : 32, width: isMobile ? "95vw" : 520, maxHeight: "85vh", overflow: "auto", boxShadow: "0 12px 48px rgba(0,0,0,0.15)" }}>
 
+        {step === -1 ? (
+          <>
+            <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "#131722", marginBottom: 8 }}>Välkommen till Thesion</div>
+              <div style={{ fontSize: 14, color: "#787b86", lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
+                För att kunna ge dig relevanta insikter och förslag behöver vi förstå dig lite bättre som investerare.
+              </div>
+              <div style={{ fontSize: 13, color: "#787b86", marginTop: 12, lineHeight: 1.6 }}>
+                Det tar bara en minut — fyra snabba frågor om din investeringsstil, riskprofil och intressen.
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 24 }}>
+              <button
+                onClick={() => setStep(0)}
+                style={{
+                  fontSize: 14, padding: "10px 28px", borderRadius: 8, border: "none",
+                  background: "#2962ff", color: "#fff", cursor: "pointer",
+                  fontFamily: "inherit", fontWeight: 500,
+                }}
+              >
+                Kom igång
+              </button>
+            </div>
+          </>
+        ) : (
+        <>
         {/* Progress */}
         <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
           {STEPS.map((_, i) => (
@@ -193,6 +219,8 @@ export default function OnboardingModal({ onComplete }) {
             {isLast ? "Klar!" : "Nästa →"}
           </button>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

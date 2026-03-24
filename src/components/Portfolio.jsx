@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { matchStock } from "../lib/profileMatcher.js";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
@@ -141,7 +142,7 @@ function formatHoldingValue(msek) {
   return `${msek.toLocaleString("sv-SE")} Mkr`;
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false }) {
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, investorProfile = null }) {
   const [price, setPrice] = useState(null);
   const [tagOpen, setTagOpen] = useState(false);
 
@@ -173,7 +174,22 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
       <td style={{ ...tdBase, width: 36 }}>{getFlag(item.ticker)}</td>
       <td style={tdBase}>
         <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{item.name || item.ticker}</div>
-        <div style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>
+          {investorProfile && (() => {
+            const { tags, warnings } = matchStock(item.ticker, investorProfile);
+            return (
+              <>
+                {tags.slice(0, 1).map(t => (
+                  <span key={t} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500 }}>{t}</span>
+                ))}
+                {warnings.slice(0, 1).map(w => (
+                  <span key={w} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#fff3e0", color: "#e65100", fontWeight: 500 }}>{w}</span>
+                ))}
+              </>
+            );
+          })()}
+        </div>
       </td>
       {showStatus && (
         <td style={tdBase} onClick={e => e.stopPropagation()}>
@@ -556,11 +572,47 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} investorProfile={preferences.investorProfile} />
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* Profile matching legend */}
+      {preferences.investorProfile && filteredItems.length > 0 && (
+        <details style={{ marginTop: 16 }}>
+          <summary style={{ fontSize: 11, color: "#b2b5be", cursor: "pointer", userSelect: "none" }}>
+            Hur vi flaggar bolag
+          </summary>
+          <div style={{ marginTop: 8, padding: "12px 16px", background: "#f8f9fd", borderRadius: 6, fontSize: 11, color: "#787b86", lineHeight: 1.6 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Matchar riskprofil</span>
+                Aktiens risknivå stämmer med din profil
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Utdelningsaktie</span>
+                Hög direktavkastning (&gt;3%)
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Tillväxtaktie</span>
+                Hög omsättningstillväxt (&gt;15%)
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Stabil värdeaktie</span>
+                Stort bolag med låg risk
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#fff3e0", color: "#e65100", fontWeight: 500, flexShrink: 0 }}>Hög risk för din profil</span>
+                Risknivån avviker från din profil
+              </div>
+            </div>
+            <div style={{ marginTop: 8, fontSize: 10, color: "#b2b5be" }}>
+              Baseras på börsvärde och sektordata. Utgör inte finansiell rådgivning.
+            </div>
+          </div>
+        </details>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Chg } from "./SharedComponents.jsx";
+import { filterSuggestionsByProfile, matchStock } from "../lib/profileMatcher.js";
 
 // Curated stock suggestions per interest category
 const SUGGESTIONS = {
@@ -85,7 +86,7 @@ const INTEREST_LABELS = {
   ev: "Elbilar", crypto: "Krypto",
 };
 
-export default function InterestSuggestions({ interests, existingTickers, isMobile, onNavigate }) {
+export default function InterestSuggestions({ interests, existingTickers, isMobile, onNavigate, profile }) {
   const [enriched, setEnriched] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -98,17 +99,20 @@ export default function InterestSuggestions({ interests, existingTickers, isMobi
     const picks = [];
     for (const interest of interests) {
       const candidates = (SUGGESTIONS[interest] || []).filter(s => !existingSet.has(s.ticker.toUpperCase()));
-      picks.push(...candidates.slice(0, 2));
+      picks.push(...candidates.slice(0, 3));
     }
 
     // Deduplicate
     const seen = new Set();
-    const unique = picks.filter(p => { if (seen.has(p.ticker)) return false; seen.add(p.ticker); return true; }).slice(0, 8);
+    const unique = picks.filter(p => { if (seen.has(p.ticker)) return false; seen.add(p.ticker); return true; });
 
-    if (unique.length === 0) { setLoading(false); return; }
+    // Filter and sort by profile match
+    const filtered = filterSuggestionsByProfile(unique, profile || {}).slice(0, 8);
+
+    if (filtered.length === 0) { setLoading(false); return; }
 
     // Fetch prices for suggestions
-    Promise.all(unique.map(async (s) => {
+    Promise.all(filtered.map(async (s) => {
       try {
         const res = await fetch(`/api/company?ticker=${encodeURIComponent(s.ticker)}`);
         const d = await res.json();
@@ -163,7 +167,12 @@ export default function InterestSuggestions({ interests, existingTickers, isMobi
               >
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 500, color: "#131722" }}>{item.name}</div>
-                  <div style={{ fontSize: 10, color: "#787b86", ...mono }}>{item.ticker}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                    <span style={{ fontSize: 10, color: "#787b86", ...mono }}>{item.ticker}</span>
+                    {(matchStock(item.ticker, profile || {}).tags || []).slice(0, 1).map(tag => (
+                      <span key={tag} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500 }}>{tag}</span>
+                    ))}
+                  </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   {item.price != null && (

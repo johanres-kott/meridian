@@ -20,17 +20,17 @@ function getFlag(ticker) {
 
 const ALL_COLUMNS = {
   name: { key: "name", label: "Bolag", align: "left" },
-  price: { key: "price", label: "Kurs", align: "right", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
-  changePercent: { key: "changePercent", label: "\u0394 Idag", align: "right", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "#787b86" },
-  peForward: { key: "peForward", label: "P/E Fwd", align: "right", fmt: v => fmt(v, "x") },
-  peTrailing: { key: "peTrailing", label: "P/E Trail", align: "right", fmt: v => fmt(v, "x") },
-  ebitdaMargin: { key: "ebitdaMargin", label: "EBITDA %", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  operatingMargin: { key: "operatingMargin", label: "Ror.marg", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  grossMargin: { key: "grossMargin", label: "Brutto %", align: "right", fmt: v => fmt(v, "%") },
-  revenueGrowth: { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
-  roic: { key: "roic", label: "ROIC", align: "right", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  debtEbitda: { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
-  dividendYield: { key: "dividendYield", label: "Utdelning", align: "right", fmt: v => fmt(v, "%"), color: v => v > 3 ? "#089981" : null },
+  price: { key: "price", label: "Kurs", align: "right", tip: "Aktiens senaste pris", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
+  changePercent: { key: "changePercent", label: "\u0394 Idag", align: "right", tip: "Kursf\u00f6r\u00e4ndring idag i procent", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "#787b86" },
+  peForward: { key: "peForward", label: "P/E Fwd", align: "right", tip: "Price/Earnings Forward \u2014 aktiekursen delat med f\u00f6rv\u00e4ntad vinst per aktie. L\u00e4gre = billigare.", fmt: v => fmt(v, "x") },
+  peTrailing: { key: "peTrailing", label: "P/E Trail", align: "right", tip: "Price/Earnings Trailing \u2014 aktiekursen delat med senaste \u00e5rets vinst per aktie.", fmt: v => fmt(v, "x") },
+  ebitdaMargin: { key: "ebitdaMargin", label: "EBITDA %", align: "right", tip: "Vinst f\u00f6re r\u00e4ntor, skatt och avskrivningar som andel av oms\u00e4ttningen. M\u00e4ter operativ l\u00f6nsamhet.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  operatingMargin: { key: "operatingMargin", label: "R\u00f6r.marg", align: "right", tip: "R\u00f6relsemarginal \u2014 r\u00f6relseresultat delat med oms\u00e4ttning. Visar hur mycket av varje krona som blir vinst.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  grossMargin: { key: "grossMargin", label: "Brutto %", align: "right", tip: "Bruttomarginal \u2014 oms\u00e4ttning minus varukostnad, delat med oms\u00e4ttning. H\u00f6gre = b\u00e4ttre prisf\u00f6rm\u00e5ga.", fmt: v => fmt(v, "%") },
+  revenueGrowth: { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", tip: "Oms\u00e4ttningstillv\u00e4xt j\u00e4mf\u00f6rt med f\u00f6reg\u00e5ende \u00e5r.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
+  roic: { key: "roic", label: "ROIC", align: "right", tip: "Return on Invested Capital \u2014 avkastning p\u00e5 investerat kapital. Visar hur effektivt bolaget anv\u00e4nder sina pengar.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  debtEbitda: { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", tip: "Nettoskuld delat med EBITDA. \u00d6ver 3x anses h\u00f6gt bel\u00e5nat.", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
+  dividendYield: { key: "dividendYield", label: "Utdelning", align: "right", tip: "Direktavkastning \u2014 \u00e5rlig utdelning delat med aktiekursen. H\u00f6gre = mer pengar tillbaka varje \u00e5r.", fmt: v => fmt(v, "%"), color: v => v > 3 ? "#089981" : null },
 };
 
 const COLUMN_ORDERS = {
@@ -168,7 +168,7 @@ export default function GapAnalysis({ preferences = {} }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 18, fontWeight: 500 }}>Nyckeltal</h1>
+        <h1 style={{ fontSize: 18, fontWeight: 500 }}>Analys</h1>
         <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
           Fundamentala nyckeltal f&ouml;r {filteredItems.length} bolag{activeGroup ? ` i ${activeGroup}` : ""}
         </p>
@@ -241,8 +241,9 @@ export default function GapAnalysis({ preferences = {} }) {
                 <th style={{ padding: "8px 10px", textAlign: "center", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
                 <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
                 {columns.map(col => (
-                  <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)}>
+                  <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)} title={col.tip || ""}>
                     {col.label}
+                    {col.tip && <span style={{ marginLeft: 2, fontSize: 9, color: "#b2b5be", cursor: "help" }}>?</span>}
                     {sortKey === col.key && <span style={{ marginLeft: 4 }}>{sortAsc ? "\u25B2" : "\u25BC"}</span>}
                   </th>
                 ))}

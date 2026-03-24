@@ -1,5 +1,7 @@
 // Static profile data for Swedish investment companies.
-// Leadership and descriptions updated manually.
+// Leadership (ceo, boardChair) is used as fallback by /api/leadership.js —
+// the API scrapes live data and falls back to these values if scraping fails.
+// Update these when leadership changes and scraping is known to be broken.
 
 export const PROFILES = {
   "Investor": {
@@ -22,7 +24,7 @@ export const PROFILES = {
     ticker: "ORES.ST",
     description: "Investmentbolag med fokus på att skapa långsiktigt god avkastning genom investeringar i nordiska börsnoterade bolag.",
     ceo: "Nicklas Paulson",
-    boardChair: "Stefan Charette",
+    boardChair: "Mats Qviberg",
     founded: 1979,
     url: "https://www.oresund.se",
   },

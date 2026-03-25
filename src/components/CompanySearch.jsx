@@ -289,14 +289,14 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
 
           {/* Metrics grid */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
-            <StatCard label="P/E Forward" value={fmt(result.peForward, "x")} />
-            <StatCard label="P/E Trailing" value={fmt(result.peTrailing, "x")} />
-            <StatCard label="EBITDA Margin" value={fmt(result.ebitdaMargin, "%")} neg={result.ebitdaMargin < 0} />
-            <StatCard label="Operating Margin" value={fmt(result.operatingMargin, "%")} neg={result.operatingMargin < 0} />
-            <StatCard label="Gross Margin" value={fmt(result.grossMargin, "%")} />
-            <StatCard label="ROIC / ROE" value={fmt(result.roic, "%")} neg={result.roic < 0} />
-            <StatCard label="Net Debt/EBITDA" value={fmt(result.debtEbitda, "x")} neg={result.debtEbitda > 3} />
-            <StatCard label="Revenue Growth" value={fmt(result.revenueGrowth, "%")} neg={result.revenueGrowth < 0} />
+            <StatCard label="P/E Forward" value={fmt(result.peForward, "x")} tooltip="Aktiekurs delat med förväntad vinst per aktie kommande 12 mån. Lägre = billigare." />
+            <StatCard label="P/E Trailing" value={fmt(result.peTrailing, "x")} tooltip="Aktiekurs delat med vinst per aktie senaste 12 mån. Lägre = billigare." />
+            <StatCard label="EBITDA-marginal" value={fmt(result.ebitdaMargin, "%")} neg={result.ebitdaMargin < 0} tooltip="Vinst före räntor, skatt och avskrivningar som andel av omsättningen." />
+            <StatCard label="Rör.marginal" value={fmt(result.operatingMargin, "%")} neg={result.operatingMargin < 0} tooltip="Rörelseresultat delat med omsättning. Visar hur mycket som blir vinst." />
+            <StatCard label="Bruttomarginal" value={fmt(result.grossMargin, "%")} tooltip="Omsättning minus varukostnad, delat med omsättning. Högre = bättre." />
+            <StatCard label="ROIC / ROE" value={fmt(result.roic, "%")} neg={result.roic < 0} tooltip="Avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar." />
+            <StatCard label="Nettoskuld/EBITDA" value={fmt(result.debtEbitda, "x")} neg={result.debtEbitda > 3} tooltip="Nettoskuld delat med EBITDA. Över 3x anses högt belånat." />
+            <StatCard label="Tillväxt" value={fmt(result.revenueGrowth, "%")} neg={result.revenueGrowth < 0} tooltip="Omsättningstillväxt jämfört med föregående år (YoY)." />
           </div>
 
           {/* Profile insight + Chart */}

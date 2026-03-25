@@ -142,7 +142,7 @@ function formatHoldingValue(msek) {
   return `${msek.toLocaleString("sv-SE")} Mkr`;
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, investorProfile = null }) {
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, investorProfile = null, scoreData = null }) {
   const [price, setPrice] = useState(null);
   const [tagOpen, setTagOpen] = useState(false);
 
@@ -176,21 +176,23 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
         <div style={{ fontWeight: 500, fontSize: 13, color: "#131722" }}>{item.name || item.ticker}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <span style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>
-          {investorProfile && price && (() => {
-            const { tags, warnings } = matchStock(item.ticker, investorProfile, {
-              beta: price.beta, dividendYield: price.dividendYield, revenueGrowth: price.revenueGrowth, marketCap: price.marketCap,
-            });
+          {scoreData && (() => {
+            const profileType = investorProfile?.investorType || "mixed";
+            const compositeScore = scoreData.composite?.[profileType] ?? scoreData.composite?.mixed;
+            if (compositeScore == null) return null;
+            const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
+            const bg = compositeScore >= 70 ? "#e8f5e9" : compositeScore >= 40 ? "#fff3e0" : "#fff5f5";
             return (
-              <>
-                {tags.slice(0, 1).map(t => (
-                  <span key={t} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500 }}>{t}</span>
-                ))}
-                {warnings.slice(0, 1).map(w => (
-                  <span key={w} style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#fff3e0", color: "#e65100", fontWeight: 500 }}>{w}</span>
-                ))}
-              </>
+              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: bg, color, fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace" }}>
+                {Math.round(compositeScore)}
+              </span>
             );
           })()}
+          {scoreData?.scores?.piotroski?.raw >= 7 && (
+            <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500 }}>
+              F-Score {scoreData.scores.piotroski.raw}/9
+            </span>
+          )}
         </div>
       </td>
       {showStatus && (
@@ -294,10 +296,23 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
+  const [scores, setScores] = useState({});
 
   const groups = preferences.groups || [];
 
-  useEffect(() => { load(); loadFxRates(); }, []);
+  useEffect(() => { load(); loadFxRates(); loadScores(); }, []);
+
+  async function loadScores() {
+    try {
+      const res = await fetch("/api/suggestions?limit=300");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const map = {};
+        data.forEach(s => { map[s.ticker?.toUpperCase()] = s; });
+        setScores(map);
+      }
+    } catch {}
+  }
 
   // Handle deep link from Översikt
   useEffect(() => {
@@ -574,7 +589,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} investorProfile={preferences.investorProfile} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} investorProfile={preferences.investorProfile} scoreData={scores[item.ticker?.toUpperCase()]} />
               ))}
             </tbody>
           </table>
@@ -585,33 +600,29 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       {preferences.investorProfile && filteredItems.length > 0 && (
         <details style={{ marginTop: 16 }}>
           <summary style={{ fontSize: 11, color: "#b2b5be", cursor: "pointer", userSelect: "none" }}>
-            Hur vi flaggar bolag
+            Hur vi poängsätter bolag
           </summary>
           <div style={{ marginTop: 8, padding: "12px 16px", background: "#f8f9fd", borderRadius: 6, fontSize: 11, color: "#787b86", lineHeight: 1.6 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Matchar riskprofil</span>
-                Aktiens risknivå stämmer med din profil
+                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#e8f5e9", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
+                Totalpoäng 70–100: Stark matchning med din profil
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Utdelningsaktie</span>
-                Hög direktavkastning (&gt;3%)
+                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#fff3e0", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
+                Totalpoäng 40–69: Okej matchning
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Tillväxtaktie</span>
-                Hög omsättningstillväxt (&gt;15%)
+                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#fff5f5", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
+                Totalpoäng 0–39: Svag matchning
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>Stabil värdeaktie</span>
-                Stort bolag med låg risk
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 2, background: "#fff3e0", color: "#e65100", fontWeight: 500, flexShrink: 0 }}>Hög risk för din profil</span>
-                Risknivån avviker från din profil
+                <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
+                Piotroski F-Score ≥ 7 — hög finansiell kvalitet
               </div>
             </div>
             <div style={{ marginTop: 8, fontSize: 10, color: "#b2b5be" }}>
-              Baseras på börsvärde och sektordata. Utgör inte finansiell rådgivning.
+              Poäng baseras på Piotroski F-Score, Magic Formula, tillväxt, utdelning och kvalitet. Viktas efter din investerarprofil. Utgör inte finansiell rådgivning.
             </div>
           </div>
         </details>

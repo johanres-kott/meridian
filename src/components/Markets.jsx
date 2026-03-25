@@ -6,6 +6,7 @@ import PortfolioSummary from "./PortfolioSummary.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
 import InterestSuggestions from "./InterestSuggestions.jsx";
+import SmartSuggestions from "./SmartSuggestions.jsx";
 
 export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
   const isMobile = useIsMobile();
@@ -39,6 +40,14 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
       <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} onNavigate={onNavigate} />
       <UpcomingEarnings userId={userId} isMobile={isMobile} />
+      {preferences.investorProfile && (
+        <SmartSuggestions
+          profile={preferences.investorProfile}
+          existingTickers={tickers}
+          isMobile={isMobile}
+          onNavigate={onNavigate}
+        />
+      )}
       {preferences.investorProfile?.interests?.length > 0 && (
         <InterestSuggestions
           interests={preferences.investorProfile.interests}

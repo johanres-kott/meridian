@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../supabase.js";
 import { PriceChart } from "./SharedComponents.jsx";
+import SmartSuggestions from "./SmartSuggestions.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -344,9 +347,18 @@ function HoldingsTable({ companyId }) {
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function InvestmentCompanies() {
+export default function InvestmentCompanies({ preferences = {}, userId, onNavigate }) {
+  const isMobile = useIsMobile();
   const [selectedId, setSelectedId] = useState("investor");
+  const [tickers, setTickers] = useState([]);
   const company = COMPANIES.find(c => c.id === selectedId);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from("watchlist").select("ticker").eq("user_id", userId).then(({ data }) => {
+      setTickers((data || []).map(d => d.ticker));
+    });
+  }, [userId]);
 
   const fullTicker = `${company.ticker}.${company.exchange}`;
   const { data: leadershipData } = useFetch(`/api/leadership?id=${selectedId}`);
@@ -360,6 +372,18 @@ export default function InvestmentCompanies() {
           100% { background-position: -200% 0; }
         }
       `}</style>
+
+      {/* ── Smart Suggestions ── */}
+      {preferences.investorProfile && (
+        <div style={{ marginBottom: 24 }}>
+          <SmartSuggestions
+            profile={preferences.investorProfile}
+            existingTickers={tickers}
+            isMobile={isMobile}
+            onNavigate={onNavigate}
+          />
+        </div>
+      )}
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>

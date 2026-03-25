@@ -16,7 +16,7 @@ import ScoringMethodology from "./components/ScoringMethodology.jsx";
 const TABS = [
   { id: "markets", label: "Översikt" },
   { id: "portfolio", label: "Portfölj" },
-  { id: "investment", label: "Investmentbolag" },
+  { id: "investment", label: "Investera" },
   { id: "analysis", label: "Analys" },
   { id: "commodities", label: "Marknader" },
   { id: "search", label: "Sök" },
@@ -334,7 +334,7 @@ export default function App() {
           {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "analysis" && <GapAnalysis preferences={preferences} onNavigate={navigate} />}
           {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} preferences={preferences} />}
-          {tab === "investment" && <InvestmentCompanies />}
+          {tab === "investment" && <InvestmentCompanies preferences={preferences} userId={session.user.id} onNavigate={navigate} />}
           {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />

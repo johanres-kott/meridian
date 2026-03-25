@@ -143,8 +143,8 @@ export const Pill = ({ text, green }) => (
   }}>{text}</span>
 );
 
-export const StatCard = ({ label, value, sub, neg }) => (
-  <div style={{ background: "#f8f9fd", borderRadius: 4, padding: "12px 14px" }}>
+export const StatCard = ({ label, value, sub, neg, tooltip }) => (
+  <div style={{ background: "#f8f9fd", borderRadius: 4, padding: "12px 14px", cursor: tooltip ? "help" : undefined }} title={tooltip || undefined}>
     <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>{label}</div>
     <div style={{ fontSize: 15, fontWeight: 500, color: neg ? "#f23645" : neg === false ? "#089981" : "#131722", fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
     {sub && <div style={{ fontSize: 11, color: "#b2b5be", marginTop: 4 }}>{sub}</div>}

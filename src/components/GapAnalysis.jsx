@@ -18,6 +18,8 @@ function getFlag(ticker) {
   return "\u{1F1FA}\u{1F1F8}";
 }
 
+const MOBILE_COLUMNS = new Set(["name", "price", "changePercent", "peForward"]);
+
 const ALL_COLUMNS = {
   name: { key: "name", label: "Bolag", align: "left" },
   price: { key: "price", label: "Kurs", align: "right", tip: "Aktiens senaste pris", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
@@ -47,7 +49,8 @@ function getColumns(investorType) {
 
 export default function GapAnalysis({ preferences = {}, onNavigate }) {
   const isMobile = useIsMobile();
-  const columns = getColumns(preferences.investorProfile?.investorType);
+  const allColumns = getColumns(preferences.investorProfile?.investorType);
+  const columns = isMobile ? allColumns.filter(c => MOBILE_COLUMNS.has(c.key)) : allColumns;
   const [items, setItems] = useState([]);
   const [companyData, setCompanyData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -146,9 +149,9 @@ export default function GapAnalysis({ preferences = {}, onNavigate }) {
   }
 
   const thStyle = (col) => ({
-    padding: "8px 10px",
+    padding: isMobile ? "6px 6px" : "8px 10px",
     textAlign: col.align,
-    fontSize: 11,
+    fontSize: isMobile ? 10 : 11,
     fontWeight: 500,
     color: sortKey === col.key ? "#2962ff" : "#787b86",
     borderBottom: "1px solid #e0e3eb",
@@ -158,18 +161,18 @@ export default function GapAnalysis({ preferences = {}, onNavigate }) {
   });
 
   const tdStyle = (col) => ({
-    padding: "8px 10px",
+    padding: isMobile ? "6px 6px" : "8px 10px",
     textAlign: col.align,
     fontFamily: col.align === "right" ? "'IBM Plex Mono', monospace" : "inherit",
-    fontSize: 12,
+    fontSize: isMobile ? 11 : 12,
     borderBottom: "1px solid #f0f3fa",
   });
 
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 18, fontWeight: 500 }}>Analys</h1>
-        <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
+        <h1 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 500 }}>Analys</h1>
+        <p style={{ fontSize: isMobile ? 11 : 12, color: "#787b86", marginTop: 2 }}>
           Fundamentala nyckeltal f&ouml;r {filteredItems.length} bolag{activeGroup ? ` i ${activeGroup}` : ""}
         </p>
         {selectedForCompare.size >= 2 && (
@@ -179,6 +182,7 @@ export default function GapAnalysis({ preferences = {}, onNavigate }) {
               marginTop: 8, fontSize: 12, padding: "6px 16px", borderRadius: 4,
               border: "none", background: "#2962ff", color: "#fff",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
+              width: isMobile ? "100%" : "auto",
             }}
           >
             J&auml;mf&ouml;r ({selectedForCompare.size})
@@ -234,12 +238,12 @@ export default function GapAnalysis({ preferences = {}, onNavigate }) {
           Inga bolag i &ldquo;{activeGroup}&rdquo;
         </div>
       ) : (
-        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : 900 }}>
+        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 360 : 900 }}>
             <thead>
               <tr>
-                <th style={{ padding: "8px 10px", textAlign: "center", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
-                <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: 30 }}></th>
+                <th style={{ padding: isMobile ? "6px 2px 6px 6px" : "8px 10px", textAlign: "center", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: isMobile ? 20 : 30 }}></th>
+                <th style={{ padding: isMobile ? "6px 4px" : "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", width: isMobile ? 24 : 30 }}></th>
                 {columns.map(col => (
                   <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)} title={col.tip || ""}>
                     {col.label}
@@ -259,16 +263,16 @@ export default function GapAnalysis({ preferences = {}, onNavigate }) {
                     onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
                     onMouseLeave={e => e.currentTarget.style.background = ""}
                   >
-                    <td style={{ padding: "8px 4px 8px 10px", borderBottom: "1px solid #f0f3fa", width: 30, textAlign: "center" }} onClick={e => e.stopPropagation()}>
+                    <td style={{ padding: isMobile ? "6px 2px 6px 6px" : "8px 4px 8px 10px", borderBottom: "1px solid #f0f3fa", width: isMobile ? 20 : 30, textAlign: "center" }} onClick={e => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selectedForCompare.has(item.ticker)}
                         onChange={() => toggleCompare(item.ticker)}
                         disabled={!selectedForCompare.has(item.ticker) && selectedForCompare.size >= 4}
-                        style={{ cursor: "pointer", accentColor: "#2962ff" }}
+                        style={{ cursor: "pointer", accentColor: "#2962ff", width: isMobile ? 14 : undefined, height: isMobile ? 14 : undefined }}
                       />
                     </td>
-                    <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa", width: 30 }}>{getFlag(item.ticker)}</td>
+                    <td style={{ padding: isMobile ? "6px 4px" : "8px 10px", borderBottom: "1px solid #f0f3fa", width: isMobile ? 24 : 30 }}>{getFlag(item.ticker)}</td>
                     {columns.map(col => {
                       const val = col.key === "name" ? null : d[col.key];
                       const colorFn = col.color;

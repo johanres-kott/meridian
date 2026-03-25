@@ -173,11 +173,11 @@ function EventList({ url, emptyMsg }) {
 
 // ─── Leadership panel ─────────────────────────────────────────────────────────
 
-function LeadershipPanel({ companyId }) {
+function LeadershipPanel({ companyId, isMobile }) {
   const { data, loading } = useFetch(companyId ? `/api/leadership?id=${companyId}` : null);
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
       {["boardChair", "ceo"].map(key => (
         <div key={key} style={{ background: "#f8f9fd", border: "1px solid #edf0f7", borderRadius: 6, padding: "14px 16px" }}>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#b2b5be", marginBottom: 7 }}>
@@ -249,9 +249,9 @@ function InfoCard({ company, leadershipData }) {
 
 // ─── Company selector (horizontal tab strip) ─────────────────────────────────
 
-function CompanySelector({ selected, onSelect }) {
+function CompanySelector({ selected, onSelect, isMobile }) {
   return (
-    <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+    <div style={{ display: "flex", gap: isMobile ? 3 : 4, flexWrap: "wrap" }}>
       {COMPANIES.map(c => {
         const active = c.id === selected;
         return (
@@ -259,12 +259,12 @@ function CompanySelector({ selected, onSelect }) {
             key={c.id}
             onClick={() => onSelect(c.id)}
             style={{
-              display: "flex", alignItems: "center", gap: 7,
-              padding: "6px 12px", borderRadius: 6,
+              display: "flex", alignItems: "center", gap: isMobile ? 4 : 7,
+              padding: isMobile ? "5px 8px" : "6px 12px", borderRadius: 6,
               border: active ? `1.5px solid ${c.color}40` : "1.5px solid transparent",
               background: active ? c.color + "0f" : "transparent",
               cursor: "pointer", fontFamily: "inherit",
-              fontSize: 12.5, fontWeight: active ? 600 : 400,
+              fontSize: isMobile ? 11 : 12.5, fontWeight: active ? 600 : 400,
               color: active ? c.color : "#787b86",
               transition: "all 0.12s",
             }}
@@ -383,7 +383,7 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
             key={tab.id}
             onClick={() => document.getElementById(tab.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
             style={{
-              fontSize: 13, fontWeight: 500, padding: "10px 20px",
+              fontSize: isMobile ? 12 : 13, fontWeight: 500, padding: isMobile ? "8px 12px" : "10px 20px",
               background: "none", border: "none", borderBottom: "2px solid transparent",
               color: "#787b86", cursor: "pointer", fontFamily: "inherit",
               transition: "all 0.15s",
@@ -417,20 +417,22 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
         <div style={{ fontSize: 11, color: "#b2b5be", marginBottom: 8, letterSpacing: "0.04em" }}>
           Investmentbolag <span style={{ margin: "0 4px" }}>›</span> {company.name}
         </div>
-        <CompanySelector selected={selectedId} onSelect={setSelectedId} />
+        <CompanySelector selected={selectedId} onSelect={setSelectedId} isMobile={isMobile} />
       </div>
 
       {/* ── Company hero ── */}
       <div style={{
         background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8,
-        padding: "20px 24px", marginBottom: 16,
-        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+        padding: isMobile ? "14px 12px" : "20px 24px", marginBottom: 16,
+        display: "flex", flexDirection: isMobile ? "column" : "row",
+        alignItems: isMobile ? "flex-start" : "center",
+        justifyContent: "space-between", gap: isMobile ? 12 : 16,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <CompanyAvatar company={company} size={42} />
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 14 }}>
+          <CompanyAvatar company={company} size={isMobile ? 34 : 42} />
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 20, fontWeight: 600, color: "#131722" }}>{company.name}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexWrap: "wrap" }}>
+              <span style={{ fontSize: isMobile ? 16 : 20, fontWeight: 600, color: "#131722" }}>{company.name}</span>
               <Badge
                 text={`${company.ticker}.${company.exchange}`}
                 color="#787b86"
@@ -448,10 +450,10 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", ...(isMobile ? { width: "100%", justifyContent: "space-between" } : {}) }}>
           {companyData?.price != null && (
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#131722" }}>
+            <div style={{ textAlign: isMobile ? "left" : "right" }}>
+              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#131722" }}>
                 {companyData.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 <span style={{ fontSize: 12, color: "#787b86", marginLeft: 4 }}>{companyData.currency}</span>
               </div>
@@ -473,31 +475,31 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
       </div>
 
       {/* ── Main 2-column layout ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 280px", gap: 16, alignItems: "start" }}>
 
         {/* Left column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
           {/* Leadership */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: "18px 20px" }}>
+          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Ledning</SectionLabel>
-            <LeadershipPanel companyId={selectedId} />
+            <LeadershipPanel companyId={selectedId} isMobile={isMobile} />
           </div>
 
           {/* Price chart */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: "18px 20px" }}>
+          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Kursutveckling</SectionLabel>
             <PriceChart ticker={fullTicker} />
           </div>
 
           {/* Holdings */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: "18px 20px" }}>
+          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Innehav</SectionLabel>
             <HoldingsTable companyId={selectedId} />
           </div>
 
           {/* Press releases */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: "18px 20px" }}>
+          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
                 <Badge text="Pressreleaser" color="#787b86" bg="#f0f3fa" />
@@ -512,7 +514,7 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
           </div>
 
           {/* EFN */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: "18px 20px" }}>
+          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
                 <Badge text="EFN.se" color="#2962ff" bg="#eef2ff" />

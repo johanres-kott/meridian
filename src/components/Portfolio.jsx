@@ -263,14 +263,16 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
           </>
         ) : null}
       </td>
-      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
-        {pl !== null ? (
-          <>
-            <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
-            <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
-          </>
-        ) : null}
-      </td>
+      {!isMobile && (
+        <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+          {pl !== null ? (
+            <>
+              <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
+              <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
+            </>
+          ) : null}
+        </td>
+      )}
       <td style={{ ...tdBase, textAlign: "center", width: 36 }} onClick={e => e.stopPropagation()}>
         <button
           onClick={() => { if (window.confirm(`Ta bort ${item.name || item.ticker} från portföljen?`)) onDelete(item.id); }}
@@ -475,7 +477,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8, flexDirection: isMobile ? "column" : "row" }}>
+        <div style={{ display: "flex", gap: 8, flexDirection: "row" }}>
           <button onClick={() => {
             const rows = [["Bolag", "Ticker", "Status", "Antal", "GAV", "Kurs", "Valuta"].join(";")];
             items.forEach(i => {
@@ -487,18 +489,20 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             a.href = url; a.download = "thesion-portfolj.csv"; a.click();
             URL.revokeObjectURL(url);
           }}
-            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
-            Exportera CSV
+            title="Exportera CSV"
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+            {isMobile ? "⬇ CSV" : "Exportera CSV"}
           </button>
           <button onClick={() => setShowImport(true)}
-            style={{ padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722", width: isMobile ? "100%" : undefined }}>
-            Importera portfölj
+            title="Importera portfölj"
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" }}>
+            {isMobile ? "⬆ Import" : "Importera portfölj"}
           </button>
         </div>
       </div>
 
       {/* Group filter bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : undefined, WebkitOverflowScrolling: isMobile ? "touch" : undefined }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : undefined, WebkitOverflowScrolling: isMobile ? "touch" : undefined, paddingBottom: isMobile ? 4 : undefined }}>
         <button
           onClick={() => setActiveGroup(null)}
           style={{
@@ -507,6 +511,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             background: activeGroup === null ? "#f0f3fa" : "#fff",
             color: activeGroup === null ? "#2962ff" : "#787b86",
             cursor: "pointer", fontFamily: "inherit", fontWeight: activeGroup === null ? 500 : 400,
+            flexShrink: 0, whiteSpace: "nowrap",
           }}
         >
           Alla ({items.length})
@@ -515,7 +520,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
           const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
           const isActive = activeGroup === g.name;
           return (
-            <div key={g.name} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <div key={g.name} style={{ position: "relative", display: "flex", alignItems: "center", flexShrink: 0 }}>
               <button
                 onClick={() => setActiveGroup(isActive ? null : g.name)}
                 style={{
@@ -524,6 +529,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
                   background: isActive ? "#f0f3fa" : "#fff",
                   color: isActive ? "#2962ff" : "#787b86",
                   cursor: "pointer", fontFamily: "inherit", fontWeight: isActive ? 500 : 400,
+                  whiteSpace: "nowrap",
                 }}
               >
                 {g.name} ({count})
@@ -558,7 +564,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
         ) : (
           <button
             onClick={() => setCreatingGroup(true)}
-            style={{ fontSize: 12, padding: "5px 12px", borderRadius: 14, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "#787b86", fontFamily: "inherit" }}
+            style={{ fontSize: 12, padding: "5px 12px", borderRadius: 14, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "#787b86", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}
           >
             + Ny grupp
           </button>
@@ -573,11 +579,11 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             : "Inga bolag ännu — sök efter ett bolag ovan för att lägga till"}
         </div>
       ) : (
-        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden", overflowX: isMobile ? "auto" : "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : undefined }}>
+        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
             <thead>
               <tr>
-                {["", "Bolag", "Status", ...(isMobile ? [] : ["Grupper"]), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                {["", "Bolag", "Status", ...(isMobile ? [] : ["Grupper"]), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(!isMobile && hasAnyPL ? ["P&L"] : []), " "].map(h => (
                   <th key={h || "flag"} style={{
                     padding: isMobile ? "6px 8px" : "8px 14px",
                     textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",

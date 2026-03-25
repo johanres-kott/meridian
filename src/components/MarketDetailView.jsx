@@ -1,7 +1,7 @@
 import { PriceChart } from "./SharedComponents.jsx";
 import { Chg } from "./SharedComponents.jsx";
 
-export default function MarketDetailView({ item, onBack }) {
+export default function MarketDetailView({ item, onBack, isMobile }) {
   const name = item.name;
   const symbol = item.display || item.symbol;
   const yahooSymbol = item.yahooSymbol;
@@ -15,26 +15,26 @@ export default function MarketDetailView({ item, onBack }) {
   return (
     <div>
       {/* Back button + header */}
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: isMobile ? 12 : 20 }}>
         <button onClick={onBack}
-          style={{ fontSize: 12, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 12 }}>
+          style={{ fontSize: isMobile ? 11 : 12, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: isMobile ? 8 : 12 }}>
           &larr; Tillbaka till marknader
         </button>
 
         <div>
-          <div style={{ fontSize: 22, fontWeight: 500, color: "#131722" }}>
+          <div style={{ fontSize: isMobile ? 17 : 22, fontWeight: 500, color: "#131722" }}>
             {name}
-            <span style={{ fontSize: 13, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace", marginLeft: 10 }}>{symbol}</span>
+            <span style={{ fontSize: isMobile ? 11 : 13, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace", marginLeft: isMobile ? 6 : 10 }}>{symbol}</span>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginTop: 8 }}>
-          <span style={{ fontSize: 28, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: isMobile ? 8 : 12, marginTop: isMobile ? 4 : 8 }}>
+          <span style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
             {price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
           </span>
-          <span style={{ fontSize: 13, color: "#787b86" }}>{unit}</span>
+          <span style={{ fontSize: isMobile ? 11 : 13, color: "#787b86" }}>{unit}</span>
           {change != null && (
-            <span style={{ fontSize: 14, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <span style={{ fontSize: isMobile ? 12 : 14, fontFamily: "'IBM Plex Mono', monospace" }}>
               <Chg value={change} />
             </span>
           )}
@@ -53,23 +53,23 @@ export default function MarketDetailView({ item, onBack }) {
 
       {/* Day stats */}
       {(high > 0 || low > 0) && (
-        <div style={{ display: "flex", gap: 24, marginTop: 20 }}>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 10 : 24, marginTop: isMobile ? 12 : 20 }}>
           {high > 0 && (
-            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "16px 20px", minWidth: 140 }}>
-              <div style={{ fontSize: 11, color: "#787b86", marginBottom: 6 }}>Dagens hogsta</div>
-              <div style={{ fontSize: 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
+              <div style={{ fontSize: isMobile ? 10 : 11, color: "#787b86", marginBottom: isMobile ? 4 : 6 }}>Dagens hogsta</div>
+              <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {high.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
               </div>
-              <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{unit}</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, color: "#787b86", marginTop: 2 }}>{unit}</div>
             </div>
           )}
           {low > 0 && (
-            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "16px 20px", minWidth: 140 }}>
-              <div style={{ fontSize: 11, color: "#787b86", marginBottom: 6 }}>Dagens lagsta</div>
-              <div style={{ fontSize: 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
+              <div style={{ fontSize: isMobile ? 10 : 11, color: "#787b86", marginBottom: isMobile ? 4 : 6 }}>Dagens lagsta</div>
+              <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {low.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
               </div>
-              <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{unit}</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, color: "#787b86", marginTop: 2 }}>{unit}</div>
             </div>
           )}
         </div>

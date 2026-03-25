@@ -159,8 +159,34 @@ function isNeg(key, value) {
   return value < 0;
 }
 
+const PROFILE_LABELS = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", mixed: "blandat", index: "indexinvesterare" };
+
+function ScoreBar({ label, value }) {
+  if (value == null) return null;
+  const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
+      <span style={{ width: 90, color: "#787b86", flexShrink: 0 }}>{label}</span>
+      <div style={{ flex: 1, height: 6, background: "#f0f3fa", borderRadius: 3, overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
+      </div>
+      <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
+    </div>
+  );
+}
+
 function ProfileInsight({ ticker, company, investorProfile }) {
-  if (!investorProfile) return null;
+  const [scoreData, setScoreData] = useState(null);
+
+  useEffect(() => {
+    if (!ticker) return;
+    fetch(`/api/score?ticker=${encodeURIComponent(ticker)}`)
+      .then(r => r.json())
+      .then(d => { if (d) setScoreData(d); })
+      .catch(() => {});
+  }, [ticker]);
+
+  if (!investorProfile && !scoreData) return null;
 
   const companyData = {
     beta: company?.beta,
@@ -215,6 +241,30 @@ function ProfileInsight({ ticker, company, investorProfile }) {
           </div>
         ))}
       </div>
+      {scoreData?.scores && (
+        <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid #f0f3fa" }}>
+          <div style={{ fontSize: 10, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} />
+            <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} />
+            <ScoreBar label="Tillväxt" value={scoreData.scores.growth} />
+            <ScoreBar label="Utdelning" value={scoreData.scores.dividend} />
+            <ScoreBar label="Kvalitet" value={scoreData.scores.quality} />
+          </div>
+          {scoreData.composite && (() => {
+            const profileType = investorProfile?.investorType || "mixed";
+            const compositeScore = scoreData.composite[profileType] ?? scoreData.composite.mixed;
+            if (compositeScore == null) return null;
+            const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
+            return (
+              <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
+                <span style={{ fontSize: 11, color: "#787b86" }}>/ 100 — totalpoäng för {PROFILE_LABELS[profileType] || profileType}</span>
+              </div>
+            );
+          })()}
+        </div>
+      )}
       <div style={{ marginTop: 10, padding: "8px 10px", background: score >= 60 ? "#e8f5e9" : score >= 40 ? "#fff8e1" : "#fff5f5", borderRadius: 4 }}>
         <div style={{ fontSize: 11, fontWeight: 500, color: score >= 60 ? "#089981" : score >= 40 ? "#e65100" : "#c62828" }}>
           {score >= 60 ? "Matchar din profil" : score >= 40 ? "Delvis matchning" : "Avviker från din profil"}

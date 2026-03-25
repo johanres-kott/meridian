@@ -5,6 +5,22 @@ import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 
+const PROFILE_LABELS = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", mixed: "blandat", index: "indexinvesterare" };
+
+function ScoreBar({ label, value }) {
+  if (value == null) return null;
+  const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
+      <span style={{ width: 90, color: "#787b86", flexShrink: 0 }}>{label}</span>
+      <div style={{ flex: 1, height: 6, background: "#f0f3fa", borderRadius: 3, overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
+      </div>
+      <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
+    </div>
+  );
+}
+
 export default function CompanySearch({ deepLink, onClearDeepLink, preferences = {} }) {
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
@@ -16,6 +32,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
   const [error, setError] = useState(null);
   const [enriched, setEnriched] = useState({});
   const [added, setAdded] = useState(false);
+  const [scoreData, setScoreData] = useState(null);
   const debounceRef = useRef(null);
   const enrichRef = useRef(0);
 
@@ -89,6 +106,9 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       setResult(d);
+      // Fetch score data
+      setScoreData(null);
+      fetch(`/api/score?ticker=${encodeURIComponent(ticker)}`).then(r => r.json()).then(s => { if (s) setScoreData(s); }).catch(() => {});
       // Check if already in portfolio
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -306,6 +326,30 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
                       </div>
                     ))}
                   </div>
+                  {scoreData?.scores && (
+                    <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid #f0f3fa" }}>
+                      <div style={{ fontSize: 10, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                        <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} />
+                        <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} />
+                        <ScoreBar label="Tillväxt" value={scoreData.scores.growth} />
+                        <ScoreBar label="Utdelning" value={scoreData.scores.dividend} />
+                        <ScoreBar label="Kvalitet" value={scoreData.scores.quality} />
+                      </div>
+                      {scoreData.composite && (() => {
+                        const profileType = profile?.investorType || "mixed";
+                        const compositeScore = scoreData.composite[profileType] ?? scoreData.composite.mixed;
+                        if (compositeScore == null) return null;
+                        const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
+                        return (
+                          <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
+                            <span style={{ fontSize: 11, color: "#787b86" }}>/ 100 — totalpoäng för {PROFILE_LABELS[profileType] || profileType}</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
                   <div style={{ marginTop: 10, padding: "8px 10px", background: score >= 60 ? "#e8f5e9" : score >= 40 ? "#fff8e1" : "#fff5f5", borderRadius: 4 }}>
                     <div style={{ fontSize: 11, fontWeight: 500, color: score >= 60 ? "#089981" : score >= 40 ? "#e65100" : "#c62828" }}>
                       {score >= 60 ? "Matchar din profil" : score >= 40 ? "Delvis matchning" : "Avviker från din profil"}

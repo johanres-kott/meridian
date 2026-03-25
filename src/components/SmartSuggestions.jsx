@@ -2,6 +2,41 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
 
+const FLAG_MAP = {
+  ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
+  OL: "\u{1F1F3}\u{1F1F4}", HK: "\u{1F1ED}\u{1F1F0}", L: "\u{1F1EC}\u{1F1E7}",
+  PA: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}", AS: "\u{1F1F3}\u{1F1F1}",
+  SW: "\u{1F1E8}\u{1F1ED}", T: "\u{1F1EF}\u{1F1F5}", TO: "\u{1F1E8}\u{1F1E6}",
+};
+
+function getFlag(ticker) {
+  if (!ticker) return "";
+  const parts = ticker.split(".");
+  if (parts.length > 1) return FLAG_MAP[parts[parts.length - 1]] || "\u{1F1FA}\u{1F1F8}";
+  return "\u{1F1FA}\u{1F1F8}";
+}
+
+const SECTOR_EMOJI = {
+  "Technology": "💻", "Tech": "💻",
+  "Financial Services": "🏦", "Finans": "🏦",
+  "Healthcare": "🏥", "Hälsovård": "🏥",
+  "Industrials": "🏭", "Industri": "🏭",
+  "Consumer Cyclical": "🛍️", "Konsument": "🛍️",
+  "Consumer Defensive": "🛒",
+  "Communication Services": "📡", "Kommunikation": "📡",
+  "Basic Materials": "⛏️", "Råvaror": "⛏️",
+  "Energy": "⚡", "Energi": "⚡",
+  "Real Estate": "🏠", "Fastigheter": "🏠",
+  "Utilities": "💡",
+};
+
+const SECTOR_SV = {
+  "Financial Services": "Finans", "Technology": "Tech", "Healthcare": "Hälsovård",
+  "Industrials": "Industri", "Consumer Cyclical": "Konsument", "Communication Services": "Kommunikation",
+  "Basic Materials": "Råvaror", "Energy": "Energi", "Real Estate": "Fastigheter",
+  "Consumer Defensive": "Dagligvaror", "Utilities": "Kraftförsörjning",
+};
+
 const PROFILE_LABELS = {
   value: "Värdeinvesterare",
   growth: "Tillväxtinvesterare",
@@ -89,6 +124,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
             <thead>
               <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
                 <th style={{ ...thStyle, width: 30, textAlign: "center" }}>#</th>
+                <th style={{ ...thStyle, width: 28 }}></th>
                 <th style={{ ...thStyle, textAlign: "left" }}>Bolag</th>
                 <th style={{ ...thStyle, textAlign: "center", width: 50 }}>Poäng</th>
                 {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>Taggar</th>}
@@ -110,6 +146,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
                     <td style={{ ...tdStyle, textAlign: "center", color: "#b2b5be", fontSize: 11 }}>{idx + 1}</td>
+                    <td style={{ ...tdStyle, width: 28, fontSize: 16, textAlign: "center" }}>{getFlag(item.ticker)}</td>
                     <td
                       style={{ ...tdStyle, color: "#131722" }}
                       onClick={() => onNavigate?.("search", { ticker: item.ticker })}
@@ -133,7 +170,12 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                     )}
                     {!isMobile && (
                       <td style={{ ...tdStyle, fontSize: 11, color: "#787b86" }}>
-                        {item.sector && item.sector !== "---" ? item.sector.replace("Financial Services", "Finans").replace("Technology", "Tech").replace("Healthcare", "Hälsovård").replace("Industrials", "Industri").replace("Consumer Cyclical", "Konsument").replace("Communication Services", "Kommunikation").replace("Basic Materials", "Råvaror") : "–"}
+                        {item.sector && item.sector !== "---" ? (
+                          <span>
+                            {SECTOR_EMOJI[item.sector] || ""}{" "}
+                            {SECTOR_SV[item.sector] || item.sector}
+                          </span>
+                        ) : "–"}
                       </td>
                     )}
                     {!isMobile && (

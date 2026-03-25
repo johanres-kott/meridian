@@ -375,7 +375,8 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
 
       {/* ── Smart Suggestions ── */}
       {preferences.investorProfile && (
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Toppförslag</div>
           <SmartSuggestions
             profile={preferences.investorProfile}
             existingTickers={tickers}
@@ -384,6 +385,9 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
           />
         </div>
       )}
+
+      {/* ── Investment companies section ── */}
+      <div style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Investera som investmentbolag</div>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>

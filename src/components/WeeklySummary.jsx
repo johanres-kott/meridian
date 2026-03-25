@@ -183,7 +183,7 @@ export default function WeeklySummary({ userId, preferences = {}, isMobile, onNa
           <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
             <div style={sectionHeader}>Din portfolj</div>
             {data.portfolio.map(item => (
-              <div key={item.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { ticker: item.ticker })}>
+              <div key={item.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("search", { ticker: item.ticker })}>
                 <div>
                   <div style={tickerStyle}>{item.name}</div>
                   <div style={{ ...subtext, ...mono }}>{item.ticker}</div>

@@ -116,22 +116,22 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
         </button>
       </div>
 
-      <div style={{ padding: isMobile ? "8px 0" : "0" }}>
+      <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
           <div style={{ fontSize: 12, color: "#787b86", padding: "20px" }}>Beräknar förslag...</div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 11 : 12, minWidth: isMobile ? 0 : undefined }}>
             <thead>
               <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
-                <th style={{ ...thStyle, width: 30, textAlign: "center" }}>#</th>
-                <th style={{ ...thStyle, width: 28 }}></th>
-                <th style={{ ...thStyle, textAlign: "left" }}>Bolag</th>
-                <th style={{ ...thStyle, textAlign: "center", width: 50 }}>Poäng</th>
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 24 : 30, textAlign: "center" }}>#</th>
+                {!isMobile && <th style={{ ...thStyle, width: 28 }}></th>}
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "left" }}>Bolag</th>
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "center", width: isMobile ? 40 : 50 }}>Poäng</th>
                 {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>Taggar</th>}
                 {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>Sektor</th>}
                 {!isMobile && <th style={{ ...thStyle, textAlign: "center" }}>Risk</th>}
-                <th style={{ ...thStyle, textAlign: "right" }}>Kurs</th>
-                <th style={{ ...thStyle, width: 70 }}></th>
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "right" }}>Kurs</th>
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 56 : 70 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -145,16 +145,18 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                     onMouseEnter={e => e.currentTarget.style.background = "#fafbfd"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ ...tdStyle, textAlign: "center", color: "#b2b5be", fontSize: 11 }}>{idx + 1}</td>
-                    <td style={{ ...tdStyle, width: 28, fontSize: 16, textAlign: "center" }}>{getFlag(item.ticker)}</td>
+                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center", color: "#b2b5be", fontSize: 11 }}>{idx + 1}</td>
+                    {!isMobile && <td style={{ ...tdStyle, width: 28, fontSize: 16, textAlign: "center" }}>{getFlag(item.ticker)}</td>}
                     <td
-                      style={{ ...tdStyle, color: "#131722" }}
+                      style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), color: "#131722", maxWidth: isMobile ? 120 : undefined }}
                       onClick={() => onNavigate?.("search", { ticker: item.ticker })}
                     >
-                      <div style={{ fontWeight: 500 }}>{item.name}</div>
+                      <div style={{ fontWeight: 500, ...(isMobile ? { fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } : {}) }}>
+                        {isMobile ? getFlag(item.ticker) + " " : ""}{item.name}
+                      </div>
                       <div style={{ fontSize: 10, color: "#787b86", ...mono }}>{item.ticker}</div>
                     </td>
-                    <td style={{ ...tdStyle, textAlign: "center" }}>
+                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       <ScoreBadge score={item.compositeScore} />
                     </td>
                     {!isMobile && (
@@ -189,11 +191,11 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                         </span>
                       </td>
                     )}
-                    <td style={{ ...tdStyle, textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
+                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
                       {item.price != null ? item.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "–"}
-                      <div style={{ fontSize: 9, color: "#787b86" }}>{item.currency || "SEK"}</div>
+                      {!isMobile && <div style={{ fontSize: 9, color: "#787b86" }}>{item.currency || "SEK"}</div>}
                     </td>
-                    <td style={{ ...tdStyle, textAlign: "center" }}>
+                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       {isAdded ? (
                         <span style={{ fontSize: 10, color: "#089981" }}>✓ Tillagd</span>
                       ) : (
@@ -230,3 +232,5 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
 
 const thStyle = { padding: "8px 10px", fontSize: 10, color: "#787b86", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.04em" };
 const tdStyle = { padding: "8px 10px" };
+const thMobile = { padding: "6px 4px", fontSize: 9 };
+const tdMobile = { padding: "6px 4px" };

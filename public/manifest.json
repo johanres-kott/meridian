@@ -1,0 +1,18 @@
+{
+  "name": "Thesion",
+  "short_name": "Thesion",
+  "description": "Aktieanalys, portföljhantering & investeringsresearch",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2962ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

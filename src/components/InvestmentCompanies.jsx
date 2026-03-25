@@ -373,9 +373,32 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
         }
       `}</style>
 
+      {/* ── Sub-navigation ── */}
+      <div style={{ display: "flex", gap: 0, borderBottom: "1px solid #e0e3eb", marginBottom: 24 }}>
+        {[
+          { id: "toppforslag", label: "Toppförslag" },
+          { id: "investmentbolag", label: "Investmentbolag" },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => document.getElementById(tab.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            style={{
+              fontSize: 13, fontWeight: 500, padding: "10px 20px",
+              background: "none", border: "none", borderBottom: "2px solid transparent",
+              color: "#787b86", cursor: "pointer", fontFamily: "inherit",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#2962ff"; e.currentTarget.style.borderBottomColor = "#2962ff"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#787b86"; e.currentTarget.style.borderBottomColor = "transparent"; }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Smart Suggestions ── */}
       {preferences.investorProfile && (
-        <div style={{ marginBottom: 32 }}>
+        <div id="toppforslag" style={{ marginBottom: 32 }}>
           <div style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Toppförslag</div>
           <SmartSuggestions
             profile={preferences.investorProfile}
@@ -387,7 +410,7 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
       )}
 
       {/* ── Investment companies section ── */}
-      <div style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Investera som investmentbolag</div>
+      <div id="investmentbolag" style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Investera som investmentbolag</div>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>

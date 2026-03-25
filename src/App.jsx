@@ -12,6 +12,8 @@ import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import ScoringMethodology from "./components/ScoringMethodology.jsx";
+import ProfilePage from "./components/ProfilePage.jsx";
+import Documentation from "./components/Documentation.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -308,6 +310,23 @@ export default function App() {
                   </div>
                 )}
                 <button
+                  onClick={() => { setTab("profile"); setProfileOpen(false); }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                >
+                  Profil & inställningar
+                </button>
+                <button
+                  onClick={() => { setTab("docs"); setProfileOpen(false); }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                >
+                  Dokumentation
+                </button>
+                <div style={{ borderTop: "1px solid #f0f3fa" }} />
+                <button
                   onClick={() => supabase.auth.signOut()}
                   style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
@@ -336,6 +355,8 @@ export default function App() {
           {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} preferences={preferences} />}
           {tab === "investment" && <InvestmentCompanies preferences={preferences} userId={session.user.id} onNavigate={navigate} />}
           {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
+          {tab === "profile" && <ProfilePage session={session} preferences={preferences} onUpdatePreferences={updatePreferences} onResetProfile={() => updatePreferences({ investorProfile: null })} />}
+          {tab === "docs" && <Documentation />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />
       </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase.js";
 import { useIsMobile } from "./hooks/useIsMobile.js";
 import Login from "./components/Login.jsx";
+import LandingPage from "./components/LandingPage.jsx";
 import Markets from "./components/Markets.jsx";
 import Portfolio from "./components/Portfolio.jsx";
 import GapAnalysis from "./components/GapAnalysis.jsx";
@@ -157,7 +158,7 @@ export default function App() {
   }
 
   if (showPrivacy) return <Privacy onBack={() => setShowPrivacy(false)} />;
-  if (!session) return <Login onShowPrivacy={() => setShowPrivacy(true)} />;
+  if (!session) return <LandingPage onShowPrivacy={() => setShowPrivacy(true)} />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#ffffff", color: "#131722", fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>

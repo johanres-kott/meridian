@@ -213,7 +213,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga bolag i bevakning</div>
           ) : (
             data.movers.slice(0, 5).map(c => (
-              <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { ticker: c.ticker })}>
+              <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("search", { ticker: c.ticker })}>
                 <div>
                   <div style={tickerStyle}>{c.name}</div>
                   <div style={{ ...subtext, ...mono }}>{c.ticker}</div>

@@ -5,7 +5,6 @@ import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
-import InterestSuggestions from "./InterestSuggestions.jsx";
 import SmartSuggestions from "./SmartSuggestions.jsx";
 
 export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
@@ -42,15 +41,6 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
       <UpcomingEarnings userId={userId} isMobile={isMobile} />
       {preferences.investorProfile && (
         <SmartSuggestions
-          profile={preferences.investorProfile}
-          existingTickers={tickers}
-          isMobile={isMobile}
-          onNavigate={onNavigate}
-        />
-      )}
-      {preferences.investorProfile?.interests?.length > 0 && (
-        <InterestSuggestions
-          interests={preferences.investorProfile.interests}
           profile={preferences.investorProfile}
           existingTickers={tickers}
           isMobile={isMobile}

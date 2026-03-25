@@ -11,6 +11,7 @@ import ChatPanel from "./components/ChatPanel.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
+import ScoringMethodology from "./components/ScoringMethodology.jsx";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -334,6 +335,7 @@ export default function App() {
           {tab === "analysis" && <GapAnalysis preferences={preferences} onNavigate={navigate} />}
           {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} preferences={preferences} />}
           {tab === "investment" && <InvestmentCompanies />}
+          {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />
       </div>

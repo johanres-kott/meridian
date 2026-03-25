@@ -9,6 +9,32 @@ export default async function handler(req, res) {
   if (setCors(req, res)) return;
   if (rateLimit(req, res, 30)) return;
 
+  const supabase = createClient(SUPABASE_URL, ANON_KEY);
+
+  // Single ticker lookup: /api/suggestions?ticker=ATCO-A.ST
+  const singleTicker = req.query.ticker;
+  if (singleTicker) {
+    const { data, error } = await supabase.from("stock_scores").select("*").eq("ticker", singleTicker).single();
+    if (error || !data) return res.json(null);
+    res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=60");
+    return res.json({
+      ticker: data.ticker, name: data.name, sector: data.sector, risk: data.risk, beta: data.beta,
+      scores: {
+        piotroski: { raw: data.piotroski_raw, normalized: data.piotroski_score },
+        magicFormula: data.magic_formula, growth: data.growth_score,
+        dividend: data.dividend_score, quality: data.quality_score,
+      },
+      composite: { value: data.score_value, growth: data.score_growth, dividend: data.score_dividend, mixed: data.score_mixed },
+      data: {
+        peForward: data.pe_forward, peTrailing: data.pe_trailing, dividendYield: data.dividend_yield,
+        revenueGrowth: data.revenue_growth, operatingMargin: data.operating_margin,
+        grossMargin: data.gross_margin, roic: data.roic, debtEbitda: data.debt_ebitda,
+      },
+      scoredAt: data.scored_at,
+    });
+  }
+
+  // List suggestions: /api/suggestions?profile=value&risk=low
   const profile = req.query.profile || "mixed";
   const risk = req.query.risk;
   const sector = req.query.sector;
@@ -19,8 +45,6 @@ export default async function handler(req, res) {
   const scoreCol = `score_${profile}`;
   const validCols = ["score_value", "score_growth", "score_dividend", "score_mixed"];
   const orderBy = validCols.includes(scoreCol) ? scoreCol : "score_mixed";
-
-  const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
   let query = supabase
     .from("stock_scores")

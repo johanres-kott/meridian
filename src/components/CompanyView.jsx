@@ -115,13 +115,21 @@ function NotesSection({ item, onUpdate }) {
   );
 }
 
-function getMetricOrder(investorType) {
+// Beginner sees 4 key metrics, intermediate 6, advanced all 8-9
+const BEGINNER_METRICS = ["peForward", "dividendYield", "revenueGrowth", "roic"];
+const INTERMEDIATE_METRICS = ["peForward", "peTrailing", "dividendYield", "revenueGrowth", "roic", "debtEbitda"];
+
+function getMetricOrder(investorType, experience) {
   const orders = {
     value: ["peForward", "peTrailing", "debtEbitda", "grossMargin", "roic", "operatingMargin", "dividendYield", "revenueGrowth"],
     growth: ["revenueGrowth", "roic", "operatingMargin", "peForward", "ebitdaMargin", "grossMargin", "dividendYield", "debtEbitda"],
     dividend: ["dividendYield", "peForward", "grossMargin", "debtEbitda", "roic", "operatingMargin", "ebitdaMargin", "revenueGrowth"],
   };
-  return orders[investorType] || ["peForward", "peTrailing", "ebitdaMargin", "operatingMargin", "grossMargin", "roic", "debtEbitda", "revenueGrowth", "dividendYield"];
+  const full = orders[investorType] || ["peForward", "peTrailing", "ebitdaMargin", "operatingMargin", "grossMargin", "roic", "debtEbitda", "revenueGrowth", "dividendYield"];
+
+  if (experience === "beginner") return full.filter(k => BEGINNER_METRICS.includes(k));
+  if (experience === "intermediate") return full.filter(k => INTERMEDIATE_METRICS.includes(k));
+  return full;
 }
 
 const METRIC_TIPS = {
@@ -368,6 +376,7 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
   const isMobile = useIsMobile();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showAllMetrics, setShowAllMetrics] = useState(false);
 
   useEffect(() => {
     fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`)
@@ -443,16 +452,37 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
             <PriceChart ticker={item.ticker} />
 
             {/* Key metrics */}
-            <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
-              <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 14 }}>Nyckeltal</div>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
-                {getMetricOrder(investorType).map(key => (
-                  <div key={key} title={METRIC_TIPS[key] || ""} style={{ cursor: METRIC_TIPS[key] ? "help" : "default" }}>
-                    <StatCard label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} />
+            {(() => {
+              const exp = showAllMetrics ? "advanced" : investorProfile?.experience;
+              const metrics = getMetricOrder(investorType, exp);
+              const isFiltered = !showAllMetrics && (investorProfile?.experience === "beginner" || investorProfile?.experience === "intermediate");
+              return (
+                <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
+                    {isFiltered && (
+                      <button onClick={() => setShowAllMetrics(true)}
+                        style={{ fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                        Visa alla →
+                      </button>
+                    )}
+                    {showAllMetrics && investorProfile?.experience !== "advanced" && (
+                      <button onClick={() => setShowAllMetrics(false)}
+                        style={{ fontSize: 10, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                        Visa färre
+                      </button>
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
+                    {metrics.map(key => (
+                      <div key={key} title={METRIC_TIPS[key] || ""} style={{ cursor: METRIC_TIPS[key] ? "help" : "default" }}>
+                        <StatCard label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Quarterly financials */}
             <QuarterlyChart ticker={item.ticker} />

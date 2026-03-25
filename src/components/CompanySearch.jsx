@@ -363,13 +363,18 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
 
           {/* Analyst */}
           {(result.targetPrice > 0 || result.recommendation !== "—") && (
-            <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+            <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
               {result.targetPrice > 0 && (
-                <div style={{ flex: 1, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>Analytikernas kursmål</div>
+                <div style={{ flex: 1, minWidth: 160, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>Kursmål (snitt)</div>
                   <div style={{ fontSize: 18, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
                     {result.targetPrice.toFixed(2)} {result.currency}
                   </div>
+                  {result.targetLow > 0 && result.targetHigh > 0 && (
+                    <div style={{ fontSize: 10, color: "#787b86", marginTop: 4 }}>
+                      Spann: {result.targetLow.toFixed(0)} – {result.targetHigh.toFixed(0)} {result.currency}
+                    </div>
+                  )}
                   {result.price > 0 && (
                     <div style={{ fontSize: 11, color: "#787b86", marginTop: 4 }}>
                       Uppsida: <span style={{ color: result.targetPrice > result.price ? "#089981" : "#f23645" }}>
@@ -377,14 +382,24 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
                       </span>
                     </div>
                   )}
+                  {result.numberOfAnalysts > 0 && (
+                    <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 6 }}>
+                      {result.numberOfAnalysts} analytiker · Yahoo Finance
+                    </div>
+                  )}
                 </div>
               )}
               {result.recommendation !== "—" && (
-                <div style={{ flex: 1, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
+                <div style={{ flex: 1, minWidth: 160, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
                   <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>Rekommendation</div>
                   <div style={{ fontSize: 16, fontWeight: 500, color: result.recommendation?.includes("buy") ? "#089981" : result.recommendation?.includes("sell") ? "#f23645" : "#131722", textTransform: "uppercase" }}>
                     {result.recommendation}
                   </div>
+                  {result.numberOfAnalysts > 0 && (
+                    <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 6 }}>
+                      {result.numberOfAnalysts} analytiker · Yahoo Finance consensus
+                    </div>
+                  )}
                 </div>
               )}
               <div style={{ flex: 1, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>

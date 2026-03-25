@@ -459,13 +459,18 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
 
             {/* Analyst targets */}
             {(company.targetPrice > 0 || company.recommendation !== "—") && (
-              <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {company.targetPrice > 0 && (
-                  <div style={{ flex: 1, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "16px 20px" }}>
-                    <div style={{ fontSize: 11, color: "#787b86", marginBottom: 6 }}>Kursmal</div>
+                  <div style={{ flex: 1, minWidth: 160, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "16px 20px" }}>
+                    <div style={{ fontSize: 11, color: "#787b86", marginBottom: 6 }}>Kursmål (snitt)</div>
                     <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
                       {company.targetPrice.toFixed(2)} {company.currency}
                     </div>
+                    {company.targetLow > 0 && company.targetHigh > 0 && (
+                      <div style={{ fontSize: 10, color: "#787b86", marginTop: 4 }}>
+                        Spann: {company.targetLow.toFixed(0)} – {company.targetHigh.toFixed(0)} {company.currency}
+                      </div>
+                    )}
                     {company.price > 0 && (
                       <div style={{ fontSize: 11, color: "#787b86", marginTop: 4 }}>
                         Uppsida: <span style={{ color: company.targetPrice > company.price ? "#089981" : "#f23645" }}>
@@ -473,10 +478,15 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
                         </span>
                       </div>
                     )}
+                    {company.numberOfAnalysts > 0 && (
+                      <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 6 }}>
+                        Baserat på {company.numberOfAnalysts} analytiker · Källa: Yahoo Finance
+                      </div>
+                    )}
                   </div>
                 )}
                 {company.recommendation !== "—" && (
-                  <div style={{ flex: 1, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "16px 20px" }}>
+                  <div style={{ flex: 1, minWidth: 160, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: "16px 20px" }}>
                     <div style={{ fontSize: 11, color: "#787b86", marginBottom: 6 }}>Rekommendation</div>
                     <div style={{
                       fontSize: 16, fontWeight: 500, textTransform: "uppercase",
@@ -484,6 +494,11 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
                     }}>
                       {company.recommendation}
                     </div>
+                    {company.numberOfAnalysts > 0 && (
+                      <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 6 }}>
+                        {company.numberOfAnalysts} analytiker · Yahoo Finance consensus
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

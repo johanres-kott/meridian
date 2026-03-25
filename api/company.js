@@ -80,6 +80,9 @@ async function getYahooFundamentals(ticker, crumbData) {
       dividendYield: sd.dividendYield?.raw ? parseFloat((sd.dividendYield.raw * 100).toFixed(2)) : 0,
       beta: sd.beta?.raw ? parseFloat(sd.beta.raw.toFixed(2)) : ks.beta?.raw ? parseFloat(ks.beta.raw.toFixed(2)) : null,
       targetPrice: fd.targetMeanPrice?.raw ?? 0,
+      targetHigh: fd.targetHighPrice?.raw ?? 0,
+      targetLow: fd.targetLowPrice?.raw ?? 0,
+      numberOfAnalysts: fd.numberOfAnalystOpinions?.raw ?? 0,
       recommendation: fd.recommendationKey ?? "—",
     };
   } catch {
@@ -168,6 +171,9 @@ export default async function handler(req, res) {
       revenueGrowth: fundamentals?.revenueGrowth ?? 0,
       dividendYield: fundamentals?.dividendYield ?? 0,
       targetPrice: fundamentals?.targetPrice ?? 0,
+      targetHigh: fundamentals?.targetHigh ?? 0,
+      targetLow: fundamentals?.targetLow ?? 0,
+      numberOfAnalysts: fundamentals?.numberOfAnalysts ?? 0,
       recommendation: fundamentals?.recommendation ?? "—",
       week52High: priceData?.week52High ?? 0,
       week52Low: priceData?.week52Low ?? 0,

@@ -31,9 +31,9 @@ export default function LandingPage({ onShowPrivacy }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }

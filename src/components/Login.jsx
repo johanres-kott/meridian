@@ -50,7 +50,7 @@ export default function Login({ onShowPrivacy }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
         <svg width="36" height="36" viewBox="0 0 56 56" fill="none">
           <rect width="56" height="56" rx="14" fill="#3B6AE6"/>
-          <path d="M10 18 Q16 10 22 18 Q28 26 34 18 Q40 10 46 18" stroke="white" strokeWidth="3.5" strokeLinecap="round" fill="none"/><line x1="28" y1="22" x2="28" y2="39" stroke="white" strokeWidth="3.5" strokeLinecap="round"/><circle cx="28" cy="45" r="2.5" fill="white"/>
+          <path d="M12 22 Q19 14 26 22 Q33 30 40 22 Q43 19 46 22" stroke="white" strokeWidth="4" strokeLinecap="round" fill="none"/><path d="M12 34 Q19 26 26 34 Q33 42 40 34 Q43 31 46 34" stroke="white" strokeWidth="4" strokeLinecap="round" fill="none"/>
         </svg>
         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 24, fontWeight: 700, letterSpacing: "-0.5px", color: "#131722" }}>Thesion</span>
       </div>

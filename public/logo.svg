@@ -1,9 +1,6 @@
 <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="56" height="56" rx="14" fill="#3B6AE6"/>
-  <!-- Wave top bar of T -->
-  <path d="M10 18 Q16 10 22 18 Q28 26 34 18 Q40 10 46 18" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-  <!-- Stem of T / body of ! -->
-  <line x1="28" y1="22" x2="28" y2="39" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- Dot of ! -->
-  <circle cx="28" cy="45" r="2.5" fill="white"/>
+  <!-- Two parallel waves ≈ -->
+  <path d="M12 22 Q19 14 26 22 Q33 30 40 22 Q43 19 46 22" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M12 34 Q19 26 26 34 Q33 42 40 34 Q43 31 46 34" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
 </svg>

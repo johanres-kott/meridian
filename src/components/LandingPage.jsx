@@ -120,12 +120,32 @@ export default function LandingPage({ onShowPrivacy }) {
         padding: isMobile ? "56px 20px 40px" : "100px 48px 72px",
         ...maxW, textAlign: "center", position: "relative", overflow: "hidden",
       }}>
-        {/* Abstract background curve */}
-        <svg style={{ position: "absolute", top: isMobile ? -40 : -80, left: "50%", transform: "translateX(-50%)", width: "120%", maxWidth: 1400, opacity: 0.06, pointerEvents: "none", zIndex: 0 }} viewBox="0 0 1200 400" fill="none">
-          <path d="M0 350 C100 300, 200 200, 350 220 S500 100, 650 160 S800 60, 950 120 S1100 180, 1200 80" stroke="#2962ff" strokeWidth="3" fill="none"/>
-          <path d="M0 380 C150 340, 250 280, 400 300 S550 180, 700 240 S850 140, 1000 200 S1150 250, 1200 160" stroke="#089981" strokeWidth="2" fill="none"/>
-        </svg>
-        <div className="fade-up" style={{ marginBottom: 20 }}>
+        {/* Premium layered wave background */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+          {/* Soft gradient orbs */}
+          <div style={{ position: "absolute", top: "-20%", right: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(41,98,255,0.06) 0%, transparent 70%)", filter: "blur(40px)" }} />
+          <div style={{ position: "absolute", top: "10%", left: "-15%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(8,153,129,0.05) 0%, transparent 70%)", filter: "blur(40px)" }} />
+          {/* Layered waves */}
+          <svg style={{ position: "absolute", bottom: isMobile ? -60 : -100, left: 0, width: "100%", opacity: 0.08 }} viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="waveGrad1" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#2962ff"/>
+                <stop offset="100%" stopColor="#089981"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,192L48,186.7C96,181,192,171,288,186.7C384,203,480,245,576,240C672,235,768,181,864,165.3C960,149,1056,171,1152,186.7C1248,203,1344,213,1392,218.7L1440,224L1440,320L0,320Z" fill="url(#waveGrad1)"/>
+          </svg>
+          <svg style={{ position: "absolute", bottom: isMobile ? -80 : -120, left: 0, width: "100%", opacity: 0.05 }} viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path d="M0,224L48,213.3C96,203,192,181,288,192C384,203,480,245,576,256C672,267,768,245,864,218.7C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192L1440,320L0,320Z" fill="#2962ff"/>
+          </svg>
+          {/* Subtle grid lines */}
+          <svg style={{ position: "absolute", top: "15%", left: "50%", transform: "translateX(-50%)", width: "80%", maxWidth: 900, opacity: 0.03 }} viewBox="0 0 800 300" fill="none">
+            <path d="M0 250 Q100 200 200 220 T400 180 T600 140 T800 100" stroke="#2962ff" strokeWidth="1.5" fill="none"/>
+            <path d="M0 270 Q150 230 300 250 T600 200 T800 150" stroke="#089981" strokeWidth="1" fill="none"/>
+            <path d="M0 230 Q200 180 400 200 T800 120" stroke="#2962ff" strokeWidth="0.5" fill="none" strokeDasharray="4 6"/>
+          </svg>
+        </div>
+        <div className="fade-up" style={{ marginBottom: 20, position: "relative", zIndex: 1 }}>
           <span style={{
             display: "inline-block", padding: "5px 14px", borderRadius: 20,
             background: "linear-gradient(135deg, #eef2ff 0%, #e8f5e9 100%)",
@@ -134,7 +154,7 @@ export default function LandingPage({ onShowPrivacy }) {
             Investeringsanalys driven av data
           </span>
         </div>
-        <h1 className="fade-up fade-up-d1" style={{
+        <h1 className="fade-up fade-up-d1" style={{ position: "relative", zIndex: 1,
           fontSize: isMobile ? 36 : 56, fontWeight: 800, color: "#131722",
           fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.1,
           marginBottom: 20, letterSpacing: "-0.03em",
@@ -144,13 +164,13 @@ export default function LandingPage({ onShowPrivacy }) {
             Investera tryggare.
           </span>
         </h1>
-        <p className="fade-up fade-up-d2" style={{
+        <p className="fade-up fade-up-d2" style={{ position: "relative", zIndex: 1,
           fontSize: isMobile ? 16 : 19, color: "#5a5d65", lineHeight: 1.7,
           maxWidth: 580, margin: "0 auto 36px", fontWeight: 400,
         }}>
           Få aktieförslag baserade på etablerade finansiella modeller, anpassade efter din investerarprofil. Följ svenska investmentbolag i realtid.
         </p>
-        <div className="fade-up fade-up-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="fade-up fade-up-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", position: "relative", zIndex: 1 }}>
           <button onClick={() => setShowLogin(true)}
             style={{
               padding: "14px 36px", background: "#2962ff", color: "#fff", border: "none",

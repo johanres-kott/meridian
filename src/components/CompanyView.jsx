@@ -476,9 +476,7 @@ export default function CompanyView({ item, onBack, onUpdate, investorType, inve
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
                     {metrics.map(key => (
-                      <div key={key} title={METRIC_TIPS[key] || ""} style={{ cursor: METRIC_TIPS[key] ? "help" : "default" }}>
-                        <StatCard label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} />
-                      </div>
+                      <StatCard key={key} label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} tooltip={METRIC_TIPS[key]} />
                     ))}
                   </div>
                 </div>

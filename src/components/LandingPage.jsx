@@ -97,13 +97,9 @@ export default function LandingPage({ onShowPrivacy }) {
         borderBottom: "1px solid rgba(0,0,0,0.04)",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <svg width="30" height="30" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="56" height="56" rx="12" fill="#3B6AE6"/>
-            <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white"/>
-            <ellipse cx="30" cy="30" rx="14" ry="14" fill="white"/>
-            <ellipse cx="30" cy="30" rx="11" ry="11" fill="#3B6AE6"/>
-            <circle cx="26" cy="27" r="2.5" fill="white"/>
-            <polygon points="20,38 18,48 24,44 30,48 28,38" fill="white"/>
+          <svg width="30" height="30" viewBox="0 0 56 56" fill="none">
+            <rect width="56" height="56" rx="14" fill="#3B6AE6"/>
+            <path d="M8 32 L18 32 L22 22 L28 38 L32 18 L36 32 L48 32" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
           <span style={{ fontSize: 21, fontWeight: 700, color: "#131722", fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: "-0.02em" }}>Thesion</span>
         </div>
@@ -122,8 +118,13 @@ export default function LandingPage({ onShowPrivacy }) {
       {/* Hero */}
       <section style={{
         padding: isMobile ? "56px 20px 40px" : "100px 48px 72px",
-        ...maxW, textAlign: "center",
+        ...maxW, textAlign: "center", position: "relative", overflow: "hidden",
       }}>
+        {/* Abstract background curve */}
+        <svg style={{ position: "absolute", top: isMobile ? -40 : -80, left: "50%", transform: "translateX(-50%)", width: "120%", maxWidth: 1400, opacity: 0.06, pointerEvents: "none", zIndex: 0 }} viewBox="0 0 1200 400" fill="none">
+          <path d="M0 350 C100 300, 200 200, 350 220 S500 100, 650 160 S800 60, 950 120 S1100 180, 1200 80" stroke="#2962ff" strokeWidth="3" fill="none"/>
+          <path d="M0 380 C150 340, 250 280, 400 300 S550 180, 700 240 S850 140, 1000 200 S1150 250, 1200 160" stroke="#089981" strokeWidth="2" fill="none"/>
+        </svg>
         <div className="fade-up" style={{ marginBottom: 20 }}>
           <span style={{
             display: "inline-block", padding: "5px 14px", borderRadius: 20,
@@ -328,9 +329,8 @@ export default function LandingPage({ onShowPrivacy }) {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <svg width="18" height="18" viewBox="0 0 56 56" fill="none">
-            <rect width="56" height="56" rx="12" fill="#3B6AE6"/>
-            <ellipse cx="30" cy="30" rx="10" ry="10" fill="white"/>
-            <ellipse cx="30" cy="30" rx="7" ry="7" fill="#3B6AE6"/>
+            <rect width="56" height="56" rx="14" fill="#3B6AE6"/>
+            <path d="M8 32 L18 32 L22 22 L28 38 L32 18 L36 32 L48 32" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
           <span style={{ fontSize: 12, color: "#b2b5be" }}>Thesion — thesion.tech</span>
         </div>

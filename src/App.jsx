@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase.js";
 import { useIsMobile } from "./hooks/useIsMobile.js";
+import { useTheme } from "./hooks/useTheme.js";
 import Login from "./components/Login.jsx";
 import LandingPage from "./components/LandingPage.jsx";
 import Markets from "./components/Markets.jsx";
@@ -28,6 +29,7 @@ const TABS = [
 
 export default function App() {
   const isMobile = useIsMobile();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [tab, setTab] = useState("markets");
   const [deepLink, setDeepLink] = useState(null);
 
@@ -152,7 +154,7 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'IBM Plex Sans', sans-serif", color: "#787b86" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', sans-serif", color: "#787b86" }}>
         Laddar...
       </div>
     );
@@ -162,14 +164,14 @@ export default function App() {
   if (!session) return <LandingPage onShowPrivacy={() => setShowPrivacy(true)} />;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#ffffff", color: "#131722", fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); --sal: env(safe-area-inset-left); --sar: env(safe-area-inset-right); }
-        .tab-btn { background: none; border: none; cursor: pointer; padding: 10px 14px; font-size: 13px; font-family: inherit; color: #787b86; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
-        .tab-btn.active { color: #131722; border-bottom-color: #2962ff; font-weight: 500; }
-        .tab-btn:hover { color: #131722; }
+        .tab-btn { background: none; border: none; cursor: pointer; padding: 10px 14px; font-size: 13px; font-family: inherit; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+        .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
+        .tab-btn:hover { color: var(--text); }
       `}</style>
 
       {/* Mobile logo banner */}
@@ -183,7 +185,7 @@ export default function App() {
       )}
 
       {/* Topbar */}
-      <div style={{ borderBottom: "1px solid #e0e3eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 8px" : "0 32px", height: 42, position: "sticky", top: isMobile ? 40 : 0, background: "#fff", zIndex: 50 }}>
+      <div style={{ borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 8px" : "0 32px", height: 42, position: "sticky", top: isMobile ? 40 : 0, background: "var(--bg-card)", zIndex: 50 }}>
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 0 : 32, flex: 1, minWidth: 0 }}>
           {!isMobile && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -231,7 +233,7 @@ export default function App() {
               {!isMobile && displayName}
             </button>
             {profileOpen && (
-              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 240, zIndex: 100 }}>
+              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 240, zIndex: 100 }}>
                 <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid #f0f3fa" }}>
                   {editingName ? (
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -309,7 +311,15 @@ export default function App() {
                 >
                   Dokumentation
                 </button>
-                <div style={{ borderTop: "1px solid #f0f3fa" }} />
+                <button
+                  onClick={toggleTheme}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                >
+                  {isDark ? "☀️" : "🌙"} {isDark ? "Ljust läge" : "Mörkt läge"}
+                </button>
+                <div style={{ borderTop: "1px solid var(--border-light)" }} />
                 <button
                   onClick={() => supabase.auth.signOut()}
                   style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}

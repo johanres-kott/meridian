@@ -42,9 +42,9 @@ export default function Login({ onShowPrivacy }) {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      fontFamily: "'IBM Plex Sans', sans-serif",
+      fontFamily: "'Inter', sans-serif",
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono&family=Plus+Jakarta+Sans:wght@700&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');`}</style>
 
       {/* Logo above card */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>

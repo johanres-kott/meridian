@@ -173,7 +173,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
               style={{
                 width: "100%", padding: "10px 14px", border: "1px solid #e0e3eb",
                 borderRadius: 4, fontSize: 13, outline: "none",
-                fontFamily: "'IBM Plex Sans', sans-serif",
+                fontFamily: "'Inter', sans-serif",
               }}
             />
             {suggestLoading && (

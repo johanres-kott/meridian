@@ -8,11 +8,11 @@ import { sanitizeInput } from "../lib/sanitize.js";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
-  Bevakar: { bg: "#f0f3fa", color: "#787b86" },
-  Analyserar: { bg: "#fff8e1", color: "#e65100" },
-  Intressant: { bg: "#e8f5e9", color: "#1b5e20" },
-  Äger: { bg: "#e3f2fd", color: "#1565c0" },
-  Avstår: { bg: "#fce4ec", color: "#880e4f" },
+  Bevakar: { bg: "var(--bg-secondary)", color: "var(--text-secondary)" },
+  Analyserar: { bg: "rgba(255,152,0,0.15)", color: "#e65100" },
+  Intressant: { bg: "rgba(8,153,129,0.15)", color: "#089981" },
+  Äger: { bg: "rgba(41,98,255,0.15)", color: "var(--accent)" },
+  Avstår: { bg: "rgba(242,54,69,0.15)", color: "#f23645" },
 };
 
 const FLAG_MAP = {
@@ -121,7 +121,7 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
           >
             <div style={{
               width: 16, height: 16, borderRadius: 3,
-              border: isMember ? "none" : "1px solid #c0c3cb",
+              border: isMember ? "none" : "1px solid var(--border)",
               background: isMember ? "var(--accent)" : "var(--bg-card)",
               display: "flex", alignItems: "center", justifyContent: "center",
               color: "#fff", fontSize: 11, fontWeight: 600,
@@ -183,7 +183,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
             const compositeScore = scoreData.composite?.[profileType] ?? scoreData.composite?.mixed;
             if (compositeScore == null) return null;
             const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
-            const bg = compositeScore >= 70 ? "#e8f5e9" : compositeScore >= 40 ? "#fff3e0" : "#fff5f5";
+            const bg = compositeScore >= 70 ? "rgba(8,153,129,0.15)" : compositeScore >= 40 ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)";
             return (
               <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: bg, color, fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {Math.round(compositeScore)}
@@ -191,7 +191,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
             );
           })()}
           {scoreData?.scores?.piotroski?.raw >= 7 && (
-            <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500 }}>
+            <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500 }}>
               F-Score {scoreData.scores.piotroski.raw}/9
             </span>
           )}
@@ -210,7 +210,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
             />
           ) : (
             <select value={item.status} onChange={e => onUpdate(item.id, { status: e.target.value })}
-              style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "#f0f3fa", color: STATUS_COLORS[item.status]?.color || "#787b86" }}>
+              style={{ fontSize: 11, padding: "3px 8px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 500, background: STATUS_COLORS[item.status]?.bg || "var(--bg-secondary)", color: STATUS_COLORS[item.status]?.color || "var(--text-secondary)" }}>
               {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           )}
@@ -223,7 +223,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
               <span key={g.name} style={{ fontSize: 10, padding: "2px 7px", borderRadius: 10, background: "var(--border-light)", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{g.name}</span>
             ))}
             <button onClick={() => setTagOpen(!tagOpen)}
-              style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "var(--text-secondary)", lineHeight: 1.4 }}
+              style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, border: "1px dashed var(--border)", background: "none", cursor: "pointer", color: "var(--text-secondary)", lineHeight: 1.4 }}
               title="Hantera grupper"
             >+</button>
             {tagOpen && <GroupTagPopover item={item} groups={groups} onToggle={onToggleGroup} onClose={() => setTagOpen(false)} />}
@@ -246,7 +246,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
             <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {price.currency || ""}</div>
             {chg != null && <div style={{ fontSize: 11, color: chgColor }}>{chg > 0 ? "+" : ""}{chg.toFixed(2)}%</div>}
           </>
-        ) : <span style={{ color: "#c0c3cb", fontSize: 11 }}>Hämtar...</span>}
+        ) : <span style={{ color: "var(--text-muted)", fontSize: 11 }}>Hämtar...</span>}
       </td>
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
         {totalValue !== null ? (
@@ -279,9 +279,9 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
         <button
           onClick={() => { if (window.confirm(`Ta bort ${item.name || item.ticker} från portföljen?`)) onDelete(item.id); }}
           title="Ta bort"
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#c0c3cb", fontSize: 14, padding: "2px 6px", lineHeight: 1 }}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 14, padding: "2px 6px", lineHeight: 1 }}
           onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
-          onMouseLeave={e => e.currentTarget.style.color = "#c0c3cb"}
+          onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
         >
           ×
         </button>
@@ -540,9 +540,9 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
                 <button
                   onClick={(e) => { e.stopPropagation(); deleteGroup(g.name); }}
                   title="Ta bort grupp"
-                  style={{ marginLeft: 2, fontSize: 11, color: "#c0c3cb", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
+                  style={{ marginLeft: 2, fontSize: 11, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
                   onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
-                  onMouseLeave={e => e.currentTarget.style.color = "#c0c3cb"}
+                  onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                 >
                   ×
                 </button>
@@ -558,15 +558,15 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
               onKeyDown={e => { if (e.key === "Enter") createGroup(); if (e.key === "Escape") { setCreatingGroup(false); setNewGroupName(""); } }}
               autoFocus
               placeholder="Gruppnamn..."
-              style={{ fontSize: 12, padding: "4px 10px", border: "1px solid var(--accent)", borderRadius: 14, outline: "none", fontFamily: "inherit", width: 140 }}
+              style={{ fontSize: 12, padding: "4px 10px", border: "1px solid var(--accent)", borderRadius: 14, outline: "none", fontFamily: "inherit", width: 140, background: "var(--bg-card)", color: "var(--text)" }}
             />
-            <button onClick={createGroup} style={{ fontSize: 11, padding: "4px 8px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontFamily: "inherit" }}>OK</button>
+            <button onClick={createGroup} style={{ fontSize: 11, padding: "4px 8px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontFamily: "inherit" }}>OK</button>
             <button onClick={() => { setCreatingGroup(false); setNewGroupName(""); }} style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer" }}>Avbryt</button>
           </div>
         ) : (
           <button
             onClick={() => setCreatingGroup(true)}
-            style={{ fontSize: 12, padding: "5px 12px", borderRadius: 14, border: "1px dashed #c0c3cb", background: "none", cursor: "pointer", color: "var(--text-secondary)", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}
+            style={{ fontSize: 12, padding: "5px 12px", borderRadius: 14, border: "1px dashed var(--border)", background: "none", cursor: "pointer", color: "var(--text-secondary)", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}
           >
             + Ny grupp
           </button>
@@ -613,19 +613,19 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
           <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--bg-secondary)", borderRadius: 6, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#e8f5e9", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
+                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
                 Totalpoäng 70–100: Stark matchning med din profil
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#fff3e0", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
+                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
                 Totalpoäng 40–69: Okej matchning
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#fff5f5", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
+                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(242,54,69,0.15)", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
                 Totalpoäng 0–39: Svag matchning
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "#e8f5e9", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
+                <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
                 Piotroski F-Score ≥ 7 — hög finansiell kvalitet
               </div>
             </div>

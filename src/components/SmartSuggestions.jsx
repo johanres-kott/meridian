@@ -47,7 +47,7 @@ const PROFILE_LABELS = {
 
 function ScoreBadge({ score }) {
   const color = score >= 70 ? "#089981" : score >= 40 ? "#e65100" : "#f23645";
-  const bg = score >= 70 ? "#e8f5e9" : score >= 40 ? "#fff8e1" : "#fce4ec";
+  const bg = score >= 70 ? "rgba(8,153,129,0.15)" : score >= 40 ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)";
   return (
     <span style={{
       display: "inline-block", fontSize: 10, fontWeight: 600, padding: "2px 6px",
@@ -163,7 +163,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                       <td style={tdStyle}>
                         <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                           {item.highlights?.slice(0, 2).map(tag => (
-                            <span key={tag} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#e8f5e9", color: "#089981", fontWeight: 500 }}>
+                            <span key={tag} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 500 }}>
                               {tag}
                             </span>
                           ))}
@@ -184,7 +184,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                       <td style={{ ...tdStyle, textAlign: "center" }}>
                         <span style={{
                           fontSize: 9, padding: "2px 6px", borderRadius: 3, fontWeight: 500,
-                          background: item.risk === "low" ? "#e8f5e9" : item.risk === "medium" ? "#fff8e1" : "#fce4ec",
+                          background: item.risk === "low" ? "rgba(8,153,129,0.15)" : item.risk === "medium" ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)",
                           color: item.risk === "low" ? "#089981" : item.risk === "medium" ? "#e65100" : "#f23645",
                         }}>
                           {item.risk === "low" ? "Låg" : item.risk === "medium" ? "Medel" : "Hög"}

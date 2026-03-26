@@ -204,8 +204,12 @@ const FETCHERS = {
 
 const VALID_IDS = new Set(Object.keys(FETCHERS));
 
+import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  if (setCors(req, res)) return;
+  if (rateLimit(req, res, 30)) return;
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
 
   const { id, count: countParam } = req.query;

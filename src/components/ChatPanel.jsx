@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { supabase } from "../supabase.js";
 
 export default function ChatPanel({ open, onClose, contextFn }) {
   const [messages, setMessages] = useState([]);
@@ -30,9 +31,13 @@ export default function ChatPanel({ open, onClose, contextFn }) {
 
     try {
       const context = contextFn ? contextFn() : {};
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           context,

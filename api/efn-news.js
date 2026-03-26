@@ -125,8 +125,12 @@ async function fetchEfnNews(id, count) {
 
 const VALID_IDS = new Set(Object.keys(EFN_QUERIES));
 
+import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  if (setCors(req, res)) return;
+  if (rateLimit(req, res, 30)) return;
   res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=7200");
 
   const { id, count: countParam } = req.query;

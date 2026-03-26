@@ -1,14 +1,32 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createClient } from "@supabase/supabase-js";
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const SUPABASE_URL = "https://acostgikldxkdmcoavkf.supabase.co";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjb3N0Z2lrbGR4a2RtY29hdmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDUzMTgsImV4cCI6MjA4ODcyMTMxOH0.lgIR-b3FpyTaO5Aa9SPnUHl-gyy5hloBvMTmnOfSLpw";
 
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (rateLimit(req, res, 10)) return; // Stricter: 10 req/min for AI chat
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
+
+  // Verify user is authenticated
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  try {
+    const supabase = createClient(SUPABASE_URL, ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) return res.status(401).json({ error: "Invalid token" });
+  } catch {
+    return res.status(401).json({ error: "Authentication failed" });
+  }
 
   const { messages, context } = req.body;
   if (!messages || !Array.isArray(messages)) {

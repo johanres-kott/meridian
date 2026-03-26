@@ -120,29 +120,42 @@ export default function LandingPage({ onShowPrivacy }) {
         padding: isMobile ? "56px 20px 40px" : "100px 48px 72px",
         ...maxW, textAlign: "center", position: "relative", overflow: "hidden",
       }}>
-        {/* Premium layered wave background */}
+        {/* Bold gradient wave background */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
-          {/* Soft gradient orbs */}
-          <div style={{ position: "absolute", top: "-20%", right: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(41,98,255,0.06) 0%, transparent 70%)", filter: "blur(40px)" }} />
-          <div style={{ position: "absolute", top: "10%", left: "-15%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(8,153,129,0.05) 0%, transparent 70%)", filter: "blur(40px)" }} />
-          {/* Layered waves */}
-          <svg style={{ position: "absolute", bottom: isMobile ? -60 : -100, left: 0, width: "100%", opacity: 0.08 }} viewBox="0 0 1440 320" preserveAspectRatio="none">
+          {/* Large gradient orbs */}
+          <div style={{ position: "absolute", top: "-30%", right: "-15%", width: 800, height: 800, borderRadius: "50%", background: "radial-gradient(circle, rgba(41,98,255,0.12) 0%, transparent 60%)" }} />
+          <div style={{ position: "absolute", bottom: "-20%", left: "-20%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(8,153,129,0.10) 0%, transparent 60%)" }} />
+          {/* Wave layer 1 — back, lighter */}
+          <svg style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "60%" }} viewBox="0 0 1440 400" preserveAspectRatio="none">
             <defs>
-              <linearGradient id="waveGrad1" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#2962ff"/>
-                <stop offset="100%" stopColor="#089981"/>
+              <linearGradient id="waveGrad1" x1="0" y1="0" x2="1" y2="0.3">
+                <stop offset="0%" stopColor="#089981" stopOpacity="0.12"/>
+                <stop offset="50%" stopColor="#2962ff" stopOpacity="0.08"/>
+                <stop offset="100%" stopColor="#7c4dff" stopOpacity="0.12"/>
               </linearGradient>
             </defs>
-            <path d="M0,192L48,186.7C96,181,192,171,288,186.7C384,203,480,245,576,240C672,235,768,181,864,165.3C960,149,1056,171,1152,186.7C1248,203,1344,213,1392,218.7L1440,224L1440,320L0,320Z" fill="url(#waveGrad1)"/>
+            <path d="M0,120 C240,60 480,200 720,140 S1200,200 1440,100 L1440,400 L0,400Z" fill="url(#waveGrad1)"/>
           </svg>
-          <svg style={{ position: "absolute", bottom: isMobile ? -80 : -120, left: 0, width: "100%", opacity: 0.05 }} viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path d="M0,224L48,213.3C96,203,192,181,288,192C384,203,480,245,576,256C672,267,768,245,864,218.7C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192L1440,320L0,320Z" fill="#2962ff"/>
+          {/* Wave layer 2 — middle */}
+          <svg style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "50%" }} viewBox="0 0 1440 400" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="waveGrad2" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#2962ff" stopOpacity="0.18"/>
+                <stop offset="100%" stopColor="#089981" stopOpacity="0.14"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,200 C180,120 360,260 600,180 S900,260 1080,200 S1320,140 1440,180 L1440,400 L0,400Z" fill="url(#waveGrad2)"/>
           </svg>
-          {/* Subtle grid lines */}
-          <svg style={{ position: "absolute", top: "15%", left: "50%", transform: "translateX(-50%)", width: "80%", maxWidth: 900, opacity: 0.03 }} viewBox="0 0 800 300" fill="none">
-            <path d="M0 250 Q100 200 200 220 T400 180 T600 140 T800 100" stroke="#2962ff" strokeWidth="1.5" fill="none"/>
-            <path d="M0 270 Q150 230 300 250 T600 200 T800 150" stroke="#089981" strokeWidth="1" fill="none"/>
-            <path d="M0 230 Q200 180 400 200 T800 120" stroke="#2962ff" strokeWidth="0.5" fill="none" strokeDasharray="4 6"/>
+          {/* Wave layer 3 — front, strongest */}
+          <svg style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "40%" }} viewBox="0 0 1440 400" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="waveGrad3" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#2962ff" stopOpacity="0.22"/>
+                <stop offset="60%" stopColor="#1e88e5" stopOpacity="0.18"/>
+                <stop offset="100%" stopColor="#089981" stopOpacity="0.22"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,240 C200,180 400,300 640,220 S960,300 1200,240 S1380,200 1440,220 L1440,400 L0,400Z" fill="url(#waveGrad3)"/>
           </svg>
         </div>
         <div className="fade-up" style={{ marginBottom: 20, position: "relative", zIndex: 1 }}>

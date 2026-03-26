@@ -154,7 +154,7 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', sans-serif", color: "#787b86" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', sans-serif", color: "var(--text-secondary)" }}>
         Laddar...
       </div>
     );
@@ -207,25 +207,25 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 16, flexShrink: 0 }}>
           {!isMobile && (
             <>
-              <span style={{ fontSize: 12, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>
                 {time.toLocaleTimeString("sv-SE")} CET
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
-                <span style={{ fontSize: 11, color: "#787b86" }}>Live</span>
+                <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>Live</span>
               </div>
             </>
           )}
           <button
             onClick={() => setChatOpen(!chatOpen)}
-            style={{ fontSize: 11, color: chatOpen ? "#2962ff" : "#787b86", background: chatOpen ? "#f0f3fa" : "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
+            style={{ fontSize: 11, color: chatOpen ? "#2962ff" : "var(--text-secondary)", background: chatOpen ? "var(--border-light)" : "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
           >
             AI
           </button>
           <div ref={profileRef} style={{ position: "relative" }}>
             <button
               onClick={() => { setProfileOpen(!profileOpen); setEditingName(false); }}
-              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: profileOpen ? "#2962ff" : "#787b86", background: profileOpen ? "#f0f3fa" : "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
+              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: profileOpen ? "#2962ff" : "var(--text-secondary)", background: profileOpen ? "var(--border-light)" : "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
             >
               <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#2962ff", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
                 {displayInitial}
@@ -234,7 +234,7 @@ export default function App() {
             </button>
             {profileOpen && (
               <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 240, zIndex: 100 }}>
-                <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid #f0f3fa" }}>
+                <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid var(--border-light)" }}>
                   {editingName ? (
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       <input
@@ -250,13 +250,13 @@ export default function App() {
                   ) : (
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>{displayName}</div>
-                        <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{session.user.email}</div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{displayName}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>{session.user.email}</div>
                       </div>
                       <button
                         onClick={startEditingName}
                         title="Byt namn"
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#787b86", padding: "2px 6px" }}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--text-secondary)", padding: "2px 6px" }}
                       >
                         ✏
                       </button>
@@ -264,8 +264,8 @@ export default function App() {
                   )}
                 </div>
                 {preferences.investorProfile && (
-                  <div style={{ padding: "10px 16px", borderBottom: "1px solid #f0f3fa" }}>
-                    <div style={{ fontSize: 10, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 6 }}>Din investerarprofil</div>
+                  <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 6 }}>Din investerarprofil</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                       {[
                         { value: preferences.investorProfile.investorType, map: { value: "Värde", growth: "Tillväxt", dividend: "Utdelning", index: "Index", mixed: "Blandat" } },
@@ -274,7 +274,7 @@ export default function App() {
                         { value: preferences.investorProfile.focus, map: { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" } },
                         { value: preferences.investorProfile.geography, map: { nordic: "Norden", global: "Globalt", both: "Blandat geo" } },
                       ].filter(t => t.value && t.map[t.value]).map((t, i) => (
-                        <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "#f0f3fa", color: "#2962ff", fontWeight: 500 }}>
+                        <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "var(--border-light)", color: "#2962ff", fontWeight: 500 }}>
                           {t.map[t.value]}
                         </span>
                       ))}
@@ -297,34 +297,34 @@ export default function App() {
                 )}
                 <button
                   onClick={() => { setTab("profile"); setProfileOpen(false); }}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
                 >
                   Profil & inställningar
                 </button>
                 <button
                   onClick={() => { setTab("docs"); setProfileOpen(false); }}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
                 >
                   Dokumentation
                 </button>
                 <button
                   onClick={toggleTheme}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}
                   onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
                 >
                   {isDark ? "☀️" : "🌙"} {isDark ? "Ljust läge" : "Mörkt läge"}
                 </button>
                 <div style={{ borderTop: "1px solid var(--border-light)" }} />
                 <button
                   onClick={() => supabase.auth.signOut()}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#f8f9fd"; e.currentTarget.style.color = "#131722"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787b86"; }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
                 >
                   Logga ut
                 </button>

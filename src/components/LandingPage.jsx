@@ -171,7 +171,7 @@ export default function LandingPage({ onShowPrivacy }) {
             { value: "Realtid", label: "Marknadsdata" },
           ].map((s, i) => (
             <div key={i} style={{ background: "#fff", padding: isMobile ? "22px 16px" : "30px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: isMobile ? 26 : 32, fontWeight: 800, color: "#131722", fontFamily: jakarta, letterSpacing: "-0.03em" }}>{s.value}</div>
+              <div style={{ fontSize: isMobile ? 26 : 32, fontWeight: 800, color: "var(--text)", fontFamily: jakarta, letterSpacing: "-0.03em" }}>{s.value}</div>
               <div style={{ fontSize: 12, color: "#787b86", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
@@ -181,7 +181,7 @@ export default function LandingPage({ onShowPrivacy }) {
       {/* ─── BENTO FEATURES ─── */}
       <section id="features" style={{ padding: isMobile ? "64px 20px" : "100px 56px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 64 }}>
-          <h2 style={{ fontSize: isMobile ? 28 : 42, fontWeight: 800, color: "#131722", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 14 }}>
+          <h2 style={{ fontSize: isMobile ? 28 : 42, fontWeight: 800, color: "var(--text)", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 14 }}>
             Allt du behöver för att investera smartare
           </h2>
           <p style={{ fontSize: 16, color: "#787b86", maxWidth: 480, margin: "0 auto", lineHeight: 1.6 }}>
@@ -226,7 +226,7 @@ export default function LandingPage({ onShowPrivacy }) {
           }}>
             <div>
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Personligt</div>
-              <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "#131722", letterSpacing: "-0.02em", marginBottom: 8 }}>
+              <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 8 }}>
                 Anpassat efter dig
               </div>
               <div style={{ fontSize: 13, color: "#787b86", lineHeight: 1.6 }}>
@@ -246,7 +246,7 @@ export default function LandingPage({ onShowPrivacy }) {
             border: "1px solid #eceef1",
           }}>
             <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Portfölj</div>
-            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "#131722", letterSpacing: "-0.02em", marginBottom: 8 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 8 }}>
               Importera från Avanza
             </div>
             <div style={{ fontSize: 13, color: "#787b86", lineHeight: 1.6 }}>
@@ -260,7 +260,7 @@ export default function LandingPage({ onShowPrivacy }) {
             border: "1px solid #eceef1",
           }}>
             <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Investmentbolag</div>
-            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "#131722", letterSpacing: "-0.02em", marginBottom: 8 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 8 }}>
               7 bolag, en vy
             </div>
             <div style={{ fontSize: 13, color: "#787b86", lineHeight: 1.6 }}>
@@ -274,7 +274,7 @@ export default function LandingPage({ onShowPrivacy }) {
             border: "1px solid #eceef1",
           }}>
             <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Insiders</div>
-            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "#131722", letterSpacing: "-0.02em", marginBottom: 8 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: jakarta, color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 8 }}>
               Se vad insiders gör
             </div>
             <div style={{ fontSize: 13, color: "#787b86", lineHeight: 1.6 }}>
@@ -288,7 +288,7 @@ export default function LandingPage({ onShowPrivacy }) {
       <section style={{ padding: isMobile ? "48px 20px" : "80px 56px", background: "#fafbfd" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: isMobile ? 40 : 64 }}>
-            <h2 style={{ fontSize: isMobile ? 28 : 42, fontWeight: 800, color: "#131722", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 14 }}>
+            <h2 style={{ fontSize: isMobile ? 28 : 42, fontWeight: 800, color: "var(--text)", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 14 }}>
               Tre steg till bättre investeringar
             </h2>
             <p style={{ fontSize: 15, color: "#787b86" }}>Kom igång på under en minut</p>
@@ -301,7 +301,7 @@ export default function LandingPage({ onShowPrivacy }) {
             ].map((s, i) => (
               <div key={i} style={{ flex: 1, textAlign: isMobile ? "center" : "left", maxWidth: 300 }}>
                 <div style={{ fontSize: 32, fontWeight: 800, color: s.color, fontFamily: jakarta, marginBottom: 12, opacity: 0.2 }}>{s.step}</div>
-                <div style={{ fontSize: 19, fontWeight: 700, color: "#131722", marginBottom: 8, fontFamily: jakarta }}>{s.title}</div>
+                <div style={{ fontSize: 19, fontWeight: 700, color: "var(--text)", marginBottom: 8, fontFamily: jakarta }}>{s.title}</div>
                 <div style={{ fontSize: 14, color: "#787b86", lineHeight: 1.7 }}>{s.desc}</div>
               </div>
             ))}
@@ -341,15 +341,15 @@ export default function LandingPage({ onShowPrivacy }) {
       {/* ─── ABOUT ─── */}
       <section style={{ padding: isMobile ? "56px 20px" : "80px 56px", background: "#fff" }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 800, color: "#131722", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 20 }}>
+          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 800, color: "var(--text)", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 20 }}>
             Om Thesion
           </h2>
           <div style={{ fontSize: 15, color: "#5a5d65", lineHeight: 1.8 }}>
             <p style={{ marginBottom: 16 }}>
-              Thesion är ett hobbyprojekt skapat av <strong style={{ color: "#131722" }}>Johan Resare</strong> med ett enkelt mål: att utforska hur långt man kan komma med att bygga en riktig produktionsapp tillsammans med AI.
+              Thesion är ett hobbyprojekt skapat av <strong style={{ color: "var(--text)" }}>Johan Resare</strong> med ett enkelt mål: att utforska hur långt man kan komma med att bygga en riktig produktionsapp tillsammans med AI.
             </p>
             <p style={{ marginBottom: 16 }}>
-              Hela appen — från frontend till backend, scoring-modeller till scraper-tjänst — är byggd med <strong style={{ color: "#131722" }}>Claude Code</strong> (Anthropic). Ingen rad kod är manuellt skriven. Projektet startade som ett experiment och växte till en fullständig investeringsplattform med autentisering, realtidsdata, dark mode och mobilstöd.
+              Hela appen — från frontend till backend, scoring-modeller till scraper-tjänst — är byggd med <strong style={{ color: "var(--text)" }}>Claude Code</strong> (Anthropic). Ingen rad kod är manuellt skriven. Projektet startade som ett experiment och växte till en fullständig investeringsplattform med autentisering, realtidsdata, dark mode och mobilstöd.
             </p>
             <p style={{ marginBottom: 24 }}>
               Thesion är inte finansiell rådgivning. Det är ett verktyg för att lära sig — både om investeringar och om vad som är möjligt när människa och AI bygger tillsammans.
@@ -358,15 +358,15 @@ export default function LandingPage({ onShowPrivacy }) {
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
             <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1" }}>
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Stack</div>
-              <div style={{ fontSize: 13, color: "#131722", fontWeight: 500 }}>React · Vercel · Supabase</div>
+              <div style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>React · Vercel · Supabase</div>
             </div>
             <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1" }}>
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Byggd med</div>
-              <div style={{ fontSize: 13, color: "#131722", fontWeight: 500 }}>Claude Code (Anthropic)</div>
+              <div style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>Claude Code (Anthropic)</div>
             </div>
             <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1" }}>
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Skapad av</div>
-              <div style={{ fontSize: 13, color: "#131722", fontWeight: 500 }}>Johan Resare</div>
+              <div style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>Johan Resare</div>
             </div>
           </div>
         </div>

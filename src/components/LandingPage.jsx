@@ -338,6 +338,40 @@ export default function LandingPage({ onShowPrivacy }) {
         </div>
       </section>
 
+      {/* ─── ABOUT ─── */}
+      <section style={{ padding: isMobile ? "56px 20px" : "80px 56px", background: "#fff" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 800, color: "#131722", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 20 }}>
+            Om Thesion
+          </h2>
+          <div style={{ fontSize: 15, color: "#5a5d65", lineHeight: 1.8 }}>
+            <p style={{ marginBottom: 16 }}>
+              Thesion är ett hobbyprojekt skapat av <strong style={{ color: "#131722" }}>Johan Resare</strong> med ett enkelt mål: att utforska hur långt man kan komma med att bygga en riktig produktionsapp tillsammans med AI.
+            </p>
+            <p style={{ marginBottom: 16 }}>
+              Hela appen — från frontend till backend, scoring-modeller till scraper-tjänst — är byggd med <strong style={{ color: "#131722" }}>Claude Code</strong> (Anthropic). Ingen rad kod är manuellt skriven. Projektet startade som ett experiment och växte till en fullständig investeringsplattform med autentisering, realtidsdata, dark mode och mobilstöd.
+            </p>
+            <p style={{ marginBottom: 24 }}>
+              Thesion är inte finansiell rådgivning. Det är ett verktyg för att lära sig — både om investeringar och om vad som är möjligt när människa och AI bygger tillsammans.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
+            <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1" }}>
+              <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Stack</div>
+              <div style={{ fontSize: 13, color: "#131722", fontWeight: 500 }}>React · Vercel · Supabase</div>
+            </div>
+            <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1" }}>
+              <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Byggd med</div>
+              <div style={{ fontSize: 13, color: "#131722", fontWeight: 500 }}>Claude Code (Anthropic)</div>
+            </div>
+            <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1" }}>
+              <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Skapad av</div>
+              <div style={{ fontSize: 13, color: "#131722", fontWeight: 500 }}>Johan Resare</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── FOOTER ─── */}
       <footer style={{
         padding: isMobile ? "24px 20px" : "28px 56px",
@@ -349,9 +383,14 @@ export default function LandingPage({ onShowPrivacy }) {
           <Logo size={16} />
           <span style={{ fontSize: 12, color: "#b2b5be" }}>Thesion — thesion.tech</span>
         </div>
-        <button onClick={onShowPrivacy} style={{ fontSize: 12, color: "#b2b5be", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-          Integritetspolicy
-        </button>
+        <div style={{ display: "flex", gap: 16 }}>
+          <button onClick={onShowPrivacy} style={{ fontSize: 12, color: "#b2b5be", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+            Integritetspolicy
+          </button>
+          <a href="https://github.com/johanres-kott/meridian" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#b2b5be", textDecoration: "none" }}>
+            GitHub
+          </a>
+        </div>
       </footer>
     </div>
   );

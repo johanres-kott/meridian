@@ -4,6 +4,7 @@ import PdfImportModal from "./PdfImportModal.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock } from "../lib/profileMatcher.js";
+import { sanitizeInput } from "../lib/sanitize.js";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
@@ -45,10 +46,11 @@ function AddCompanyBar({ onAdd, isMobile }) {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    if (query.length < 2) { setResults([]); return; }
+    const sanitized = sanitizeInput(query);
+    if (sanitized.length < 2) { setResults([]); return; }
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(sanitized)}`);
         const data = await res.json();
         const filtered = (data.result || []).filter(r => r.type === "Common Stock").slice(0, 6);
         setResults(filtered);
@@ -382,7 +384,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   }
 
   function createGroup() {
-    const name = newGroupName.trim();
+    const name = sanitizeInput(newGroupName);
     if (!name) return;
     if (groups.some(g => g.name === name)) return;
     const updated = [...groups, { name, members: [] }];
@@ -400,7 +402,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   }
 
   function renameGroup(oldName, newName) {
-    const trimmed = newName.trim();
+    const trimmed = sanitizeInput(newName);
     if (!trimmed || trimmed === oldName) return;
     if (groups.some(g => g.name === trimmed)) return;
     const updated = groups.map(g => g.name === oldName ? { ...g, name: trimmed } : g);

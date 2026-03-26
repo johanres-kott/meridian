@@ -4,6 +4,7 @@ import { fmt } from "./shared.js"
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
+import { sanitizeInput } from "../lib/sanitize.js";
 
 const PROFILE_LABELS = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", mixed: "blandat", index: "indexinvesterare" };
 
@@ -58,10 +59,11 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
 
   // Name search via Finnhub symbol lookup
   const searchSuggestions = useCallback(async (q) => {
-    if (q.length < 2) { setSuggestions([]); setEnriched({}); return; }
+    const sanitized = sanitizeInput(q);
+    if (sanitized.length < 2) { setSuggestions([]); setEnriched({}); return; }
     setSuggestLoading(true);
     try {
-      const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const r = await fetch(`/api/search?q=${encodeURIComponent(sanitized)}`);
       const d = await r.json();
       const results = (d.result ?? [])
         .filter(s => s.type === "Common Stock" || s.type === "EQS")
@@ -144,7 +146,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       setShowSuggestions(false);
-      fetchCompany(query.trim().toUpperCase());
+      fetchCompany(sanitizeInput(query).toUpperCase());
     }
     if (e.key === "Escape") setShowSuggestions(false);
   };
@@ -181,7 +183,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
             )}
           </div>
           <button
-            onClick={() => { setShowSuggestions(false); fetchCompany(query.trim().toUpperCase()); }}
+            onClick={() => { setShowSuggestions(false); fetchCompany(sanitizeInput(query).toUpperCase()); }}
             disabled={loading}
             style={{ padding: "10px 20px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }}
           >

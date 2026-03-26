@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { sanitizeInput } from "../lib/sanitize.js";
 
 const INVESTOR_LABELS = { value: "Värdeinvesterare", growth: "Tillväxtinvesterare", dividend: "Utdelningsinvesterare", index: "Indexinvesterare", mixed: "Blandat" };
 const RISK_LABELS = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" };
@@ -21,8 +22,9 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
   const profile = preferences.investorProfile;
 
   async function saveName() {
-    if (!nameInput.trim()) return;
-    await onUpdatePreferences({ display_name: nameInput.trim() });
+    const sanitized = sanitizeInput(nameInput);
+    if (!sanitized) return;
+    await onUpdatePreferences({ display_name: sanitized });
     setEditingName(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

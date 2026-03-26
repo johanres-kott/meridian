@@ -18,6 +18,7 @@ export default async function handler(req, res) {
 
   const { ticker, range = "1m" } = req.query;
   if (!ticker) return res.status(400).json({ error: "ticker required" });
+  if (!/^[A-Za-z0-9.\-^%]+$/.test(ticker)) return res.status(400).json({ error: "invalid ticker format" });
 
   const cfg = RANGE_MAP[range] || RANGE_MAP["1m"];
 

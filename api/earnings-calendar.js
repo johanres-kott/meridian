@@ -11,6 +11,7 @@ export default async function handler(req, res) {
 
   const { tickers } = req.query;
   if (!tickers) return res.status(400).json({ error: "tickers parameter required" });
+  if (!/^[A-Za-z0-9.\-^%,\s]+$/.test(tickers)) return res.status(400).json({ error: "invalid tickers format" });
   if (!FINNHUB_KEY) return res.status(500).json({ error: "FINNHUB_KEY not configured" });
 
   try {

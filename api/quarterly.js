@@ -29,6 +29,7 @@ export default async function handler(req, res) {
 
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: "ticker parameter required" });
+  if (!/^[A-Za-z0-9.\-^%]+$/.test(ticker)) return res.status(400).json({ error: "invalid ticker format" });
 
   try {
     const crumbData = await getYahooCrumb();

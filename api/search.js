@@ -8,8 +8,13 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (rateLimit(req, res)) return;
 
-  const q = req.query.q;
-  if (!q || q.length < 2) {
+  const rawQ = req.query.q;
+  if (!rawQ || rawQ.length < 2) {
+    return res.status(400).json({ error: "Query parameter 'q' required (min 2 chars)" });
+  }
+  // Strip HTML tags to prevent injection into downstream APIs
+  const q = rawQ.replace(/<[^>]*>/g, "").trim();
+  if (q.length < 2) {
     return res.status(400).json({ error: "Query parameter 'q' required (min 2 chars)" });
   }
 

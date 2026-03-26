@@ -5,6 +5,7 @@ import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 import QuarterlyChart from "./QuarterlyChart.jsx";
+import { sanitizeInput } from "../lib/sanitize.js";
 
 const STATUS_COLORS = {
   Bevakar: { bg: "#f0f3fa", color: "#787b86" },
@@ -24,7 +25,7 @@ function NotesSection({ item, onUpdate }) {
   const [gav, setGav] = useState(item.gav || "");
 
   async function saveNotes() {
-    await onUpdate(item.id, { notes });
+    await onUpdate(item.id, { notes: sanitizeInput(notes) });
     setEditing(false);
   }
 

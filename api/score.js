@@ -11,6 +11,7 @@ export default async function handler(req, res) {
 
   const ticker = req.query.ticker;
   if (!ticker) return res.status(400).json({ error: "Missing ticker" });
+  if (!/^[A-Za-z0-9.\-^%]+$/.test(ticker)) return res.status(400).json({ error: "invalid ticker format" });
 
   const supabase = createClient(SUPABASE_URL, ANON_KEY);
   const { data, error } = await supabase

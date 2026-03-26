@@ -15,6 +15,7 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 import ScoringMethodology from "./components/ScoringMethodology.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
+import { sanitizeInput } from "./lib/sanitize.js";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -96,9 +97,9 @@ export default function App() {
   }
 
   function saveDisplayName() {
-    const trimmed = nameInput.trim();
-    if (trimmed) {
-      updatePreferences({ display_name: trimmed });
+    const sanitized = sanitizeInput(nameInput);
+    if (sanitized) {
+      updatePreferences({ display_name: sanitized });
     }
     setEditingName(false);
   }

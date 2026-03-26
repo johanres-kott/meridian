@@ -56,7 +56,7 @@ export default function UpcomingEarnings({ userId, isMobile }) {
 
   if (loading) {
     return (
-      <div style={{ padding: "20px 24px", marginBottom: 24, background: "#f8f9fd", border: "1px solid #e0e3eb", borderRadius: 8, color: "#787b86", fontSize: 12 }}>
+      <div style={{ padding: "20px 24px", marginBottom: 24, background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontSize: 12 }}>
         Laddar kommande rapporter...
       </div>
     );
@@ -67,7 +67,7 @@ export default function UpcomingEarnings({ userId, isMobile }) {
   const sectionHeader = {
     fontSize: isMobile ? 10 : 11,
     fontWeight: 500,
-    color: "#787b86",
+    color: "var(--text-secondary)",
     letterSpacing: "0.06em",
     textTransform: "uppercase",
     marginBottom: isMobile ? 6 : 10,
@@ -77,7 +77,7 @@ export default function UpcomingEarnings({ userId, isMobile }) {
     justifyContent: "space-between",
     alignItems: "center",
     padding: isMobile ? "4px 0" : "5px 0",
-    borderBottom: "1px solid #f0f3fa",
+    borderBottom: "1px solid var(--border-light)",
   };
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
@@ -99,16 +99,16 @@ export default function UpcomingEarnings({ userId, isMobile }) {
   }
 
   return (
-    <div style={{ marginBottom: 24, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Kommande rapporter</span>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Kommande rapporter</span>
       </div>
 
       <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
         <div style={sectionHeader}>KOMMANDE RAPPORTER</div>
 
         {earnings.length === 0 ? (
-          <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga kommande rapporter</div>
+          <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga kommande rapporter</div>
         ) : (
           Object.entries(grouped).map(([date, items]) => (
             <div key={date}>
@@ -117,8 +117,8 @@ export default function UpcomingEarnings({ userId, isMobile }) {
                   <div style={{
                     fontSize: isMobile ? 10 : 11,
                     fontWeight: 500,
-                    color: "#fff",
-                    background: "#131722",
+                    color: "var(--bg-card)",
+                    background: "var(--text)",
                     borderRadius: 4,
                     padding: isMobile ? "2px 6px" : "2px 8px",
                     marginRight: isMobile ? 8 : 12,
@@ -128,10 +128,10 @@ export default function UpcomingEarnings({ userId, isMobile }) {
                     {formatDate(date)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "#131722", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {item.companyName}
                     </div>
-                    <div style={{ fontSize: isMobile ? 10 : 11, color: "#787b86", ...mono }}>
+                    <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", ...mono }}>
                       {item.ticker}
                     </div>
                   </div>

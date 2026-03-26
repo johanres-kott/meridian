@@ -97,20 +97,20 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
   return (
-    <div style={{ marginBottom: 24, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
       <div style={{
-        padding: isMobile ? "10px 12px" : "14px 20px", borderBottom: "1px solid #f0f3fa",
-        background: "#f8f9fd", display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: isMobile ? "10px 12px" : "14px 20px", borderBottom: "1px solid var(--border-light)",
+        background: "var(--bg-secondary)", display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <div>
-          <span style={{ fontSize: 15, fontWeight: 600, color: "#131722" }}>Toppförslag för dig</span>
-          <span style={{ fontSize: 11, color: "#787b86", marginLeft: 8 }}>
+          <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>Toppförslag för dig</span>
+          <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>
             {PROFILE_LABELS[investorType] || investorType}
           </span>
         </div>
         <button
           onClick={() => onNavigate?.("methodology")}
-          style={{ fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+          style={{ fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
         >
           Hur fungerar poängsättningen? →
         </button>
@@ -118,11 +118,11 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
 
       <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
-          <div style={{ fontSize: 12, color: "#787b86", padding: "20px" }}>Beräknar förslag...</div>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Beräknar förslag...</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 11 : 12, minWidth: isMobile ? 0 : undefined }}>
             <thead>
-              <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
+              <tr style={{ borderBottom: "2px solid var(--border)" }}>
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 24 : 30, textAlign: "center" }}>#</th>
                 {!isMobile && <th style={{ ...thStyle, width: 28 }}></th>}
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "left" }}>Bolag</th>
@@ -141,20 +141,20 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                 return (
                   <tr
                     key={item.ticker}
-                    style={{ borderBottom: "1px solid #f0f3fa", cursor: "pointer" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#fafbfd"}
+                    style={{ borderBottom: "1px solid var(--border-light)", cursor: "pointer" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center", color: "#b2b5be", fontSize: 11 }}>{idx + 1}</td>
+                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>{idx + 1}</td>
                     {!isMobile && <td style={{ ...tdStyle, width: 28, fontSize: 16, textAlign: "center" }}>{getFlag(item.ticker)}</td>}
                     <td
-                      style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), color: "#131722", maxWidth: isMobile ? 120 : undefined }}
+                      style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), color: "var(--text)", maxWidth: isMobile ? 120 : undefined }}
                       onClick={() => onNavigate?.("search", { ticker: item.ticker })}
                     >
                       <div style={{ fontWeight: 500, ...(isMobile ? { fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } : {}) }}>
                         {isMobile ? getFlag(item.ticker) + " " : ""}{item.name}
                       </div>
-                      <div style={{ fontSize: 10, color: "#787b86", ...mono }}>{item.ticker}</div>
+                      <div style={{ fontSize: 10, color: "var(--text-secondary)", ...mono }}>{item.ticker}</div>
                     </td>
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       <ScoreBadge score={item.compositeScore} />
@@ -171,7 +171,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                       </td>
                     )}
                     {!isMobile && (
-                      <td style={{ ...tdStyle, fontSize: 11, color: "#787b86" }}>
+                      <td style={{ ...tdStyle, fontSize: 11, color: "var(--text-secondary)" }}>
                         {item.sector && item.sector !== "---" ? (
                           <span>
                             {SECTOR_EMOJI[item.sector] || ""}{" "}
@@ -193,7 +193,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                     )}
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
                       {item.price != null ? item.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "–"}
-                      {!isMobile && <div style={{ fontSize: 9, color: "#787b86" }}>{item.currency || "SEK"}</div>}
+                      {!isMobile && <div style={{ fontSize: 9, color: "var(--text-secondary)" }}>{item.currency || "SEK"}</div>}
                     </td>
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       {isAdded ? (
@@ -204,7 +204,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                           disabled={isAdding}
                           style={{
                             fontSize: 10, padding: "3px 8px", borderRadius: 4,
-                            border: "1px solid #2962ff", background: "#fff", color: "#2962ff",
+                            border: "1px solid var(--accent)", background: "var(--bg-card)", color: "var(--accent)",
                             cursor: isAdding ? "wait" : "pointer", fontFamily: "inherit",
                             opacity: isAdding ? 0.5 : 1,
                           }}
@@ -221,7 +221,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
         )}
 
         {data?.scoredAt && (
-          <div style={{ fontSize: 10, color: "#b2b5be", padding: "8px 20px 12px" }}>
+          <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "8px 20px 12px" }}>
             Poäng beräknade: {new Date(data.scoredAt).toLocaleDateString("sv-SE")} · {data.suggestions?.length || 0} bolag
           </div>
         )}
@@ -230,7 +230,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
   );
 }
 
-const thStyle = { padding: "8px 10px", fontSize: 10, color: "#787b86", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.04em" };
+const thStyle = { padding: "8px 10px", fontSize: 10, color: "var(--text-secondary)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.04em" };
 const tdStyle = { padding: "8px 10px" };
 const thMobile = { padding: "6px 4px", fontSize: 9 };
 const tdMobile = { padding: "6px 4px" };

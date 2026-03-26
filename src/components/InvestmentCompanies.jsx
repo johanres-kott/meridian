@@ -41,7 +41,7 @@ function Skeleton({ w = "100%", h = 13, mb = 0 }) {
   return (
     <div style={{
       width: w, height: h, borderRadius: 3, marginBottom: mb,
-      background: "linear-gradient(90deg,#f0f3fa 25%,#e4e8f5 50%,#f0f3fa 75%)",
+      background: "linear-gradient(90deg,var(--border-light) 25%,var(--border) 50%,var(--border-light) 75%)",
       backgroundSize: "200% 100%",
       animation: "shimmer 1.5s ease-in-out infinite",
     }} />
@@ -54,7 +54,7 @@ function Badge({ text, color, bg }) {
       display: "inline-flex", alignItems: "center",
       fontSize: 10, fontWeight: 600, letterSpacing: "0.05em",
       padding: "2px 7px", borderRadius: 3,
-      color: color ?? "#787b86", background: bg ?? "#f0f3fa",
+      color: color ?? "var(--text-secondary)", background: bg ?? "var(--border-light)",
     }}>
       {text}
     </span>
@@ -64,7 +64,7 @@ function Badge({ text, color, bg }) {
 function SectionLabel({ children, action }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-      <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#787b86" }}>
+      <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)" }}>
         {children}
       </span>
       {action}
@@ -109,7 +109,7 @@ function EventRow({ item, isLast }) {
         alignItems: "center",
         gap: 12,
         padding: "10px 0",
-        borderBottom: isLast ? "none" : "1px solid #f0f3fa",
+        borderBottom: isLast ? "none" : "1px solid var(--border-light)",
         textDecoration: "none",
         color: "inherit",
         cursor: "pointer",
@@ -120,7 +120,7 @@ function EventRow({ item, isLast }) {
     >
       {/* Date chip */}
       <div style={{
-        fontSize: 10, fontWeight: 500, color: "#b2b5be",
+        fontSize: 10, fontWeight: 500, color: "var(--text-muted)",
         fontFamily: "'IBM Plex Mono', monospace",
         letterSpacing: "0.02em", lineHeight: 1.3,
       }}>
@@ -128,7 +128,7 @@ function EventRow({ item, isLast }) {
       </div>
 
       {/* Title */}
-      <div style={{ fontSize: 12.5, color: "#131722", lineHeight: 1.4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+      <div style={{ fontSize: 12.5, color: "var(--text)", lineHeight: 1.4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
         {item.title}
       </div>
 
@@ -146,7 +146,7 @@ function EventList({ url, emptyMsg }) {
     return (
       <div>
         {[90, 75, 85, 70, 80].map((w, i) => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "52px 1fr", gap: 12, padding: "11px 0", borderBottom: i < 4 ? "1px solid #f0f3fa" : "none" }}>
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "52px 1fr", gap: 12, padding: "11px 0", borderBottom: i < 4 ? "1px solid var(--border-light)" : "none" }}>
             <Skeleton w={36} h={10} />
             <div>
               <Skeleton w={`${w}%`} h={12} mb={5} />
@@ -159,7 +159,7 @@ function EventList({ url, emptyMsg }) {
   }
 
   if (items.length === 0) {
-    return <div style={{ fontSize: 12, color: "#b2b5be", padding: "16px 0" }}>{emptyMsg}</div>;
+    return <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "16px 0" }}>{emptyMsg}</div>;
   }
 
   return (
@@ -179,13 +179,13 @@ function LeadershipPanel({ companyId, isMobile }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
       {["boardChair", "ceo"].map(key => (
-        <div key={key} style={{ background: "#f8f9fd", border: "1px solid #edf0f7", borderRadius: 6, padding: "14px 16px" }}>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#b2b5be", marginBottom: 7 }}>
+        <div key={key} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-light)", borderRadius: 6, padding: "14px 16px" }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 7 }}>
             {key === "boardChair" ? "Styrelseordförande" : "Verkst. direktör"}
           </div>
           {loading
             ? <Skeleton w="70%" h={14} />
-            : <div style={{ fontSize: 13.5, fontWeight: 500, color: "#131722" }}>
+            : <div style={{ fontSize: 13.5, fontWeight: 500, color: "var(--text)" }}>
                 {data?.[key] || "—"}
               </div>
           }
@@ -205,19 +205,19 @@ function InfoCard({ company, leadershipData }) {
   ];
 
   return (
-    <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ padding: "14px 16px", borderBottom: "1px solid #f0f3fa" }}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#787b86", marginBottom: 12 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-light)" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>
           Bolagsinfo
         </div>
         {rows.map(r => (
           <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
-            <span style={{ fontSize: 11, color: "#787b86" }}>{r.label}</span>
+            <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{r.label}</span>
             {r.href
-              ? <a href={r.href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "#2962ff", textDecoration: "none", fontFamily: "'IBM Plex Mono', monospace" }}>
+              ? <a href={r.href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", fontFamily: "'IBM Plex Mono', monospace" }}>
                   {r.value}
                 </a>
-              : <span style={{ fontSize: 11, color: "#131722", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
+              : <span style={{ fontSize: 11, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
                   {r.value}
                 </span>
             }
@@ -227,9 +227,9 @@ function InfoCard({ company, leadershipData }) {
 
       {/* Data freshness */}
       {leadershipData && (
-        <div style={{ padding: "10px 16px", background: "#f8f9fd" }}>
+        <div style={{ padding: "10px 16px", background: "var(--bg-secondary)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 10, color: "#b2b5be" }}>Ledarskapsdata</span>
+            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Ledarskapsdata</span>
             <Badge
               text={leadershipData.source === "live" ? "● Live" : "Cached"}
               color={leadershipData.source === "live" ? "#089981" : "#b2b5be"}
@@ -265,7 +265,7 @@ function CompanySelector({ selected, onSelect, isMobile }) {
               background: active ? c.color + "0f" : "transparent",
               cursor: "pointer", fontFamily: "inherit",
               fontSize: isMobile ? 11 : 12.5, fontWeight: active ? 600 : 400,
-              color: active ? c.color : "#787b86",
+              color: active ? c.color : "var(--text-secondary)",
               transition: "all 0.12s",
             }}
           >
@@ -294,7 +294,7 @@ function HoldingsTable({ companyId }) {
     return (
       <div>
         {[1, 2, 3, 4, 5].map(i => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 80px 60px 80px", gap: 8, padding: "8px 0", borderBottom: i < 5 ? "1px solid #f0f3fa" : "none" }}>
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 80px 60px 80px", gap: 8, padding: "8px 0", borderBottom: i < 5 ? "1px solid var(--border-light)" : "none" }}>
             <Skeleton w="70%" h={12} />
             <Skeleton w="60%" h={12} />
             <Skeleton w="50%" h={12} />
@@ -306,20 +306,20 @@ function HoldingsTable({ companyId }) {
   }
 
   if (holdings.length === 0) {
-    return <div style={{ fontSize: 12, color: "#b2b5be", padding: "16px 0" }}>Inga innehav hittade</div>;
+    return <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "16px 0" }}>Inga innehav hittade</div>;
   }
 
   return (
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid #e0e3eb" }}>
+          <tr style={{ borderBottom: "1px solid var(--border)" }}>
             {["Bolag", "Ticker", "Vikt (%)", "Värde (Mkr)"].map(h => (
               <th key={h} style={{
                 textAlign: h === "Bolag" || h === "Ticker" ? "left" : "right",
                 padding: "8px 6px", fontSize: 10, fontWeight: 600,
                 letterSpacing: "0.07em", textTransform: "uppercase",
-                color: "#787b86", whiteSpace: "nowrap",
+                color: "var(--text-secondary)", whiteSpace: "nowrap",
               }}>
                 {h}
               </th>
@@ -328,13 +328,13 @@ function HoldingsTable({ companyId }) {
         </thead>
         <tbody>
           {holdings.map((h, i) => (
-            <tr key={i} style={{ borderBottom: i < holdings.length - 1 ? "1px solid #f0f3fa" : "none" }}>
-              <td style={{ padding: "8px 6px", color: "#131722", fontWeight: 500 }}>{h.name}</td>
-              <td style={{ padding: "8px 6px", color: "#787b86", fontFamily: "'IBM Plex Mono', monospace", fontSize: 11 }}>{h.ticker || "—"}</td>
-              <td style={{ padding: "8px 6px", textAlign: "right", color: "#131722", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <tr key={i} style={{ borderBottom: i < holdings.length - 1 ? "1px solid var(--border-light)" : "none" }}>
+              <td style={{ padding: "8px 6px", color: "var(--text)", fontWeight: 500 }}>{h.name}</td>
+              <td style={{ padding: "8px 6px", color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", fontSize: 11 }}>{h.ticker || "—"}</td>
+              <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
                 {h.weight != null ? h.weight.toFixed(1) : "—"}
               </td>
-              <td style={{ padding: "8px 6px", textAlign: "right", color: "#131722", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
                 {h.valueMSEK != null ? h.valueMSEK.toLocaleString("sv-SE") : "—"}
               </td>
             </tr>
@@ -374,7 +374,7 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
       `}</style>
 
       {/* ── Sub-navigation ── */}
-      <div style={{ display: "flex", gap: 0, borderBottom: "1px solid #e0e3eb", marginBottom: 24 }}>
+      <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 24 }}>
         {[
           { id: "toppforslag", label: "Toppförslag" },
           { id: "investmentbolag", label: "Investmentbolag" },
@@ -385,11 +385,11 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
             style={{
               fontSize: isMobile ? 12 : 13, fontWeight: 500, padding: isMobile ? "8px 12px" : "10px 20px",
               background: "none", border: "none", borderBottom: "2px solid transparent",
-              color: "#787b86", cursor: "pointer", fontFamily: "inherit",
+              color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit",
               transition: "all 0.15s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#2962ff"; e.currentTarget.style.borderBottomColor = "#2962ff"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "#787b86"; e.currentTarget.style.borderBottomColor = "transparent"; }}
+            onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.borderBottomColor = "var(--accent)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.borderBottomColor = "transparent"; }}
           >
             {tab.label}
           </button>
@@ -399,7 +399,7 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
       {/* ── Smart Suggestions ── */}
       {preferences.investorProfile && (
         <div id="toppforslag" style={{ marginBottom: 32 }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Toppförslag</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Toppförslag</div>
           <SmartSuggestions
             profile={preferences.investorProfile}
             existingTickers={tickers}
@@ -410,11 +410,11 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
       )}
 
       {/* ── Investment companies section ── */}
-      <div id="investmentbolag" style={{ fontSize: 18, fontWeight: 600, color: "#131722", marginBottom: 16 }}>Investera som investmentbolag</div>
+      <div id="investmentbolag" style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Investera som investmentbolag</div>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 11, color: "#b2b5be", marginBottom: 8, letterSpacing: "0.04em" }}>
+        <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8, letterSpacing: "0.04em" }}>
           Investmentbolag <span style={{ margin: "0 4px" }}>›</span> {company.name}
         </div>
         <CompanySelector selected={selectedId} onSelect={setSelectedId} isMobile={isMobile} />
@@ -422,7 +422,7 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
 
       {/* ── Company hero ── */}
       <div style={{
-        background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8,
+        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8,
         padding: isMobile ? "14px 12px" : "20px 24px", marginBottom: 16,
         display: "flex", flexDirection: isMobile ? "column" : "row",
         alignItems: isMobile ? "flex-start" : "center",
@@ -432,18 +432,18 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
           <CompanyAvatar company={company} size={isMobile ? 34 : 42} />
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexWrap: "wrap" }}>
-              <span style={{ fontSize: isMobile ? 16 : 20, fontWeight: 600, color: "#131722" }}>{company.name}</span>
+              <span style={{ fontSize: isMobile ? 16 : 20, fontWeight: 600, color: "var(--text)" }}>{company.name}</span>
               <Badge
                 text={`${company.ticker}.${company.exchange}`}
-                color="#787b86"
-                bg="#f0f3fa"
+                color="var(--text-secondary)"
+                bg="var(--border-light)"
               />
             </div>
             <a
               href={`https://www.${company.url}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: 11, color: "#b2b5be", textDecoration: "none" }}
+              style={{ fontSize: 11, color: "var(--text-muted)", textDecoration: "none" }}
             >
               {company.url} ↗
             </a>
@@ -453,9 +453,9 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
         <div style={{ display: "flex", gap: 12, alignItems: "center", ...(isMobile ? { width: "100%", justifyContent: "space-between" } : {}) }}>
           {companyData?.price != null && (
             <div style={{ textAlign: isMobile ? "left" : "right" }}>
-              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#131722" }}>
+              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "var(--text)" }}>
                 {companyData.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                <span style={{ fontSize: 12, color: "#787b86", marginLeft: 4 }}>{companyData.currency}</span>
+                <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 4 }}>{companyData.currency}</span>
               </div>
               {companyData.changePercent != null && (
                 <div style={{ fontSize: 12, fontWeight: 500, color: companyData.changePercent >= 0 ? "#089981" : "#f23645" }}>
@@ -481,28 +481,28 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
           {/* Leadership */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Ledning</SectionLabel>
             <LeadershipPanel companyId={selectedId} isMobile={isMobile} />
           </div>
 
           {/* Price chart */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Kursutveckling</SectionLabel>
             <PriceChart ticker={fullTicker} />
           </div>
 
           {/* Holdings */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Innehav</SectionLabel>
             <HoldingsTable companyId={selectedId} />
           </div>
 
           {/* Press releases */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
-                <Badge text="Pressreleaser" color="#787b86" bg="#f0f3fa" />
+                <Badge text="Pressreleaser" color="var(--text-secondary)" bg="var(--border-light)" />
               }
             >
               Senaste händelser
@@ -514,10 +514,10 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
           </div>
 
           {/* EFN */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
-                <Badge text="EFN.se" color="#2962ff" bg="#eef2ff" />
+                <Badge text="EFN.se" color="var(--accent)" bg="var(--accent-light)" />
               }
             >
               Nyheter &amp; Analyser
@@ -534,8 +534,8 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
           <InfoCard company={company} leadershipData={leadershipData} />
 
           {/* Quick links */}
-          <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, padding: "14px 16px" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "#787b86", marginBottom: 10 }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 10 }}>
               Snabblänkar
             </div>
             {[
@@ -552,12 +552,12 @@ export default function InvestmentCompanies({ preferences = {}, userId, onNaviga
                 style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   padding: "7px 0",
-                  borderBottom: "1px solid #f8f9fd",
+                  borderBottom: "1px solid var(--bg-secondary)",
                   textDecoration: "none",
-                  fontSize: 12, color: "#131722",
+                  fontSize: 12, color: "var(--text)",
                 }}
-                onMouseEnter={e => e.currentTarget.style.color = "#2962ff"}
-                onMouseLeave={e => e.currentTarget.style.color = "#131722"}
+                onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+                onMouseLeave={e => e.currentTarget.style.color = "var(--text)"}
               >
                 {link.label}
                 <span style={{ fontSize: 11, color: "#c0c3cb" }}>↗</span>

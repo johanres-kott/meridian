@@ -90,18 +90,18 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
-      <div style={{ background: "#fff", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
+      <div style={{ background: "var(--bg-card)", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
 
         {error && (
-          <div style={{ background: "#fff5f5", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
+          <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
             {error}
           </div>
         )}
 
         {!selected ? (
           <>
-            <div style={{ fontWeight: 600, fontSize: 16, color: "#131722", marginBottom: 4 }}>Skapa grupp från investmentbolag</div>
-            <div style={{ fontSize: 12, color: "#787b86", marginBottom: 20 }}>
+            <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 4 }}>Skapa grupp från investmentbolag</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 20 }}>
               Välj ett investmentbolag för att skapa en grupp med deras noterade innehav.
               {loading && " Hämtar data..."}
             </div>
@@ -113,20 +113,20 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                   onClick={() => selectCompany(company)}
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "14px 16px", border: "1px solid #e0e3eb", borderRadius: 6,
-                    background: "#fff", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                    padding: "14px 16px", border: "1px solid var(--border)", borderRadius: 6,
+                    background: "var(--bg-card)", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
                     transition: "border-color 0.15s",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = "#2962ff"}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = "#e0e3eb"}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
                 >
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: "#131722" }}>{company.name}</div>
-                    <div style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text)" }}>{company.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
                       {company.holdings.length} noterade innehav
                     </div>
                   </div>
-                  <div style={{ fontSize: 11, color: "#787b86" }}>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
                     Uppdaterad {company.lastUpdated}
                   </div>
                 </button>
@@ -139,7 +139,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
           </>
         ) : importing ? (
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <div style={{ fontSize: 13, color: "#131722" }}>Skapar grupp...</div>
+            <div style={{ fontSize: 13, color: "var(--text)" }}>Skapar grupp...</div>
           </div>
         ) : (() => {
           const hasValues = selected.holdings.some(h => h.valueMSEK != null);
@@ -149,21 +149,21 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
               <button
                 onClick={() => { setSelected(null); setError(null); }}
-                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "#787b86", padding: 0 }}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "var(--text-secondary)", padding: 0 }}
               >
                 ←
               </button>
-              <div style={{ fontWeight: 600, fontSize: 16, color: "#131722" }}>
+              <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)" }}>
                 {selected.name}
               </div>
             </div>
-            <div style={{ fontSize: 12, color: "#787b86", marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 16 }}>
               {selected.holdings.length} noterade innehav{totalWeight > 0 ? ` — ${totalWeight.toFixed(1).replace(".0", "")}% av totala tillgångar` : ""}
             </div>
 
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 20 }}>
               <thead>
-                <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
+                <tr style={{ borderBottom: "2px solid var(--border)" }}>
                   <th style={{ ...thStyle, textAlign: "left" }}>Bolag</th>
                   <th style={{ ...thStyle, textAlign: "right" }}>Vikt</th>
                   {hasValues && <th style={{ ...thStyle, textAlign: "right" }}>Värde</th>}
@@ -174,16 +174,16 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                 {selected.holdings.map((h, idx) => {
                   const exists = existingTickers.has(h.ticker.toUpperCase());
                   return (
-                    <tr key={idx} style={{ borderBottom: "1px solid #f0f3fa" }}>
-                      <td style={{ ...tdStyle, color: "#131722" }}>
+                    <tr key={idx} style={{ borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ ...tdStyle, color: "var(--text)" }}>
                         <div>{h.name}</div>
-                        <div style={{ fontFamily: "monospace", fontSize: 10, color: "#787b86" }}>{h.ticker}</div>
+                        <div style={{ fontFamily: "monospace", fontSize: 10, color: "var(--text-secondary)" }}>{h.ticker}</div>
                       </td>
-                      <td style={{ ...tdStyle, textAlign: "right", color: "#131722", fontVariantNumeric: "tabular-nums" }}>
+                      <td style={{ ...tdStyle, textAlign: "right", color: "var(--text)", fontVariantNumeric: "tabular-nums" }}>
                         {h.weight != null ? `${h.weight}%` : "–"}
                       </td>
                       {hasValues && (
-                        <td style={{ ...tdStyle, textAlign: "right", color: "#131722", fontVariantNumeric: "tabular-nums" }}>
+                        <td style={{ ...tdStyle, textAlign: "right", color: "var(--text)", fontVariantNumeric: "tabular-nums" }}>
                           {h.valueMSEK != null ? formatValue(h.valueMSEK) : "–"}
                         </td>
                       )}
@@ -191,7 +191,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                         {exists ? (
                           <span style={{ color: "#1b5e20", fontSize: 11 }}>Finns i portfölj</span>
                         ) : (
-                          <span style={{ color: "#2962ff", fontSize: 11 }}>Läggs till</span>
+                          <span style={{ color: "var(--accent)", fontSize: 11 }}>Läggs till</span>
                         )}
                       </td>
                     </tr>
@@ -201,11 +201,11 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
             </table>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, color: "#787b86", display: "block", marginBottom: 4 }}>Gruppnamn</label>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 4 }}>Gruppnamn</label>
               <input
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
-                style={{ width: "100%", padding: "7px 10px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", color: "#131722", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 4, fontSize: 13, fontFamily: "inherit", color: "var(--text)", background: "var(--bg-card)", boxSizing: "border-box" }}
               />
             </div>
 
@@ -227,7 +227,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
   );
 }
 
-const thStyle = { padding: "8px 6px", fontSize: 11, color: "#787b86", fontWeight: 500 };
+const thStyle = { padding: "8px 6px", fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 };
 const tdStyle = { padding: "8px 6px" };
-const btnSecondary = { padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" };
-const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "#2962ff", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };
+const btnSecondary = { padding: "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
+const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "var(--accent)", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };

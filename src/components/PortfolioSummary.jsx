@@ -133,7 +133,7 @@ export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
 
   if (loading) {
     return (
-      <div style={{ padding: "20px 24px", marginBottom: 24, background: "#f8f9fd", border: "1px solid #e0e3eb", borderRadius: 8, color: "#787b86", fontSize: 12 }}>
+      <div style={{ padding: "20px 24px", marginBottom: 24, background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontSize: 12 }}>
         Laddar portfolj...
       </div>
     );
@@ -141,36 +141,36 @@ export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
 
   if (!data || data.empty) return null;
 
-  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10 };
-  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid #f0f3fa" };
+  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10 };
+  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid var(--border-light)" };
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
   return (
-    <div style={{ marginBottom: 24, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
-      <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Din portfolj</span>
-        <span style={{ fontSize: 11, color: "#787b86", marginLeft: 8 }}>{data.totalCount} bolag</span>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Din portfolj</span>
+        <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>{data.totalCount} bolag</span>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : (data.hasHoldings ? "1fr 1fr 1fr" : "1fr 1fr"), gap: 0 }}>
         {/* Holdings value by currency */}
         {data.hasHoldings && (
-          <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
+          <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
             <div style={sectionHeader}>Innehav</div>
             {data.totalSek !== null && (
-              <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: "1px solid #f0f3fa" }}>
-                <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "#131722" }}>
+              <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: "1px solid var(--border-light)" }}>
+                <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>
                   {data.totalSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
                 </div>
                 <div style={{ ...mono, fontSize: 11, marginTop: 2, color: data.dailyChangeSek >= 0 ? "#089981" : "#f23645" }}>
                   {data.dailyChangeSek >= 0 ? "+" : ""}{data.dailyChangeSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK idag ({data.dailyChangeSekPct >= 0 ? "+" : ""}{data.dailyChangeSekPct.toFixed(2)}%)
                 </div>
-                <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 4 }}>Omräknat till SEK</div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>Omräknat till SEK</div>
               </div>
             )}
             {data.currencyGroups.map((g, i) => (
               <div key={g.currency} style={{ marginBottom: i < data.currencyGroups.length - 1 ? 8 : 0 }}>
-                <div style={{ ...mono, fontSize: 14, fontWeight: 500, color: "#131722" }}>
+                <div style={{ ...mono, fontSize: 14, fontWeight: 500, color: "var(--text)" }}>
                   {g.value.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {g.currency}
                 </div>
                 <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "#089981" : "#f23645" }}>
@@ -182,12 +182,12 @@ export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
         )}
 
         {/* Status distribution */}
-        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
           <div style={sectionHeader}>Status</div>
           {Object.entries(data.statusCounts).map(([status, count]) => (
             <div key={status} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0" }}>
-              <span style={{ fontSize: 12, color: STATUS_COLORS[status] || "#787b86", fontWeight: 500 }}>{status}</span>
-              <span style={{ ...mono, fontSize: 12, color: "#131722" }}>{count} st</span>
+              <span style={{ fontSize: 12, color: STATUS_COLORS[status] || "var(--text-secondary)", fontWeight: 500 }}>{status}</span>
+              <span style={{ ...mono, fontSize: 12, color: "var(--text)" }}>{count} st</span>
             </div>
           ))}
         </div>
@@ -196,13 +196,13 @@ export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
           <div style={sectionHeader}>Största rörelser idag</div>
           {data.movers.length === 0 ? (
-            <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga rörelser</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga rörelser</div>
           ) : (
             data.movers.map(item => (
               <div key={item.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("search", { ticker: item.ticker })}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: "#131722" }}>{item.name || item.ticker}</div>
-                  <div style={{ fontSize: 10, color: "#787b86", ...mono }}>{item.ticker}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text)" }}>{item.name || item.ticker}</div>
+                  <div style={{ fontSize: 10, color: "var(--text-secondary)", ...mono }}>{item.ticker}</div>
                 </div>
                 <div style={mono}>
                   <Chg value={parseFloat(item.changePercent.toFixed(2))} />

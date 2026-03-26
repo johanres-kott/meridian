@@ -10,7 +10,7 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
   return (
     <div>
       <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-        <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "#131722", marginBottom: 2 }}>
+        <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>
           Hej, {displayName}!
         </h1>
         {preferences.investorProfile && (() => {
@@ -20,7 +20,7 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
           const focusMap = { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" };
           const parts = [typeMap[p.investorType], riskMap[p.riskProfile], focusMap[p.focus]].filter(Boolean);
           return parts.length > 0 ? (
-            <div style={{ fontSize: 12, color: "#787b86" }}>{parts.join(" · ")}</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{parts.join(" · ")}</div>
           ) : null;
         })()}
       </div>

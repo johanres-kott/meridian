@@ -56,30 +56,30 @@ function Picker({ items, selected, onSave, onCancel, isMobile }) {
               type="checkbox"
               checked={checked.has(item.symbol)}
               onChange={() => toggle(item.symbol)}
-              style={{ accentColor: "#2962ff" }}
+              style={{ accentColor: "var(--accent)" }}
             />
-            <span style={{ color: "#131722" }}>{item.name}</span>
-            <span style={{ color: "#b2b5be", fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{item.symbol}</span>
+            <span style={{ color: "var(--text)" }}>{item.name}</span>
+            <span style={{ color: "var(--text-muted)", fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{item.symbol}</span>
           </label>
         ))}
       </div>
       <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
         <button
           onClick={() => onSave([...checked])}
-          style={{ fontSize: 11, color: "#fff", background: "#2962ff", border: "none", borderRadius: 3, padding: "4px 12px", cursor: "pointer", fontFamily: "inherit" }}
+          style={{ fontSize: 11, color: "#fff", background: "var(--accent)", border: "none", borderRadius: 3, padding: "4px 12px", cursor: "pointer", fontFamily: "inherit" }}
         >
           Spara
         </button>
         <button
           onClick={onCancel}
-          style={{ fontSize: 11, color: "#787b86", background: "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
+          style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
         >
           Avbryt
         </button>
         {checked.size > 0 && (
           <button
             onClick={() => onSave([])}
-            style={{ fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" }}
+            style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" }}
           >
             Aterstall
           </button>
@@ -158,7 +158,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
 
   if (!lastSeenAt || dismissed) return null;
   if (loading) return (
-    <div style={{ padding: "20px 24px", marginBottom: 24, background: "#f8f9fd", border: "1px solid #e0e3eb", borderRadius: 8, color: "#787b86", fontSize: 12 }}>
+    <div style={{ padding: "20px 24px", marginBottom: 24, background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontSize: 12 }}>
       Sammanstaller vad som hant sedan sist...
     </div>
   );
@@ -180,24 +180,24 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
   const lastDate = new Date(lastSeenAt);
   const formattedDate = lastDate.toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
 
-  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10, display: "flex", justifyContent: "space-between", alignItems: "center" };
-  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid #f0f3fa" };
-  const tickerStyle = { fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "#131722" };
-  const subtext = { fontSize: isMobile ? 10 : 11, color: "#787b86" };
+  const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10, display: "flex", justifyContent: "space-between", alignItems: "center" };
+  const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid var(--border-light)" };
+  const tickerStyle = { fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "var(--text)" };
+  const subtext = { fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)" };
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
-  const editBtn = { fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textTransform: "none", letterSpacing: "normal", fontWeight: 400 };
+  const editBtn = { fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textTransform: "none", letterSpacing: "normal", fontWeight: 400 };
 
   return (
-    <div style={{ marginBottom: 28, background: "#fff", border: "1px solid #e0e3eb", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ marginBottom: 28, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid #f0f3fa", background: "#f8f9fd" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "#131722" }}>Sedan sist</span>
-          <span style={{ fontSize: 11, color: "#787b86" }}>sedan {formattedDate}</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Sedan sist</span>
+          <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>sedan {formattedDate}</span>
         </div>
         <button
           onClick={() => setDismissed(true)}
-          style={{ fontSize: 11, color: "#787b86", background: "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "3px 10px", cursor: "pointer", fontFamily: "inherit" }}
+          style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "3px 10px", cursor: "pointer", fontFamily: "inherit" }}
         >
           Stang
         </button>
@@ -207,10 +207,10 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr 1fr", gap: 0 }}>
 
         {/* Portfolio movers */}
-        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
           <div style={sectionHeader}><span>Din portfolj</span></div>
           {data.movers.length === 0 ? (
-            <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga bolag i bevakning</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga bolag i bevakning</div>
           ) : (
             data.movers.slice(0, 5).map(c => (
               <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("search", { ticker: c.ticker })}>
@@ -227,7 +227,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         </div>
 
         {/* Market highlights */}
-        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
           <div style={sectionHeader}>
             <span>Marknader{pinnedIndices.length > 0 ? "" : " (topp 4)"}</span>
             <button style={editBtn} onClick={() => { setEditingIndices(!editingIndices); setEditingCommodities(false); }}>
@@ -250,7 +250,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
                   <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
                 </div>
                 <div style={{ ...mono, fontSize: 12, textAlign: "right" }}>
-                  <div style={{ fontWeight: 500, color: "#131722" }}>{idx.price?.toLocaleString("sv-SE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontWeight: 500, color: "var(--text)" }}>{idx.price?.toLocaleString("sv-SE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</div>
                   <Chg value={idx.change} />
                 </div>
               </div>
@@ -259,7 +259,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         </div>
 
         {/* Commodity highlights */}
-        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid #f0f3fa", borderBottom: isMobile ? "1px solid #f0f3fa" : "none" }}>
+        <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
           <div style={sectionHeader}>
             <span>Ravaror & FX{pinnedCommodities.length > 0 ? "" : " (topp 4)"}</span>
             <button style={editBtn} onClick={() => { setEditingCommodities(!editingCommodities); setEditingIndices(false); }}>
@@ -282,7 +282,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
                   <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>
                 </div>
                 <div style={{ ...mono, fontSize: 12, textAlign: "right" }}>
-                  <div style={{ fontWeight: 500, color: "#131722" }}>{c.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {c.unit || ""}</div>
+                  <div style={{ fontWeight: 500, color: "var(--text)" }}>{c.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {c.unit || ""}</div>
                   <Chg value={c.change} />
                 </div>
               </div>
@@ -294,21 +294,21 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
           <div style={sectionHeader}><span>Nyheter</span></div>
           {data.news.length === 0 ? (
-            <div style={{ fontSize: 11, color: "#b2b5be", fontStyle: "italic" }}>Inga nyheter</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga nyheter</div>
           ) : (
             data.news.map((n, i) => (
-              <div key={i} style={{ padding: "5px 0", borderBottom: "1px solid #f0f3fa" }}>
+              <div key={i} style={{ padding: "5px 0", borderBottom: "1px solid var(--border-light)" }}>
                 <a
                   href={n.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: 12, color: "#131722", textDecoration: "none", lineHeight: 1.4, display: "block" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#2962ff"}
-                  onMouseLeave={e => e.currentTarget.style.color = "#131722"}
+                  style={{ fontSize: 12, color: "var(--text)", textDecoration: "none", lineHeight: 1.4, display: "block" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+                  onMouseLeave={e => e.currentTarget.style.color = "var(--text)"}
                 >
                   {n.headline}
                 </a>
-                <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 2 }}>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
                   {n.companyName && <span>{n.companyName}</span>}
                   {n.source && <span> · {n.source}</span>}
                 </div>

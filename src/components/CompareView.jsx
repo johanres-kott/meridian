@@ -58,8 +58,8 @@ export default function CompareView({ companies, onBack }) {
         <button
           onClick={onBack}
           style={{
-            background: "none", border: "1px solid #e0e3eb", borderRadius: 4,
-            padding: "6px 14px", fontSize: 12, color: "#131722", cursor: "pointer",
+            background: "none", border: "1px solid var(--border)", borderRadius: 4,
+            padding: "6px 14px", fontSize: 12, color: "var(--text)", cursor: "pointer",
             fontFamily: "inherit",
           }}
         >
@@ -67,7 +67,7 @@ export default function CompareView({ companies, onBack }) {
         </button>
         <div>
           <h1 style={{ fontSize: 18, fontWeight: 500, margin: 0 }}>Jämförelse</h1>
-          <p style={{ fontSize: 12, color: "#787b86", margin: "2px 0 0 0" }}>
+          <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: "2px 0 0 0" }}>
             {companies.map(c => c.name || c.ticker).join(" vs ")}
           </p>
         </div>
@@ -81,23 +81,23 @@ export default function CompareView({ companies, onBack }) {
       }}>
         {companies.map((c, i) => (
           <div key={c.ticker} style={{
-            border: "1px solid #e0e3eb", borderRadius: 6, padding: 16,
+            border: "1px solid var(--border)", borderRadius: 6, padding: 16,
             borderTop: `3px solid ${COMPANY_COLORS[i]}`,
           }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#131722" }}>{c.name || c.ticker}</div>
-            <div style={{ fontSize: 11, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace", marginTop: 2 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text)" }}>{c.name || c.ticker}</div>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", marginTop: 2 }}>
               {c.ticker}
             </div>
             {c.price != null && (
-              <div style={{ fontSize: 18, fontWeight: 500, marginTop: 8, color: "#131722" }}>
+              <div style={{ fontSize: 18, fontWeight: 500, marginTop: 8, color: "var(--text)" }}>
                 {c.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                <span style={{ fontSize: 12, color: "#787b86", marginLeft: 4 }}>{c.currency || ""}</span>
+                <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 4 }}>{c.currency || ""}</span>
               </div>
             )}
             {c.changePercent != null && (
               <div style={{
                 fontSize: 12, marginTop: 4,
-                color: c.changePercent > 0 ? "#089981" : c.changePercent < 0 ? "#f23645" : "#787b86",
+                color: c.changePercent > 0 ? "#089981" : c.changePercent < 0 ? "#f23645" : "var(--text-secondary)",
               }}>
                 {c.changePercent >= 0 ? "+" : ""}{c.changePercent.toFixed(2)}%
               </div>
@@ -107,12 +107,12 @@ export default function CompareView({ companies, onBack }) {
       </div>
 
       {/* Radar chart */}
-      <div style={{ border: "1px solid #e0e3eb", borderRadius: 6, padding: 16, marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "#131722", marginBottom: 12 }}>Relativt styrkeindex</div>
+      <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16, marginBottom: 24 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>Relativt styrkeindex</div>
         <ResponsiveContainer width="100%" height={isMobile ? 280 : 350}>
           <RadarChart data={radarData} cx="50%" cy="50%" outerRadius={isMobile ? "65%" : "70%"}>
-            <PolarGrid stroke="#e0e3eb" />
-            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11, fill: "#787b86" }} />
+            <PolarGrid stroke="var(--border)" />
+            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11, fill: "var(--text-secondary)" }} />
             <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
             {companies.map((c, i) => (
               <Radar
@@ -126,27 +126,27 @@ export default function CompareView({ companies, onBack }) {
               />
             ))}
             <Legend
-              wrapperStyle={{ fontSize: 11, color: "#787b86" }}
+              wrapperStyle={{ fontSize: 11, color: "var(--text-secondary)" }}
             />
           </RadarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Metrics comparison table */}
-      <div style={{ border: "1px solid #e0e3eb", borderRadius: 6, overflow: "auto" }}>
+      <div style={{ border: "1px solid var(--border)", borderRadius: 6, overflow: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 400 : 0 }}>
           <thead>
             <tr>
               <th style={{
                 padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500,
-                color: "#787b86", borderBottom: "1px solid #e0e3eb",
+                color: "var(--text-secondary)", borderBottom: "1px solid var(--border)",
               }}>
                 Nyckeltal
               </th>
               {companies.map((c, i) => (
                 <th key={c.ticker} style={{
                   padding: "8px 10px", textAlign: "right", fontSize: 11, fontWeight: 500,
-                  color: COMPANY_COLORS[i], borderBottom: "1px solid #e0e3eb",
+                  color: COMPANY_COLORS[i], borderBottom: "1px solid var(--border)",
                 }}>
                   {c.name || c.ticker}
                 </th>
@@ -157,8 +157,8 @@ export default function CompareView({ companies, onBack }) {
             {METRIC_COLUMNS.map(col => (
               <tr key={col.key}>
                 <td style={{
-                  padding: "8px 10px", fontSize: 12, color: "#131722",
-                  borderBottom: "1px solid #f0f3fa",
+                  padding: "8px 10px", fontSize: 12, color: "var(--text)",
+                  borderBottom: "1px solid var(--border-light)",
                 }}>
                   {col.label}
                 </td>
@@ -169,8 +169,8 @@ export default function CompareView({ companies, onBack }) {
                     <td key={c.ticker} style={{
                       padding: "8px 10px", textAlign: "right",
                       fontFamily: "'IBM Plex Mono', monospace", fontSize: 12,
-                      borderBottom: "1px solid #f0f3fa",
-                      color: cellColor || "#131722",
+                      borderBottom: "1px solid var(--border-light)",
+                      color: cellColor || "var(--text)",
                     }}>
                       {col.fmt ? col.fmt(val) : (val ?? "\u2014")}
                     </td>

@@ -13,8 +13,8 @@ function ScoreBar({ label, value }) {
   const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
-      <span style={{ width: 90, color: "#787b86", flexShrink: 0 }}>{label}</span>
-      <div style={{ flex: 1, height: 6, background: "#f0f3fa", borderRadius: 3, overflow: "hidden" }}>
+      <span style={{ width: 90, color: "var(--text-secondary)", flexShrink: 0 }}>{label}</span>
+      <div style={{ flex: 1, height: 6, background: "var(--border-light)", borderRadius: 3, overflow: "hidden" }}>
         <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
       </div>
       <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
@@ -155,7 +155,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
     <div>
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: 18, fontWeight: 500 }}>Company Search</h1>
-        <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
+        <p style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
           Sök på bolagsnamn eller ticker — t.ex. "Ericsson", "Volvo", "Apple"
         </p>
       </div>
@@ -171,13 +171,13 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               placeholder='Sök bolag — "Ericsson B", "Volvo", "AAPL"...'
               style={{
-                width: "100%", padding: "10px 14px", border: "1px solid #e0e3eb",
+                width: "100%", padding: "10px 14px", border: "1px solid var(--border)",
                 borderRadius: 4, fontSize: 13, outline: "none",
                 fontFamily: "'Inter', sans-serif",
               }}
             />
             {suggestLoading && (
-              <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "#787b86" }}>
+              <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--text-secondary)" }}>
                 Söker...
               </div>
             )}
@@ -195,51 +195,51 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
         {showSuggestions && suggestions.length > 0 && (
           <div style={{
             position: "absolute", top: "100%", left: 0, right: 48,
-            background: "#fff", border: "1px solid #e0e3eb", borderRadius: 4,
+            background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 4,
             boxShadow: "0 4px 16px rgba(0,0,0,0.08)", zIndex: 100, marginTop: 4,
           }}>
             {suggestions.map(s => {
               const key = s.ticker.replace(/ /g, "-");
               const e = enriched[key];
-              const changeColor = e ? (e.changePercent >= 0 ? "#089981" : "#f23645") : "#787b86";
+              const changeColor = e ? (e.changePercent >= 0 ? "#089981" : "#f23645") : "var(--text-secondary)";
               return (
                 <div
                   key={s.ticker}
                   onClick={() => selectSuggestion(s)}
-                  style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid #f0f3fa" }}
-                  onMouseEnter={ev => ev.currentTarget.style.background = "#f8f9fd"}
+                  style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid var(--border-light)" }}
+                  onMouseEnter={ev => ev.currentTarget.style.background = "var(--bg-secondary)"}
                   onMouseLeave={ev => ev.currentTarget.style.background = "transparent"}
                 >
                   {/* Top row: name, exchange, ticker */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <span style={{ fontWeight: 500, fontSize: 13 }}>{s.name}</span>
-                      <span style={{ fontSize: 11, color: "#787b86", marginLeft: 8 }}>{s.exchange}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>{s.exchange}</span>
                     </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "#2962ff", flexShrink: 0, marginLeft: 8 }}>{s.ticker}</span>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "var(--accent)", flexShrink: 0, marginLeft: 8 }}>{s.ticker}</span>
                   </div>
                   {/* Bottom row: enriched data */}
                   {e ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 5, flexWrap: "wrap" }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, fontWeight: 500, color: "#131722" }}>
-                        {e.price?.toFixed(2)} <span style={{ fontSize: 11, fontWeight: 400, color: "#787b86" }}>{e.currency}</span>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, fontWeight: 500, color: "var(--text)" }}>
+                        {e.price?.toFixed(2)} <span style={{ fontSize: 11, fontWeight: 400, color: "var(--text-secondary)" }}>{e.currency}</span>
                       </span>
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, fontWeight: 500, color: changeColor }}>
                         {e.changePercent >= 0 ? "+" : ""}{e.changePercent?.toFixed(2)}%
                       </span>
                       {e.sector && e.sector !== "—" && (
-                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "#f0f3fa", color: "#787b86" }}>{e.sector}</span>
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "var(--border-light)", color: "var(--text-secondary)" }}>{e.sector}</span>
                       )}
                       {e.peForward > 0 && (
-                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "#f0f3fa", color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>P/E {e.peForward}x</span>
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "var(--border-light)", color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>P/E {e.peForward}x</span>
                       )}
                       {e.marketCap > 0 && (
-                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "#f0f3fa", color: "#787b86", fontFamily: "'IBM Plex Mono', monospace" }}>MCap {e.marketCap}B</span>
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 3, background: "var(--border-light)", color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>MCap {e.marketCap}B</span>
                       )}
                     </div>
                   ) : (
                     enrichRef.current > 0 && (
-                      <div style={{ marginTop: 4, fontSize: 10, color: "#b2b5be" }}>Laddar...</div>
+                      <div style={{ marginTop: 4, fontSize: 10, color: "var(--text-muted)" }}>Laddar...</div>
                     )
                   )}
                 </div>
@@ -256,21 +256,21 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
       )}
 
       {result && (
-        <div style={{ border: "1px solid #e0e3eb", borderRadius: 4, padding: isMobile ? 12 : 24 }}>
+        <div style={{ border: "1px solid var(--border)", borderRadius: 4, padding: isMobile ? 12 : 24 }}>
           {/* Header */}
           <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 {result.sector}{result.industry !== "—" ? ` · ${result.industry}` : ""}
               </div>
               <div style={{ fontSize: 22, fontWeight: 500 }}>
                 {result.name}
-                <span style={{ fontSize: 14, color: "#787b86", fontFamily: "'IBM Plex Mono', monospace", marginLeft: 10 }}>{result.ticker}</span>
+                <span style={{ fontSize: 14, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", marginLeft: 10 }}>{result.ticker}</span>
               </div>
               <div style={{ fontSize: 24, fontWeight: 300, marginTop: 4, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {result.price?.toFixed(2)}
-                <span style={{ fontSize: 13, color: "#787b86", marginLeft: 8 }}>{result.currency}</span>
-                {result.marketCap > 0 && <span style={{ fontSize: 13, color: "#787b86", marginLeft: 16 }}>Mkt Cap: {result.marketCap}B {result.currency}</span>}
+                <span style={{ fontSize: 13, color: "var(--text-secondary)", marginLeft: 8 }}>{result.currency}</span>
+                {result.marketCap > 0 && <span style={{ fontSize: 13, color: "var(--text-secondary)", marginLeft: 16 }}>Mkt Cap: {result.marketCap}B {result.currency}</span>}
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
@@ -283,7 +283,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
                 </button>
               )}
               {result.week52High > 0 && (
-                <div style={{ textAlign: "right", fontSize: 12, color: "#787b86" }}>
+                <div style={{ textAlign: "right", fontSize: 12, color: "var(--text-secondary)" }}>
                   <span>52v: <span style={{ color: "#f23645" }}>{result.week52Low?.toFixed(0)}</span> – <span style={{ color: "#089981" }}>{result.week52High.toFixed(0)}</span> {result.currency}</span>
                 </div>
               )}
@@ -311,16 +311,16 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
             return (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
                   {isFiltered && (
                     <button onClick={() => setShowAllMetrics(true)}
-                      style={{ fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                      style={{ fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                       Visa alla →
                     </button>
                   )}
                   {showAllMetrics && preferences.investorProfile?.experience !== "advanced" && (
                     <button onClick={() => setShowAllMetrics(false)}
-                      style={{ fontSize: 10, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                      style={{ fontSize: 10, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                       Visa färre
                     </button>
                   )}
@@ -347,23 +347,23 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
                 items.push({ icon: "◉", color: rc, text: isInvestmentCompany(result.ticker) ? `${riskLabel(risk)} — diversifierat investmentbolag` : result.beta != null ? betaDescription(result.beta) : `${riskLabel(risk)} (baserat på börsvärde)` });
               }
               if (result.dividendYield > 0) items.push({ icon: "💰", color: "#089981", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
-              else items.push({ icon: "–", color: "#787b86", text: "Ingen utdelning" });
+              else items.push({ icon: "–", color: "var(--text-secondary)", text: "Ingen utdelning" });
               tags.forEach(t => items.push({ icon: "✓", color: "#089981", text: t }));
               warnings.forEach(w => items.push({ icon: "⚠", color: "#e65100", text: w }));
               return (
-                <div style={{ border: "1px solid #e0e3eb", borderRadius: 6, padding: 16 }}>
-                  <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
+                <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {items.map((it, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
                         <span style={{ color: it.color, fontSize: 12, width: 16, textAlign: "center", flexShrink: 0 }}>{it.icon}</span>
-                        <span style={{ color: "#131722" }}>{it.text}</span>
+                        <span style={{ color: "var(--text)" }}>{it.text}</span>
                       </div>
                     ))}
                   </div>
                   {scoreData?.scores && (
-                    <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid #f0f3fa" }}>
-                      <div style={{ fontSize: 10, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
+                    <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
+                      <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                         <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} />
                         <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} />
@@ -379,7 +379,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
                         return (
                           <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
-                            <span style={{ fontSize: 11, color: "#787b86" }}>/ 100 — totalpoäng för {PROFILE_LABELS[profileType] || profileType}</span>
+                            <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>/ 100 — totalpoäng för {PROFILE_LABELS[profileType] || profileType}</span>
                           </div>
                         );
                       })()}
@@ -400,47 +400,47 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
           {(result.targetPrice > 0 || result.recommendation !== "—") && (
             <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
               {result.targetPrice > 0 && (
-                <div style={{ flex: 1, minWidth: 160, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>Kursmål (snitt)</div>
+                <div style={{ flex: 1, minWidth: 160, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Kursmål (snitt)</div>
                   <div style={{ fontSize: 18, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
                     {result.targetPrice.toFixed(2)} {result.currency}
                   </div>
                   {result.targetLow > 0 && result.targetHigh > 0 && (
-                    <div style={{ fontSize: 10, color: "#787b86", marginTop: 4 }}>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 4 }}>
                       Spann: {result.targetLow.toFixed(0)} – {result.targetHigh.toFixed(0)} {result.currency}
                     </div>
                   )}
                   {result.price > 0 && (
-                    <div style={{ fontSize: 11, color: "#787b86", marginTop: 4 }}>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
                       Uppsida: <span style={{ color: result.targetPrice > result.price ? "#089981" : "#f23645" }}>
                         {(((result.targetPrice / result.price) - 1) * 100).toFixed(1)}%
                       </span>
                     </div>
                   )}
                   {result.numberOfAnalysts > 0 && (
-                    <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 6 }}>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
                       {result.numberOfAnalysts} analytiker · Yahoo Finance
                     </div>
                   )}
                 </div>
               )}
               {result.recommendation !== "—" && (
-                <div style={{ flex: 1, minWidth: 160, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
-                  <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>Rekommendation</div>
-                  <div style={{ fontSize: 16, fontWeight: 500, color: result.recommendation?.includes("buy") ? "#089981" : result.recommendation?.includes("sell") ? "#f23645" : "#131722", textTransform: "uppercase" }}>
+                <div style={{ flex: 1, minWidth: 160, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Rekommendation</div>
+                  <div style={{ fontSize: 16, fontWeight: 500, color: result.recommendation?.includes("buy") ? "#089981" : result.recommendation?.includes("sell") ? "#f23645" : "var(--text)", textTransform: "uppercase" }}>
                     {result.recommendation}
                   </div>
                   {result.numberOfAnalysts > 0 && (
-                    <div style={{ fontSize: 10, color: "#b2b5be", marginTop: 6 }}>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
                       {result.numberOfAnalysts} analytiker · Yahoo Finance consensus
                     </div>
                   )}
                 </div>
               )}
-              <div style={{ flex: 1, border: "1px solid #e0e3eb", borderRadius: 4, padding: "12px 14px" }}>
-                <div style={{ fontSize: 11, color: "#787b86", marginBottom: 4 }}>Datakällor</div>
-                <div style={{ fontSize: 12, color: "#131722" }}>{result.sources?.fundamentals}</div>
-                <div style={{ fontSize: 11, color: "#b2b5be", marginTop: 2 }}>Nyheter: {result.sources?.news}</div>
+              <div style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Datakällor</div>
+                <div style={{ fontSize: 12, color: "var(--text)" }}>{result.sources?.fundamentals}</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Nyheter: {result.sources?.news}</div>
               </div>
             </div>
           )}
@@ -448,12 +448,12 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
           {/* News */}
           {result.news?.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, color: "#787b86", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Senaste nyheter</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Senaste nyheter</div>
               {result.news.map((n, i) => (
                 <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f0f3fa", textDecoration: "none", color: "#131722" }}>
+                  style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border-light)", textDecoration: "none", color: "var(--text)" }}>
                   <span style={{ fontSize: 12 }}>{n.headline}</span>
-                  <span style={{ fontSize: 11, color: "#b2b5be", marginLeft: 16, whiteSpace: "nowrap" }}>{n.source}</span>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 16, whiteSpace: "nowrap" }}>{n.source}</span>
                 </a>
               ))}
             </div>

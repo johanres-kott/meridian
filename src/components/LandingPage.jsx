@@ -127,9 +127,9 @@ export default function LandingPage({ onShowPrivacy }) {
             </button>
           </div>
 
-          {/* App mockup */}
+          {/* App screenshot */}
           <div className="fu fu4" style={{
-            maxWidth: isMobile ? "100%" : 900, margin: "0 auto",
+            maxWidth: isMobile ? "100%" : 960, margin: "0 auto",
             background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)",
             borderRadius: "12px 12px 0 0", border: "1px solid rgba(255,255,255,0.08)", borderBottom: "none",
             padding: "12px 12px 0", position: "relative",
@@ -143,49 +143,12 @@ export default function LandingPage({ onShowPrivacy }) {
                 <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", fontFamily: mono }}>thesion.tech</span>
               </div>
             </div>
-            {/* Fake app screenshot */}
-            <div style={{
-              background: "#fff", borderRadius: "8px 8px 0 0", padding: isMobile ? "16px 12px" : "24px 28px",
-              minHeight: isMobile ? 180 : 280,
-            }}>
-              {/* Fake header */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, borderBottom: "1px solid #f0f3fa", paddingBottom: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Logo size={18} />
-                  <span style={{ fontSize: 13, fontWeight: 700, fontFamily: jakarta, color: "#131722" }}>Thesion</span>
-                </div>
-                <div style={{ display: "flex", gap: 16 }}>
-                  {["Översikt", "Portfölj", "Investera", "Analys"].map(t => (
-                    <span key={t} style={{ fontSize: 10, color: t === "Översikt" ? "#2962ff" : "#787b86", fontWeight: t === "Översikt" ? 600 : 400 }}>{t}</span>
-                  ))}
-                </div>
-              </div>
-              {/* Fake content grid */}
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
-                <div style={{ background: "#f8f9fd", borderRadius: 8, padding: 14 }}>
-                  <div style={{ fontSize: 9, color: "#787b86", textTransform: "uppercase", marginBottom: 6 }}>Toppförslag</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#131722" }}>Evolution</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: "#089981", fontFamily: mono }}>82</span>
-                    <span style={{ fontSize: 10, color: "#787b86" }}>F-Score 9/9</span>
-                  </div>
-                </div>
-                {!isMobile && (
-                  <>
-                    <div style={{ background: "#f8f9fd", borderRadius: 8, padding: 14 }}>
-                      <div style={{ fontSize: 9, color: "#787b86", textTransform: "uppercase", marginBottom: 6 }}>Portfölj</div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#131722" }}>+12.4%</div>
-                      <div style={{ fontSize: 10, color: "#089981", marginTop: 4 }}>↑ 42 300 SEK</div>
-                    </div>
-                    <div style={{ background: "#f8f9fd", borderRadius: 8, padding: 14 }}>
-                      <div style={{ fontSize: 9, color: "#787b86", textTransform: "uppercase", marginBottom: 6 }}>Riskprofil</div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#131722" }}>Medel risk</div>
-                      <div style={{ fontSize: 10, color: "#ff9800", marginTop: 4 }}>Beta 1.05</div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+            {/* Real app screenshot */}
+            <img
+              src="/app-screenshot.png"
+              alt="Thesion — Översikt"
+              style={{ width: "100%", borderRadius: "8px 8px 0 0", display: "block" }}
+            />
           </div>
         </div>
 

@@ -86,20 +86,20 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
       <div style={{ marginBottom: isMobile ? 12 : 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <h1 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 500 }}>Marknader</h1>
-          <p style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>
+          <p style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
             {today}
             <span style={{ marginLeft: 12, color: "#089981" }}>· Yahoo Finance</span>
           </p>
         </div>
         {lastUpdated && (
-          <button onClick={fetchAll} style={{ fontSize: 11, color: "#787b86", background: "none", border: "1px solid #e0e3eb", borderRadius: 3, padding: "4px 10px", cursor: "pointer" }}>
+          <button onClick={fetchAll} style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer" }}>
             ↻ Uppdatera
           </button>
         )}
       </div>
 
       {/* Global Indices */}
-      {idxLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "#787b86" }}>Hamtar index...</div>}
+      {idxLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hamtar index...</div>}
       {idxError && <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "#f23645", marginBottom: 20 }}>Fel: {idxError}</div>}
 
       {!idxLoading && !idxError && REGIONS.map(region => {
@@ -107,7 +107,7 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
         if (!items.length) return null;
         return (
           <div key={region} style={{ marginBottom: isMobile ? 20 : 28 }}>
-            <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #f0f3fa" }}>
+            <div style={{ fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid var(--border-light)" }}>
               {region}
             </div>
             <div style={{ overflowX: isMobile ? "auto" : "visible", WebkitOverflowScrolling: "touch" }}>
@@ -115,33 +115,33 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
               <thead>
                 <tr>
                   {(isMobile ? ["Symbol", "Price", "Change %", "Change"] : ["Symbol", "Name", "Price", "Valuta", "Change %", "Change", "High", "Low"]).map(h => (
-                    <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 10px", textAlign: ["Symbol","Name","Valuta"].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #e0e3eb", whiteSpace: "nowrap" }}>{h}</th>
+                    <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 10px", textAlign: ["Symbol","Name","Valuta"].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {items.map(idx => (
                   <tr key={idx.symbol} onClick={() => setSelected(idx)} style={{ cursor: "pointer" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
                     onMouseLeave={e => e.currentTarget.style.background = ""}>
-                    <td style={{ padding: isMobile ? "6px" : "8px 10px", fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : 12, borderBottom: "1px solid #f0f3fa", whiteSpace: "nowrap" }}>{idx.symbol}</td>
-                    {!isMobile && <td style={{ padding: "8px 10px", borderBottom: "1px solid #f0f3fa" }}>{idx.name}</td>}
-                    <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid #f0f3fa" }}>
+                    <td style={{ padding: isMobile ? "6px" : "8px 10px", fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : 12, borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>{idx.symbol}</td>
+                    {!isMobile && <td style={{ padding: "8px 10px", borderBottom: "1px solid var(--border-light)" }}>{idx.name}</td>}
+                    <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid var(--border-light)" }}>
                       {idx.price > 0 ? idx.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "\u2014"}
                     </td>
-                    {!isMobile && <td style={{ padding: "8px 10px", fontSize: 11, color: "#787b86", borderBottom: "1px solid #f0f3fa" }}>
+                    {!isMobile && <td style={{ padding: "8px 10px", fontSize: 11, color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {idx.currency || ""}
                     </td>}
-                    <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid #f0f3fa" }}>
+                    <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid var(--border-light)" }}>
                       {idx.price > 0 ? <Chg value={idx.change} /> : "\u2014"}
                     </td>
-                    <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : undefined, color: idx.changeAbs >= 0 ? "#089981" : "#f23645", borderBottom: "1px solid #f0f3fa" }}>
+                    <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : undefined, color: idx.changeAbs >= 0 ? "#089981" : "#f23645", borderBottom: "1px solid var(--border-light)" }}>
                       {idx.price > 0 ? `${idx.changeAbs >= 0 ? "+" : ""}${idx.changeAbs.toFixed(2)}` : "\u2014"}
                     </td>
-                    {!isMobile && <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#787b86", borderBottom: "1px solid #f0f3fa" }}>
+                    {!isMobile && <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {idx.high > 0 ? idx.high.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "\u2014"}
                     </td>}
-                    {!isMobile && <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#787b86", borderBottom: "1px solid #f0f3fa" }}>
+                    {!isMobile && <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {idx.low > 0 ? idx.low.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "\u2014"}
                     </td>}
                   </tr>
@@ -158,13 +158,13 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
         <h2 style={{ fontSize: isMobile ? 13 : 15, fontWeight: 500 }}>Ravaror & Valutor</h2>
       </div>
 
-      {comLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "#787b86" }}>Hamtar ravarudata...</div>}
+      {comLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hamtar ravarudata...</div>}
 
       {!comLoading && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 12 : 16 }}>
           {grouped.map(group => (
-            <div key={group.label} style={{ border: "1px solid #e0e3eb", borderRadius: 4, overflow: "hidden" }}>
-              <div style={{ padding: isMobile ? "8px 10px" : "10px 14px", background: "#f8f9fd", borderBottom: "1px solid #e0e3eb", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div key={group.label} style={{ border: "1px solid var(--border)", borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ padding: isMobile ? "8px 10px" : "10px 14px", background: "var(--bg-secondary)", borderBottom: "1px solid var(--border)", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 {group.label}
               </div>
               <div style={{ overflowX: isMobile ? "auto" : "visible", WebkitOverflowScrolling: "touch" }}>
@@ -172,24 +172,24 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
                 <thead>
                   <tr>
                     {(isMobile ? ["Symbol", "Pris", "Forandring"] : ["Symbol", "Ravara", "Pris", "Forandring", "Enhet"]).map(h => (
-                      <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 12px", textAlign: ["Symbol","Ravara","Enhet"].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "#787b86", borderBottom: "1px solid #f0f3fa", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 12px", textAlign: ["Symbol","Ravara","Enhet"].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {group.items.map(item => (
                     <tr key={item.display} onClick={() => setSelected(item)} style={{ cursor: "pointer" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#f8f9fd"}
+                      onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
                       onMouseLeave={e => e.currentTarget.style.background = ""}>
-                      <td style={{ padding: isMobile ? "6px" : "8px 12px", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : 12, borderBottom: "1px solid #f0f3fa", color: "#2962ff", whiteSpace: "nowrap" }}>{item.display}</td>
-                      {!isMobile && <td style={{ padding: "8px 12px", borderBottom: "1px solid #f0f3fa" }}>{item.name}</td>}
-                      <td style={{ padding: isMobile ? "6px" : "8px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid #f0f3fa" }}>
+                      <td style={{ padding: isMobile ? "6px" : "8px 12px", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : 12, borderBottom: "1px solid var(--border-light)", color: "var(--accent)", whiteSpace: "nowrap" }}>{item.display}</td>
+                      {!isMobile && <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)" }}>{item.name}</td>}
+                      <td style={{ padding: isMobile ? "6px" : "8px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid var(--border-light)" }}>
                         {item.price > 0 ? item.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : "\u2014"}
                       </td>
-                      <td style={{ padding: isMobile ? "6px" : "8px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid #f0f3fa" }}>
+                      <td style={{ padding: isMobile ? "6px" : "8px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid var(--border-light)" }}>
                         {item.price > 0 ? <Chg value={item.change} /> : "\u2014"}
                       </td>
-                      {!isMobile && <td style={{ padding: "8px 12px", fontSize: 11, color: "#787b86", borderBottom: "1px solid #f0f3fa" }}>{item.unit}</td>}
+                      {!isMobile && <td style={{ padding: "8px 12px", fontSize: 11, color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)" }}>{item.unit}</td>}
                     </tr>
                   ))}
                 </tbody>

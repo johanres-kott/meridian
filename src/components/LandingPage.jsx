@@ -5,7 +5,9 @@ import Login from "./Login.jsx";
 const Logo = ({ size = 30 }) => (
   <svg width={size} height={size} viewBox="0 0 56 56" fill="none">
     <rect width="56" height="56" rx="14" fill="#3B6AE6"/>
-    <path d="M8 32 L18 32 L22 22 L28 38 L32 18 L36 32 L48 32" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <path d="M10 18 Q16 10 22 18 Q28 26 34 18 Q40 10 46 18" stroke="white" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+    <line x1="28" y1="22" x2="28" y2="39" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+    <circle cx="28" cy="45" r="2.5" fill="white"/>
   </svg>
 );
 

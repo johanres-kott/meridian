@@ -87,18 +87,18 @@ export default function ChatPanel({ open, onClose, contextFn }) {
 
   return (
     <div style={{
-      width: 380, height: "100%", borderLeft: "1px solid #e0e3eb", display: "flex", flexDirection: "column", background: "#fff", flexShrink: 0,
+      width: 380, height: "100%", borderLeft: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--bg-card)", flexShrink: 0,
     }}>
       {/* Header */}
-      <div style={{ padding: "10px 16px", borderBottom: "1px solid #e0e3eb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: 13, fontWeight: 500 }}>AI-assistent</span>
-        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#787b86", lineHeight: 1 }}>✕</button>
+        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "var(--text-secondary)", lineHeight: 1 }}>✕</button>
       </div>
 
       {/* Messages */}
       <div style={{ flex: 1, overflow: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
         {messages.length === 0 && (
-          <div style={{ color: "#b2b5be", fontSize: 12, textAlign: "center", marginTop: 40 }}>
+          <div style={{ color: "var(--text-muted)", fontSize: 12, textAlign: "center", marginTop: 40 }}>
             Fråga om din portfölj, marknader, råvaror...
           </div>
         )}
@@ -111,8 +111,8 @@ export default function ChatPanel({ open, onClose, contextFn }) {
             fontSize: 12,
             lineHeight: 1.5,
             whiteSpace: "pre-wrap",
-            background: msg.role === "user" ? "#2962ff" : "#f0f3fa",
-            color: msg.role === "user" ? "#fff" : "#131722",
+            background: msg.role === "user" ? "var(--accent)" : "var(--border-light)",
+            color: msg.role === "user" ? "#fff" : "var(--text)",
           }}>
             {msg.content || (streaming && i === messages.length - 1 ? "..." : "")}
           </div>
@@ -121,7 +121,7 @@ export default function ChatPanel({ open, onClose, contextFn }) {
       </div>
 
       {/* Input */}
-      <div style={{ padding: "12px 16px", borderTop: "1px solid #e0e3eb", display: "flex", gap: 8 }}>
+      <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", gap: 8 }}>
         <input
           ref={inputRef}
           value={input}
@@ -130,7 +130,7 @@ export default function ChatPanel({ open, onClose, contextFn }) {
           placeholder="Skriv en fråga..."
           disabled={streaming}
           style={{
-            flex: 1, padding: "8px 12px", border: "1px solid #e0e3eb", borderRadius: 6, fontSize: 12,
+            flex: 1, padding: "8px 12px", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12, background: "var(--bg-card)", color: "var(--text)",
             fontFamily: "inherit", outline: "none",
           }}
         />
@@ -138,8 +138,8 @@ export default function ChatPanel({ open, onClose, contextFn }) {
           onClick={send}
           disabled={streaming || !input.trim()}
           style={{
-            padding: "8px 14px", background: streaming || !input.trim() ? "#e0e3eb" : "#2962ff",
-            color: streaming || !input.trim() ? "#787b86" : "#fff", border: "none", borderRadius: 6,
+            padding: "8px 14px", background: streaming || !input.trim() ? "var(--border)" : "var(--accent)",
+            color: streaming || !input.trim() ? "var(--text-secondary)" : "#fff", border: "none", borderRadius: 6,
             fontSize: 12, cursor: streaming || !input.trim() ? "default" : "pointer", fontFamily: "inherit",
           }}
         >

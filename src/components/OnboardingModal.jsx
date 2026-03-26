@@ -112,16 +112,16 @@ export default function OnboardingModal({ onComplete }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300 }}>
-      <div style={{ background: "#fff", borderRadius: 12, padding: isMobile ? 20 : 32, width: isMobile ? "95vw" : 520, maxHeight: "85vh", overflow: "auto", boxShadow: "0 12px 48px rgba(0,0,0,0.15)" }}>
+      <div style={{ background: "var(--bg-card)", borderRadius: 12, padding: isMobile ? 20 : 32, width: isMobile ? "95vw" : 520, maxHeight: "85vh", overflow: "auto", boxShadow: "0 12px 48px rgba(0,0,0,0.15)" }}>
 
         {step === -1 ? (
           <>
             <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
-              <div style={{ fontSize: 28, fontWeight: 700, color: "#131722", marginBottom: 8 }}>Välkommen till Thesion</div>
-              <div style={{ fontSize: 14, color: "#787b86", lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Välkommen till Thesion</div>
+              <div style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
                 För att kunna ge dig relevanta insikter och förslag behöver vi förstå dig lite bättre som investerare.
               </div>
-              <div style={{ fontSize: 13, color: "#787b86", marginTop: 12, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 12, lineHeight: 1.6 }}>
                 Det tar bara en minut — fyra snabba frågor om din investeringsstil, riskprofil och intressen.
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function OnboardingModal({ onComplete }) {
                 onClick={() => setStep(0)}
                 style={{
                   fontSize: 14, padding: "10px 28px", borderRadius: 8, border: "none",
-                  background: "#2962ff", color: "#fff", cursor: "pointer",
+                  background: "var(--accent)", color: "#fff", cursor: "pointer",
                   fontFamily: "inherit", fontWeight: 500,
                 }}
               >
@@ -143,13 +143,13 @@ export default function OnboardingModal({ onComplete }) {
         {/* Progress */}
         <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
           {STEPS.map((_, i) => (
-            <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= step ? "#2962ff" : "#e0e3eb", transition: "background 0.2s" }} />
+            <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= step ? "var(--accent)" : "var(--border)", transition: "background 0.2s" }} />
           ))}
         </div>
 
         {/* Title */}
-        <div style={{ fontSize: 20, fontWeight: 600, color: "#131722", marginBottom: 4 }}>{current.title}</div>
-        <div style={{ fontSize: 13, color: "#787b86", marginBottom: 20 }}>{current.subtitle}</div>
+        <div style={{ fontSize: 20, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>{current.title}</div>
+        <div style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 20 }}>{current.subtitle}</div>
 
         {/* Options */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: current.extra ? 20 : 0 }}>
@@ -164,14 +164,14 @@ export default function OnboardingModal({ onComplete }) {
                 style={{
                   display: "flex", flexDirection: "column", alignItems: "flex-start",
                   padding: "12px 16px", borderRadius: 8,
-                  border: selected ? "2px solid #2962ff" : "2px solid #e0e3eb",
-                  background: selected ? "#f0f4ff" : "#fff",
+                  border: selected ? "2px solid var(--accent)" : "2px solid var(--border)",
+                  background: selected ? "var(--accent-light)" : "var(--bg-card)",
                   cursor: "pointer", fontFamily: "inherit", textAlign: "left",
                   transition: "all 0.15s",
                 }}
               >
-                <div style={{ fontSize: 14, fontWeight: 500, color: selected ? "#2962ff" : "#131722" }}>{opt.label}</div>
-                {opt.desc && <div style={{ fontSize: 12, color: "#787b86", marginTop: 2 }}>{opt.desc}</div>}
+                <div style={{ fontSize: 14, fontWeight: 500, color: selected ? "var(--accent)" : "var(--text)" }}>{opt.label}</div>
+                {opt.desc && <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>{opt.desc}</div>}
               </button>
             );
           })}
@@ -180,7 +180,7 @@ export default function OnboardingModal({ onComplete }) {
         {/* Extra question (geography on step 3) */}
         {current.extra && (
           <div style={{ marginTop: 20 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#131722", marginBottom: 8 }}>{current.extra.title}</div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{current.extra.title}</div>
             <div style={{ display: "flex", gap: 8 }}>
               {current.extra.options.map(opt => {
                 const selected = answers[current.extra.id] === opt.value;
@@ -190,10 +190,10 @@ export default function OnboardingModal({ onComplete }) {
                     onClick={() => setAnswers({ ...answers, [current.extra.id]: opt.value })}
                     style={{
                       flex: 1, padding: "8px 12px", borderRadius: 6,
-                      border: selected ? "2px solid #2962ff" : "2px solid #e0e3eb",
-                      background: selected ? "#f0f4ff" : "#fff",
+                      border: selected ? "2px solid var(--accent)" : "2px solid var(--border)",
+                      background: selected ? "var(--accent-light)" : "var(--bg-card)",
                       cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 500,
-                      color: selected ? "#2962ff" : "#787b86",
+                      color: selected ? "var(--accent)" : "var(--text-secondary)",
                       transition: "all 0.15s",
                     }}
                   >
@@ -210,7 +210,7 @@ export default function OnboardingModal({ onComplete }) {
           <button
             onClick={back}
             disabled={step === 0}
-            style={{ fontSize: 13, color: step === 0 ? "#c0c3cb" : "#787b86", background: "none", border: "none", cursor: step === 0 ? "default" : "pointer", fontFamily: "inherit" }}
+            style={{ fontSize: 13, color: step === 0 ? "var(--text-muted)" : "var(--text-secondary)", background: "none", border: "none", cursor: step === 0 ? "default" : "pointer", fontFamily: "inherit" }}
           >
             ← Tillbaka
           </button>
@@ -219,8 +219,8 @@ export default function OnboardingModal({ onComplete }) {
             disabled={!canProceed}
             style={{
               fontSize: 13, padding: "8px 20px", borderRadius: 6, border: "none",
-              background: canProceed ? "#2962ff" : "#e0e3eb",
-              color: canProceed ? "#fff" : "#787b86",
+              background: canProceed ? "var(--accent)" : "var(--border)",
+              color: canProceed ? "#fff" : "var(--text-secondary)",
               cursor: canProceed ? "pointer" : "default",
               fontFamily: "inherit", fontWeight: 500,
               transition: "all 0.15s",

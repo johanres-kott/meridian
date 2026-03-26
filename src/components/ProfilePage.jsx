@@ -30,14 +30,14 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const cardStyle = { background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? 16 : 24, marginBottom: 16 };
-  const labelStyle = { fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
-  const fieldLabel = { fontSize: 11, color: "#787b86", marginBottom: 4 };
-  const fieldValue = { fontSize: 14, color: "#131722", fontWeight: 500 };
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 16 : 24, marginBottom: 16 };
+  const labelStyle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
+  const fieldLabel = { fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 };
+  const fieldValue = { fontSize: 14, color: "var(--text)", fontWeight: 500 };
 
   return (
     <div>
-      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "#131722", marginBottom: 20 }}>Profil</h1>
+      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 20 }}>Profil</h1>
 
       {/* Avatar + Name + Email */}
       <div style={cardStyle}>
@@ -45,7 +45,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
         <div style={{ display: "flex", gap: 20, alignItems: isMobile ? "flex-start" : "center", flexDirection: isMobile ? "column" : "row" }}>
           {/* Avatar */}
           <div style={{
-            width: 64, height: 64, borderRadius: "50%", background: "#2962ff", color: "#fff",
+            width: 64, height: 64, borderRadius: "50%", background: "var(--accent)", color: "#fff",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 24, fontWeight: 600, flexShrink: 0,
           }}>
@@ -63,16 +63,16 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
                     onChange={e => setNameInput(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") saveName(); if (e.key === "Escape") setEditingName(false); }}
                     autoFocus
-                    style={{ flex: 1, padding: "6px 10px", border: "1px solid #2962ff", borderRadius: 4, fontSize: 14, fontFamily: "inherit", outline: "none", maxWidth: 250 }}
+                    style={{ flex: 1, padding: "6px 10px", border: "1px solid var(--accent)", borderRadius: 4, fontSize: 14, fontFamily: "inherit", outline: "none", maxWidth: 250, background: "var(--bg-card)", color: "var(--text)" }}
                   />
-                  <button onClick={saveName} style={{ padding: "6px 14px", fontSize: 12, background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Spara</button>
-                  <button onClick={() => setEditingName(false)} style={{ padding: "6px 14px", fontSize: 12, background: "#fff", color: "#787b86", border: "1px solid #e0e3eb", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
+                  <button onClick={saveName} style={{ padding: "6px 14px", fontSize: 12, background: "var(--accent)", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Spara</button>
+                  <button onClick={() => setEditingName(false)} style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
                 </div>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={fieldValue}>{displayName}</span>
                   <button onClick={() => { setNameInput(displayName); setEditingName(true); }}
-                    style={{ fontSize: 11, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                    style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                     Ändra
                   </button>
                   {saved && <span style={{ fontSize: 11, color: "#089981" }}>Sparat!</span>}
@@ -83,7 +83,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
             {/* Email */}
             <div>
               <div style={fieldLabel}>E-post</div>
-              <div style={{ ...fieldValue, color: "#787b86", fontWeight: 400 }}>{email}</div>
+              <div style={{ ...fieldValue, color: "var(--text-secondary)", fontWeight: 400 }}>{email}</div>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={labelStyle}>Investerarprofil</div>
           <button onClick={onResetProfile}
-            style={{ fontSize: 11, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+            style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
             Ändra profil →
           </button>
         </div>
@@ -133,7 +133,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
             </div>
           </div>
         ) : (
-          <div style={{ fontSize: 13, color: "#787b86" }}>Ingen profil skapad ännu. Klicka "Ändra profil" för att komma igång.</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Ingen profil skapad ännu. Klicka "Ändra profil" för att komma igång.</div>
         )}
       </div>
 
@@ -143,21 +143,21 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <div style={{ fontSize: 13, color: "#131722" }}>Logga ut</div>
-              <div style={{ fontSize: 11, color: "#787b86" }}>Du loggas ut från alla enheter</div>
+              <div style={{ fontSize: 13, color: "var(--text)" }}>Logga ut</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>Du loggas ut från alla enheter</div>
             </div>
             <button onClick={() => supabase.auth.signOut()}
-              style={{ padding: "6px 14px", fontSize: 12, background: "#fff", color: "#787b86", border: "1px solid #e0e3eb", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>
+              style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>
               Logga ut
             </button>
           </div>
-          <div style={{ borderTop: "1px solid #f0f3fa", paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 13, color: "#c62828" }}>Radera konto</div>
-              <div style={{ fontSize: 11, color: "#787b86" }}>All data raderas permanent</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>All data raderas permanent</div>
             </div>
             <button disabled
-              style={{ padding: "6px 14px", fontSize: 12, background: "#fff", color: "#c62828", border: "1px solid #fce4ec", borderRadius: 4, cursor: "not-allowed", fontFamily: "inherit", opacity: 0.5 }}
+              style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "#c62828", border: "1px solid #fce4ec", borderRadius: 4, cursor: "not-allowed", fontFamily: "inherit", opacity: 0.5 }}
               title="Kontakta support för att radera konto">
               Radera
             </button>

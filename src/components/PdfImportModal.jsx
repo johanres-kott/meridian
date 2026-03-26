@@ -82,11 +82,11 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
-      <div style={{ background: "#fff", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
-        <div style={{ fontWeight: 600, fontSize: 16, color: "#131722", marginBottom: 20 }}>Importera portfölj från PDF</div>
+      <div style={{ background: "var(--bg-card)", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
+        <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 20 }}>Importera portfölj från PDF</div>
 
         {error && (
-          <div style={{ background: "#fff5f5", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
+          <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
             {error}
           </div>
         )}
@@ -99,18 +99,18 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
             onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
             onClick={() => fileRef.current?.click()}
             style={{
-              border: `2px dashed ${dragOver ? "#2962ff" : "#e0e3eb"}`,
+              border: `2px dashed ${dragOver ? "var(--accent)" : "var(--border)"}`,
               borderRadius: 8,
               padding: "48px 24px",
               textAlign: "center",
               cursor: "pointer",
-              background: dragOver ? "#f0f4ff" : "#fafbfd",
+              background: dragOver ? "var(--accent-light)" : "var(--bg-secondary)",
               transition: "all 0.15s",
             }}
           >
             <div style={{ fontSize: 28, marginBottom: 12 }}>PDF</div>
-            <div style={{ fontSize: 13, color: "#131722", marginBottom: 6 }}>Dra och släpp en PDF från Avanza</div>
-            <div style={{ fontSize: 12, color: "#787b86" }}>eller klicka för att välja fil</div>
+            <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 6 }}>Dra och släpp en PDF från Avanza</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>eller klicka för att välja fil</div>
             <input
               ref={fileRef}
               type="file"
@@ -124,23 +124,23 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
         {/* Parsing / resolving phase */}
         {(phase === PHASES.parsing || phase === PHASES.resolving) && (
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <div style={{ fontSize: 13, color: "#131722", marginBottom: 8 }}>
+            <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8 }}>
               {phase === PHASES.parsing ? "Läser PDF..." : progress}
             </div>
-            <div style={{ fontSize: 12, color: "#787b86" }}>Vänta medan filen bearbetas</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>Vänta medan filen bearbetas</div>
           </div>
         )}
 
         {/* Preview phase */}
         {phase === PHASES.preview && (
           <>
-            <div style={{ fontSize: 12, color: "#787b86", marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
               {rows.length} innehav hittade. Granska och justera innan import.
             </div>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                 <thead>
-                  <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
+                  <tr style={{ borderBottom: "2px solid var(--border)" }}>
                     <th style={thStyle}></th>
                     <th style={{ ...thStyle, textAlign: "left" }}>Värdepapper</th>
                     <th style={{ ...thStyle, textAlign: "left" }}>Ticker</th>
@@ -151,7 +151,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                 </thead>
                 <tbody>
                   {rows.map((row, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #f0f3fa" }}>
+                    <tr key={idx} style={{ borderBottom: "1px solid var(--border-light)" }}>
                       <td style={tdStyle}>
                         <input
                           type="checkbox"
@@ -159,7 +159,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                           onChange={(e) => updateRow(idx, "selected", e.target.checked)}
                         />
                       </td>
-                      <td style={{ ...tdStyle, color: "#131722", maxWidth: 180 }}>
+                      <td style={{ ...tdStyle, color: "var(--text)", maxWidth: 180 }}>
                         {row.name}
                       </td>
                       <td style={tdStyle}>
@@ -169,11 +169,12 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                           style={{
                             width: 110,
                             padding: "3px 6px",
-                            border: `1px solid ${row.matched ? "#e0e3eb" : "#f23645"}`,
+                            border: `1px solid ${row.matched ? "var(--border)" : "#f23645"}`,
                             borderRadius: 3,
                             fontSize: 11,
                             fontFamily: "monospace",
-                            color: "#131722",
+                            color: "var(--text)",
+                            background: "var(--bg-card)",
                           }}
                         />
                       </td>
@@ -182,7 +183,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                           type="number"
                           value={row.shares ?? ""}
                           onChange={(e) => updateRow(idx, "shares", parseFloat(e.target.value) || null)}
-                          style={{ width: 70, padding: "3px 6px", border: "1px solid #e0e3eb", borderRadius: 3, fontSize: 11, textAlign: "right", fontFamily: "inherit" }}
+                          style={{ width: 70, padding: "3px 6px", border: "1px solid var(--border)", borderRadius: 3, fontSize: 11, textAlign: "right", fontFamily: "inherit", background: "var(--bg-card)", color: "var(--text)" }}
                         />
                       </td>
                       <td style={{ ...tdStyle, textAlign: "right" }}>
@@ -190,7 +191,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                           type="number"
                           value={row.gav ?? ""}
                           onChange={(e) => updateRow(idx, "gav", parseFloat(e.target.value) || null)}
-                          style={{ width: 80, padding: "3px 6px", border: "1px solid #e0e3eb", borderRadius: 3, fontSize: 11, textAlign: "right", fontFamily: "inherit" }}
+                          style={{ width: 80, padding: "3px 6px", border: "1px solid var(--border)", borderRadius: 3, fontSize: 11, textAlign: "right", fontFamily: "inherit", background: "var(--bg-card)", color: "var(--text)" }}
                         />
                       </td>
                       <td style={tdStyle}>
@@ -220,7 +221,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
         {/* Importing phase */}
         {phase === PHASES.importing && (
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <div style={{ fontSize: 13, color: "#131722" }}>Importerar...</div>
+            <div style={{ fontSize: 13, color: "var(--text)" }}>Importerar...</div>
           </div>
         )}
 
@@ -235,7 +236,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
   );
 }
 
-const thStyle = { padding: "8px 6px", fontSize: 11, color: "#787b86", fontWeight: 500 };
+const thStyle = { padding: "8px 6px", fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 };
 const tdStyle = { padding: "8px 6px" };
-const btnSecondary = { padding: "7px 16px", border: "1px solid #e0e3eb", borderRadius: 4, background: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "#131722" };
-const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "#2962ff", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };
+const btnSecondary = { padding: "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
+const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "var(--accent)", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };

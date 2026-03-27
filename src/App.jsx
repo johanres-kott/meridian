@@ -131,16 +131,41 @@ export default function App() {
         ]);
         const watchlist = watchlistRes.data || [];
         const portfolio = await Promise.all(
-          watchlist.slice(0, 10).map(async (item) => {
+          watchlist.slice(0, 20).map(async (item) => {
             try {
               const r = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
               const d = await r.json();
-              return { ticker: item.ticker, name: d.name, price: d.price, currency: d.currency, changePercent: d.changePercent };
+              const shares = item.shares || 0;
+              const gav = item.gav || 0;
+              const valueSek = shares > 0 ? shares * d.price : 0;
+              const costSek = shares > 0 && gav > 0 ? shares * gav : 0;
+              const plSek = costSek > 0 ? valueSek - costSek : null;
+              const plPct = costSek > 0 ? ((valueSek - costSek) / costSek * 100) : null;
+              return {
+                ticker: item.ticker, name: d.name || item.name, price: d.price, currency: d.currency,
+                changePercent: d.changePercent, status: item.status,
+                shares, gav, valueSek: Math.round(valueSek),
+                plSek: plSek != null ? Math.round(plSek) : null,
+                plPct: plPct != null ? +plPct.toFixed(1) : null,
+                sector: d.sector,
+              };
             } catch { return null; }
           })
         );
+        const validPortfolio = portfolio.filter(Boolean);
+        const totalValue = validPortfolio.reduce((s, p) => s + (p.valueSek || 0), 0);
+        const totalCost = validPortfolio.reduce((s, p) => s + (p.shares > 0 && p.gav > 0 ? p.shares * p.gav : 0), 0);
+        const totalPl = totalCost > 0 ? totalValue - totalCost : null;
+        const totalPlPct = totalCost > 0 ? ((totalValue - totalCost) / totalCost * 100) : null;
         chatContextRef.current = {
-          portfolio: portfolio.filter(Boolean),
+          portfolio: validPortfolio,
+          portfolioSummary: {
+            totalValue, totalCost,
+            totalPl: totalPl != null ? Math.round(totalPl) : null,
+            totalPlPct: totalPlPct != null ? +totalPlPct.toFixed(1) : null,
+            holdingsWithShares: validPortfolio.filter(p => p.shares > 0).length,
+            totalHoldings: validPortfolio.length,
+          },
           indices: indicesRes.filter(i => i.price > 0),
           commodities: commoditiesRes.filter(c => c.price > 0),
           investorProfile: preferences.investorProfile || null,

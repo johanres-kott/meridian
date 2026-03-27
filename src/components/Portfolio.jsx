@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
 import PdfImportModal from "./PdfImportModal.jsx";
+import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock } from "../lib/profileMatcher.js";
@@ -296,6 +297,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [selected, setSelected] = useState(null);
   const [fxRates, setFxRates] = useState({ SEK: 1 });
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
@@ -473,6 +475,12 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
           onImport={importHoldings}
         />
       )}
+      {showGuide && (
+        <ImportGuide
+          onClose={() => setShowGuide(false)}
+          onStartImport={() => setShowImport(true)}
+        />
+      )}
       <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 20, gap: isMobile ? 12 : 0 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>Portfölj</div>
@@ -500,6 +508,11 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             title="Importera portfölj"
             style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? "⬆ Import" : "Importera portfölj"}
+          </button>
+          <button onClick={() => setShowGuide(true)}
+            title="Hur importerar jag?"
+            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
+            ?
           </button>
         </div>
       </div>

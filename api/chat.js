@@ -66,10 +66,23 @@ export default async function handler(req, res) {
 
   if (context) {
     const parts = [];
+    if (context.portfolioSummary) {
+      const s = context.portfolioSummary;
+      parts.push(`PORTFÖLJÖVERSIKT:\nTotalt värde: ${s.totalValue?.toLocaleString("sv-SE")} SEK\nTotal kostnad: ${s.totalCost?.toLocaleString("sv-SE")} SEK\nP&L: ${s.totalPl != null ? (s.totalPl >= 0 ? "+" : "") + s.totalPl.toLocaleString("sv-SE") + " SEK (" + (s.totalPlPct >= 0 ? "+" : "") + s.totalPlPct + "%)" : "Ej beräknat"}\nAntal innehav: ${s.totalHoldings} (${s.holdingsWithShares} med aktier)`);
+    }
     if (context.portfolio?.length > 0) {
-      parts.push("PORTFÖLJ:\n" + context.portfolio.map(c =>
-        `${c.name} (${c.ticker}): ${c.price} ${c.currency}, idag ${c.changePercent > 0 ? "+" : ""}${c.changePercent}%`
-      ).join("\n"));
+      const owned = context.portfolio.filter(c => c.shares > 0);
+      const watched = context.portfolio.filter(c => !c.shares);
+      if (owned.length > 0) {
+        parts.push("ÄGDA AKTIER:\n" + owned.map(c =>
+          `${c.name} (${c.ticker}): ${c.shares} st à ${c.price} ${c.currency}, värde ${c.valueSek?.toLocaleString("sv-SE")} SEK, P&L ${c.plSek != null ? (c.plSek >= 0 ? "+" : "") + c.plSek.toLocaleString("sv-SE") + " SEK (" + (c.plPct >= 0 ? "+" : "") + c.plPct + "%)" : "—"}, idag ${c.changePercent > 0 ? "+" : ""}${c.changePercent}%, sektor: ${c.sector || "—"}`
+        ).join("\n"));
+      }
+      if (watched.length > 0) {
+        parts.push("BEVAKADE (ej ägda):\n" + watched.slice(0, 10).map(c =>
+          `${c.name} (${c.ticker}): ${c.price} ${c.currency}, idag ${c.changePercent > 0 ? "+" : ""}${c.changePercent}%`
+        ).join("\n"));
+      }
     }
     if (context.indices?.length > 0) {
       parts.push("INDEX:\n" + context.indices.map(i =>

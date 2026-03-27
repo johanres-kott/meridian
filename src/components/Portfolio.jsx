@@ -576,7 +576,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
 
       <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
 
-      {hasAnyShares && userId && <PortfolioChart userId={userId} />}
+      {items.some(i => i.shares) && userId && <PortfolioChart userId={userId} />}
 
       {filteredItems.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>

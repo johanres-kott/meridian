@@ -137,6 +137,37 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
         )}
       </div>
 
+      {/* Privacy & AI */}
+      <div style={cardStyle}>
+        <div style={labelStyle}>Integritet & AI</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ fontSize: 13, color: "var(--text)" }}>Dela portföljdata med AI</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>AI-assistenten kan ge personliga svar baserat på dina innehav</div>
+            </div>
+            <button
+              onClick={() => onUpdatePreferences({ sharePortfolioWithAI: !(preferences.sharePortfolioWithAI !== false) })}
+              style={{
+                width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+                background: (preferences.sharePortfolioWithAI !== false) ? "#089981" : "var(--border)",
+                position: "relative", transition: "background 0.2s",
+              }}
+            >
+              <div style={{
+                width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                position: "absolute", top: 3,
+                left: (preferences.sharePortfolioWithAI !== false) ? 23 : 3,
+                transition: "left 0.2s",
+              }} />
+            </button>
+          </div>
+          <div style={{ fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5 }}>
+            Din portföljdata skickas till Anthropic (Claude) under chattsamtal för att ge relevanta svar. Data sparas inte av Anthropic och används inte för träning. Du kan stänga av detta när som helst.
+          </div>
+        </div>
+      </div>
+
       {/* Account actions */}
       <div style={cardStyle}>
         <div style={labelStyle}>Konto</div>

@@ -377,7 +377,7 @@ export default function App() {
           {tab === "profile" && <ProfilePage session={session} preferences={preferences} onUpdatePreferences={updatePreferences} onResetProfile={() => updatePreferences({ investorProfile: null })} />}
           {tab === "docs" && <Documentation />}
         </div>
-        <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} />
+        <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} sharePortfolio={preferences.sharePortfolioWithAI !== false} />
       </div>
     </div>
   );

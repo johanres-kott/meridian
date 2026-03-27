@@ -36,12 +36,32 @@ export default function Privacy({ onBack }) {
         hämta kurser och generera nyckeltal. Vi säljer aldrig din data till tredje part.
       </Section>
 
-      <Section title="5. Cookies">
+      <Section title="5. AI-assistenten och din portföljdata">
+        Thesion har en inbyggd AI-assistent (driven av Anthropic Claude). När du använder chatten
+        kan din portföljdata — inklusive aktieinnehav, antal aktier, GAV och P&L — skickas till
+        Anthropic för att ge personliga svar.
+        <ul style={ulStyle}>
+          <li><strong>Opt-in/Opt-out</strong> — Du kan stänga av delning av portföljdata med AI:n under Profil → Integritet & AI.</li>
+          <li><strong>Ingen träning</strong> — Anthropic använder inte din data för att träna sina modeller (Anthropics användningsvillkor).</li>
+          <li><strong>Ingen lagring</strong> — Portföljdatan sparas inte av Anthropic efter samtalet.</li>
+          <li><strong>Marknadsdata</strong> — Index, råvaror och offentliga aktiekurser delas alltid (ej personlig data).</li>
+        </ul>
+      </Section>
+
+      <Section title="6. Vem har tillgång till din data">
+        <ul style={ulStyle}>
+          <li><strong>Du</strong> — Bara du kan se din portfölj, dina innehav och dina inställningar (skyddat av Row Level Security).</li>
+          <li><strong>Administratörer</strong> — Projektägaren har teknisk tillgång till Supabase-databasen för felsökning och support. Denna åtkomst loggas.</li>
+          <li><strong>Tredje parter</strong> — Supabase (datalagring, EU), Anthropic (AI-chat, vid aktiverad delning), Vercel (hosting). Ingen av dessa får tillgång utan ditt medgivande.</li>
+        </ul>
+      </Section>
+
+      <Section title="7. Cookies">
         Vi använder enbart nödvändiga cookies för autentisering (Supabase Auth). Inga
         reklam- eller analyticscookies används.
       </Section>
 
-      <Section title="6. Dina rättigheter (GDPR)">
+      <Section title="8. Dina rättigheter (GDPR)">
         Du har rätt att:
         <ul style={ulStyle}>
           <li>Begära ut all data vi har om dig.</li>
@@ -51,7 +71,7 @@ export default function Privacy({ onBack }) {
         </ul>
       </Section>
 
-      <Section title="7. Kontakt">
+      <Section title="9. Kontakt">
         Har du frågor om din data eller vill utöva dina rättigheter? Kontakta oss
         på <strong>privacy@thesion.tech</strong>.
       </Section>

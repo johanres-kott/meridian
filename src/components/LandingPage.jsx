@@ -368,6 +368,10 @@ export default function LandingPage({ onShowPrivacy }) {
               <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Skapad av</div>
               <div style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>Johan Resare</div>
             </div>
+            <a href="mailto:info@thesion.tech" style={{ padding: "12px 16px", borderRadius: 8, background: "#f8f9fd", border: "1px solid #eceef1", textDecoration: "none", display: "block" }}>
+              <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Kontakt</div>
+              <div style={{ fontSize: 13, color: "var(--accent)", fontWeight: 500 }}>info@thesion.tech</div>
+            </a>
           </div>
         </div>
       </section>
@@ -384,6 +388,9 @@ export default function LandingPage({ onShowPrivacy }) {
           <span style={{ fontSize: 12, color: "#b2b5be" }}>Thesion — thesion.tech</span>
         </div>
         <div style={{ display: "flex", gap: 16 }}>
+          <a href="mailto:info@thesion.tech" style={{ fontSize: 12, color: "#b2b5be", textDecoration: "none" }}>
+            Kontakt
+          </a>
           <button onClick={onShowPrivacy} style={{ fontSize: 12, color: "#b2b5be", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
             Integritetspolicy
           </button>

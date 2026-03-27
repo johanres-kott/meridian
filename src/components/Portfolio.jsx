@@ -5,6 +5,7 @@ import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock } from "../lib/profileMatcher.js";
 import { sanitizeInput } from "../lib/sanitize.js";
+import PortfolioChart from "./PortfolioChart.jsx";
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
@@ -290,7 +291,7 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
   );
 }
 
-export default function Portfolio({ preferences = {}, onUpdatePreferences, deepLink, onClearDeepLink }) {
+export default function Portfolio({ preferences = {}, onUpdatePreferences, deepLink, onClearDeepLink, userId }) {
   const isMobile = useIsMobile();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -574,6 +575,9 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       </div>
 
       <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
+
+      {hasAnyShares && userId && <PortfolioChart userId={userId} />}
+
       {filteredItems.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
           {activeGroup

@@ -1,6 +1,7 @@
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
+import PortfolioChart from "./PortfolioChart.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
 
@@ -26,6 +27,11 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
       </div>
       <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
+      {userId && (
+        <div style={{ marginBottom: isMobile ? 12 : 20 }}>
+          <PortfolioChart userId={userId} compact />
+        </div>
+      )}
       <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} onNavigate={onNavigate} />
       <UpcomingEarnings userId={userId} isMobile={isMobile} />
     </div>

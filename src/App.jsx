@@ -344,7 +344,7 @@ export default function App() {
         <div style={{ flex: 1, overflow: "auto", padding: isMobile ? "16px 12px" : "24px 32px", paddingBottom: isMobile ? "calc(16px + env(safe-area-inset-bottom, 0px))" : "24px", paddingLeft: isMobile ? "calc(12px + env(safe-area-inset-left, 0px))" : "32px", paddingRight: isMobile ? "calc(12px + env(safe-area-inset-right, 0px))" : "32px" }}>
           {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} onNavigate={navigate} />}
           {tab === "commodities" && <Commodities deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-          {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+          {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} userId={session.user.id} />}
           {tab === "analysis" && <GapAnalysis preferences={preferences} onNavigate={navigate} />}
           {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} preferences={preferences} />}
           {tab === "investment" && <InvestmentCompanies preferences={preferences} userId={session.user.id} onNavigate={navigate} />}

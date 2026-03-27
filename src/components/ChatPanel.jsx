@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../supabase.js";
 
-export default function ChatPanel({ open, onClose, contextFn }) {
+export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -30,7 +30,13 @@ export default function ChatPanel({ open, onClose, contextFn }) {
     setMessages([...newMessages, assistantMsg]);
 
     try {
-      const context = contextFn ? contextFn() : {};
+      const fullContext = contextFn ? contextFn() : {};
+      // Strip portfolio data if user opted out
+      const context = sharePortfolio ? fullContext : {
+        indices: fullContext.indices,
+        commodities: fullContext.commodities,
+        investorProfile: fullContext.investorProfile,
+      };
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -98,8 +104,15 @@ export default function ChatPanel({ open, onClose, contextFn }) {
       {/* Messages */}
       <div style={{ flex: 1, overflow: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
         {messages.length === 0 && (
-          <div style={{ color: "var(--text-muted)", fontSize: 12, textAlign: "center", marginTop: 40 }}>
-            Fråga om din portfölj, marknader, råvaror...
+          <div style={{ textAlign: "center", marginTop: 40 }}>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 12 }}>
+              Fråga om din portfölj, marknader, råvaror...
+            </div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "6px 10px", background: "var(--bg-secondary)", borderRadius: 6, display: "inline-block" }}>
+              {sharePortfolio
+                ? "🔓 AI:n har tillgång till din portfölj för personliga svar"
+                : "🔒 Portföljdata delas inte med AI:n"}
+            </div>
           </div>
         )}
         {messages.map((msg, i) => (

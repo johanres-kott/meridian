@@ -26,11 +26,17 @@ export default function PortfolioChart({ userId, compact = false }) {
         return r.json();
       })
       .then(d => {
-        const pts = (d.points || d || []).map(p => ({
-          date: p.date,
-          value: p.value,
-          estimated: !!p.estimated,
-        }));
+        const raw = d.snapshots || d.points || d || [];
+        // Filter out incomplete days (where only a few holdings had data)
+        const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
+        const threshold = maxHoldings * 0.5; // at least 50% of holdings
+        const pts = raw
+          .filter(p => (p.holdingsCount || 0) >= threshold)
+          .map(p => ({
+            date: p.date,
+            value: p.totalValue ?? p.value ?? 0,
+            estimated: !!p.estimated,
+          }));
         setAllPoints(pts);
         setLoading(false);
       })

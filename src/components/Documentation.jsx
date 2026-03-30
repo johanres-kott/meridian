@@ -35,8 +35,34 @@ export default function Documentation() {
     <div>
       <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 20 }}>Dokumentation</h1>
 
+      {/* Table of contents */}
+      <nav style={{ ...sectionStyle, padding: isMobile ? 16 : 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Innehåll</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {[
+            { label: "Hur vi poängsätter bolag", id: "scoring", indent: 0 },
+            { label: "De fem delmodellerna", id: "models", indent: 1 },
+            { label: "Profilviktning", id: "weighting", indent: 1 },
+            { label: "Riskbedömning (Beta)", id: "risk", indent: 1 },
+            { label: "Riskjustering av poäng", id: "risk-adjust", indent: 1 },
+            { label: "Nyckeltal A–Ö", id: "glossary", indent: 0 },
+            { label: "Datakällor", id: "sources", indent: 0 },
+            { label: "Uppdateringsfrekvens", id: "frequency", indent: 0 },
+            { label: "Ansvarsfriskrivning", id: "disclaimer", indent: 0 },
+          ].map((item, i) => (
+            <a key={i} href={`#${item.id}`} onClick={e => { e.preventDefault(); document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+              style={{ fontSize: 12, color: item.indent ? "var(--text-secondary)" : "var(--text)", textDecoration: "none", paddingLeft: item.indent * 16, cursor: "pointer", lineHeight: 1.8 }}
+              onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+              onMouseLeave={e => e.currentTarget.style.color = item.indent ? "var(--text-secondary)" : "var(--text)"}
+            >
+              {item.indent ? "— " : ""}{item.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       {/* Scoring overview */}
-      <div style={sectionStyle}>
+      <div id="scoring" style={sectionStyle}>
         <div style={h2Style}>Hur vi poängsätter bolag</div>
         <p style={pStyle}>
           Thesion använder en sammansatt modell med fem etablerade värderingsmetoder. Varje bolag
@@ -46,7 +72,7 @@ export default function Documentation() {
       </div>
 
       {/* 5 models */}
-      <div style={sectionStyle}>
+      <div id="models" style={sectionStyle}>
         <div style={h2Style}>De fem delmodellerna</div>
 
         <div style={h3Style}>1. Piotroski F-Score (0–9)</div>
@@ -103,7 +129,7 @@ export default function Documentation() {
       </div>
 
       {/* Profile weighting */}
-      <div style={sectionStyle}>
+      <div id="weighting" style={sectionStyle}>
         <div style={h2Style}>Profilviktning</div>
         <p style={pStyle}>
           Totalpoängen beräknas genom att vikta de fem delmodellerna baserat på din investerarprofil.
@@ -141,7 +167,7 @@ export default function Documentation() {
       </div>
 
       {/* Risk */}
-      <div style={sectionStyle}>
+      <div id="risk" style={sectionStyle}>
         <div style={h2Style}>Riskbedömning (Beta)</div>
         <p style={pStyle}>
           Vi mäter risk genom Beta — ett mått på hur mycket en aktie rör sig jämfört med
@@ -172,7 +198,7 @@ export default function Documentation() {
       </div>
 
       {/* Riskjustering */}
-      <div style={sectionStyle}>
+      <div id="risk-adjust" style={sectionStyle}>
         <div style={h2Style}>Riskjustering av poäng</div>
         <p style={pStyle}>
           Totalpoängen justeras baserat på hur väl aktiens risknivå matchar din profil:
@@ -185,7 +211,7 @@ export default function Documentation() {
       </div>
 
       {/* Data sources */}
-      <div style={sectionStyle}>
+      <div id="sources" style={sectionStyle}>
         <div style={h2Style}>Datakällor</div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", gap: 12 }}>
           {[
@@ -207,7 +233,7 @@ export default function Documentation() {
       </div>
 
       {/* Uppdateringsfrekvens */}
-      <div style={sectionStyle}>
+      <div id="frequency" style={sectionStyle}>
         <div style={h2Style}>Uppdateringsfrekvens</div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", gap: 12 }}>
           {[
@@ -226,7 +252,7 @@ export default function Documentation() {
       </div>
 
       {/* Glossary */}
-      <div style={sectionStyle}>
+      <div id="glossary" style={sectionStyle}>
         <div style={h2Style}>Nyckeltal A–Ö</div>
         <p style={pStyle}>
           Här förklaras alla nyckeltal och begrepp som används i Thesion — på ett pedagogiskt sätt med exempel.
@@ -245,7 +271,7 @@ export default function Documentation() {
       </div>
 
       {/* Disclaimer */}
-      <div style={{ ...sectionStyle, background: "rgba(255,152,0,0.08)", border: "1px solid rgba(255,152,0,0.2)" }}>
+      <div id="disclaimer" style={{ ...sectionStyle, background: "rgba(255,152,0,0.08)", border: "1px solid rgba(255,152,0,0.2)" }}>
         <div style={{ ...h2Style, color: "#e65100" }}>Ansvarsfriskrivning</div>
         <p style={{ ...pStyle, color: "var(--text-secondary)" }}>
           Thesion tillhandahåller verktyg för aktieanalys och portföljhantering. Informationen och

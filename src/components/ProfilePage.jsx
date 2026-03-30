@@ -137,6 +137,40 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
         )}
       </div>
 
+      {/* Account type */}
+      <div style={cardStyle}>
+        <div style={labelStyle}>Kontotyp</div>
+        <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
+          Påverkar skatteråd från Mats. ISK har schablonbeskattning — inga förlustavdrag.
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {[
+            { value: "isk", label: "ISK", desc: "Investeringssparkonto" },
+            { value: "af", label: "AF", desc: "Aktie- & fondkonto" },
+            { value: "kf", label: "KF", desc: "Kapitalförsäkring" },
+            { value: "unknown", label: "Vet inte", desc: "" },
+          ].map(opt => {
+            const current = preferences.accountType || "unknown";
+            const isActive = current === opt.value;
+            return (
+              <button key={opt.value}
+                onClick={() => onUpdatePreferences({ accountType: opt.value })}
+                style={{
+                  padding: "8px 14px", borderRadius: 6, fontSize: 12, fontFamily: "inherit", cursor: "pointer",
+                  border: isActive ? "1px solid var(--accent)" : "1px solid var(--border)",
+                  background: isActive ? "var(--accent-light)" : "var(--bg-card)",
+                  color: isActive ? "var(--accent)" : "var(--text-secondary)",
+                  fontWeight: isActive ? 600 : 400,
+                }}
+              >
+                {opt.label}
+                {opt.desc && <span style={{ fontSize: 10, marginLeft: 4, opacity: 0.7 }}>{opt.desc}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Privacy & AI */}
       <div style={cardStyle}>
         <div style={labelStyle}>Integritet & AI</div>

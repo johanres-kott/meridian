@@ -108,6 +108,18 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
   if (context) {
     const parts = [];
 
+    // Account type affects tax advice
+    if (context.accountType) {
+      const accountInfo = {
+        isk: "Användaren har ISK (Investeringssparkonto). VIKTIGT: ISK har schablonbeskattning — INGA förlustavdrag, INGEN reavinstskatt. Ge ALDRIG råd om att sälja med förlust för skattereduktion. Skatten är fast oavsett vinst/förlust.",
+        af: "Användaren har Aktie- & fondkonto (AF). Här beskattas realiserade vinster med 30% och förluster kan kvittas mot vinster.",
+        kf: "Användaren har Kapitalförsäkring (KF). Liknar ISK — schablonbeskattning, inga förlustavdrag.",
+      };
+      if (accountInfo[context.accountType]) {
+        parts.push(accountInfo[context.accountType]);
+      }
+    }
+
     // Saved strategy and todos — so Mats doesn't repeat himself
     if (context.savedStrategy) {
       parts.push(`ANVÄNDARENS SPARADE INVESTERINGSSTRATEGI (ge inte samma råd igen, bygg vidare):\n${context.savedStrategy.slice(0, 500)}`);

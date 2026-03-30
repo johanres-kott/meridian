@@ -123,7 +123,7 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
                 {items.map(idx => (
                   <tr key={idx.symbol} onClick={() => setSelected(idx)} style={{ cursor: "pointer" }}
                     onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
-                    onMouseLeave={e => e.currentTarget.style.background = ""}>
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <td style={{ padding: isMobile ? "6px" : "8px 10px", fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace", fontSize: isMobile ? 11 : 12, borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>{idx.symbol}</td>
                     {!isMobile && <td style={{ padding: "8px 10px", borderBottom: "1px solid var(--border-light)" }}>{idx.name}</td>}
                     <td style={{ padding: isMobile ? "6px" : "8px 10px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid var(--border-light)" }}>
@@ -180,7 +180,7 @@ export default function Commodities({ deepLink, onClearDeepLink }) {
                   {group.items.map(item => (
                     <tr key={item.display} onClick={() => setSelected(item)} style={{ cursor: "pointer" }}
                       onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
-                      onMouseLeave={e => e.currentTarget.style.background = ""}>
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                       <td style={{ padding: isMobile ? "6px" : "8px 12px", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : 12, borderBottom: "1px solid var(--border-light)", color: "var(--accent)", whiteSpace: "nowrap" }}>{item.display}</td>
                       {!isMobile && <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)" }}>{item.name}</td>}
                       <td style={{ padding: isMobile ? "6px" : "8px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, fontSize: isMobile ? 11 : undefined, borderBottom: "1px solid var(--border-light)" }}>

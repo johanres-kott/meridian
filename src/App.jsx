@@ -10,6 +10,7 @@ import GapAnalysis from "./components/GapAnalysis.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
 import Commodities from "./components/Commodities.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
+import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
@@ -284,6 +285,7 @@ export default function App() {
           >
             AI
           </button>
+          <NotificationBell userId={session.user.id} />
           <div ref={profileRef} style={{ position: "relative" }}>
             <button
               onClick={() => { setProfileOpen(!profileOpen); setEditingName(false); }}

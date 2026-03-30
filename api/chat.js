@@ -69,12 +69,15 @@ Håll svaren under 200 ord. Var direkt och handlingsorienterad.`;
     const typeLabels = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", index: "indexinvesterare", mixed: "blandar strategier" };
     const riskLabels = { low: "låg", medium: "medel", high: "hög" };
     const focusLabels = { dividends: "utdelning", appreciation: "kursökning", both: "totalavkastning" };
-    systemPrompt += `\n\nANVÄNDARENS PROFIL (du VET redan detta — fråga INTE om det):
-- Typ: ${typeLabels[p.investorType] || p.investorType}
+    systemPrompt += `\n\nKRITISKT — ANVÄNDARENS PROFIL ÄR REDAN KÄND:
+- Investerartyp: ${typeLabels[p.investorType] || p.investorType}
 - Risktolerans: ${riskLabels[p.riskProfile] || p.riskProfile}
 - Fokus: ${focusLabels[p.focus] || p.focus}
 - Erfarenhet: ${p.experience || "ej angett"}
-ANVÄND denna profil direkt i dina svar. Fråga ALDRIG om risktolerans, investeringsstil eller mål — du har redan svaren.`;
+- Intressen: ${p.interests?.join(", ") || "ej angett"}
+- Geografi: ${p.geography || "ej angett"}
+
+DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorisont eller budget. Du har redan all info du behöver. Ge DIREKT ett konkret förslag med specifika bolag och belopp. Om du behöver ett totalbelopp, anta 50 000 SEK om användaren inte angett annat.`;
 
     const profileInstructions = {
       value: "Användaren är värdeinvesterare. Fokusera på P/E-tal, substansvärde, skuldsättning och säkerhetsmarginal. Ge konservativa förslag med fokus på fundamenta.",

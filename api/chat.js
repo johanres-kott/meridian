@@ -107,6 +107,14 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
 
   if (context) {
     const parts = [];
+
+    // Saved strategy and todos — so Mats doesn't repeat himself
+    if (context.savedStrategy) {
+      parts.push(`ANVÄNDARENS SPARADE INVESTERINGSSTRATEGI (ge inte samma råd igen, bygg vidare):\n${context.savedStrategy.slice(0, 500)}`);
+    }
+    if (context.savedTodos?.length > 0) {
+      parts.push(`ANVÄNDARENS ATT-GÖRA-LISTA (dessa är redan givna råd):\n${context.savedTodos.join("\n")}`);
+    }
     if (context.portfolioSummary) {
       const s = context.portfolioSummary;
       let summaryText = `PORTFÖLJÖVERSIKT:\nTotalt värde: ${s.totalValue?.toLocaleString("sv-SE")} SEK\nTotal kostnad: ${s.totalCost?.toLocaleString("sv-SE")} SEK\nP&L: ${s.totalPl != null ? (s.totalPl >= 0 ? "+" : "") + s.totalPl.toLocaleString("sv-SE") + " SEK (" + (s.totalPlPct >= 0 ? "+" : "") + s.totalPlPct + "%)" : "Ej beräknat"}\nAntal innehav: ${s.totalHoldings} (${s.holdingsWithShares} med aktier)`;

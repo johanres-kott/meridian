@@ -212,7 +212,7 @@ export default function App() {
       }
     }
     loadContext();
-  }, [chatOpen, session]);
+  }, [chatOpen, session, preferences.investorProfile]);
 
   if (authLoading) {
     return (

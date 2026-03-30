@@ -115,6 +115,11 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
     if (context.savedTodos?.length > 0) {
       parts.push(`ANVÄNDARENS ATT-GÖRA-LISTA (dessa är redan givna råd):\n${context.savedTodos.join("\n")}`);
     }
+    if (context.topSuggestions?.length > 0) {
+      parts.push(`THESIONS TOPPFÖRSLAG (baserat på scoring-modellen, anpassade efter användarens profil):\n${context.topSuggestions.map((s, i) =>
+        `${i + 1}. ${s.name} (${s.ticker}) — Score: ${s.score}/100, Sektor: ${s.sector || "—"}, Risk: ${s.risk || "—"}`
+      ).join("\n")}\n\nAnvänd dessa förslag som grund när du ger rekommendationer. De är redan rankade och anpassade.`);
+    }
     if (context.portfolioSummary) {
       const s = context.portfolioSummary;
       let summaryText = `PORTFÖLJÖVERSIKT:\nTotalt värde: ${s.totalValue?.toLocaleString("sv-SE")} SEK\nTotal kostnad: ${s.totalCost?.toLocaleString("sv-SE")} SEK\nP&L: ${s.totalPl != null ? (s.totalPl >= 0 ? "+" : "") + s.totalPl.toLocaleString("sv-SE") + " SEK (" + (s.totalPlPct >= 0 ? "+" : "") + s.totalPlPct + "%)" : "Ej beräknat"}\nAntal innehav: ${s.totalHoldings} (${s.holdingsWithShares} med aktier)`;

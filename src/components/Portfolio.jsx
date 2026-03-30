@@ -517,6 +517,33 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
         </div>
       </div>
 
+      {/* Investment strategy card */}
+      {preferences.investmentPlan?.text && (
+        <div style={{
+          marginBottom: 16, padding: isMobile ? 14 : 18, borderRadius: 8,
+          background: "linear-gradient(135deg, var(--accent-light), var(--bg-secondary))",
+          border: "1px solid var(--border)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
+              Din investeringsstrategi
+            </div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
+              Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
+            </div>
+          </div>
+          <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6, whiteSpace: "pre-wrap", maxHeight: 120, overflow: "auto" }}>
+            {preferences.investmentPlan.text}
+          </div>
+          <button
+            onClick={() => onUpdatePreferences({ investmentPlan: null })}
+            style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            Ta bort strategi
+          </button>
+        </div>
+      )}
+
       {/* Group filter bar */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : undefined, WebkitOverflowScrolling: isMobile ? "touch" : undefined, paddingBottom: isMobile ? 4 : undefined }}>
         <button

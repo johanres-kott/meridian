@@ -69,7 +69,24 @@ function SaveInsightButton({ content, contextFn }) {
   );
 }
 
-export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true }) {
+function SaveStrategyButton({ content, onSave }) {
+  const [saved, setSaved] = useState(false);
+
+  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>Strategi sparad!</span>;
+
+  return (
+    <button
+      onClick={() => { onSave(content); setSaved(true); }}
+      style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: "2px 0", marginTop: 2 }}
+      onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+      onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
+    >
+      Spara som investeringsstrategi
+    </button>
+  );
+}
+
+export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true, onSaveStrategy }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -197,7 +214,10 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
               {msg.content || (streaming && i === messages.length - 1 ? "..." : "")}
             </div>
             {msg.role === "assistant" && msg.content && !streaming && (
-              <SaveInsightButton content={msg.content} contextFn={contextFn} />
+              <div style={{ display: "flex", gap: 12 }}>
+                <SaveInsightButton content={msg.content} contextFn={contextFn} />
+                {onSaveStrategy && <SaveStrategyButton content={msg.content} onSave={onSaveStrategy} />}
+              </div>
             )}
           </div>
         ))}

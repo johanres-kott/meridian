@@ -273,7 +273,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
               {[
                 { emoji: "📊", text: "Analysera min portfölj", q: "Analysera min portfölj — vad är bra och vad kan förbättras?" },
                 { emoji: "💡", text: "Ge mig en investeringsplan", q: "Ge mig en konkret investeringsplan med specifika bolag, belopp och tidsplan baserat på min profil och portfölj." },
-                { emoji: "📉", text: "Varför har portföljen gått ner?", q: "Varför har min portfölj gått ner? Vilka aktier är skyldiga?" },
+                { emoji: "📈", text: "Vad driver min portfölj?", q: "Analysera vilka aktier som påverkat min portfölj mest — både uppåt och nedåt. Vad har gått bra och vad har gått dåligt?" },
                 { emoji: "🔄", text: "Vad borde jag sälja/köpa?", q: "Vilka aktier borde jag sälja och vilka borde jag köpa istället? Ge konkreta förslag." },
               ].map((item, i) => (
                 <button key={i} onClick={() => sendWithMessage(item.q)}

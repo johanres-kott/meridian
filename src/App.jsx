@@ -82,14 +82,30 @@ export default function App() {
     trackVisit();
   }, [session]);
 
+  const prefsRef = useRef(preferences);
+  prefsRef.current = preferences;
+
   async function updatePreferences(newPrefs) {
-    const merged = { ...preferences, ...newPrefs };
+    // Use ref to always get latest state (avoids stale closure race conditions)
+    const latest = prefsRef.current;
+    const merged = { ...latest, ...newPrefs };
     setPreferences(merged);
+    prefsRef.current = merged;
     if (session) {
+      // Atomic read-merge-write to prevent race conditions with concurrent updates
+      const { data } = await supabase
+        .from("user_prefs")
+        .select("preferences")
+        .eq("user_id", session.user.id)
+        .single();
+      const serverMerged = { ...(data?.preferences || {}), ...newPrefs };
       await supabase
         .from("user_prefs")
-        .update({ preferences: merged })
+        .update({ preferences: serverMerged })
         .eq("user_id", session.user.id);
+      // Sync local state with server truth
+      setPreferences(serverMerged);
+      prefsRef.current = serverMerged;
     }
   }
 

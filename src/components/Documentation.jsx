@@ -1,17 +1,39 @@
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-const sectionStyle = { background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 24, marginBottom: 16 };
-const h2Style = { fontSize: 16, fontWeight: 600, color: "#131722", marginBottom: 12 };
-const h3Style = { fontSize: 13, fontWeight: 600, color: "#131722", marginBottom: 6, marginTop: 16 };
-const pStyle = { fontSize: 13, color: "#787b86", lineHeight: 1.7, marginBottom: 8 };
-const listStyle = { fontSize: 13, color: "#787b86", lineHeight: 1.7, paddingLeft: 20, marginBottom: 8 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 24, marginBottom: 16 };
+const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
+const h3Style = { fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6, marginTop: 16 };
+const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
+const listStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 20, marginBottom: 8 };
+
+const GLOSSARY = [
+  { term: "Beta", def: "Mäter hur mycket en akties kurs svänger jämfört med marknaden. Beta 1.0 = samma som index. Under 0.8 = stabilare, över 1.2 = mer volatil.", example: "AstraZeneca har beta 0.29 (väldigt stabil), Sinch har 1.72 (svänger mycket)." },
+  { term: "Bruttomarginal", def: "Hur mycket av varje intjänad krona som blir kvar efter att varukostnaden dragits av. Bruttomarginal = (Omsättning − Varukostnad) / Omsättning.", example: "Ett bolag med 40% bruttomarginal behåller 40 öre av varje intjänad krona efter varukostnader." },
+  { term: "Direktavkastning", def: "Årlig utdelning delat med aktiekursen. Visar hur mycket pengar du får tillbaka varje år bara för att äga aktien.", example: "Om aktien kostar 100 kr och utdelningen är 4 kr per år → 4% direktavkastning." },
+  { term: "EBITDA", def: "Earnings Before Interest, Taxes, Depreciation and Amortization — vinst före räntor, skatt och avskrivningar. Visar bolagets operativa lönsamhet utan påverkan av finansiering och bokföringsmässiga avskrivningar.", example: "Används för att jämföra lönsamhet mellan bolag oavsett skuldsättning." },
+  { term: "EBITDA-marginal", def: "EBITDA delat med omsättning. Visar hur stor andel av varje intjänad krona som blir operativ vinst.", example: "25% EBITDA-marginal = 25 öre av varje krona blir vinst före räntor och skatt." },
+  { term: "EPS", def: "Earnings Per Share — vinst per aktie. Nettovinsten delat med antal utestående aktier.", example: "Om bolaget tjänar 1 miljard och har 100 miljoner aktier → EPS = 10 kr." },
+  { term: "F-Score (Piotroski)", def: "En poäng mellan 0 och 9 som mäter ett bolags finansiella hälsa. Utvecklad av professor Joseph Piotroski vid Stanford. Baseras på 9 kriterier kring lönsamhet, skuldsättning och effektivitet. Högre = friskare bolag.", example: "F-Score 8 eller 9 = starkt bolag. Under 3 = potentiella problem." },
+  { term: "GAV", def: "Genomsnittligt Anskaffningsvärde — det genomsnittliga priset du betalat för dina aktier. Används för att beräkna P&L (vinst/förlust).", example: "Om du köpt 100 aktier à 50 kr och 100 aktier à 60 kr → GAV = 55 kr." },
+  { term: "Magic Formula", def: "Joel Greenblatts investeringsstrategi som rankar bolag efter kombinationen av hög earnings yield (billig aktie) och hög ROIC (effektiv verksamhet).", example: "Ett bolag med lågt P/E OCH hög ROIC hamnar högt på listan." },
+  { term: "Nettoskuld/EBITDA", def: "Nettoskulden (räntebärande skulder minus kassa) delat med EBITDA. Visar hur många års vinst det tar att betala av skulden. Över 3x anses högt belånat.", example: "Nettoskuld 6 miljarder / EBITDA 2 miljarder = 3x. Bolaget behöver 3 års vinst för att betala skulden." },
+  { term: "P&L", def: "Profit & Loss — vinst eller förlust. I Thesion: skillnaden mellan nuvarande värde och ditt anskaffningsvärde (GAV).", example: "Köpt för 10 000 kr, värt 12 000 kr idag → P&L = +2 000 kr (+20%)." },
+  { term: "P/E Forward", def: "Price/Earnings Forward — aktiekursen delat med förväntad vinst per aktie nästa år. Lägre P/E = billigare aktie relativt sin vinst.", example: "Aktiekurs 100 kr, förväntad EPS 10 kr → P/E Forward = 10x. Du betalar 10 gånger vinsten." },
+  { term: "P/E Trailing", def: "Price/Earnings Trailing — aktiekursen delat med senaste 12 månadernas faktiska vinst per aktie.", example: "Skillnaden mot Forward: trailing tittar bakåt (vad bolaget tjänade), forward tittar framåt (vad analytiker tror)." },
+  { term: "PEG Ratio", def: "P/E delat med förväntad tillväxt. Under 1 = aktien kan vara undervärderad givet sin tillväxt. Över 2 = kan vara dyr.", example: "P/E 20 och tillväxt 20% → PEG = 1.0. P/E 30 och tillväxt 10% → PEG = 3.0 (dyrt)." },
+  { term: "ROIC", def: "Return on Invested Capital — avkastning på investerat kapital. Visar hur effektivt bolaget använder pengar som investerats i verksamheten.", example: "ROIC 15% = varje investerad krona genererar 15 öre i vinst per år. Över 10% anses bra." },
+  { term: "ROE", def: "Return on Equity — avkastning på eget kapital. Nettovinst delat med eget kapital.", example: "ROE 20% = aktieägarna får 20% avkastning på sitt investerade kapital." },
+  { term: "Rörelsemarginal", def: "Rörelseresultat delat med omsättning. Visar hur stor del av intäkterna som blir vinst efter alla operativa kostnader (men före räntor och skatt).", example: "15% rörelsemarginal = 15 öre av varje intjänad krona blir rörelsevinst." },
+  { term: "Substansvärde (NAV)", def: "Net Asset Value — det verkliga värdet av ett investmentbolags tillgångar. Ofta jämförs aktiekursen med substansvärdet — handlas det med rabatt eller premie?", example: "Investors substansvärde = 350 kr/aktie, aktiekurs 300 kr → 14% substansrabatt." },
+  { term: "Tillväxt (Revenue Growth)", def: "Omsättningstillväxt jämfört med föregående år. Visar om bolaget växer eller krymper.", example: "+15% tillväxt = omsättningen ökade med 15% jämfört med förra året. Negativt = bolaget krymper." },
+];
 
 export default function Documentation() {
   const isMobile = useIsMobile();
 
   return (
     <div>
-      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "#131722", marginBottom: 20 }}>Dokumentation</h1>
+      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 20 }}>Dokumentation</h1>
 
       {/* Scoring overview */}
       <div style={sectionStyle}>
@@ -90,7 +112,7 @@ export default function Documentation() {
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
             <thead>
-              <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
+              <tr style={{ borderBottom: "2px solid var(--border)" }}>
                 <th style={thStyle}>Modell</th>
                 <th style={{ ...thStyle, textAlign: "center" }}>Värde</th>
                 <th style={{ ...thStyle, textAlign: "center" }}>Tillväxt</th>
@@ -107,7 +129,7 @@ export default function Documentation() {
                 ["Kvalitet", "30%", "35%", "35%", "20%"],
               ].map(([model, ...weights], i) => (
                 <tr key={i} style={{ borderBottom: "1px solid #f0f3fa" }}>
-                  <td style={{ ...tdStyle, fontWeight: 500, color: "#131722" }}>{model}</td>
+                  <td style={{ ...tdStyle, fontWeight: 500, color: "var(--text)" }}>{model}</td>
                   {weights.map((w, j) => (
                     <td key={j} style={{ ...tdStyle, textAlign: "center" }}>{w}</td>
                   ))}
@@ -128,18 +150,18 @@ export default function Documentation() {
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
             <span style={{ color: "#089981", fontSize: 14 }}>◉</span>
-            <strong style={{ width: 80, color: "#131722" }}>Låg risk</strong>
-            <span style={{ color: "#787b86" }}>Beta &lt; 0.8 — aktien rör sig mindre än marknaden</span>
+            <strong style={{ width: 80, color: "var(--text)" }}>Låg risk</strong>
+            <span style={{ color: "var(--text-secondary)" }}>Beta &lt; 0.8 — aktien rör sig mindre än marknaden</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
             <span style={{ color: "#ff9800", fontSize: 14 }}>◉</span>
-            <strong style={{ width: 80, color: "#131722" }}>Medel risk</strong>
-            <span style={{ color: "#787b86" }}>Beta 0.8–1.2 — följer marknaden relativt nära</span>
+            <strong style={{ width: 80, color: "var(--text)" }}>Medel risk</strong>
+            <span style={{ color: "var(--text-secondary)" }}>Beta 0.8–1.2 — följer marknaden relativt nära</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
             <span style={{ color: "#f23645", fontSize: 14 }}>◉</span>
-            <strong style={{ width: 80, color: "#131722" }}>Hög risk</strong>
-            <span style={{ color: "#787b86" }}>Beta &gt; 1.2 — större kurssvängningar än marknaden</span>
+            <strong style={{ width: 80, color: "var(--text)" }}>Hög risk</strong>
+            <span style={{ color: "var(--text-secondary)" }}>Beta &gt; 1.2 — större kurssvängningar än marknaden</span>
           </div>
         </div>
         <p style={{ ...pStyle, marginTop: 12 }}>
@@ -173,9 +195,9 @@ export default function Documentation() {
             { name: "Finansinspektionen", desc: "Insidertransaktioner (insynsregistret)" },
             { name: "Investmentbolagens hemsidor", desc: "Portföljinnehav, vikter, värden" },
           ].map((s, i) => (
-            <div key={i} style={{ background: "#f8f9fd", borderRadius: 4, padding: "10px 14px" }}>
-              <div style={{ fontSize: 12, fontWeight: 500, color: "#131722" }}>{s.name}</div>
-              <div style={{ fontSize: 11, color: "#787b86", marginTop: 2 }}>{s.desc}</div>
+            <div key={i} style={{ background: "var(--bg-secondary)", borderRadius: 4, padding: "10px 14px" }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text)" }}>{s.name}</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>{s.desc}</div>
             </div>
           ))}
         </div>
@@ -196,17 +218,36 @@ export default function Documentation() {
             { what: "Nyheter", freq: "Realtid vid sidladdning" },
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f0f3fa" }}>
-              <span style={{ fontSize: 12, color: "#131722" }}>{item.what}</span>
-              <span style={{ fontSize: 12, color: "#787b86" }}>{item.freq}</span>
+              <span style={{ fontSize: 12, color: "var(--text)" }}>{item.what}</span>
+              <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{item.freq}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Glossary */}
+      <div style={sectionStyle}>
+        <div style={h2Style}>Nyckeltal A–Ö</div>
+        <p style={pStyle}>
+          Här förklaras alla nyckeltal och begrepp som används i Thesion — på ett pedagogiskt sätt med exempel.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 0, marginTop: 12 }}>
+          {GLOSSARY.map((g, i) => (
+            <div key={i} style={{ padding: "14px 0", borderBottom: i < GLOSSARY.length - 1 ? "1px solid var(--border-light)" : "none" }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>{g.term}</div>
+              <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 6 }}>{g.def}</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6, fontStyle: "italic", paddingLeft: 12, borderLeft: "2px solid var(--border)" }}>
+                Exempel: {g.example}
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Disclaimer */}
-      <div style={{ ...sectionStyle, background: "#fff8e1", border: "1px solid #ffe082" }}>
+      <div style={{ ...sectionStyle, background: "rgba(255,152,0,0.08)", border: "1px solid rgba(255,152,0,0.2)" }}>
         <div style={{ ...h2Style, color: "#e65100" }}>Ansvarsfriskrivning</div>
-        <p style={{ ...pStyle, color: "#795548" }}>
+        <p style={{ ...pStyle, color: "var(--text-secondary)" }}>
           Thesion tillhandahåller verktyg för aktieanalys och portföljhantering. Informationen och
           rekommendationerna utgör inte finansiell rådgivning. Alla investeringsbeslut fattas av
           användaren själv. Historisk avkastning är ingen garanti för framtida resultat.
@@ -217,5 +258,5 @@ export default function Documentation() {
   );
 }
 
-const thStyle = { padding: "8px 6px", fontSize: 11, color: "#787b86", fontWeight: 500 };
-const tdStyle = { padding: "8px 6px", fontSize: 12, color: "#787b86" };
+const thStyle = { padding: "8px 6px", fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 };
+const tdStyle = { padding: "8px 6px", fontSize: 12, color: "var(--text-secondary)" };

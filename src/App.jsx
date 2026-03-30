@@ -477,7 +477,10 @@ export default function App() {
           {tab === "docs" && <Documentation />}
           {tab === "about" && <AboutPage />}
         </div>
-        <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} sharePortfolio={preferences.sharePortfolioWithAI !== false} onSaveStrategy={(text) => updatePreferences({ investmentPlan: { text, savedAt: new Date().toISOString() } })} />
+        <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} sharePortfolio={preferences.sharePortfolioWithAI !== false} onSaveStrategy={(text) => updatePreferences({ investmentPlan: { text, savedAt: new Date().toISOString() } })} onSaveTodo={(text) => {
+          const todos = preferences.todos || [];
+          updatePreferences({ todos: [...todos, { text, done: false, createdAt: new Date().toISOString() }] });
+        }} />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import PortfolioSummary from "./PortfolioSummary.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
+import TodoList from "./TodoList.jsx";
 
 export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
   const isMobile = useIsMobile();
@@ -25,6 +26,13 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
           ) : null;
         })()}
       </div>
+      {preferences.todos?.length > 0 && (
+        <TodoList
+          todos={preferences.todos}
+          onUpdate={(updated) => onUpdatePreferences({ todos: updated })}
+          isMobile={isMobile}
+        />
+      )}
       <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       {userId && (

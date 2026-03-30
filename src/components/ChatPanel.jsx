@@ -69,6 +69,23 @@ function SaveInsightButton({ content, contextFn }) {
   );
 }
 
+function SaveTodoButton({ content, onSave }) {
+  const [saved, setSaved] = useState(false);
+
+  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>Tillagd!</span>;
+
+  return (
+    <button
+      onClick={() => { onSave(content); setSaved(true); }}
+      style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: "2px 0", marginTop: 2 }}
+      onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+      onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
+    >
+      Spara som att-göra
+    </button>
+  );
+}
+
 function SaveStrategyButton({ content, onSave }) {
   const [saved, setSaved] = useState(false);
 
@@ -86,7 +103,7 @@ function SaveStrategyButton({ content, onSave }) {
   );
 }
 
-export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true, onSaveStrategy }) {
+export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true, onSaveStrategy, onSaveTodo }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -217,6 +234,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
               <div style={{ display: "flex", gap: 12 }}>
                 <SaveInsightButton content={msg.content} contextFn={contextFn} />
                 {onSaveStrategy && <SaveStrategyButton content={msg.content} onSave={onSaveStrategy} />}
+                {onSaveTodo && <SaveTodoButton content={msg.content} onSave={onSaveTodo} />}
               </div>
             )}
           </div>

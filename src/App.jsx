@@ -225,7 +225,21 @@ export default function App() {
           investorProfile: preferences.investorProfile || null,
           savedStrategy: preferences.investmentPlan?.text || null,
           savedTodos: (preferences.todos || []).filter(t => !t.done).map(t => t.text).slice(0, 5),
+          topSuggestions: null,
         };
+
+        // Fetch top suggestions from scoring
+        try {
+          const investorType = preferences.investorProfile?.investorType || "mixed";
+          const sugRes = await fetch(`/api/suggestions?profile=${investorType}&limit=10`);
+          const sugData = await sugRes.json();
+          if (sugData?.suggestions) {
+            chatContextRef.current.topSuggestions = sugData.suggestions.map(s => ({
+              ticker: s.ticker, name: s.name, score: s.compositeScore,
+              sector: s.sector, risk: s.risk,
+            }));
+          }
+        } catch {}
       } catch (err) {
         console.error("Chat context load error:", err);
       }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const RANGES = [
@@ -145,12 +145,41 @@ export const Pill = ({ text, green }) => (
 
 export const StatCard = ({ label, value, sub, neg, tooltip }) => {
   const [show, setShow] = useState(false);
+  const [delayedShow, setDelayedShow] = useState(false);
+  const timerRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (!tooltip) return;
+    timerRef.current = setTimeout(() => {
+      setShow(true);
+      // Trigger opacity transition on next frame
+      requestAnimationFrame(() => setDelayedShow(true));
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = null;
+    setDelayedShow(false);
+    setShow(false);
+  };
+
+  const handleClick = () => {
+    if (!tooltip) return;
+    if (show) {
+      handleMouseLeave();
+    } else {
+      setShow(true);
+      requestAnimationFrame(() => setDelayedShow(true));
+    }
+  };
+
   return (
     <div
       style={{ background: "var(--bg-secondary)", borderRadius: 4, padding: "12px 14px", cursor: tooltip ? "help" : undefined, position: "relative" }}
-      onMouseEnter={() => tooltip && setShow(true)}
-      onMouseLeave={() => setShow(false)}
-      onClick={() => tooltip && setShow(!show)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
     >
       <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>
         {label}
@@ -160,16 +189,19 @@ export const StatCard = ({ label, value, sub, neg, tooltip }) => {
       {sub && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{sub}</div>}
       {show && tooltip && (
         <div style={{
-          position: "absolute", bottom: "calc(100% + 6px)", left: 0, right: 0,
+          position: "absolute", top: "calc(100% + 6px)", left: 0,
+          maxWidth: 260, minWidth: 180,
           background: "var(--text)", color: "var(--bg)", fontSize: 11, lineHeight: 1.5,
           padding: "8px 10px", borderRadius: 6, zIndex: 50,
           boxShadow: "0 4px 12px rgba(0,0,0,0.15)", pointerEvents: "none",
+          opacity: delayedShow ? 1 : 0,
+          transition: "opacity 150ms ease-in",
         }}>
-          {tooltip}
           <div style={{
-            position: "absolute", bottom: -4, left: 16, width: 8, height: 8,
+            position: "absolute", top: -4, left: 16, width: 8, height: 8,
             background: "var(--text)", transform: "rotate(45deg)",
           }} />
+          {tooltip}
         </div>
       )}
     </div>

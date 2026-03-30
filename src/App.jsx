@@ -16,6 +16,7 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 import ScoringMethodology from "./components/ScoringMethodology.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
+import AboutPage from "./components/AboutPage.jsx";
 import { sanitizeInput } from "./lib/sanitize.js";
 
 const TABS = [
@@ -153,18 +154,53 @@ export default function App() {
           })
         );
         const validPortfolio = portfolio.filter(Boolean);
-        const totalValue = validPortfolio.reduce((s, p) => s + (p.valueSek || 0), 0);
-        const totalCost = validPortfolio.reduce((s, p) => s + (p.shares > 0 && p.gav > 0 ? p.shares * p.gav : 0), 0);
+
+        // Fetch scoring data for owned stocks
+        const ownedTickers = validPortfolio.filter(p => p.shares > 0).map(p => p.ticker);
+        const scoreResults = await Promise.all(
+          ownedTickers.slice(0, 15).map(async (ticker) => {
+            try {
+              const r = await fetch(`/api/score?ticker=${encodeURIComponent(ticker)}`);
+              const d = await r.json();
+              return d ? { ticker, composite: d.composite, scores: d.scores, data: d.data, risk: d.risk } : null;
+            } catch { return null; }
+          })
+        );
+        const scoresMap = {};
+        scoreResults.filter(Boolean).forEach(s => { scoresMap[s.ticker] = s; });
+
+        // Enrich portfolio with scores
+        const enrichedPortfolio = validPortfolio.map(p => ({
+          ...p,
+          score: scoresMap[p.ticker] || null,
+        }));
+
+        const totalValue = enrichedPortfolio.reduce((s, p) => s + (p.valueSek || 0), 0);
+        const totalCost = enrichedPortfolio.reduce((s, p) => s + (p.shares > 0 && p.gav > 0 ? p.shares * p.gav : 0), 0);
         const totalPl = totalCost > 0 ? totalValue - totalCost : null;
         const totalPlPct = totalCost > 0 ? ((totalValue - totalCost) / totalCost * 100) : null;
+
+        // Build sector distribution
+        const sectorDist = {};
+        enrichedPortfolio.filter(p => p.shares > 0 && p.valueSek > 0).forEach(p => {
+          const sector = p.sector || "Okänd";
+          sectorDist[sector] = (sectorDist[sector] || 0) + p.valueSek;
+        });
+        const sectorBreakdown = totalValue > 0
+          ? Object.entries(sectorDist).map(([sector, value]) => ({
+              sector, value: Math.round(value), pct: +((value / totalValue) * 100).toFixed(1),
+            })).sort((a, b) => b.value - a.value)
+          : [];
+
         chatContextRef.current = {
-          portfolio: validPortfolio,
+          portfolio: enrichedPortfolio,
           portfolioSummary: {
             totalValue, totalCost,
             totalPl: totalPl != null ? Math.round(totalPl) : null,
             totalPlPct: totalPlPct != null ? +totalPlPct.toFixed(1) : null,
-            holdingsWithShares: validPortfolio.filter(p => p.shares > 0).length,
-            totalHoldings: validPortfolio.length,
+            holdingsWithShares: enrichedPortfolio.filter(p => p.shares > 0).length,
+            totalHoldings: enrichedPortfolio.length,
+            sectorBreakdown,
           },
           indices: indicesRes.filter(i => i.price > 0),
           commodities: commoditiesRes.filter(c => c.price > 0),
@@ -337,6 +373,14 @@ export default function App() {
                   Dokumentation
                 </button>
                 <button
+                  onClick={() => { setTab("about"); setProfileOpen(false); }}
+                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+                >
+                  Om Thesion
+                </button>
+                <button
                   onClick={toggleTheme}
                   style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}
                   onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
@@ -376,6 +420,7 @@ export default function App() {
           {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
           {tab === "profile" && <ProfilePage session={session} preferences={preferences} onUpdatePreferences={updatePreferences} onResetProfile={() => updatePreferences({ investorProfile: null })} />}
           {tab === "docs" && <Documentation />}
+          {tab === "about" && <AboutPage />}
         </div>
         <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} sharePortfolio={preferences.sharePortfolioWithAI !== false} />
       </div>

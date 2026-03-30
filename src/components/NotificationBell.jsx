@@ -206,7 +206,7 @@ export default function NotificationBell({ userId }) {
                   padding: 0,
                 }}
               >
-                Markera alla som l\u00e4sta
+                Markera alla som lästa
               </button>
             )}
           </div>
@@ -222,7 +222,7 @@ export default function NotificationBell({ userId }) {
                   fontSize: 12,
                 }}
               >
-                Inga notifikationer \u00e4nnu
+                Inga notifikationer ännu
               </div>
             ) : (
               notifications.map((n) => (

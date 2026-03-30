@@ -405,7 +405,56 @@ export default function App() {
 
       {/* Onboarding modal for new users */}
       {!preferences.investorProfile && (
-        <OnboardingModal onComplete={(profile) => updatePreferences({ investorProfile: profile })} />
+        <OnboardingModal onComplete={async (profile) => {
+          updatePreferences({ investorProfile: profile });
+          // Add 5 starter stocks based on investor type
+          const STARTER_STOCKS = {
+            value: [
+              { ticker: "INVE-B.ST", name: "Investor" },
+              { ticker: "SEB-A.ST", name: "SEB" },
+              { ticker: "VOLV-B.ST", name: "Volvo" },
+              { ticker: "SHB-A.ST", name: "Handelsbanken" },
+              { ticker: "AZN.ST", name: "AstraZeneca" },
+            ],
+            growth: [
+              { ticker: "EVO.ST", name: "Evolution" },
+              { ticker: "SINCH.ST", name: "Sinch" },
+              { ticker: "HEX-B.ST", name: "Hexagon" },
+              { ticker: "ATCO-A.ST", name: "Atlas Copco" },
+              { ticker: "SAAB-B.ST", name: "Saab" },
+            ],
+            dividend: [
+              { ticker: "INVE-B.ST", name: "Investor" },
+              { ticker: "SHB-A.ST", name: "Handelsbanken" },
+              { ticker: "AXFO.ST", name: "Axfood" },
+              { ticker: "CAST.ST", name: "Castellum" },
+              { ticker: "SEB-A.ST", name: "SEB" },
+            ],
+            index: [
+              { ticker: "ERIC-B.ST", name: "Ericsson" },
+              { ticker: "VOLV-B.ST", name: "Volvo" },
+              { ticker: "ABB.ST", name: "ABB" },
+              { ticker: "AZN.ST", name: "AstraZeneca" },
+              { ticker: "ATCO-A.ST", name: "Atlas Copco" },
+            ],
+            mixed: [
+              { ticker: "INVE-B.ST", name: "Investor" },
+              { ticker: "VOLV-B.ST", name: "Volvo" },
+              { ticker: "ERIC-B.ST", name: "Ericsson" },
+              { ticker: "AZN.ST", name: "AstraZeneca" },
+              { ticker: "EVO.ST", name: "Evolution" },
+            ],
+          };
+          const starters = STARTER_STOCKS[profile.investorType] || STARTER_STOCKS.mixed;
+          try {
+            const { data: existing } = await supabase.from("watchlist").select("ticker").eq("user_id", session.user.id);
+            const existingTickers = new Set((existing || []).map(e => e.ticker.toUpperCase()));
+            const newStocks = starters.filter(s => !existingTickers.has(s.ticker.toUpperCase()));
+            if (newStocks.length > 0) {
+              await supabase.from("watchlist").insert(newStocks.map(s => ({ ticker: s.ticker, name: s.name, user_id: session.user.id, status: "Bevakar" })));
+            }
+          } catch {}
+        }} />
       )}
 
       {/* Content + Chat */}

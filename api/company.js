@@ -1,8 +1,25 @@
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
+import { createClient } from "@supabase/supabase-js";
 
 const FMP_KEY = process.env.FMP_KEY;
 const FINNHUB_KEY = process.env.FINNHUB_KEY;
+const SUPABASE_URL = "https://acostgikldxkdmcoavkf.supabase.co";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjb3N0Z2lrbGR4a2RtY29hdmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDUzMTgsImV4cCI6MjA4ODcyMTMxOH0.lgIR-b3FpyTaO5Aa9SPnUHl-gyy5hloBvMTmnOfSLpw";
+
+async function getCalculatedBeta(ticker) {
+  try {
+    const sb = createClient(SUPABASE_URL, ANON_KEY);
+    const { data } = await sb
+      .from("stock_scores")
+      .select("beta_calculated, beta_index, market_cap_sek")
+      .eq("ticker", ticker)
+      .single();
+    return data;
+  } catch {
+    return null;
+  }
+}
 const UA = "Mozilla/5.0";
 
 async function getYahooCrumb() {
@@ -141,11 +158,12 @@ export default async function handler(req, res) {
   try {
     const crumbData = await getYahooCrumb();
 
-    const [priceData, fundamentals, fmpData, news] = await Promise.all([
+    const [priceData, fundamentals, fmpData, news, calculatedBeta] = await Promise.all([
       getYahooPriceV8(ticker),
       getYahooFundamentals(ticker, crumbData),
       getFMPData(ticker),
       getFinnhubNews(ticker),
+      getCalculatedBeta(ticker),
     ]);
 
     if (!priceData && !fundamentals && !fmpData) {
@@ -176,6 +194,9 @@ export default async function handler(req, res) {
       targetLow: fundamentals?.targetLow ?? 0,
       numberOfAnalysts: fundamentals?.numberOfAnalysts ?? 0,
       recommendation: fundamentals?.recommendation ?? "—",
+      beta: calculatedBeta?.beta_calculated ?? fundamentals?.beta ?? null,
+      betaIndex: calculatedBeta?.beta_index ?? null,
+      marketCapSek: calculatedBeta?.market_cap_sek ?? null,
       week52High: priceData?.week52High ?? 0,
       week52Low: priceData?.week52Low ?? 0,
       news,

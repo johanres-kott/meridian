@@ -16,6 +16,7 @@ const mono = "'IBM Plex Mono', monospace";
 export default function LandingPage({ onShowPrivacy }) {
   const isMobile = useIsMobile();
   const [showLogin, setShowLogin] = useState(false);
+  const [defaultMode, setDefaultMode] = useState("login");
 
   if (showLogin) {
     return (
@@ -25,7 +26,7 @@ export default function LandingPage({ onShowPrivacy }) {
             ← Tillbaka
           </button>
         </div>
-        <Login onShowPrivacy={onShowPrivacy} />
+        <Login onShowPrivacy={onShowPrivacy} defaultMode={defaultMode} />
       </div>
     );
   }
@@ -61,11 +62,11 @@ export default function LandingPage({ onShowPrivacy }) {
             <span style={{ fontSize: 19, fontWeight: 700, color: "#fff", fontFamily: jakarta, letterSpacing: "-0.02em" }}>Thesion</span>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button onClick={() => setShowLogin(true)}
+            <button onClick={() => { setDefaultMode("login"); setShowLogin(true); }}
               style={{ padding: "8px 18px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontFamily: "inherit", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
               Logga in
             </button>
-            <button onClick={() => setShowLogin(true)}
+            <button onClick={() => { setDefaultMode("signup"); setShowLogin(true); }}
               style={{ padding: "9px 22px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600, transition: "background 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.background = "#3d72ff"}
               onMouseLeave={e => e.currentTarget.style.background = "#2962ff"}
@@ -107,7 +108,7 @@ export default function LandingPage({ onShowPrivacy }) {
           </p>
 
           <div className="fu fu3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: isMobile ? 48 : 72 }}>
-            <button onClick={() => setShowLogin(true)}
+            <button onClick={() => { setDefaultMode("signup"); setShowLogin(true); }}
               style={{
                 padding: "14px 36px", background: "#2962ff", color: "#fff", border: "none",
                 borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
@@ -323,7 +324,7 @@ export default function LandingPage({ onShowPrivacy }) {
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.4)", marginBottom: 36, lineHeight: 1.6 }}>
             Skapa ett konto gratis. Inga kreditkort. Inga bindningstider.
           </p>
-          <button onClick={() => setShowLogin(true)}
+          <button onClick={() => { setDefaultMode("signup"); setShowLogin(true); }}
             style={{
               padding: "15px 44px", background: "#2962ff", color: "#fff", border: "none",
               borderRadius: 10, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",

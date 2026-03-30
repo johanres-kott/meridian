@@ -223,6 +223,7 @@ export default function App() {
           indices: indicesRes.filter(i => i.price > 0),
           commodities: commoditiesRes.filter(c => c.price > 0),
           investorProfile: preferences.investorProfile || null,
+          accountType: preferences.accountType || null,
           savedStrategy: preferences.investmentPlan?.text || null,
           savedTodos: (preferences.todos || []).filter(t => !t.done).map(t => t.text).slice(0, 5),
           topSuggestions: null,

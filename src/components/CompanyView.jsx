@@ -170,22 +170,121 @@ function isNeg(key, value) {
 
 const PROFILE_LABELS = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", mixed: "blandat", index: "indexinvesterare" };
 
-function ScoreBar({ label, value }) {
+const SCORE_DETAILS = {
+  piotroski: {
+    title: "Piotroski F-Score (0\u20139)",
+    description: "M\u00e4ter finansiell styrka baserat p\u00e5 9 kriterier inom l\u00f6nsamhet, skulds\u00e4ttning och effektivitet. H\u00f6gre po\u00e4ng = starkare finansiell h\u00e4lsa.",
+    items: [
+      "Positivt nettoresultat",
+      "Positivt operativt kassafl\u00f6de",
+      "Stigande avkastning p\u00e5 tillg\u00e5ngar (ROA)",
+      "Kassafl\u00f6de \u00f6verstiger nettoresultat",
+      "Minskande skulds\u00e4ttning",
+      "Stigande likviditetskvot",
+      "Inga nya aktier emitterade",
+      "Stigande bruttomarginal",
+      "Stigande tillg\u00e5ngsomsättning",
+    ],
+    formatRaw: (raw) => raw != null ? `${raw}/9` : null,
+  },
+  magicFormula: {
+    title: "Magic Formula",
+    description: "Kombinerar Earnings Yield (vinstavkastning) och ROIC (avkastning p\u00e5 investerat kapital) f\u00f6r att hitta billiga kvalitetsbolag.",
+    items: [
+      "Earnings Yield \u2014 h\u00f6g vinst relativt priset",
+      "ROIC \u2014 effektiv kapitalanv\u00e4ndning",
+    ],
+  },
+  growth: {
+    title: "Tillv\u00e4xt",
+    description: "Bed\u00f6mer bolagets tillv\u00e4xttakt baserat p\u00e5 oms\u00e4ttningsutveckling och tillv\u00e4xttrend.",
+    items: [
+      "Oms\u00e4ttningstillv\u00e4xt",
+      "Tillv\u00e4xtens stabilitet och trend",
+    ],
+  },
+  dividend: {
+    title: "Utdelning",
+    description: "Utv\u00e4rderar utdelningens niv\u00e5 och stabilitet \u00f6ver tid.",
+    items: [
+      "Direktavkastning",
+      "Utdelningens stabilitet och tillv\u00e4xt",
+    ],
+  },
+  quality: {
+    title: "Kvalitet",
+    description: "Helhetsbild av bolagets kvalitet baserat p\u00e5 marginaler, kapitaleffektivitet och skulds\u00e4ttning.",
+    items: [
+      "Marginaler (brutto, r\u00f6relse, EBITDA)",
+      "ROIC \u2014 avkastning p\u00e5 investerat kapital",
+      "Skulds\u00e4ttningsgrad",
+    ],
+  },
+};
+
+function ScoreDetail({ scoreKey, scoreData }) {
+  const detail = SCORE_DETAILS[scoreKey];
+  if (!detail) return null;
+
+  const rawScore = scoreKey === "piotroski" && detail.formatRaw
+    ? detail.formatRaw(scoreData?.piotroski?.raw)
+    : null;
+
+  return (
+    <div style={{
+      padding: "10px 12px", marginTop: 4, marginBottom: 2,
+      background: "var(--bg-secondary)", borderRadius: 4,
+      fontSize: 11, lineHeight: 1.6, color: "var(--text-secondary)",
+    }}>
+      <div style={{ fontWeight: 500, color: "var(--text)", marginBottom: 4, fontSize: 12 }}>{detail.title}</div>
+      {rawScore && (
+        <div style={{ marginBottom: 6, fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, color: "var(--text)" }}>
+          Po\u00e4ng: {rawScore}
+        </div>
+      )}
+      <div style={{ marginBottom: 8 }}>{detail.description}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        {detail.items.map((item, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+            <span style={{ flexShrink: 0, color: "var(--text-muted)", fontSize: 10, marginTop: 1 }}>\u2022</span>
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle }) {
   if (value == null) return null;
   const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
+  const hasDetail = !!SCORE_DETAILS[scoreKey];
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
-      <span style={{ width: 90, color: "var(--text-secondary)", flexShrink: 0 }}>{label}</span>
-      <div style={{ flex: 1, height: 6, background: "var(--border-light)", borderRadius: 3, overflow: "hidden" }}>
-        <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
+    <div>
+      <div
+        style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, cursor: hasDetail ? "pointer" : undefined }}
+        onClick={() => hasDetail && onToggle?.()}
+        role={hasDetail ? "button" : undefined}
+        tabIndex={hasDetail ? 0 : undefined}
+        onKeyDown={hasDetail ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle?.(); } } : undefined}
+      >
+        <span style={{ width: 90, color: expanded ? "var(--text)" : "var(--text-secondary)", flexShrink: 0, fontWeight: expanded ? 500 : 400, transition: "color 150ms" }}>
+          {label}
+          {hasDetail && <span style={{ marginLeft: 3, fontSize: 9, opacity: 0.5 }}>{expanded ? "\u25B2" : "\u25BC"}</span>}
+        </span>
+        <div style={{ flex: 1, height: 6, background: "var(--border-light)", borderRadius: 3, overflow: "hidden" }}>
+          <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
+        </div>
+        <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
       </div>
-      <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
+      {expanded && <ScoreDetail scoreKey={scoreKey} scoreData={scoreData} />}
     </div>
   );
 }
 
 function ProfileInsight({ ticker, company, investorProfile }) {
   const [scoreData, setScoreData] = useState(null);
+  const [expandedScore, setExpandedScore] = useState(null);
 
   useEffect(() => {
     if (!ticker) return;
@@ -252,11 +351,11 @@ function ProfileInsight({ ticker, company, investorProfile }) {
         <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
           <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} />
-            <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} />
-            <ScoreBar label="Tillväxt" value={scoreData.scores.growth} />
-            <ScoreBar label="Utdelning" value={scoreData.scores.dividend} />
-            <ScoreBar label="Kvalitet" value={scoreData.scores.quality} />
+            <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} scoreKey="piotroski" scoreData={scoreData.scores} expanded={expandedScore === "piotroski"} onToggle={() => setExpandedScore(expandedScore === "piotroski" ? null : "piotroski")} />
+            <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} scoreKey="magicFormula" scoreData={scoreData.scores} expanded={expandedScore === "magicFormula"} onToggle={() => setExpandedScore(expandedScore === "magicFormula" ? null : "magicFormula")} />
+            <ScoreBar label="Tillväxt" value={scoreData.scores.growth} scoreKey="growth" scoreData={scoreData.scores} expanded={expandedScore === "growth"} onToggle={() => setExpandedScore(expandedScore === "growth" ? null : "growth")} />
+            <ScoreBar label="Utdelning" value={scoreData.scores.dividend} scoreKey="dividend" scoreData={scoreData.scores} expanded={expandedScore === "dividend"} onToggle={() => setExpandedScore(expandedScore === "dividend" ? null : "dividend")} />
+            <ScoreBar label="Kvalitet" value={scoreData.scores.quality} scoreKey="quality" scoreData={scoreData.scores} expanded={expandedScore === "quality"} onToggle={() => setExpandedScore(expandedScore === "quality" ? null : "quality")} />
           </div>
           {scoreData.composite && (() => {
             const profileType = investorProfile?.investorType || "mixed";

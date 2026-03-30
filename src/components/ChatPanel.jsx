@@ -161,12 +161,12 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
 
   return (
     <div style={{
-      width: 380, height: "100%", borderLeft: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--bg-card)", flexShrink: 0,
+      width: 380, height: "100%", borderLeft: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--bg-secondary)", flexShrink: 0,
     }}>
       {/* Header */}
-      <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 13, fontWeight: 500 }}>Mats <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 400 }}>AI-assistent</span></span>
-        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "var(--text-secondary)", lineHeight: 1 }}>✕</button>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(135deg, var(--accent), #1e88e5)", color: "#fff" }}>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>Mats <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.7 }}>Finansassistent (AI)</span></span>
+        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1 }}>✕</button>
       </div>
 
       {/* Messages */}
@@ -174,7 +174,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
         {messages.length === 0 && (
           <div style={{ textAlign: "center", marginTop: 40 }}>
             <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 12 }}>
-              Hej! Jag är Mats, din AI-assistent. Fråga mig om din portfölj, marknader eller aktier.
+              Hej! Jag är Mats — din AI-drivna finansassistent. Fråga mig om din portfölj, aktieanalys, marknader eller investeringsstrategier.
             </div>
             <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "6px 10px", background: "var(--bg-secondary)", borderRadius: 6, display: "inline-block" }}>
               {sharePortfolio

@@ -235,9 +235,7 @@ function ProfileInsight({ ticker, company, investorProfile }) {
     allItems.push({ icon: "🏢", color: "var(--text-secondary)", text: company.sector });
   }
 
-  // Profile tags
-  tags.forEach(t => allItems.push({ icon: "✓", color: "#089981", text: t }));
-  warnings.forEach(w => allItems.push({ icon: "⚠", color: "#e65100", text: w }));
+  // Old matchStock tags removed — scoring model handles matching now
 
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>

@@ -143,10 +143,35 @@ export const Pill = ({ text, green }) => (
   }}>{text}</span>
 );
 
-export const StatCard = ({ label, value, sub, neg, tooltip }) => (
-  <div style={{ background: "var(--bg-secondary)", borderRadius: 4, padding: "12px 14px", cursor: tooltip ? "help" : undefined }} title={tooltip || undefined}>
-    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>{label}</div>
-    <div style={{ fontSize: 15, fontWeight: 500, color: neg ? "#f23645" : neg === false ? "#089981" : "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
-    {sub && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{sub}</div>}
-  </div>
-);
+export const StatCard = ({ label, value, sub, neg, tooltip }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div
+      style={{ background: "var(--bg-secondary)", borderRadius: 4, padding: "12px 14px", cursor: tooltip ? "help" : undefined, position: "relative" }}
+      onMouseEnter={() => tooltip && setShow(true)}
+      onMouseLeave={() => setShow(false)}
+      onClick={() => tooltip && setShow(!show)}
+    >
+      <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>
+        {label}
+        {tooltip && <span style={{ marginLeft: 4, fontSize: 9, opacity: 0.5 }}>?</span>}
+      </div>
+      <div style={{ fontSize: 15, fontWeight: 500, color: neg ? "#f23645" : neg === false ? "#089981" : "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{sub}</div>}
+      {show && tooltip && (
+        <div style={{
+          position: "absolute", bottom: "calc(100% + 6px)", left: 0, right: 0,
+          background: "var(--text)", color: "var(--bg)", fontSize: 11, lineHeight: 1.5,
+          padding: "8px 10px", borderRadius: 6, zIndex: 50,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)", pointerEvents: "none",
+        }}>
+          {tooltip}
+          <div style={{
+            position: "absolute", bottom: -4, left: 16, width: 8, height: 8,
+            background: "var(--text)", transform: "rotate(45deg)",
+          }} />
+        </div>
+      )}
+    </div>
+  );
+};

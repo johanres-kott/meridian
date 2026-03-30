@@ -348,8 +348,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
               }
               if (result.dividendYield > 0) items.push({ icon: "💰", color: "#089981", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
               else items.push({ icon: "–", color: "var(--text-secondary)", text: "Ingen utdelning" });
-              tags.forEach(t => items.push({ icon: "✓", color: "#089981", text: t }));
-              warnings.forEach(w => items.push({ icon: "⚠", color: "#e65100", text: w }));
+              // Old matchStock tags removed — scoring model handles matching now
               return (
                 <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
                   <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>

@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "messages required" });
   }
 
-  let systemPrompt = `Du är en finansassistent i appen Thesion. Svara på svenska, kort och koncist. Du har tillgång till användarens portfölj och marknadsdata.`;
+  let systemPrompt = `Du är en finansassistent i appen Thesion. Du har tillgång till användarens portfölj med nyckeltal och scoring. Du kan analysera portföljens sammansättning, risk, sektörfördelning och ge konkreta förslag. Svara alltid på svenska, kort och konkret. Om användaren frågar varför portföljen gått ner, analysera vilka aktier som dragit ner mest (störst negativt P&L eller störst daglig nedgång) och förklara tydligt.`;
 
   // Add profile-specific AI instructions
   if (context?.investorProfile) {
@@ -68,15 +68,37 @@ export default async function handler(req, res) {
     const parts = [];
     if (context.portfolioSummary) {
       const s = context.portfolioSummary;
-      parts.push(`PORTFÖLJÖVERSIKT:\nTotalt värde: ${s.totalValue?.toLocaleString("sv-SE")} SEK\nTotal kostnad: ${s.totalCost?.toLocaleString("sv-SE")} SEK\nP&L: ${s.totalPl != null ? (s.totalPl >= 0 ? "+" : "") + s.totalPl.toLocaleString("sv-SE") + " SEK (" + (s.totalPlPct >= 0 ? "+" : "") + s.totalPlPct + "%)" : "Ej beräknat"}\nAntal innehav: ${s.totalHoldings} (${s.holdingsWithShares} med aktier)`);
+      let summaryText = `PORTFÖLJÖVERSIKT:\nTotalt värde: ${s.totalValue?.toLocaleString("sv-SE")} SEK\nTotal kostnad: ${s.totalCost?.toLocaleString("sv-SE")} SEK\nP&L: ${s.totalPl != null ? (s.totalPl >= 0 ? "+" : "") + s.totalPl.toLocaleString("sv-SE") + " SEK (" + (s.totalPlPct >= 0 ? "+" : "") + s.totalPlPct + "%)" : "Ej beräknat"}\nAntal innehav: ${s.totalHoldings} (${s.holdingsWithShares} med aktier)`;
+      if (s.sectorBreakdown?.length > 0) {
+        summaryText += "\n\nSEKTÖRFÖRDELNING:\n" + s.sectorBreakdown.map(sec =>
+          `${sec.sector}: ${sec.value?.toLocaleString("sv-SE")} SEK (${sec.pct}%)`
+        ).join("\n");
+      }
+      parts.push(summaryText);
     }
     if (context.portfolio?.length > 0) {
       const owned = context.portfolio.filter(c => c.shares > 0);
       const watched = context.portfolio.filter(c => !c.shares);
       if (owned.length > 0) {
-        parts.push("ÄGDA AKTIER:\n" + owned.map(c =>
-          `${c.name} (${c.ticker}): ${c.shares} st à ${c.price} ${c.currency}, värde ${c.valueSek?.toLocaleString("sv-SE")} SEK, P&L ${c.plSek != null ? (c.plSek >= 0 ? "+" : "") + c.plSek.toLocaleString("sv-SE") + " SEK (" + (c.plPct >= 0 ? "+" : "") + c.plPct + "%)" : "—"}, idag ${c.changePercent > 0 ? "+" : ""}${c.changePercent}%, sektor: ${c.sector || "—"}`
-        ).join("\n"));
+        parts.push("ÄGDA AKTIER:\n" + owned.map(c => {
+          let line = `${c.name} (${c.ticker}): ${c.shares} st à ${c.price} ${c.currency}, värde ${c.valueSek?.toLocaleString("sv-SE")} SEK, P&L ${c.plSek != null ? (c.plSek >= 0 ? "+" : "") + c.plSek.toLocaleString("sv-SE") + " SEK (" + (c.plPct >= 0 ? "+" : "") + c.plPct + "%)" : "—"}, idag ${c.changePercent > 0 ? "+" : ""}${c.changePercent}%, sektor: ${c.sector || "—"}`;
+          if (c.score) {
+            const sc = c.score;
+            const scoreParts = [];
+            if (sc.composite) {
+              const compKeys = { value: "värde", growth: "tillväxt", dividend: "utdelning", mixed: "blandat" };
+              Object.entries(sc.composite).filter(([, v]) => v != null).forEach(([k, v]) => {
+                scoreParts.push(`${compKeys[k] || k}: ${v}/100`);
+              });
+            }
+            if (sc.risk) scoreParts.push(`risk: ${sc.risk}`);
+            if (sc.data?.peForward) scoreParts.push(`P/E(fwd): ${sc.data.peForward}`);
+            if (sc.data?.dividendYield) scoreParts.push(`utd.avk: ${(sc.data.dividendYield * 100).toFixed(1)}%`);
+            if (sc.data?.revenueGrowth) scoreParts.push(`oms.tillväxt: ${(sc.data.revenueGrowth * 100).toFixed(1)}%`);
+            if (scoreParts.length > 0) line += ` | Scoring: ${scoreParts.join(", ")}`;
+          }
+          return line;
+        }).join("\n"));
       }
       if (watched.length > 0) {
         parts.push("BEVAKADE (ej ägda):\n" + watched.slice(0, 10).map(c =>

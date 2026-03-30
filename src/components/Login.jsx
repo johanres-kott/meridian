@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { supabase } from "../supabase.js";
 
-export default function Login({ onShowPrivacy }) {
+export default function Login({ onShowPrivacy, defaultMode = "login" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState("login"); // "login" | "signup" | "magic"
+  const [mode, setMode] = useState(defaultMode); // "login" | "signup" | "magic"
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);

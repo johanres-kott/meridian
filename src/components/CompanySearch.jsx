@@ -385,11 +385,18 @@ export default function CompanySearch({ deepLink, onClearDeepLink, preferences =
                       })()}
                     </div>
                   )}
-                  <div style={{ marginTop: 10, padding: "8px 10px", background: score >= 60 ? "#e8f5e9" : score >= 40 ? "#fff8e1" : "#fff5f5", borderRadius: 4 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: score >= 60 ? "#089981" : score >= 40 ? "#e65100" : "#c62828" }}>
-                      {score >= 60 ? "Matchar din profil" : score >= 40 ? "Delvis matchning" : "Avviker från din profil"}
-                    </div>
-                  </div>
+                  {(() => {
+                    const profileType = profile?.investorType || "mixed";
+                    const cs = scoreData?.composite?.[profileType] ?? scoreData?.composite?.mixed ?? score;
+                    const matchColor = cs >= 70 ? "#089981" : cs >= 40 ? "#e65100" : "#c62828";
+                    const matchBg = cs >= 70 ? "rgba(8,153,129,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
+                    const matchText = cs >= 70 ? "Stark matchning" : cs >= 40 ? "Delvis matchning" : "Svag matchning";
+                    return (
+                      <div style={{ marginTop: 10, padding: "8px 10px", background: matchBg, borderRadius: 4 }}>
+                        <div style={{ fontSize: 11, fontWeight: 500, color: matchColor }}>{matchText}</div>
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })()}

@@ -66,6 +66,16 @@ Håll svaren under 200 ord. Var direkt och handlingsorienterad.`;
   // Add profile-specific AI instructions
   if (context?.investorProfile) {
     const p = context.investorProfile;
+    const typeLabels = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", index: "indexinvesterare", mixed: "blandar strategier" };
+    const riskLabels = { low: "låg", medium: "medel", high: "hög" };
+    const focusLabels = { dividends: "utdelning", appreciation: "kursökning", both: "totalavkastning" };
+    systemPrompt += `\n\nANVÄNDARENS PROFIL (du VET redan detta — fråga INTE om det):
+- Typ: ${typeLabels[p.investorType] || p.investorType}
+- Risktolerans: ${riskLabels[p.riskProfile] || p.riskProfile}
+- Fokus: ${focusLabels[p.focus] || p.focus}
+- Erfarenhet: ${p.experience || "ej angett"}
+ANVÄND denna profil direkt i dina svar. Fråga ALDRIG om risktolerans, investeringsstil eller mål — du har redan svaren.`;
+
     const profileInstructions = {
       value: "Användaren är värdeinvesterare. Fokusera på P/E-tal, substansvärde, skuldsättning och säkerhetsmarginal. Ge konservativa förslag med fokus på fundamenta.",
       growth: "Användaren är tillväxtinvesterare. Fokusera på omsättningstillväxt, ROIC, skalbarhet och marknadspotential. Var positiv till bolag med stark tillväxt även om P/E är högt.",

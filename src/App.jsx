@@ -43,7 +43,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [lastSeenAt, setLastSeenAt] = useState(null);
   const [preferences, setPreferences] = useState({});
-  const [chatOpen, setChatOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);

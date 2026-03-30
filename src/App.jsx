@@ -13,6 +13,7 @@ import ChatPanel from "./components/ChatPanel.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
+import QuickGuide from "./components/QuickGuide.jsx";
 import ScoringMethodology from "./components/ScoringMethodology.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
@@ -455,6 +456,11 @@ export default function App() {
             }
           } catch {}
         }} />
+      )}
+
+      {/* Quick guide for new users (after onboarding) */}
+      {preferences.investorProfile && !preferences.guideSeen && (
+        <QuickGuide onComplete={() => updatePreferences({ guideSeen: true })} />
       )}
 
       {/* Content + Chat */}

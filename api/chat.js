@@ -54,10 +54,16 @@ Strukturera ALLTID svaret i denna ordning:
 
 **Vad** — Lista de specifika bolagen (BARA från toppförslags-listan) med ticker, t.ex. "4 bolag: Volvo (VOLV-B.ST), Sandvik (SAND.ST)..."
 
-**Hur** — Totalbelopp och tidsplan, följt av en konkret månadsplan:
+**Hur** — Totalbelopp och investeringsstrategi. Anpassa DCA vs Lump Sum efter risktolerans:
+- Hög risk → Lump sum (investera allt direkt). Statistiskt bäst i ~66% av fallen då börsen trendar uppåt.
+- Medel risk → Mild DCA, sprid över 2-3 månader.
+- Låg risk → DCA, sprid över 3-4 månader för att minska timingrisken.
+
+Förklara kort VARFÖR du väljer DCA eller lump sum (t.ex. "Eftersom du har hög risktolerans investerar vi allt direkt — historiskt ger det bäst avkastning i 2 av 3 fall").
+
+Om DCA, inkludera en månadsplan:
 Mån 1: Bolag A — 8 000 kr, Bolag B — 2 000 kr
 Mån 2: Bolag C — 6 000 kr, Bolag D — 4 000 kr
-osv.
 
 NÄR ANVÄNDAREN FRÅGAR OM PORTFÖLJEN:
 - Analysera vilka aktier som dragit ner/upp mest (P&L)

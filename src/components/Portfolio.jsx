@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabase.js";
+import { Treemap, ResponsiveContainer } from "recharts";
 import PdfImportModal from "./PdfImportModal.jsx";
 import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
@@ -146,13 +147,88 @@ function formatHoldingValue(msek) {
   return `${msek.toLocaleString("sv-SE")} Mkr`;
 }
 
-function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, investorProfile = null, scoreData = null }) {
-  const [price, setPrice] = useState(null);
+function TreemapCell({ x, y, width, height, name, ticker, valueSek, changePercent }) {
+  if (width < 4 || height < 4) return null;
+  const bg = changePercent > 0 ? "#089981" : changePercent < 0 ? "#f23645" : "#42a5f5";
+  const showTicker = width > 50 && height > 30;
+  const showValue = width > 60 && height > 44;
+  const fontSize = Math.max(10, Math.min(14, width / 8));
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} rx={3} ry={3}
+        style={{ fill: bg, stroke: "#fff", strokeWidth: 2, cursor: "pointer" }} />
+      {showTicker && (
+        <text x={x + 6} y={y + 4 + fontSize} fontSize={fontSize} fontWeight={600} fill="#fff" fontFamily="inherit">
+          {width < 80 ? ticker : name}
+        </text>
+      )}
+      {showValue && (
+        <text x={x + 6} y={y + 6 + fontSize * 2.1} fontSize={Math.max(9, fontSize - 2)} fill="rgba(255,255,255,0.85)" fontFamily="inherit">
+          {valueSek >= 1000000
+            ? `${(valueSek / 1000000).toFixed(1)} Mkr`
+            : `${Math.round(valueSek).toLocaleString("sv-SE")} kr`}
+        </text>
+      )}
+    </g>
+  );
+}
+
+function PortfolioTreemap({ items, prices, fxRates, onSelect, isMobile }) {
+  const treemapData = items
+    .filter(item => item.shares && prices[item.ticker]?.price)
+    .map(item => {
+      const p = prices[item.ticker];
+      const currency = p.currency || "SEK";
+      const fx = fxRates[currency] || 1;
+      const valueSek = item.shares * p.price * fx;
+      return { name: item.name || item.ticker, ticker: item.ticker, valueSek, changePercent: p.changePercent || 0, _item: item };
+    })
+    .filter(d => d.valueSek > 0)
+    .sort((a, b) => b.valueSek - a.valueSek);
+
+  if (treemapData.length < 2) return null;
+
+  const total = treemapData.reduce((s, d) => s + d.valueSek, 0);
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary, #131722)" }}>Portföljkarta</div>
+        <div style={{ fontSize: 12, color: "var(--text-secondary, #787b86)" }}>
+          Totalt: {total >= 1000000
+            ? `${(total / 1000000).toFixed(1)} Mkr`
+            : `${Math.round(total).toLocaleString("sv-SE")} kr`}
+        </div>
+      </div>
+      <div style={{ border: "1px solid var(--border, #e0e3eb)", borderRadius: 6, overflow: "hidden" }}>
+        <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
+          <Treemap
+            data={treemapData}
+            dataKey="valueSek"
+            content={<TreemapCell />}
+            onClick={(node) => {
+              if (node?._item) onSelect(node._item);
+            }}
+            isAnimationActive={false}
+          />
+        </ResponsiveContainer>
+      </div>
+      <div style={{ display: "flex", gap: 12, marginTop: 6, fontSize: 11, color: "var(--text-secondary, #787b86)" }}>
+        <span><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "#089981", marginRight: 4 }} />Upp idag</span>
+        <span><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "#f23645", marginRight: 4 }} />Ner idag</span>
+      </div>
+    </div>
+  );
+}
+
+function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, investorProfile = null, scoreData = null, priceData = null }) {
+  const [price, setPrice] = useState(priceData);
   const [tagOpen, setTagOpen] = useState(false);
 
   useEffect(() => {
+    if (priceData) { setPrice(priceData); return; }
     fetchPrice(item.ticker).then(d => { if (d && d.price) setPrice(d); });
-  }, [item.ticker]);
+  }, [item.ticker, priceData]);
 
   const chg = price?.changePercent;
   const chgColor = chg > 0 ? "#089981" : chg < 0 ? "#f23645" : "var(--text-secondary)";
@@ -304,6 +380,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [scores, setScores] = useState({});
+  const [prices, setPrices] = useState({});
 
   const groups = preferences.groups || [];
 
@@ -337,6 +414,15 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
     const { data } = await supabase.from("watchlist").select("*").eq("user_id", user.id).order("created_at");
     setItems(data || []);
     setLoading(false);
+    if (data && data.length > 0) {
+      Promise.all(data.map(item =>
+        fetchPrice(item.ticker).then(d => d?.price ? [item.ticker, d] : null)
+      )).then(results => {
+        const map = {};
+        for (const r of results) { if (r) map[r[0]] = r[1]; }
+        setPrices(map);
+      });
+    }
   }
 
   async function loadFxRates() {
@@ -615,6 +701,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       </div>
 
       <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
+      <PortfolioTreemap items={filteredItems} prices={prices} fxRates={fxRates} onSelect={setSelected} isMobile={isMobile} />
 
       {items.some(i => i.shares) && userId && <PortfolioChart userId={userId} />}
 
@@ -641,7 +728,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} investorProfile={preferences.investorProfile} scoreData={scores[item.ticker?.toUpperCase()]} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} investorProfile={preferences.investorProfile} scoreData={scores[item.ticker?.toUpperCase()]} priceData={prices[item.ticker] || null} />
               ))}
             </tbody>
           </table>

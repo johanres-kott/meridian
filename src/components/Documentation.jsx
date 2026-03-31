@@ -7,6 +7,8 @@ const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, 
 const listStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 20, marginBottom: 8 };
 
 const GLOSSARY = [
+  { term: "DCA (Dollar Cost Averaging)", def: "En investeringsstrategi där du sprider ut dina köp över tid — till exempel lika mycket varje månad. Minskar risken att köpa allt på toppen.", example: "Du vill investera 60 000 kr. Istället för allt på en gång köper du för 20 000 kr per månad i tre månader." },
+  { term: "Lump Sum (Engångsinsats)", def: "Att investera hela beloppet direkt istället för att sprida ut det. Historiskt ger detta bättre avkastning i ungefär två av tre fall, eftersom marknaden tenderar att gå uppåt över tid.", example: "Du har 60 000 kr att investera och köper för hela beloppet idag istället för att dela upp det." },
   { term: "Beta", def: "Mäter hur mycket en akties kurs svänger jämfört med marknaden. Beta 1.0 = samma som index. Under 0.8 = stabilare, över 1.2 = mer volatil.", example: "AstraZeneca har beta 0.29 (väldigt stabil), Sinch har 1.72 (svänger mycket)." },
   { term: "Bruttomarginal", def: "Hur mycket av varje intjänad krona som blir kvar efter att varukostnaden dragits av. Bruttomarginal = (Omsättning − Varukostnad) / Omsättning.", example: "Ett bolag med 40% bruttomarginal behåller 40 öre av varje intjänad krona efter varukostnader." },
   { term: "Direktavkastning", def: "Årlig utdelning delat med aktiekursen. Visar hur mycket pengar du får tillbaka varje år bara för att äga aktien.", example: "Om aktien kostar 100 kr och utdelningen är 4 kr per år → 4% direktavkastning." },
@@ -45,6 +47,8 @@ export default function Documentation() {
             { label: "Profilviktning", id: "weighting", indent: 1 },
             { label: "Riskbedömning (Beta)", id: "risk", indent: 1 },
             { label: "Riskjustering av poäng", id: "risk-adjust", indent: 1 },
+            { label: "Investeringsstrategier", id: "strategies", indent: 0 },
+            { label: "DCA vs Lump Sum", id: "dca-lump", indent: 1 },
             { label: "Nyckeltal A–Ö", id: "glossary", indent: 0 },
             { label: "Datakällor", id: "sources", indent: 0 },
             { label: "Uppdateringsfrekvens", id: "frequency", indent: 0 },
@@ -249,6 +253,69 @@ export default function Documentation() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Investment strategies */}
+      <div id="strategies" style={sectionStyle}>
+        <div style={h2Style}>Investeringsstrategier</div>
+        <p style={pStyle}>
+          När du har pengar att investera finns det två huvudstrategier för hur du lägger in dem på marknaden.
+          Thesion anpassar sin rekommendation baserat på din riskprofil.
+        </p>
+
+        <div id="dca-lump" style={h3Style}>DCA vs Lump Sum</div>
+        <p style={pStyle}>
+          <strong>Lump Sum</strong> innebär att du investerar hela beloppet direkt. <strong>DCA (Dollar Cost Averaging)</strong> innebär
+          att du sprider ut köpen över tid — till exempel lika mycket varje vecka eller månad.
+        </p>
+
+        <div style={{ background: "var(--bg-secondary)", borderRadius: 6, padding: "14px 16px", marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>Vad säger forskningen?</div>
+          <p style={{ ...pStyle, marginBottom: 8 }}>
+            Vanguards studie <em>"Dollar-cost averaging just means taking risk later"</em> (2012) analyserade data
+            från USA, Storbritannien och Australien mellan 1926–2011. Resultaten visar att:
+          </p>
+          <ul style={listStyle}>
+            <li>Lump Sum slog DCA i cirka <strong>två av tre fall</strong> (66% av alla 12-månadersperioder)</li>
+            <li>Genomsnittlig fördel för Lump Sum: <strong>2,3 procentenheter</strong> högre avkastning över 12 månader</li>
+            <li>Anledningen: marknaden tenderar att gå uppåt över tid, så pengar som ligger och väntar missar avkastning</li>
+          </ul>
+          <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 0, lineHeight: 1.5 }}>
+            Källa: Vanguard Research, "Dollar-cost averaging just means taking risk later" (Juli 2012).
+            Författare: Georgianni, Shtekhman &amp; Tasopoulos.
+          </p>
+        </div>
+
+        <div style={h3Style}>Hur Thesion anpassar strategin</div>
+        <p style={pStyle}>Baserat på din riskprofil rekommenderar Mats olika strategier:</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
+            <span style={{ color: "#089981", fontSize: 14 }}>◉</span>
+            <div>
+              <strong style={{ color: "var(--text)" }}>Låg risk-profil → DCA 3–4 månader</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>Sprider risken maximalt. Du slipper oroa dig för tajming och marknadens svängningar.</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
+            <span style={{ color: "#ff9800", fontSize: 14 }}>◉</span>
+            <div>
+              <strong style={{ color: "var(--text)" }}>Medel risk-profil → DCA 2–3 månader</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>Balans mellan riskspridning och att komma in i marknaden snabbt.</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
+            <span style={{ color: "#f23645", fontSize: 14 }}>◉</span>
+            <div>
+              <strong style={{ color: "var(--text)" }}>Hög risk-profil → Lump Sum (engångsinsats)</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>Historiskt bäst avkastning. Passar dig som tål svängningar och tror på marknaden långsiktigt.</div>
+            </div>
+          </div>
+        </div>
+
+        <p style={{ ...pStyle, marginTop: 16, fontSize: 12, color: "var(--text-muted)" }}>
+          <strong>Tips:</strong> Oavsett strategi — det viktigaste är att du investerar regelbundet och håller dig till din plan.
+          Att vänta på "rätt tillfälle" brukar ge sämre resultat än att bara komma igång.
+        </p>
       </div>
 
       {/* Glossary */}

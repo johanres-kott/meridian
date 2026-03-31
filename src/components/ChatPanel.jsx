@@ -450,6 +450,27 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
             )}
           </div>
         ))}
+        {messages.length > 0 && !streaming && !wizardActive && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+            {[
+              { emoji: "📊", text: "Analysera portföljen", q: "Analysera min portfölj — vad är bra och vad kan förbättras?" },
+              { emoji: "💡", text: "Investeringsplan", wizard: true },
+              { emoji: "🔄", text: "Köpa/sälja?", q: "Vilka aktier borde jag sälja och vilka borde jag köpa istället? Ge konkreta förslag." },
+            ].map((item, i) => (
+              <button key={i} onClick={() => item.wizard ? setWizardActive(true) : sendWithMessage(item.q)}
+                style={{
+                  padding: "6px 10px", borderRadius: 14, border: "1px solid var(--border)",
+                  background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit",
+                  fontSize: 11, color: "var(--text-secondary)", transition: "all 0.15s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+              >
+                {item.emoji} {item.text}
+              </button>
+            ))}
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 

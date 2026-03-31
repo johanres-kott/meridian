@@ -8,6 +8,44 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock } from "../lib/profileMatcher.js";
 import { sanitizeInput } from "../lib/sanitize.js";
 import PortfolioChart from "./PortfolioChart.jsx";
+function SimpleMarkdown({ text }) {
+  const lines = text.split("\n");
+  const elements = [];
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    // Headers
+    if (line.startsWith("### ")) { elements.push(<div key={i} style={{ fontWeight: 600, fontSize: 12, marginTop: i > 0 ? 8 : 0, marginBottom: 2 }}>{renderInline(line.slice(4))}</div>); continue; }
+    if (line.startsWith("## ")) { elements.push(<div key={i} style={{ fontWeight: 600, fontSize: 13, marginTop: i > 0 ? 10 : 0, marginBottom: 2 }}>{renderInline(line.slice(3))}</div>); continue; }
+    if (line.startsWith("# ")) { elements.push(<div key={i} style={{ fontWeight: 700, fontSize: 14, marginTop: i > 0 ? 10 : 0, marginBottom: 4 }}>{renderInline(line.slice(2))}</div>); continue; }
+    // Horizontal rule
+    if (/^---+$/.test(line.trim())) { elements.push(<hr key={i} style={{ border: "none", borderTop: "1px solid var(--border, #e0e3eb)", margin: "8px 0" }} />); continue; }
+    // List items
+    if (/^\d+\.\s/.test(line)) { elements.push(<div key={i} style={{ paddingLeft: 8, marginTop: 2 }}>{renderInline(line)}</div>); continue; }
+    if (line.startsWith("- ")) { elements.push(<div key={i} style={{ paddingLeft: 8, marginTop: 2 }}>{renderInline(line)}</div>); continue; }
+    // Empty line
+    if (!line.trim()) { elements.push(<div key={i} style={{ height: 6 }} />); continue; }
+    // Normal text
+    elements.push(<div key={i} style={{ marginTop: 1 }}>{renderInline(line)}</div>);
+  }
+  return <>{elements}</>;
+}
+
+function renderInline(text) {
+  // Bold: **text**
+  const parts = [];
+  let remaining = text;
+  let key = 0;
+  while (remaining) {
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+    if (!boldMatch) { parts.push(remaining); break; }
+    const idx = boldMatch.index;
+    if (idx > 0) parts.push(remaining.slice(0, idx));
+    parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
+    remaining = remaining.slice(idx + boldMatch[0].length);
+  }
+  return parts;
+}
+
 const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
 
 const STATUS_COLORS = {
@@ -618,8 +656,8 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
               Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
             </div>
           </div>
-          <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6, whiteSpace: "pre-wrap", maxHeight: 120, overflow: "auto" }}>
-            {preferences.investmentPlan.text}
+          <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6, maxHeight: 200, overflow: "auto" }}>
+            <SimpleMarkdown text={preferences.investmentPlan.text} />
           </div>
           <button
             onClick={() => onUpdatePreferences({ investmentPlan: null })}

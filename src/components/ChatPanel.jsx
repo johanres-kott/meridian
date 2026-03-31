@@ -1,6 +1,35 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../supabase.js";
 
+function renderInline(text) {
+  const parts = [];
+  let remaining = text;
+  let key = 0;
+  while (remaining) {
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+    if (!boldMatch) { parts.push(remaining); break; }
+    const idx = boldMatch.index;
+    if (idx > 0) parts.push(remaining.slice(0, idx));
+    parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
+    remaining = remaining.slice(idx + boldMatch[0].length);
+  }
+  return parts;
+}
+
+function ChatMarkdown({ text }) {
+  const lines = text.split("\n");
+  return lines.map((line, i) => {
+    if (line.startsWith("### ")) return <div key={i} style={{ fontWeight: 600, fontSize: 12, marginTop: i > 0 ? 6 : 0 }}>{renderInline(line.slice(4))}</div>;
+    if (line.startsWith("## ")) return <div key={i} style={{ fontWeight: 600, fontSize: 13, marginTop: i > 0 ? 8 : 0 }}>{renderInline(line.slice(3))}</div>;
+    if (line.startsWith("# ")) return <div key={i} style={{ fontWeight: 700, fontSize: 13, marginTop: i > 0 ? 8 : 0 }}>{renderInline(line.slice(2))}</div>;
+    if (/^---+$/.test(line.trim())) return <hr key={i} style={{ border: "none", borderTop: "1px solid currentColor", opacity: 0.15, margin: "6px 0" }} />;
+    if (/^\d+\.\s/.test(line)) return <div key={i} style={{ paddingLeft: 4, marginTop: 2 }}>{renderInline(line)}</div>;
+    if (line.startsWith("- ")) return <div key={i} style={{ paddingLeft: 4, marginTop: 2 }}>{renderInline(line)}</div>;
+    if (!line.trim()) return <div key={i} style={{ height: 4 }} />;
+    return <div key={i} style={{ marginTop: 1 }}>{renderInline(line)}</div>;
+  });
+}
+
 function SaveInsightButton({ content, contextFn }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -439,11 +468,13 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
               borderRadius: 8,
               fontSize: 12,
               lineHeight: 1.5,
-              whiteSpace: "pre-wrap",
+              whiteSpace: msg.role === "user" ? "pre-wrap" : undefined,
               background: msg.role === "user" ? "var(--accent)" : "var(--border-light)",
               color: msg.role === "user" ? "#fff" : "var(--text)",
             }}>
-              {msg.content || (streaming && i === messages.length - 1 ? "..." : "")}
+              {msg.role === "assistant" && msg.content
+                ? <ChatMarkdown text={msg.content} />
+                : (msg.content || (streaming && i === messages.length - 1 ? "..." : ""))}
             </div>
             {msg.role === "assistant" && msg.content && !streaming && (
               <SaveMenu content={msg.content} contextFn={contextFn} onSaveStrategy={onSaveStrategy} onSaveTodo={onSaveTodo} />

@@ -164,6 +164,14 @@ function SaveStrategyButton({ content, onSave }) {
 
 const PLAN_QUESTIONS = [
   {
+    key: "type",
+    question: "Vill du sätta in nya pengar eller omfördela det du redan har?",
+    options: [
+      { label: "Nya pengar", value: "investera färska pengar" },
+      { label: "Omfördela", value: "omfördela min befintliga portfölj" },
+    ],
+  },
+  {
     key: "amount",
     question: "Hur mycket vill du investera?",
     options: [
@@ -175,26 +183,7 @@ const PLAN_QUESTIONS = [
     ],
     allowCustom: true,
     customPlaceholder: "Ange belopp i kr...",
-  },
-  {
-    key: "horizon",
-    question: "Vilken tidshorisont har du?",
-    options: [
-      { label: "1-3 månader", value: "kort (1-3 månader)" },
-      { label: "3-12 månader", value: "medel (3-12 månader)" },
-      { label: "1-3 år", value: "lång (1-3 år)" },
-      { label: "3+ år", value: "mycket lång (3+ år)" },
-    ],
-  },
-  {
-    key: "goal",
-    question: "Vad är viktigast för dig?",
-    options: [
-      { label: "Trygg tillväxt", value: "trygg, stabil tillväxt med låg risk" },
-      { label: "Hög avkastning", value: "hög avkastning, accepterar högre risk" },
-      { label: "Utdelningar", value: "löpande utdelningar och kassaflöde" },
-      { label: "Diversifiera", value: "diversifiera min nuvarande portfölj" },
-    ],
+    onlyIf: (answers) => answers.type === "investera färska pengar",
   },
 ];
 
@@ -203,14 +192,25 @@ function InvestmentWizard({ onComplete, onCancel }) {
   const [answers, setAnswers] = useState({});
   const [customValue, setCustomValue] = useState("");
 
-  const q = PLAN_QUESTIONS[step];
+  // Find the next applicable question
+  function nextApplicableStep(fromStep, currentAnswers) {
+    for (let i = fromStep; i < PLAN_QUESTIONS.length; i++) {
+      const q = PLAN_QUESTIONS[i];
+      if (!q.onlyIf || q.onlyIf(currentAnswers)) return i;
+    }
+    return -1; // no more questions
+  }
+
+  const effectiveStep = nextApplicableStep(step, answers);
+  const q = effectiveStep >= 0 ? PLAN_QUESTIONS[effectiveStep] : null;
 
   function select(value) {
     const updated = { ...answers, [q.key]: value };
     setAnswers(updated);
     setCustomValue("");
-    if (step < PLAN_QUESTIONS.length - 1) {
-      setStep(step + 1);
+    const next = nextApplicableStep(effectiveStep + 1, updated);
+    if (next >= 0) {
+      setStep(next);
     } else {
       onComplete(updated);
     }
@@ -228,13 +228,21 @@ function InvestmentWizard({ onComplete, onCancel }) {
     fontSize: 12, color: "var(--text)", transition: "all 0.15s",
   };
 
+  if (!q) return null;
+
+  // Count which visible step we're on
+  const applicableQuestions = PLAN_QUESTIONS.filter(pq => !pq.onlyIf || pq.onlyIf(answers));
+  const visibleStepIndex = applicableQuestions.indexOf(q) + 1;
+
   return (
     <div style={{ padding: "8px 0" }}>
       <div style={{ padding: "8px 12px", borderRadius: 8, background: "var(--border-light)", fontSize: 12, lineHeight: 1.5, color: "var(--text)", marginBottom: 8 }}>
         {q.question}
-        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-          Steg {step + 1} av {PLAN_QUESTIONS.length}
-        </div>
+        {applicableQuestions.length > 1 && (
+          <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+            Steg {visibleStepIndex} av {applicableQuestions.length}
+          </div>
+        )}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {q.options.map(opt => (
@@ -410,9 +418,16 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
           <InvestmentWizard
             onComplete={(answers) => {
               setWizardActive(false);
-              const amountText = answers.amount;
-              const summary = `Jag vill investera ${amountText}. Tidshorisont: ${answers.horizon}. Mål: ${answers.goal}.`;
-              sendWithMessage(`Ge mig en konkret investeringsplan. ${summary} Ge specifika bolag med ticker, belopp per bolag och motivering.`);
+              const isNew = answers.type === "investera färska pengar";
+              const parts = [`Jag vill ${answers.type}.`];
+              if (isNew && answers.amount) {
+                parts.push(`Belopp: ${answers.amount}.`);
+              }
+              parts.push("Analysera min profil och nuvarande portfölj, föreslå konkreta bolag med ticker, belopp per bolag och motivering.");
+              if (!isNew) {
+                parts.push("Föreslå vilka aktier jag borde sälja och vad jag borde köpa istället.");
+              }
+              sendWithMessage(`Ge mig en konkret investeringsplan. ${parts.join(" ")}`);
             }}
             onCancel={() => setWizardActive(false)}
           />

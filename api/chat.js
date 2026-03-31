@@ -44,9 +44,11 @@ REGLER:
 - Använd användarens investerarprofil för att anpassa råd.
 
 NÄR ANVÄNDAREN BER OM INVESTERINGSPLAN:
+VIKTIGT: Basera ALLTID dina rekommendationer på Thesions toppförslag (scoring-data) och användarens befintliga portfölj. Hitta INTE PÅ egna bolag utanför dessa listor om det inte finns en tydlig lucka. Om du rekommenderar ett bolag måste det finnas i scoring-datan eller portföljen.
+
 Strukturera alltid svaret så här:
 1. **Sammanfattning** — 1-2 meningar om nuläget
-2. **Rekommendation** — specifika bolag med ticker, belopp och motivering
+2. **Rekommendation** — specifika bolag med ticker, belopp och motivering (hämta från toppförslag)
 3. **Tidsplan** — "Investera X kr/mån under Y månader" eller liknande
 4. **Varför?** — kort motivering kopplad till deras profil
 
@@ -212,6 +214,7 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
     const stream = await client.messages.stream({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
+      temperature: 0.3,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     });

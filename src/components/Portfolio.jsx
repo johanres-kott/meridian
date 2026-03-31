@@ -642,31 +642,94 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       </div>
 
       {/* Investment strategy card */}
-      {preferences.investmentPlan?.text && (
-        <div style={{
-          marginBottom: 16, padding: isMobile ? 14 : 18, borderRadius: 8,
-          background: "linear-gradient(135deg, var(--accent-light), var(--bg-secondary))",
-          border: "1px solid var(--border)",
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
-              Din investeringsstrategi
+      {preferences.investmentPlan?.text && (() => {
+        const text = preferences.investmentPlan.text;
+        // Parse sections: look for **Varför**, **Vad**, **Hur** (or ## variants)
+        const sectionRegex = /(?:^|\n)\s*(?:\*\*|#{1,3}\s*)(Varf[öo]r|Vad|Hur)(?:\*\*|)\s*[:—\-]?\s*/gi;
+        const sections = {};
+        let matches = [];
+        let m;
+        while ((m = sectionRegex.exec(text)) !== null) {
+          matches.push({ key: m[1].toLowerCase().replace("ö", "o"), index: m.index, end: m.index + m[0].length });
+        }
+        if (matches.length >= 2) {
+          for (let i = 0; i < matches.length; i++) {
+            const nextStart = i + 1 < matches.length ? matches[i + 1].index : text.length;
+            sections[matches[i].key] = text.slice(matches[i].end, nextStart).trim();
+          }
+          // Text before first section
+          const preamble = text.slice(0, matches[0].index).trim();
+          return (
+            <div style={{
+              marginBottom: 16, padding: isMobile ? 14 : 18, borderRadius: 8,
+              background: "linear-gradient(135deg, var(--accent-light), var(--bg-secondary))",
+              border: "1px solid var(--border)",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
+                  Din investeringsstrategi
+                </div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                  Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
+                </div>
+              </div>
+              {preamble && <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}><SimpleMarkdown text={preamble} /></div>}
+              {sections.varfor && (
+                <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Varför</div>
+                  <SimpleMarkdown text={sections.varfor} />
+                </div>
+              )}
+              <div style={{ display: isMobile ? "block" : "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                {sections.vad && (
+                  <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Vad</div>
+                    <SimpleMarkdown text={sections.vad} />
+                  </div>
+                )}
+                {sections.hur && (
+                  <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginTop: isMobile ? 10 : 0 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Hur</div>
+                    <SimpleMarkdown text={sections.hur} />
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => onUpdatePreferences({ investmentPlan: null })}
+                style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+              >
+                Ta bort strategi
+              </button>
             </div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-              Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
+          );
+        }
+        // Fallback: render as before if sections not detected
+        return (
+          <div style={{
+            marginBottom: 16, padding: isMobile ? 14 : 18, borderRadius: 8,
+            background: "linear-gradient(135deg, var(--accent-light), var(--bg-secondary))",
+            border: "1px solid var(--border)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
+                Din investeringsstrategi
+              </div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
+              </div>
             </div>
+            <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6 }}>
+              <SimpleMarkdown text={text} />
+            </div>
+            <button
+              onClick={() => onUpdatePreferences({ investmentPlan: null })}
+              style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+            >
+              Ta bort strategi
+            </button>
           </div>
-          <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6, maxHeight: 200, overflow: "auto" }}>
-            <SimpleMarkdown text={preferences.investmentPlan.text} />
-          </div>
-          <button
-            onClick={() => onUpdatePreferences({ investmentPlan: null })}
-            style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-          >
-            Ta bort strategi
-          </button>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Group filter bar */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : undefined, WebkitOverflowScrolling: isMobile ? "touch" : undefined, paddingBottom: isMobile ? 4 : undefined }}>

@@ -644,13 +644,16 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       {/* Investment strategy card */}
       {preferences.investmentPlan?.text && (() => {
         const text = preferences.investmentPlan.text;
-        // Parse sections: look for **Varför**, **Vad**, **Hur** (or ## variants)
-        const sectionRegex = /(?:^|\n)\s*(?:\*\*|#{1,3}\s*)(Varf[öo]r|Vad|Hur)(?:\*\*|)\s*[:—\-]?\s*/gi;
+        // Parse sections: look for **VARFÖR...**, **VAD...**, **HUR...**, **Motivering** (or ## variants)
+        // Consume the entire header line so leftover text doesn't leak into content
+        const sectionRegex = /(?:^|\n)\s*(?:\*\*|#{1,3}\s*)(Varf[öo]r|Vad|Hur|Motivering)\b[^\n]*\n?/gi;
         const sections = {};
         let matches = [];
         let m;
         while ((m = sectionRegex.exec(text)) !== null) {
-          matches.push({ key: m[1].toLowerCase().replace("ö", "o"), index: m.index, end: m.index + m[0].length });
+          const rawKey = m[1].toLowerCase().replace("ö", "o");
+          const key = rawKey === "motivering" ? "motivering" : rawKey;
+          matches.push({ key, index: m.index, end: m.index + m[0].length });
         }
         if (matches.length >= 2) {
           for (let i = 0; i < matches.length; i++) {
@@ -675,25 +678,31 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
               </div>
               {preamble && <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}><SimpleMarkdown text={preamble} /></div>}
               {sections.varfor && (
-                <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Varför</div>
+                <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 12, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Varför</div>
                   <SimpleMarkdown text={sections.varfor} />
                 </div>
               )}
-              <div style={{ display: isMobile ? "block" : "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={{ display: isMobile ? "flex" : "grid", flexDirection: isMobile ? "column" : undefined, gridTemplateColumns: isMobile ? undefined : "1fr 1fr", gap: 12, marginBottom: 12 }}>
                 {sections.vad && (
-                  <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Vad</div>
+                  <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Vad</div>
                     <SimpleMarkdown text={sections.vad} />
                   </div>
                 )}
                 {sections.hur && (
-                  <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginTop: isMobile ? 10 : 0 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Hur</div>
+                  <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Hur</div>
                     <SimpleMarkdown text={sections.hur} />
                   </div>
                 )}
               </div>
+              {sections.motivering && (
+                <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)", marginBottom: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Motivering</div>
+                  <SimpleMarkdown text={sections.motivering} />
+                </div>
+              )}
               <button
                 onClick={() => onUpdatePreferences({ investmentPlan: null })}
                 style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}

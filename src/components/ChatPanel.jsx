@@ -162,10 +162,118 @@ function SaveStrategyButton({ content, onSave }) {
   );
 }
 
+const PLAN_QUESTIONS = [
+  {
+    key: "amount",
+    question: "Hur mycket vill du investera?",
+    options: [
+      { label: "5 000 kr", value: "5000" },
+      { label: "10 000 kr", value: "10000" },
+      { label: "25 000 kr", value: "25000" },
+      { label: "50 000 kr", value: "50000" },
+      { label: "100 000 kr", value: "100000" },
+    ],
+    allowCustom: true,
+    customPlaceholder: "Ange belopp i kr...",
+  },
+  {
+    key: "horizon",
+    question: "Vilken tidshorisont har du?",
+    options: [
+      { label: "1-3 månader", value: "kort (1-3 månader)" },
+      { label: "3-12 månader", value: "medel (3-12 månader)" },
+      { label: "1-3 år", value: "lång (1-3 år)" },
+      { label: "3+ år", value: "mycket lång (3+ år)" },
+    ],
+  },
+  {
+    key: "goal",
+    question: "Vad är viktigast för dig?",
+    options: [
+      { label: "Trygg tillväxt", value: "trygg, stabil tillväxt med låg risk" },
+      { label: "Hög avkastning", value: "hög avkastning, accepterar högre risk" },
+      { label: "Utdelningar", value: "löpande utdelningar och kassaflöde" },
+      { label: "Diversifiera", value: "diversifiera min nuvarande portfölj" },
+    ],
+  },
+];
+
+function InvestmentWizard({ onComplete, onCancel }) {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [customValue, setCustomValue] = useState("");
+
+  const q = PLAN_QUESTIONS[step];
+
+  function select(value) {
+    const updated = { ...answers, [q.key]: value };
+    setAnswers(updated);
+    setCustomValue("");
+    if (step < PLAN_QUESTIONS.length - 1) {
+      setStep(step + 1);
+    } else {
+      onComplete(updated);
+    }
+  }
+
+  function submitCustom() {
+    const val = customValue.trim();
+    if (!val) return;
+    select(val + " kr");
+  }
+
+  const chipStyle = {
+    padding: "8px 14px", borderRadius: 16, border: "1px solid var(--border)",
+    background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit",
+    fontSize: 12, color: "var(--text)", transition: "all 0.15s",
+  };
+
+  return (
+    <div style={{ padding: "8px 0" }}>
+      <div style={{ padding: "8px 12px", borderRadius: 8, background: "var(--border-light)", fontSize: 12, lineHeight: 1.5, color: "var(--text)", marginBottom: 8 }}>
+        {q.question}
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+          Steg {step + 1} av {PLAN_QUESTIONS.length}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {q.options.map(opt => (
+          <button key={opt.value} onClick={() => select(opt.value)} style={chipStyle}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text)"; }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      {q.allowCustom && (
+        <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+          <input
+            value={customValue}
+            onChange={e => setCustomValue(e.target.value.replace(/[^0-9]/g, ""))}
+            onKeyDown={e => { if (e.key === "Enter") submitCustom(); }}
+            placeholder={q.customPlaceholder}
+            style={{ flex: 1, padding: "6px 10px", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12, background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit", outline: "none" }}
+          />
+          {customValue && (
+            <button onClick={submitCustom} style={{ ...chipStyle, background: "var(--accent)", color: "#fff", border: "none" }}>
+              {Number(customValue).toLocaleString("sv-SE")} kr
+            </button>
+          )}
+        </div>
+      )}
+      <button onClick={onCancel} style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>
+        Avbryt
+      </button>
+    </div>
+  );
+}
+
 export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true, onSaveStrategy, onSaveTodo }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [wizardActive, setWizardActive] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -272,11 +380,11 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {[
                 { emoji: "📊", text: "Analysera min portfölj", q: "Analysera min portfölj — vad är bra och vad kan förbättras?" },
-                { emoji: "💡", text: "Ge mig en investeringsplan", q: "Ge mig en konkret investeringsplan med specifika bolag, belopp och tidsplan baserat på min profil och portfölj." },
+                { emoji: "💡", text: "Ge mig en investeringsplan", wizard: true },
                 { emoji: "📈", text: "Vad driver min portfölj?", q: "Analysera vilka aktier som påverkat min portfölj mest — både uppåt och nedåt. Vad har gått bra och vad har gått dåligt?" },
                 { emoji: "🔄", text: "Vad borde jag sälja/köpa?", q: "Vilka aktier borde jag sälja och vilka borde jag köpa istället? Ge konkreta förslag." },
               ].map((item, i) => (
-                <button key={i} onClick={() => sendWithMessage(item.q)}
+                <button key={i} onClick={() => item.wizard ? setWizardActive(true) : sendWithMessage(item.q)}
                   style={{
                     display: "flex", alignItems: "center", gap: 8, padding: "10px 12px",
                     background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8,
@@ -297,6 +405,17 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
                 : "🔒 Portföljdata delas inte"}
             </div>
           </div>
+        )}
+        {wizardActive && (
+          <InvestmentWizard
+            onComplete={(answers) => {
+              setWizardActive(false);
+              const amountText = answers.amount;
+              const summary = `Jag vill investera ${amountText}. Tidshorisont: ${answers.horizon}. Mål: ${answers.goal}.`;
+              sendWithMessage(`Ge mig en konkret investeringsplan. ${summary} Ge specifika bolag med ticker, belopp per bolag och motivering.`);
+            }}
+            onCancel={() => setWizardActive(false)}
+          />
         )}
         {messages.map((msg, i) => (
           <div key={i} style={{ alignSelf: msg.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%" }}>

@@ -44,7 +44,7 @@ REGLER:
 - Använd användarens investerarprofil för att anpassa råd.
 
 NÄR ANVÄNDAREN BER OM INVESTERINGSPLAN:
-STRIKT REGEL: Du får BARA rekommendera bolag som finns i THESIONS TOPPFÖRSLAG nedan. Nämn ALDRIG bolag som inte finns i den listan. Om listan är tom eller saknas, be användaren gå till Investera-fliken först.
+Utgå från Thesions toppförslag (scoring-data) när du rekommenderar bolag. Om användaren ber om något specifikt (t.ex. svenska bolag, viss sektor) och toppförslagen inte täcker det, får du rekommendera andra välkända bolag — men motivera alltid varför.
 
 Om användaren redan har en sparad strategi, var KONSEKVENT med den. Ändra inte tidsplan eller bolagsval utan tydlig anledning.
 
@@ -137,9 +137,9 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
       parts.push(`ANVÄNDARENS ATT-GÖRA-LISTA (dessa är redan givna råd):\n${context.savedTodos.join("\n")}`);
     }
     if (context.topSuggestions?.length > 0) {
-      parts.push(`THESIONS TOPPFÖRSLAG — detta är den ENDA listan du får välja bolag från:\n${context.topSuggestions.map((s, i) =>
+      parts.push(`THESIONS TOPPFÖRSLAG (utgå från dessa, men du kan komplettera med andra bolag om användaren ber om det):\n${context.topSuggestions.map((s, i) =>
         `${i + 1}. ${s.name} (${s.ticker}) — Score: ${s.score}/100, Sektor: ${s.sector || "—"}, Risk: ${s.risk || "—"}`
-      ).join("\n")}\n\nDu får INTE rekommendera bolag utanför denna lista. Välj de som bäst matchar användarens profil och behov.`);
+      ).join("\n")}`);
     }
     if (context.portfolioSummary) {
       const s = context.portfolioSummary;

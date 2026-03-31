@@ -77,12 +77,33 @@ const STEPS = [
   },
 ];
 
+const PROFILE_EXPLANATIONS = {
+  investorType: {
+    value: { label: "Värdeinvesterare", explanation: "Du letar efter bolag som handlas under sitt verkliga värde. Thesion prioriterar bolag med stark fundamental — lågt P/E, hög avkastning på kapital och bra kassaflöden." },
+    growth: { label: "Tillväxtinvesterare", explanation: "Du satsar på bolag med stark tillväxt. Thesion prioriterar snabbväxande bolag med hög omsättningstillväxt och skalbar affärsmodell — även om de har högt P/E." },
+    dividend: { label: "Utdelningsinvesterare", explanation: "Du vill ha löpande utdelningar. Thesion prioriterar bolag med hög och stabil direktavkastning, lång utdelningshistorik och hållbar utdelningsandel." },
+    index: { label: "Indexinvesterare", explanation: "Du föredrar bred exponering. Thesion visar hur din portfölj presterar mot index och hjälper dig hitta kompletterande fonder med låga avgifter." },
+    mixed: { label: "Blandat", explanation: "Du kombinerar flera strategier. Thesion ger en balanserad mix av värde, tillväxt och utdelning i sina förslag." },
+  },
+  riskProfile: {
+    low: { label: "Låg risk", explanation: "Vi filtrerar bort spekulativa bolag och small caps. Fokus på stora, etablerade bolag med låg volatilitet. Investeringsplaner sprids över tid (DCA) för att minska timingrisken." },
+    medium: { label: "Medel risk", explanation: "En balans mellan stabila storbolag och mer spännande tillväxtcase. Investeringsplaner sprids över 2-3 månader." },
+    high: { label: "Hög risk", explanation: "Du kan tåla stora kurssvängningar. Vi inkluderar small caps och tillväxtbolag med högre potential. Investeringar görs gärna direkt (lump sum) för bäst historisk avkastning." },
+  },
+  experience: {
+    beginner: { label: "Nybörjare", explanation: "Mats (AI-assistenten) förklarar allt med enkla ord och undviker facktermer. Tooltips och förklaringar visas extra tydligt." },
+    intermediate: { label: "Lite erfarenhet", explanation: "Mats använder vanliga finanstermer men förklarar mer avancerade begrepp. Du får en bra mix av pedagogik och djup." },
+    advanced: { label: "Erfaren", explanation: "Mats ger djupgående analys med nyckeltal, trender och jämförelser utan att hålla tillbaka." },
+  },
+};
+
 export default function OnboardingModal({ onComplete }) {
   const isMobile = useIsMobile();
-  const [step, setStep] = useState(-1); // -1 = welcome screen
+  const [step, setStep] = useState(-1); // -1 = welcome, STEPS.length = summary
   const [answers, setAnswers] = useState({});
 
-  const current = step >= 0 ? STEPS[step] : null;
+  const isSummary = step === STEPS.length;
+  const current = step >= 0 && step < STEPS.length ? STEPS[step] : null;
   const isLast = step === STEPS.length - 1;
   const canProceed = current
     ? (current.multi ? (answers[current.id] || []).length > 0 : !!answers[current.id])
@@ -99,7 +120,7 @@ export default function OnboardingModal({ onComplete }) {
   }
 
   function next() {
-    if (isLast) {
+    if (isSummary) {
       onComplete(answers);
     } else {
       setStep(step + 1);
@@ -226,10 +247,72 @@ export default function OnboardingModal({ onComplete }) {
               transition: "all 0.15s",
             }}
           >
-            {isLast ? "Klar!" : "Nästa →"}
+            {isLast ? "Nästa →" : "Nästa →"}
           </button>
         </div>
         </>
+        )}
+
+        {/* Summary screen */}
+        {isSummary && (
+          <>
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>Din investerarprofil</div>
+              <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                Baserat på dina svar har vi skapat en profil som anpassar hela appen åt dig.
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[
+                { key: "investorType", icon: "🎯", title: "Investeringsstil" },
+                { key: "riskProfile", icon: "📊", title: "Risknivå" },
+                { key: "experience", icon: "🎓", title: "Erfarenhet" },
+              ].map(({ key, icon, title }) => {
+                const val = answers[key];
+                const info = PROFILE_EXPLANATIONS[key]?.[val];
+                if (!info) return null;
+                return (
+                  <div key={key} style={{
+                    padding: "12px 14px", borderRadius: 8,
+                    background: "var(--bg-secondary)", border: "1px solid var(--border)",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 16 }}>{icon}</span>
+                      <span style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500 }}>{title}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginLeft: "auto" }}>{info.label}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, paddingLeft: 28 }}>
+                      {info.explanation}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", marginTop: 16, lineHeight: 1.5 }}>
+              Du kan ändra din profil när som helst via profilsidan.
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
+              <button
+                onClick={() => setStep(step - 1)}
+                style={{ fontSize: 13, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+              >
+                ← Tillbaka
+              </button>
+              <button
+                onClick={next}
+                style={{
+                  fontSize: 14, padding: "10px 28px", borderRadius: 8, border: "none",
+                  background: "var(--accent)", color: "#fff", cursor: "pointer",
+                  fontFamily: "inherit", fontWeight: 500,
+                }}
+              >
+                Starta Thesion
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

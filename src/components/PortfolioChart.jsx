@@ -114,12 +114,11 @@ export default function PortfolioChart({ userId, compact = false }) {
     indexDataMap[id] && points.some(p => p[`${id}Pct`] != null)
   );
 
+  if (error || points.length < 2) return null;
+
   const first = points[0]?.value;
   const last = points[points.length - 1]?.value;
-  if (!first || !last) {
-    if (loading) return null;
-    if (error || points.length < 2) return null;
-  }
+  if (first == null || last == null) return null;
   const isUp = last >= first;
   const color = isUp ? "#089981" : "#f23645";
   const returnSek = last - first;

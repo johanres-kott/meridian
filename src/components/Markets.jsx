@@ -1,3 +1,4 @@
+import { Component } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
@@ -6,6 +7,12 @@ import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
 import TodoList from "./TodoList.jsx";
 import InvestmentPlanTracker from "./InvestmentPlanTracker.jsx";
+
+class SafeCard extends Component {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? null : this.props.children; }
+}
 
 export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
   const isMobile = useIsMobile();
@@ -35,12 +42,14 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
         />
       )}
       <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
-      <InvestmentPlanTracker preferences={preferences} onUpdatePreferences={onUpdatePreferences} isMobile={isMobile} onNavigate={onNavigate} />
+      <SafeCard><InvestmentPlanTracker preferences={preferences} onUpdatePreferences={onUpdatePreferences} isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
       <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       {userId && (
-        <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-          <PortfolioChart userId={userId} compact />
-        </div>
+        <SafeCard>
+          <div style={{ marginBottom: isMobile ? 12 : 20 }}>
+            <PortfolioChart userId={userId} compact />
+          </div>
+        </SafeCard>
       )}
       <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} onNavigate={onNavigate} />
       <UpcomingEarnings userId={userId} isMobile={isMobile} />

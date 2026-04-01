@@ -9,27 +9,32 @@ const RANGES = [
   { id: "1y", label: "1Y", days: 365 },
 ];
 
-const RANGE_TO_CHART = { "1m": "1m", "3m": "3m", "6m": "6m", "1y": "1y" };
+const INDEXES = [
+  { id: "omxs30", ticker: "^OMX", label: "OMXS30", color: "#787b86" },
+  { id: "sp500", ticker: "^GSPC", label: "S&P 500", color: "#5b9bd5" },
+];
 
 export default function PortfolioChart({ userId, compact = false }) {
   const isMobile = useIsMobile();
   const [range, setRange] = useState("3m");
   const [allPoints, setAllPoints] = useState([]);
-  const [indexData, setIndexData] = useState({});
+  const [indexDataMap, setIndexDataMap] = useState({}); // { omxs30: { date: close }, sp500: { date: close } }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [showIndex, setShowIndex] = useState(true);
+  const [activeIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]); // Which indexes to show
 
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
     setError(false);
 
-    // Fetch portfolio + OMXS30 in parallel
+    // Fetch portfolio + all indexes in parallel
     Promise.all([
       fetch(`https://thesion-scraper.vercel.app/api/portfolio-history?user_id=${encodeURIComponent(userId)}`).then(r => r.ok ? r.json() : null),
-      fetch(`/api/chart?ticker=${encodeURIComponent("^OMX")}&range=1y`).then(r => r.ok ? r.json() : null),
-    ]).then(([portfolioData, omxData]) => {
+      ...INDEXES.map(idx =>
+        fetch(`/api/chart?ticker=${encodeURIComponent(idx.ticker)}&range=1y`).then(r => r.ok ? r.json() : null).catch(() => null)
+      ),
+    ]).then(([portfolioData, ...indexResults]) => {
       // Portfolio
       const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
       const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
@@ -43,12 +48,17 @@ export default function PortfolioChart({ userId, compact = false }) {
         }));
       setAllPoints(pts);
 
-      // OMXS30 — build date→close map
-      if (omxData?.points) {
-        const map = {};
-        omxData.points.forEach(p => { map[p.date] = p.close; });
-        setIndexData(map);
-      }
+      // Build index data maps
+      const idxMap = {};
+      INDEXES.forEach((idx, i) => {
+        const data = indexResults[i];
+        if (data?.points) {
+          const map = {};
+          data.points.forEach(p => { map[p.date] = p.close; });
+          idxMap[idx.id] = map;
+        }
+      });
+      setIndexDataMap(idxMap);
 
       setLoading(false);
     }).catch(() => {
@@ -56,6 +66,12 @@ export default function PortfolioChart({ userId, compact = false }) {
       setLoading(false);
     });
   }, [userId]);
+
+  const toggleIndex = (id) => {
+    setActiveIndexes(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
 
   const points = useMemo(() => {
     if (allPoints.length === 0) return [];
@@ -68,29 +84,56 @@ export default function PortfolioChart({ userId, compact = false }) {
 
     // Normalize to % change from first point
     const firstVal = filtered[0].value;
-    const firstIdx = indexData[filtered[0].date];
+    const firstDate = filtered[0].date;
+
+    // Get first values for each index
+    const firstIndexVals = {};
+    INDEXES.forEach(idx => {
+      const data = indexDataMap[idx.id];
+      if (data) firstIndexVals[idx.id] = data[firstDate];
+    });
 
     return filtered.map(p => {
       const portfolioPct = firstVal > 0 ? ((p.value - firstVal) / firstVal) * 100 : 0;
-      const idxClose = indexData[p.date];
-      const indexPct = (firstIdx && idxClose) ? ((idxClose - firstIdx) / firstIdx) * 100 : null;
-      return { ...p, portfolioPct, indexPct };
+      const point = { ...p, portfolioPct };
+
+      // Add each index's % change
+      INDEXES.forEach(idx => {
+        const data = indexDataMap[idx.id];
+        const firstIdx = firstIndexVals[idx.id];
+        const close = data?.[p.date];
+        point[`${idx.id}Pct`] = (firstIdx && close) ? ((close - firstIdx) / firstIdx) * 100 : null;
+      });
+
+      return point;
     });
-  }, [allPoints, range, indexData]);
+  }, [allPoints, range, indexDataMap]);
 
   const hasEstimated = points.some(p => p.estimated);
-  const hasIndex = showIndex && points.some(p => p.indexPct != null);
+  const hasAnyIndex = activeIndexes.some(id =>
+    indexDataMap[id] && points.some(p => p[`${id}Pct`] != null)
+  );
 
   const first = points[0]?.value;
   const last = points[points.length - 1]?.value;
+  if (!first || !last) {
+    if (loading) return null;
+    if (error || points.length < 2) return null;
+  }
   const isUp = last >= first;
   const color = isUp ? "#089981" : "#f23645";
   const returnSek = last - first;
   const returnPct = first > 0 ? ((last - first) / first) * 100 : 0;
 
-  // Index return for comparison
-  const lastIndexPct = points[points.length - 1]?.indexPct;
-  const beatIndex = returnPct > (lastIndexPct || 0);
+  // Index returns for comparison
+  const indexReturns = {};
+  INDEXES.forEach(idx => {
+    const val = points[points.length - 1]?.[`${idx.id}Pct`];
+    if (val != null) indexReturns[idx.id] = val;
+  });
+
+  // Best-performing index for "beat" indicator
+  const bestIdx = Object.entries(indexReturns).sort((a, b) => b[1] - a[1])[0];
 
   const gradientId = `portfolioChartGrad-${range}`;
   const chartHeight = compact ? 160 : (isMobile ? 180 : 220);
@@ -98,7 +141,6 @@ export default function PortfolioChart({ userId, compact = false }) {
   // Split data into actual and estimated segments for dashed line effect
   const splitPoints = useMemo(() => {
     if (!hasEstimated) return [];
-    // Find last actual point to use as bridge connecting the two line segments
     let lastActualIdx = -1;
     for (let i = points.length - 1; i >= 0; i--) {
       if (!points[i].estimated) { lastActualIdx = i; break; }
@@ -128,7 +170,7 @@ export default function PortfolioChart({ userId, compact = false }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: compact ? "center" : "flex-start", marginBottom: compact ? 10 : 16, flexDirection: compact && isMobile ? "column" : "row", gap: compact && isMobile ? 8 : 0 }}>
         <div>
           <div style={{ fontSize: compact ? 10 : 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: compact ? 2 : 4 }}>
-            Portfoljutveckling (SEK)
+            Portföljutveckling
           </div>
           {!compact && (
             <div>
@@ -140,38 +182,65 @@ export default function PortfolioChart({ userId, compact = false }) {
                   {returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK ({returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%)
                 </span>
               </div>
-              {hasIndex && lastIndexPct != null && (
-                <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>OMXS30: <span style={{ color: lastIndexPct >= 0 ? "#089981" : "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>{lastIndexPct >= 0 ? "+" : ""}{lastIndexPct.toFixed(1)}%</span></span>
-                  <span style={{ color: beatIndex ? "#089981" : "#f23645", fontWeight: 500 }}>
-                    {beatIndex ? "▲" : "▼"} {Math.abs(returnPct - lastIndexPct).toFixed(1)}% vs index
-                  </span>
+              {/* Index comparison stats */}
+              {Object.keys(indexReturns).length > 0 && (
+                <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  {INDEXES.filter(idx => indexReturns[idx.id] != null && activeIndexes.includes(idx.id)).map(idx => (
+                    <span key={idx.id}>
+                      {idx.label}: <span style={{ color: indexReturns[idx.id] >= 0 ? "#089981" : "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {indexReturns[idx.id] >= 0 ? "+" : ""}{indexReturns[idx.id].toFixed(1)}%
+                      </span>
+                    </span>
+                  ))}
+                  {bestIdx && (
+                    <span style={{ color: returnPct > bestIdx[1] ? "#089981" : "#f23645", fontWeight: 500 }}>
+                      {returnPct > bestIdx[1] ? "▲" : "▼"} {Math.abs(returnPct - bestIdx[1]).toFixed(1)}% vs index
+                    </span>
+                  )}
                 </div>
               )}
             </div>
           )}
           {compact && (
-            <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
-              {returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%
-              <span style={{ color: "var(--text-secondary)", fontWeight: 400, marginLeft: 6 }}>
-                ({returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK)
+            <div>
+              <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
+                {returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%
+                <span style={{ color: "var(--text-secondary)", fontWeight: 400, marginLeft: 6 }}>
+                  ({returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK)
+                </span>
               </span>
-            </span>
+              {/* Compact index comparison */}
+              {Object.keys(indexReturns).length > 0 && (
+                <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 3, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {INDEXES.filter(idx => indexReturns[idx.id] != null && activeIndexes.includes(idx.id)).map(idx => (
+                    <span key={idx.id}>
+                      <span style={{ color: idx.color, fontSize: 8 }}>●</span> {idx.label}: <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: indexReturns[idx.id] >= 0 ? "#089981" : "#f23645" }}>
+                        {indexReturns[idx.id] >= 0 ? "+" : ""}{indexReturns[idx.id].toFixed(1)}%
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
-        <div style={{ display: "flex", gap: 4 }}>
-          {!compact && Object.keys(indexData).length > 0 && (
-            <button onClick={() => setShowIndex(!showIndex)}
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+          {/* Index toggle buttons */}
+          {INDEXES.filter(idx => indexDataMap[idx.id]).map(idx => (
+            <button key={idx.id} onClick={() => toggleIndex(idx.id)}
               style={{
                 fontSize: 10, padding: "3px 8px", borderRadius: 3, cursor: "pointer",
-                fontFamily: "inherit", fontWeight: 500, marginRight: 8,
-                background: showIndex ? "rgba(120,123,134,0.15)" : "var(--border-light)",
-                color: showIndex ? "var(--text)" : "var(--text-muted)",
+                fontFamily: "inherit", fontWeight: 500,
+                background: activeIndexes.includes(idx.id) ? "rgba(120,123,134,0.15)" : "var(--border-light)",
+                color: activeIndexes.includes(idx.id) ? idx.color : "var(--text-muted)",
                 border: "none",
               }}>
-              {showIndex ? "● OMXS30" : "○ OMXS30"}
+              {activeIndexes.includes(idx.id) ? "●" : "○"} {idx.label}
             </button>
-          )}
+          ))}
+          {/* Spacer */}
+          {INDEXES.some(idx => indexDataMap[idx.id]) && <div style={{ width: compact ? 4 : 8 }} />}
+          {/* Range buttons */}
           {RANGES.map(r => (
             <button key={r.id} onClick={() => setRange(r.id)}
               style={{
@@ -188,8 +257,8 @@ export default function PortfolioChart({ userId, compact = false }) {
 
       {/* Chart */}
       <ResponsiveContainer width="100%" height={chartHeight}>
-        {hasIndex ? (
-          // Comparison mode: % change with two lines
+        {hasAnyIndex ? (
+          // Comparison mode: % change with multiple lines
           <ComposedChart data={points} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -208,13 +277,16 @@ export default function PortfolioChart({ userId, compact = false }) {
               contentStyle={{ fontSize: 12, borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
               formatter={(v, name) => {
                 if (v == null) return [null, null];
-                const label = name === "portfolioPct" ? "Min portfölj" : "OMXS30";
-                return [`${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, label];
+                if (name === "portfolioPct") return [`${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, "Min portfölj"];
+                const idx = INDEXES.find(i => `${i.id}Pct` === name);
+                return [`${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, idx?.label || name];
               }}
               labelFormatter={d => d}
             />
             <Area type="monotone" dataKey="portfolioPct" stroke={color} strokeWidth={2} fill={`url(#${gradientId})`} dot={false} name="portfolioPct" />
-            <Line type="monotone" dataKey="indexPct" stroke="var(--text-muted)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} name="indexPct" connectNulls />
+            {INDEXES.filter(idx => activeIndexes.includes(idx.id) && indexDataMap[idx.id]).map(idx => (
+              <Line key={idx.id} type="monotone" dataKey={`${idx.id}Pct`} stroke={idx.color} strokeWidth={1.5} strokeDasharray="4 3" dot={false} name={`${idx.id}Pct`} connectNulls />
+            ))}
           </ComposedChart>
         ) : (
           // Absolute mode: SEK value
@@ -252,8 +324,8 @@ export default function PortfolioChart({ userId, compact = false }) {
       {/* Footer */}
       {!compact && points.length > 1 && (
         <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11, color: "var(--text-secondary)", flexWrap: "wrap" }}>
-          <span>{"H\u00f6gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
-          <span>{"L\u00e4gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{"\u0048\u00f6gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{"\u004c\u00e4gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
           {hasEstimated && (
             <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
               {"Estimerat baserat p\u00e5 nuvarande innehav"}

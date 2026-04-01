@@ -81,10 +81,12 @@ function parseDCAPlan(text, savedAt) {
  */
 export default function InvestmentPlanTracker({ preferences, onUpdatePreferences, isMobile, onNavigate }) {
   const plan = preferences?.investmentPlan;
-  if (!plan?.text) return null;
+  const dcaPlan = useMemo(
+    () => plan?.text ? parseDCAPlan(plan.text, plan.savedAt) : null,
+    [plan?.text, plan?.savedAt]
+  );
 
-  const dcaPlan = useMemo(() => parseDCAPlan(plan.text, plan.savedAt), [plan.text, plan.savedAt]);
-  if (!dcaPlan || dcaPlan.months.length <= 1) return null; // Only show for multi-month DCA plans
+  if (!dcaPlan || dcaPlan.months.length <= 1) return null;
 
   const completedSteps = preferences?.planProgress?.completedSteps || [];
 

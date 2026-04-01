@@ -114,22 +114,22 @@ export default function PortfolioChart({ userId, compact = false }) {
     indexDataMap[id] && points.some(p => p[`${id}Pct`] != null)
   );
 
-  if (error || points.length < 2) return null;
-
-  const first = points[0]?.value;
-  const last = points[points.length - 1]?.value;
-  if (first == null || last == null) return null;
-  const isUp = last >= first;
+  const first = points.length >= 2 ? points[0]?.value : null;
+  const last = points.length >= 2 ? points[points.length - 1]?.value : null;
+  const canRender = !error && first != null && last != null;
+  const isUp = canRender ? last >= first : true;
   const color = isUp ? "#089981" : "#f23645";
-  const returnSek = last - first;
-  const returnPct = first > 0 ? ((last - first) / first) * 100 : 0;
+  const returnSek = canRender ? last - first : 0;
+  const returnPct = canRender && first > 0 ? ((last - first) / first) * 100 : 0;
 
   // Index returns for comparison
   const indexReturns = {};
-  INDEXES.forEach(idx => {
-    const val = points[points.length - 1]?.[`${idx.id}Pct`];
-    if (val != null) indexReturns[idx.id] = val;
-  });
+  if (canRender) {
+    INDEXES.forEach(idx => {
+      const val = points[points.length - 1]?.[`${idx.id}Pct`];
+      if (val != null) indexReturns[idx.id] = val;
+    });
+  }
 
   // Best-performing index for "beat" indicator
   const bestIdx = Object.entries(indexReturns).sort((a, b) => b[1] - a[1])[0];
@@ -139,7 +139,7 @@ export default function PortfolioChart({ userId, compact = false }) {
 
   // Split data into actual and estimated segments for dashed line effect
   const splitPoints = useMemo(() => {
-    if (!hasEstimated) return [];
+    if (!hasEstimated || !canRender) return [];
     let lastActualIdx = -1;
     for (let i = points.length - 1; i >= 0; i--) {
       if (!points[i].estimated) { lastActualIdx = i; break; }
@@ -149,7 +149,7 @@ export default function PortfolioChart({ userId, compact = false }) {
       actual: p.estimated ? undefined : p.value,
       est: (p.estimated || i === lastActualIdx) ? p.value : undefined,
     }));
-  }, [points, hasEstimated]);
+  }, [points, hasEstimated, canRender]);
 
   if (loading) {
     return (
@@ -161,7 +161,7 @@ export default function PortfolioChart({ userId, compact = false }) {
     );
   }
 
-  if (error || points.length < 2) return null;
+  if (!canRender) return null;
 
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>

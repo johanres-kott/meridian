@@ -5,6 +5,7 @@ import PortfolioChart from "./PortfolioChart.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
 import TodoList from "./TodoList.jsx";
+import InvestmentPlanTracker from "./InvestmentPlanTracker.jsx";
 
 export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
   const isMobile = useIsMobile();
@@ -34,6 +35,7 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
         />
       )}
       <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
+      <InvestmentPlanTracker preferences={preferences} onUpdatePreferences={onUpdatePreferences} isMobile={isMobile} onNavigate={onNavigate} />
       <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
       {userId && (
         <div style={{ marginBottom: isMobile ? 12 : 20 }}>

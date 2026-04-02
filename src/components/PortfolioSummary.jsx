@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { Chg, StatCard } from "./SharedComponents.jsx";
 import { parseFxRates } from "../hooks/useFxRates.js";
+import { STATUS_COLORS } from "../constants.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
 export default function PortfolioSummary({ isMobile, onNavigate }) {

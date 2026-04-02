@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase.js";
 import { useIsMobile } from "./hooks/useIsMobile.js";
 import { useTheme } from "./hooks/useTheme.js";
+import { UserProvider, useUser } from "./contexts/UserContext.jsx";
 import Login from "./components/Login.jsx";
 import LandingPage from "./components/LandingPage.jsx";
 import Markets from "./components/Markets.jsx";
@@ -33,27 +34,9 @@ const TABS = [
 ];
 
 export default function App() {
-  const isMobile = useIsMobile();
-  const { theme, toggleTheme, isDark } = useTheme();
-  const [tab, setTab] = useState("markets");
-  const [deepLink, setDeepLink] = useState(null);
-
-  function navigate(targetTab, detail) {
-    setDeepLink(detail || null);
-    setTab(targetTab);
-  }
-  const [time, setTime] = useState(new Date());
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [lastSeenAt, setLastSeenAt] = useState(null);
-  const [preferences, setPreferences] = useState({});
-  const [chatOpen, setChatOpen] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [editingName, setEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState("");
-  const chatContextRef = useRef({});
-  const profileRef = useRef(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -66,52 +49,43 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (!session) return;
-    async function trackVisit() {
-      const userId = session.user.id;
-      const { data } = await supabase
-        .from("user_prefs")
-        .select("last_seen_at, preferences")
-        .eq("user_id", userId)
-        .single();
-      setLastSeenAt(data?.last_seen_at || null);
-      setPreferences(data?.preferences || {});
-      await supabase
-        .from("user_prefs")
-        .upsert({ user_id: userId, last_seen_at: new Date().toISOString() });
-    }
-    trackVisit();
-  }, [session]);
-
-  const prefsRef = useRef(preferences);
-  prefsRef.current = preferences;
-
-  async function updatePreferences(newPrefs) {
-    // Use ref to always get latest state (avoids stale closure race conditions)
-    const latest = prefsRef.current;
-    const merged = { ...latest, ...newPrefs };
-    setPreferences(merged);
-    prefsRef.current = merged;
-    if (session) {
-      // Atomic read-merge-write to prevent race conditions with concurrent updates
-      const { data } = await supabase
-        .from("user_prefs")
-        .select("preferences")
-        .eq("user_id", session.user.id)
-        .single();
-      const serverMerged = { ...(data?.preferences || {}), ...newPrefs };
-      await supabase
-        .from("user_prefs")
-        .update({ preferences: serverMerged })
-        .eq("user_id", session.user.id);
-      // Sync local state with server truth
-      setPreferences(serverMerged);
-      prefsRef.current = serverMerged;
-    }
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', sans-serif", color: "var(--text-secondary)" }}>
+        Laddar...
+      </div>
+    );
   }
 
-  const displayName = preferences.display_name || session?.user?.email?.split("@")[0] || "";
+  if (showPrivacy) return <Privacy onBack={() => setShowPrivacy(false)} />;
+  if (!session) return <LandingPage onShowPrivacy={() => setShowPrivacy(true)} />;
+
+  return (
+    <UserProvider session={session}>
+      <AppContent />
+    </UserProvider>
+  );
+}
+
+function AppContent() {
+  const { userId, preferences, updatePreferences, lastSeenAt, displayName, session } = useUser();
+  const isMobile = useIsMobile();
+  const { theme, toggleTheme, isDark } = useTheme();
+  const [tab, setTab] = useState("markets");
+  const [deepLink, setDeepLink] = useState(null);
+
+  function navigate(targetTab, detail) {
+    setDeepLink(detail || null);
+    setTab(targetTab);
+  }
+  const [time, setTime] = useState(new Date());
+  const [chatOpen, setChatOpen] = useState(true);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const chatContextRef = useRef({});
+  const profileRef = useRef(null);
+
   const displayInitial = (preferences.display_name?.[0] || session?.user?.email?.[0] || "?").toUpperCase();
 
   function startEditingName() {
@@ -148,7 +122,7 @@ export default function App() {
         const [indicesRes, commoditiesRes, watchlistRes] = await Promise.all([
           fetch("/api/indices").then(r => r.json()).catch(() => []),
           fetch("/api/commodities").then(r => r.json()).catch(() => []),
-          supabase.from("watchlist").select("*").eq("user_id", session.user.id).order("created_at"),
+          supabase.from("watchlist").select("*").eq("user_id", userId).order("created_at"),
         ]);
         const watchlist = watchlistRes.data || [];
         const portfolio = await Promise.all(
@@ -276,17 +250,6 @@ export default function App() {
     loadContext();
   }, [chatOpen, session, preferences.investorProfile]);
 
-  if (authLoading) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', sans-serif", color: "var(--text-secondary)" }}>
-        Laddar...
-      </div>
-    );
-  }
-
-  if (showPrivacy) return <Privacy onBack={() => setShowPrivacy(false)} />;
-  if (!session) return <LandingPage onShowPrivacy={() => setShowPrivacy(true)} />;
-
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
       <style>{`
@@ -346,7 +309,7 @@ export default function App() {
           >
             AI
           </button>
-          <NotificationBell userId={session.user.id} />
+          <NotificationBell />
           <div ref={profileRef} style={{ position: "relative" }}>
             <button
               onClick={() => { setProfileOpen(!profileOpen); setEditingName(false); }}
@@ -511,11 +474,11 @@ export default function App() {
           };
           const starters = STARTER_STOCKS[profile.investorType] || STARTER_STOCKS.mixed;
           try {
-            const { data: existing } = await supabase.from("watchlist").select("ticker").eq("user_id", session.user.id);
+            const { data: existing } = await supabase.from("watchlist").select("ticker").eq("user_id", userId);
             const existingTickers = new Set((existing || []).map(e => e.ticker.toUpperCase()));
             const newStocks = starters.filter(s => !existingTickers.has(s.ticker.toUpperCase()));
             if (newStocks.length > 0) {
-              await supabase.from("watchlist").insert(newStocks.map(s => ({ ticker: s.ticker, name: s.name, user_id: session.user.id, status: "Bevakar" })));
+              await supabase.from("watchlist").insert(newStocks.map(s => ({ ticker: s.ticker, name: s.name, user_id: userId, status: "Bevakar" })));
             }
           } catch {}
         }} />
@@ -529,14 +492,14 @@ export default function App() {
       {/* Content + Chat */}
       <div style={{ display: "flex", height: isMobile ? "calc(100vh - 82px)" : "calc(100vh - 42px)" }}>
         <div style={{ flex: 1, overflow: "auto", padding: isMobile ? "16px 12px" : "24px 32px", paddingBottom: isMobile ? "calc(16px + env(safe-area-inset-bottom, 0px))" : "24px", paddingLeft: isMobile ? "calc(12px + env(safe-area-inset-left, 0px))" : "32px", paddingRight: isMobile ? "calc(12px + env(safe-area-inset-right, 0px))" : "32px" }}>
-          {tab === "markets" && <Markets lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={updatePreferences} userId={session.user.id} displayName={displayName} onNavigate={navigate} />}
+          {tab === "markets" && <Markets onNavigate={navigate} />}
           {tab === "commodities" && <Commodities deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-          {tab === "portfolio" && <Portfolio preferences={preferences} onUpdatePreferences={updatePreferences} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} userId={session.user.id} />}
-          {tab === "analysis" && <GapAnalysis preferences={preferences} onNavigate={navigate} />}
-          {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} preferences={preferences} />}
-          {tab === "investment" && <InvestmentCompanies preferences={preferences} userId={session.user.id} onNavigate={navigate} />}
+          {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+          {tab === "analysis" && <GapAnalysis onNavigate={navigate} />}
+          {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+          {tab === "investment" && <InvestmentCompanies onNavigate={navigate} />}
           {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
-          {tab === "profile" && <ProfilePage session={session} preferences={preferences} onUpdatePreferences={updatePreferences} onResetProfile={() => updatePreferences({ investorProfile: null })} />}
+          {tab === "profile" && <ProfilePage onResetProfile={() => updatePreferences({ investorProfile: null })} />}
           {tab === "docs" && <Documentation />}
           {tab === "about" && <AboutPage />}
         </div>

@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js"
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 import { sanitizeInput } from "../lib/sanitize.js";
 
@@ -22,7 +23,8 @@ function ScoreBar({ label, value }) {
   );
 }
 
-export default function CompanySearch({ deepLink, onClearDeepLink, preferences = {} }) {
+export default function CompanySearch({ deepLink, onClearDeepLink }) {
+  const { preferences } = useUser();
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);

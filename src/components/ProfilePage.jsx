@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 const INVESTOR_LABELS = { value: "Värdeinvesterare", growth: "Tillväxtinvesterare", dividend: "Utdelningsinvesterare", index: "Indexinvesterare", mixed: "Blandat" };
 const RISK_LABELS = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" };
@@ -10,7 +11,8 @@ const EXP_LABELS = { beginner: "Nybörjare", intermediate: "Lite erfarenhet", ad
 const GEO_LABELS = { nordic: "Norden", global: "Globalt", both: "Blandat" };
 const INTEREST_LABELS = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat & Livsmedel", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
 
-export default function ProfilePage({ session, preferences, onUpdatePreferences, onResetProfile }) {
+export default function ProfilePage({ onResetProfile }) {
+  const { session, preferences, updatePreferences } = useUser();
   const isMobile = useIsMobile();
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(preferences.display_name || "");
@@ -24,7 +26,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
   async function saveName() {
     const sanitized = sanitizeInput(nameInput);
     if (!sanitized) return;
-    await onUpdatePreferences({ display_name: sanitized });
+    await updatePreferences({ display_name: sanitized });
     setEditingName(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -154,7 +156,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
             const isActive = current === opt.value;
             return (
               <button key={opt.value}
-                onClick={() => onUpdatePreferences({ accountType: opt.value })}
+                onClick={() => updatePreferences({ accountType: opt.value })}
                 style={{
                   padding: "8px 14px", borderRadius: 6, fontSize: 12, fontFamily: "inherit", cursor: "pointer",
                   border: isActive ? "1px solid var(--accent)" : "1px solid var(--border)",
@@ -181,7 +183,7 @@ export default function ProfilePage({ session, preferences, onUpdatePreferences,
               <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>AI-assistenten kan ge personliga svar baserat på dina innehav</div>
             </div>
             <button
-              onClick={() => onUpdatePreferences({ sharePortfolioWithAI: !(preferences.sharePortfolioWithAI !== false) })}
+              onClick={() => updatePreferences({ sharePortfolioWithAI: !(preferences.sharePortfolioWithAI !== false) })}
               style={{
                 width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
                 background: (preferences.sharePortfolioWithAI !== false) ? "#089981" : "var(--border)",

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 import CompareView from "./CompareView.jsx";
 import { getFlag } from "../constants.js";
 
@@ -34,7 +35,8 @@ function getColumns(investorType) {
   return order.map(key => ALL_COLUMNS[key]).filter(Boolean);
 }
 
-export default function GapAnalysis({ preferences = {}, onNavigate }) {
+export default function GapAnalysis({ onNavigate }) {
+  const { preferences } = useUser();
   const isMobile = useIsMobile();
   const allColumns = getColumns(preferences.investorProfile?.investorType);
   const columns = isMobile ? allColumns.filter(c => MOBILE_COLUMNS.has(c.key)) : allColumns;

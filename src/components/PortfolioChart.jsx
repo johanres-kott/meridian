@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 const RANGES = [
   { id: "1m", label: "1M", days: 30 },
@@ -14,7 +15,8 @@ const INDEXES = [
   { id: "sp500", ticker: "^GSPC", label: "S&P 500", color: "#5b9bd5" },
 ];
 
-export default function PortfolioChart({ userId, compact = false }) {
+export default function PortfolioChart({ compact = false }) {
+  const { userId } = useUser();
   const isMobile = useIsMobile();
   const [range, setRange] = useState("3m");
   const [allPoints, setAllPoints] = useState([]);

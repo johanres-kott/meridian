@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "../supabase.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
@@ -23,7 +24,8 @@ function timeAgo(dateStr) {
   return date.toLocaleDateString("sv-SE");
 }
 
-export default function NotificationBell({ userId }) {
+export default function NotificationBell() {
+  const { userId } = useUser();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);

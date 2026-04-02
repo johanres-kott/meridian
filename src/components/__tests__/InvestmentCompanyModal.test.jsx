@@ -2,12 +2,23 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import InvestmentCompanyModal from "../InvestmentCompanyModal.jsx";
 
+// Mock useUser hook
+vi.mock("../../contexts/UserContext.jsx", () => ({
+  useUser: () => ({
+    userId: "test-user",
+    preferences: {},
+    updatePreferences: vi.fn(),
+    lastSeenAt: null,
+    displayName: "Test",
+    session: { user: { id: "test-user", email: "test@test.com" } },
+  }),
+}));
+
 const defaultProps = {
   onClose: vi.fn(),
   existingItems: [],
   onImport: vi.fn(),
   groups: [],
-  onUpdatePreferences: vi.fn(),
   onSetActiveGroup: vi.fn(),
 };
 

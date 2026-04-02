@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { PriceChart } from "./SharedComponents.jsx";
 import SmartSuggestions from "./SmartSuggestions.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -347,7 +348,8 @@ function HoldingsTable({ companyId }) {
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function InvestmentCompanies({ preferences = {}, userId, onNavigate }) {
+export default function InvestmentCompanies({ onNavigate }) {
+  const { userId, preferences } = useUser();
   const isMobile = useIsMobile();
   const [selectedId, setSelectedId] = useState("investor");
   const [tickers, setTickers] = useState([]);

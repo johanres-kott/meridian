@@ -12,6 +12,7 @@ import AllocationCard from "./AllocationCard.jsx";
 import Markdown from "./Markdown.jsx";
 import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { useFxRates } from "../hooks/useFxRates.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 async function fetchPrice(ticker) {
   try {
@@ -347,7 +348,8 @@ function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups =
   );
 }
 
-export default function Portfolio({ preferences = {}, onUpdatePreferences, deepLink, onClearDeepLink, userId }) {
+export default function Portfolio({ deepLink, onClearDeepLink }) {
+  const { userId, preferences, updatePreferences } = useUser();
   const isMobile = useIsMobile();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -439,7 +441,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       members: (g.members || []).filter(m => m !== id),
     }));
     if (JSON.stringify(updated) !== JSON.stringify(groups)) {
-      onUpdatePreferences({ groups: updated });
+      updatePreferences({ groups: updated });
     }
   }
 
@@ -448,7 +450,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
     if (!name) return;
     if (groups.some(g => g.name === name)) return;
     const updated = [...groups, { name, members: [] }];
-    onUpdatePreferences({ groups: updated });
+    updatePreferences({ groups: updated });
     setNewGroupName("");
     setCreatingGroup(false);
     setActiveGroup(name);
@@ -457,7 +459,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   function deleteGroup(name) {
     if (!window.confirm(`Ta bort gruppen "${name}"?`)) return;
     const updated = groups.filter(g => g.name !== name);
-    onUpdatePreferences({ groups: updated });
+    updatePreferences({ groups: updated });
     if (activeGroup === name) setActiveGroup(null);
   }
 
@@ -466,7 +468,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
     if (!trimmed || trimmed === oldName) return;
     if (groups.some(g => g.name === trimmed)) return;
     const updated = groups.map(g => g.name === oldName ? { ...g, name: trimmed } : g);
-    onUpdatePreferences({ groups: updated });
+    updatePreferences({ groups: updated });
     if (activeGroup === oldName) setActiveGroup(trimmed);
   }
 
@@ -480,7 +482,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
         return { ...g, members: [...members, itemId] };
       }
     });
-    onUpdatePreferences({ groups: updated });
+    updatePreferences({ groups: updated });
   }
 
   if (loading) return <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>Laddar...</div>;
@@ -501,7 +503,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
           if (g.name !== activeGroup) return g;
           return { ...g, members: [...(g.members || []), ...newIds] };
         });
-        onUpdatePreferences({ groups: updated });
+        updatePreferences({ groups: updated });
       }
     }
     return { data, error };
@@ -637,7 +639,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
                 </div>
               )}
               <button
-                onClick={() => onUpdatePreferences({ investmentPlan: null })}
+                onClick={() => updatePreferences({ investmentPlan: null })}
                 style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
               >
                 Ta bort strategi
@@ -664,7 +666,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
               <Markdown text={text} />
             </div>
             <button
-              onClick={() => onUpdatePreferences({ investmentPlan: null })}
+              onClick={() => updatePreferences({ investmentPlan: null })}
               style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
             >
               Ta bort strategi
@@ -756,7 +758,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
       <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
       <PortfolioTreemap items={filteredItems} prices={prices} fxRates={fxRates} onSelect={setSelected} isMobile={isMobile} />
 
-      {items.some(i => i.shares) && userId && <PortfolioChart userId={userId} />}
+      {items.some(i => i.shares) && userId && <PortfolioChart />}
 
       {filteredItems.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>

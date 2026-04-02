@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";
@@ -14,7 +15,8 @@ class SafeCard extends Component {
   render() { return this.state.hasError ? null : this.props.children; }
 }
 
-export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, userId, displayName, onNavigate }) {
+export default function Markets({ onNavigate }) {
+  const { userId, preferences, updatePreferences, lastSeenAt, displayName } = useUser();
   const isMobile = useIsMobile();
 
   return (
@@ -37,22 +39,22 @@ export default function Markets({ lastSeenAt, preferences, onUpdatePreferences, 
       {preferences.todos?.length > 0 && (
         <TodoList
           todos={preferences.todos}
-          onUpdate={(updated) => onUpdatePreferences({ todos: updated })}
+          onUpdate={(updated) => updatePreferences({ todos: updated })}
           isMobile={isMobile}
         />
       )}
-      <SedanSist lastSeenAt={lastSeenAt} preferences={preferences} onUpdatePreferences={onUpdatePreferences} userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
-      <SafeCard><InvestmentPlanTracker preferences={preferences} onUpdatePreferences={onUpdatePreferences} isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
-      <PortfolioSummary userId={userId} isMobile={isMobile} onNavigate={onNavigate} />
+      <SedanSist isMobile={isMobile} onNavigate={onNavigate} />
+      <SafeCard><InvestmentPlanTracker isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
+      <PortfolioSummary isMobile={isMobile} onNavigate={onNavigate} />
       {userId && (
         <SafeCard>
           <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-            <PortfolioChart userId={userId} compact />
+            <PortfolioChart compact />
           </div>
         </SafeCard>
       )}
-      <WeeklySummary userId={userId} preferences={preferences} isMobile={isMobile} onNavigate={onNavigate} />
-      <UpcomingEarnings userId={userId} isMobile={isMobile} />
+      <WeeklySummary isMobile={isMobile} onNavigate={onNavigate} />
+      <UpcomingEarnings isMobile={isMobile} />
     </div>
   );
 }

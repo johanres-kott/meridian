@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
-export default function UpcomingEarnings({ userId, isMobile }) {
+export default function UpcomingEarnings({ isMobile }) {
+  const { userId } = useUser();
   const [loading, setLoading] = useState(true);
   const [earnings, setEarnings] = useState([]);
 

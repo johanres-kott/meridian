@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
+import { useUser } from "../contexts/UserContext.jsx";
 
 function getDateDaysAgo(days) {
   const d = new Date();
@@ -17,7 +18,8 @@ function calcWeeklyChange(points, currentPrice) {
   return ((currentPrice - ref.close) / ref.close) * 100;
 }
 
-export default function WeeklySummary({ userId, preferences = {}, isMobile, onNavigate }) {
+export default function WeeklySummary({ isMobile, onNavigate }) {
+  const { userId, preferences } = useUser();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 

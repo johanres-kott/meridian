@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
 
@@ -12,7 +13,8 @@ function formatValue(msek) {
   return `${msek.toLocaleString("sv-SE")} Mkr`;
 }
 
-export default function InvestmentCompanyModal({ onClose, existingItems, onImport, groups, onUpdatePreferences, onSetActiveGroup }) {
+export default function InvestmentCompanyModal({ onClose, existingItems, onImport, groups, onSetActiveGroup }) {
+  const { updatePreferences } = useUser();
   const isMobile = useIsMobile();
   const [selected, setSelected] = useState(null);
   const [groupName, setGroupName] = useState("");
@@ -79,7 +81,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
 
       const allIds = [...existingIds, ...newIds];
       const updated = [...(groups || []), { name: groupName.trim(), members: allIds }];
-      onUpdatePreferences({ groups: updated });
+      updatePreferences({ groups: updated });
       onSetActiveGroup(groupName.trim());
       onClose();
     } catch (err) {

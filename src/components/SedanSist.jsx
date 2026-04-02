@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
+import { useUser } from "../contexts/UserContext.jsx";
 
 const AVAILABLE_INDICES = [
   { symbol: "OMXS30", name: "OMX Stockholm 30" },
@@ -89,7 +90,8 @@ function Picker({ items, selected, onSave, onCancel, isMobile }) {
   );
 }
 
-export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePreferences, userId, isMobile, onNavigate }) {
+export default function SedanSist({ isMobile, onNavigate }) {
+  const { userId, preferences, updatePreferences, lastSeenAt } = useUser();
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [data, setData] = useState(null);
@@ -238,7 +240,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             <Picker
               items={AVAILABLE_INDICES}
               selected={pinnedIndices}
-              onSave={(syms) => { onUpdatePreferences({ pinned_indices: syms }); setEditingIndices(false); }}
+              onSave={(syms) => { updatePreferences({ pinned_indices: syms }); setEditingIndices(false); }}
               onCancel={() => setEditingIndices(false)}
               isMobile={isMobile}
             />
@@ -270,7 +272,7 @@ export default function SedanSist({ lastSeenAt, preferences = {}, onUpdatePrefer
             <Picker
               items={AVAILABLE_COMMODITIES}
               selected={pinnedCommodities}
-              onSave={(syms) => { onUpdatePreferences({ pinned_commodities: syms }); setEditingCommodities(false); }}
+              onSave={(syms) => { updatePreferences({ pinned_commodities: syms }); setEditingCommodities(false); }}
               onCancel={() => setEditingCommodities(false)}
               isMobile={isMobile}
             />

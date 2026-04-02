@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useUser } from "../contexts/UserContext.jsx";
 
 /**
  * Parse a DCA plan from the strategy text into structured monthly steps.
@@ -79,7 +80,8 @@ function parseDCAPlan(text, savedAt) {
  * Compact investment plan tracker card for the Overview page.
  * Shows current month's actions from a DCA plan.
  */
-export default function InvestmentPlanTracker({ preferences, onUpdatePreferences, isMobile, onNavigate }) {
+export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
+  const { preferences, updatePreferences } = useUser();
   const plan = preferences?.investmentPlan;
   const dcaPlan = useMemo(
     () => plan?.text ? parseDCAPlan(plan.text, plan.savedAt) : null,
@@ -96,7 +98,7 @@ export default function InvestmentPlanTracker({ preferences, onUpdatePreferences
     const updated = current.includes(stepKey)
       ? current.filter(s => s !== stepKey)
       : [...current, stepKey];
-    onUpdatePreferences({
+    updatePreferences({
       planProgress: {
         ...preferences?.planProgress,
         completedSteps: updated,

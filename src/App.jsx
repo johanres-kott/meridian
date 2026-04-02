@@ -14,7 +14,6 @@ import ChatPanel from "./components/ChatPanel.jsx";
 import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
-import { analyzeAllocation, allocationSummary } from "./utils/portfolioAllocation.js";
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import QuickGuide from "./components/QuickGuide.jsx";
 import ScoringMethodology from "./components/ScoringMethodology.jsx";
@@ -22,7 +21,7 @@ import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
 import AboutPage from "./components/AboutPage.jsx";
 import { sanitizeInput } from "./lib/sanitize.js";
-import { parseFxRates } from "./hooks/useFxRates.js";
+import { useChatContext } from "./hooks/useChatContext.js";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -83,7 +82,7 @@ function AppContent() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
-  const chatContextRef = useRef({});
+  const chatContextRef = useChatContext(chatOpen);
   const profileRef = useRef(null);
 
   const displayInitial = (preferences.display_name?.[0] || session?.user?.email?.[0] || "?").toUpperCase();
@@ -114,141 +113,6 @@ function AppContent() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [profileOpen]);
-
-  useEffect(() => {
-    if (!chatOpen || !session) return;
-    async function loadContext() {
-      try {
-        const [indicesRes, commoditiesRes, watchlistRes] = await Promise.all([
-          fetch("/api/indices").then(r => r.json()).catch(() => []),
-          fetch("/api/commodities").then(r => r.json()).catch(() => []),
-          supabase.from("watchlist").select("*").eq("user_id", userId).order("created_at"),
-        ]);
-        const watchlist = watchlistRes.data || [];
-        const portfolio = await Promise.all(
-          watchlist.slice(0, 20).map(async (item) => {
-            try {
-              const r = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
-              const d = await r.json();
-              const shares = item.shares || 0;
-              const gav = item.gav || 0;
-              const valueSek = shares > 0 ? shares * d.price : 0;
-              const costSek = shares > 0 && gav > 0 ? shares * gav : 0;
-              const plSek = costSek > 0 ? valueSek - costSek : null;
-              const plPct = costSek > 0 ? ((valueSek - costSek) / costSek * 100) : null;
-              return {
-                ticker: item.ticker, name: d.name || item.name, price: d.price, currency: d.currency,
-                changePercent: d.changePercent, status: item.status,
-                shares, gav, valueSek: Math.round(valueSek),
-                plSek: plSek != null ? Math.round(plSek) : null,
-                plPct: plPct != null ? +plPct.toFixed(1) : null,
-                sector: d.sector,
-              };
-            } catch { return null; }
-          })
-        );
-        const validPortfolio = portfolio.filter(Boolean);
-
-        // Fetch scoring data for owned stocks
-        const ownedTickers = validPortfolio.filter(p => p.shares > 0).map(p => p.ticker);
-        const scoreResults = await Promise.all(
-          ownedTickers.slice(0, 15).map(async (ticker) => {
-            try {
-              const r = await fetch(`/api/score?ticker=${encodeURIComponent(ticker)}`);
-              const d = await r.json();
-              return d ? { ticker, composite: d.composite, scores: d.scores, data: d.data, risk: d.risk } : null;
-            } catch { return null; }
-          })
-        );
-        const scoresMap = {};
-        scoreResults.filter(Boolean).forEach(s => { scoresMap[s.ticker] = s; });
-
-        // Enrich portfolio with scores
-        const enrichedPortfolio = validPortfolio.map(p => ({
-          ...p,
-          score: scoresMap[p.ticker] || null,
-        }));
-
-        const totalValue = enrichedPortfolio.reduce((s, p) => s + (p.valueSek || 0), 0);
-        const totalCost = enrichedPortfolio.reduce((s, p) => s + (p.shares > 0 && p.gav > 0 ? p.shares * p.gav : 0), 0);
-        const totalPl = totalCost > 0 ? totalValue - totalCost : null;
-        const totalPlPct = totalCost > 0 ? ((totalValue - totalCost) / totalCost * 100) : null;
-
-        // Build sector distribution
-        const sectorDist = {};
-        enrichedPortfolio.filter(p => p.shares > 0 && p.valueSek > 0).forEach(p => {
-          const sector = p.sector || "Okänd";
-          sectorDist[sector] = (sectorDist[sector] || 0) + p.valueSek;
-        });
-        const sectorBreakdown = totalValue > 0
-          ? Object.entries(sectorDist).map(([sector, value]) => ({
-              sector, value: Math.round(value), pct: +((value / totalValue) * 100).toFixed(1),
-            })).sort((a, b) => b.value - a.value)
-          : [];
-
-        // Build allocation analysis for Mats
-        const riskProfile = preferences.investorProfile?.riskProfile || "medium";
-        const allocItems = enrichedPortfolio.filter(p => p.shares > 0).map(p => ({
-          ticker: p.ticker, name: p.name, shares: p.shares,
-        }));
-        const allocScores = {};
-        enrichedPortfolio.forEach(p => {
-          if (p.score) {
-            allocScores[p.ticker.toUpperCase()] = {
-              beta: p.score.data?.beta,
-              risk: p.score.risk,
-              sector: p.sector,
-              marketCap: p.score.data?.marketCap,
-              subScores: { qualityScore: p.score.scores?.quality, piotroski: p.score.scores?.piotroski?.raw },
-            };
-          }
-        });
-        const allocPrices = {};
-        enrichedPortfolio.forEach(p => {
-          allocPrices[p.ticker] = { price: p.price, currency: p.currency };
-        });
-        const fxRatesForAlloc = parseFxRates(commoditiesRes);
-        const allocation = analyzeAllocation(allocItems, allocScores, allocPrices, fxRatesForAlloc, riskProfile);
-        const allocationText = allocationSummary(allocation);
-
-        chatContextRef.current = {
-          portfolio: enrichedPortfolio,
-          portfolioSummary: {
-            totalValue, totalCost,
-            totalPl: totalPl != null ? Math.round(totalPl) : null,
-            totalPlPct: totalPlPct != null ? +totalPlPct.toFixed(1) : null,
-            holdingsWithShares: enrichedPortfolio.filter(p => p.shares > 0).length,
-            totalHoldings: enrichedPortfolio.length,
-            sectorBreakdown,
-          },
-          allocation: allocationText,
-          indices: indicesRes.filter(i => i.price > 0),
-          commodities: commoditiesRes.filter(c => c.price > 0),
-          investorProfile: preferences.investorProfile || null,
-          accountType: preferences.accountType || null,
-          savedStrategy: preferences.investmentPlan?.text || null,
-          savedTodos: (preferences.todos || []).filter(t => !t.done).map(t => t.text).slice(0, 5),
-          topSuggestions: null,
-        };
-
-        // Fetch top suggestions from scoring
-        try {
-          const investorType = preferences.investorProfile?.investorType || "mixed";
-          const sugRes = await fetch(`/api/suggestions?profile=${investorType}&limit=10`);
-          const sugData = await sugRes.json();
-          if (sugData?.suggestions) {
-            chatContextRef.current.topSuggestions = sugData.suggestions.map(s => ({
-              ticker: s.ticker, name: s.name, score: s.compositeScore,
-              sector: s.sector, risk: s.risk,
-            }));
-          }
-        } catch {}
-      } catch (err) {
-        console.error("Chat context load error:", err);
-      }
-    }
-    loadContext();
-  }, [chatOpen, session, preferences.investorProfile]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
@@ -480,7 +344,7 @@ function AppContent() {
             if (newStocks.length > 0) {
               await supabase.from("watchlist").insert(newStocks.map(s => ({ ticker: s.ticker, name: s.name, user_id: userId, status: "Bevakar" })));
             }
-          } catch {}
+          } catch (err) { console.error("Failed to add starter stocks:", err); }
         }} />
       )}
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { sanitizeInput } from "../lib/sanitize.js";
+import { searchStocks } from "../lib/apiClient.js";
 
 export default function AddCompanyBar({ onAdd, isMobile }) {
   const [query, setQuery] = useState("");
@@ -9,19 +10,15 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
     const sanitized = sanitizeInput(query);
     if (sanitized.length < 2) { setResults([]); return; }
     const t = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(sanitized)}`);
-        const data = await res.json();
-        const filtered = (data.result || []).filter(r => r.type === "Common Stock").slice(0, 6);
-        setResults(filtered);
-      } catch {}
+      const data = await searchStocks(sanitized, 6);
+      setResults(data);
     }, 350);
     return () => clearTimeout(t);
   }, [query]);
 
   function select(r) {
-    const ticker = r.symbol.replace(/ /g, "-");
-    onAdd({ ticker, name: r.description });
+    const ticker = (r.symbol || r.ticker || "").replace(/ /g, "-");
+    onAdd({ ticker, name: r.description || r.name });
     setQuery("");
     setResults([]);
   }
@@ -37,13 +34,13 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
       {results.length > 0 && (
         <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", zIndex: 100, marginTop: 4 }}>
           {results.map(r => (
-            <div key={r.symbol} onClick={() => select(r)}
+            <div key={r.symbol || r.ticker} onClick={() => select(r)}
               style={{ padding: "10px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-light)" }}
               onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
               onMouseLeave={e => e.currentTarget.style.background = "var(--bg-card)"}
             >
-              <span style={{ fontWeight: 500, color: "var(--text)" }}>{r.description}</span>
-              <span style={{ color: "var(--text-secondary)", fontSize: 12, fontFamily: "monospace" }}>{r.symbol}</span>
+              <span style={{ fontWeight: 500, color: "var(--text)" }}>{r.description || r.name}</span>
+              <span style={{ color: "var(--text-secondary)", fontSize: 12, fontFamily: "monospace" }}>{r.symbol || r.ticker}</span>
             </div>
           ))}
         </div>

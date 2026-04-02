@@ -35,7 +35,8 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
                 const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
                 const d = await res.json();
                 return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
-              } catch {
+              } catch (err) {
+                console.error(`PortfolioSummary: failed to fetch ${item.ticker}:`, err);
                 return { ...item, price: 0, changePercent: 0 };
               }
             })
@@ -59,7 +60,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
               const res = await fetch(`/api/company?ticker=${encodeURIComponent(cur + "SEK=X")}`);
               const d = await res.json();
               if (d.price > 0) fxToSek[cur] = d.price;
-            } catch {}
+            } catch (err) { console.error(`PortfolioSummary: FX rate fetch failed for ${cur}:`, err); }
           }));
         }
         const byCurrency = {};

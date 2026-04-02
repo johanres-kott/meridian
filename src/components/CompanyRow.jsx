@@ -1,16 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { formatHoldingValue } from "./PortfolioTreemap.jsx";
-
-async function fetchPrice(ticker) {
-  try {
-    const res = await fetch(`/api/company?ticker=${encodeURIComponent(ticker)}`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
+import { useUser } from "../contexts/UserContext.jsx";
+import { fetchCompany } from "../lib/apiClient.js";
 
 function GroupTagPopover({ item, groups, onToggle, onClose }) {
   const ref = useRef(null);
@@ -56,13 +48,15 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
   );
 }
 
-export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, investorProfile = null, scoreData = null, priceData = null }) {
+export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, scoreData = null, priceData = null }) {
+  const { preferences } = useUser();
+  const investorProfile = preferences.investorProfile || null;
   const [price, setPrice] = useState(priceData);
   const [tagOpen, setTagOpen] = useState(false);
 
   useEffect(() => {
     if (priceData) { setPrice(priceData); return; }
-    fetchPrice(item.ticker).then(d => { if (d && d.price) setPrice(d); });
+    fetchCompany(item.ticker).then(d => { if (d && d.price) setPrice(d); });
   }, [item.ticker, priceData]);
 
   const chg = price?.changePercent;

@@ -90,7 +90,8 @@ export async function resolveTicker(securityName) {
     }
 
     return { ticker: "", name: securityName, matched: false };
-  } catch {
+  } catch (err) {
+    console.error(`resolveAvanzaTicker failed for "${securityName}":`, err);
     return { ticker: "", name: securityName, matched: false };
   }
 }

@@ -7,13 +7,15 @@ import { useState, useEffect } from "react";
  * Replaces duplicated FX parsing in Portfolio.jsx, PortfolioSummary.jsx, and App.jsx.
  */
 const DEFAULT_RATES = { SEK: 1 };
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // Module-level cache so multiple components share the same data
 let cachedRates = null;
+let cachedAt = 0;
 let fetchPromise = null;
 
 async function fetchRates() {
-  if (cachedRates) return cachedRates;
+  if (cachedRates && (Date.now() - cachedAt < CACHE_TTL_MS)) return cachedRates;
   if (fetchPromise) return fetchPromise;
 
   fetchPromise = fetch("/api/commodities")
@@ -26,6 +28,7 @@ async function fetchRates() {
         if (c.display === "GBP/SEK" && c.price > 0) rates.GBP = c.price;
       }
       cachedRates = rates;
+      cachedAt = Date.now();
       fetchPromise = null;
       return rates;
     })

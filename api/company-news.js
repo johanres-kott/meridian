@@ -226,6 +226,7 @@ export default async function handler(req, res) {
     const sliced = items.slice(0, count);
     res.status(200).json({ id, items: sliced, count: sliced.length, fetchedAt: new Date().toISOString() });
   } catch (err) {
+    console.error(`Company news fetch error for ${id}:`, err);
     // Always return 200 to frontend — empty list is better than an error page
     res.status(200).json({ id, items: [], count: 0, error: "scraping_failed", fetchedAt: new Date().toISOString() });
   }

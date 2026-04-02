@@ -9,5 +9,19 @@ export function setCors(req, res) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+}
+
+/**
+ * Wrapper that applies CORS and handles OPTIONS preflight.
+ * Usage: export default withCors(handler)
+ */
+export function withCors(handler) {
+  return function corsWrapped(req, res) {
+    setCors(req, res);
+    if (req.method === "OPTIONS") {
+      return res.status(204).end();
+    }
+    return handler(req, res);
+  };
 }

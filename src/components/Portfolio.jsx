@@ -5,6 +5,7 @@ import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
+import { fetchCompany } from "../lib/apiClient.js";
 import PortfolioChart from "./PortfolioChart.jsx";
 import AllocationCard from "./AllocationCard.jsx";
 import StrategyCard from "./StrategyCard.jsx";
@@ -13,6 +14,7 @@ import GroupFilterBar from "./GroupFilterBar.jsx";
 import CompanyRow from "./CompanyRow.jsx";
 import AddCompanyBar from "./AddCompanyBar.jsx";
 import { useFxRates } from "../hooks/useFxRates.js";
+import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
 export default function Portfolio({ deepLink, onClearDeepLink }) {
@@ -25,23 +27,12 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
   const [selected, setSelected] = useState(null);
   const { fxRates } = useFxRates();
   const [activeGroup, setActiveGroup] = useState(null);
-  const [scores, setScores] = useState({});
+  const { scores } = useScores();
   const [prices, setPrices] = useState({});
 
   const groups = preferences.groups || [];
 
-  useEffect(() => { load(); loadScores(); }, []);
-
-  async function loadScores() {
-    try {
-      const res = await fetch("/api/suggestions?limit=300");
-      const data = await res.json();
-      const list = data?.suggestions || (Array.isArray(data) ? data : []);
-      const map = {};
-      list.forEach(s => { map[s.ticker?.toUpperCase()] = s; });
-      setScores(map);
-    } catch {}
-  }
+  useEffect(() => { load(); }, []);
 
   // Handle deep link from Översikt
   useEffect(() => {
@@ -64,10 +55,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       if (withShares.length > 0) {
         const results = await Promise.all(
           withShares.map(item =>
-            fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`)
-              .then(r => r.ok ? r.json() : null)
-              .then(d => d?.price ? [item.ticker, d] : null)
-              .catch(() => null)
+            fetchCompany(item.ticker).then(d => d?.price ? [item.ticker, d] : null)
           )
         );
         const map = {};
@@ -146,7 +134,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
 
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
-    return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} investorType={preferences.investorProfile?.investorType} investorProfile={preferences.investorProfile} />;
+    return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
   }
 
   // Filter items by active group
@@ -254,7 +242,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
             </thead>
             <tbody>
               {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} investorProfile={preferences.investorProfile} scoreData={scores[item.ticker?.toUpperCase()]} priceData={prices[item.ticker] || null} />
+                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} scoreData={scores[item.ticker?.toUpperCase()]} priceData={prices[item.ticker] || null} />
               ))}
             </tbody>
           </table>

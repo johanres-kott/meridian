@@ -3,7 +3,7 @@ import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
-const SCRAPER_API = "https://thesion-scraper.vercel.app/api/holdings";
+const HOLDINGS_API = "/api/holdings";
 
 function formatValue(msek) {
   if (msek >= 1000) {
@@ -24,12 +24,12 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(SCRAPER_API)
+    fetch(HOLDINGS_API)
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) setCompanies(data);
       })
-      .catch(() => {}) // Fall back to static data
+      .catch(err => { console.error("Failed to fetch holdings:", err); }) // Fall back to static data
       .finally(() => setLoading(false));
   }, []);
 

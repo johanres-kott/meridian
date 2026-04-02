@@ -65,7 +65,8 @@ export default function GapAnalysis({ onNavigate }) {
             const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
             const d = await res.json();
             return { ticker: item.ticker, data: d };
-          } catch {
+          } catch (err) {
+            console.error(`GapAnalysis: failed to fetch ${item.ticker}:`, err);
             return { ticker: item.ticker, data: null };
           }
         })

@@ -2,93 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
-
-const AVAILABLE_INDICES = [
-  { symbol: "OMXS30", name: "OMX Stockholm 30" },
-  { symbol: "SPX", name: "S&P 500" },
-  { symbol: "IXIC", name: "Nasdaq" },
-  { symbol: "DJI", name: "Dow Jones" },
-  { symbol: "SX5E", name: "Euro Stoxx 50" },
-  { symbol: "DAX", name: "DAX" },
-  { symbol: "FTSE", name: "FTSE 100" },
-  { symbol: "CAC", name: "CAC 40" },
-  { symbol: "N225", name: "Nikkei 225" },
-  { symbol: "HSI", name: "Hang Seng" },
-  { symbol: "SENSEX", name: "BSE Sensex" },
-  { symbol: "KOSPI", name: "KOSPI" },
-  { symbol: "OMXHPI", name: "OMX Helsinki" },
-  { symbol: "OMXC25", name: "OMX Copenhagen 25" },
-];
-
-const AVAILABLE_COMMODITIES = [
-  { symbol: "GC", name: "Guld" },
-  { symbol: "SI", name: "Silver" },
-  { symbol: "PL", name: "Platina" },
-  { symbol: "PA", name: "Palladium" },
-  { symbol: "BRENT", name: "Olja Brent" },
-  { symbol: "WTI", name: "Olja WTI" },
-  { symbol: "NG", name: "Naturgas" },
-  { symbol: "CU", name: "Koppar" },
-  { symbol: "AL", name: "Aluminium" },
-  { symbol: "WHEAT", name: "Vete" },
-  { symbol: "CORN", name: "Majs" },
-  { symbol: "SOY", name: "Sojabonor" },
-  { symbol: "USD/SEK", name: "Dollarn" },
-  { symbol: "EUR/SEK", name: "Euron" },
-  { symbol: "GBP/SEK", name: "Pundet" },
-];
-
-function Picker({ items, selected, onSave, onCancel, isMobile }) {
-  const [checked, setChecked] = useState(new Set(selected));
-
-  function toggle(symbol) {
-    const next = new Set(checked);
-    if (next.has(symbol)) next.delete(symbol);
-    else next.add(symbol);
-    setChecked(next);
-  }
-
-  return (
-    <div style={{ padding: "12px 0" }}>
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "2px 8px" : "2px 16px" }}>
-        {items.map(item => (
-          <label key={item.symbol} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 0", cursor: "pointer", fontSize: 12 }}>
-            <input
-              type="checkbox"
-              checked={checked.has(item.symbol)}
-              onChange={() => toggle(item.symbol)}
-              style={{ accentColor: "var(--accent)" }}
-            />
-            <span style={{ color: "var(--text)" }}>{item.name}</span>
-            <span style={{ color: "var(--text-muted)", fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{item.symbol}</span>
-          </label>
-        ))}
-      </div>
-      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <button
-          onClick={() => onSave([...checked])}
-          style={{ fontSize: 11, color: "#fff", background: "var(--accent)", border: "none", borderRadius: 3, padding: "4px 12px", cursor: "pointer", fontFamily: "inherit" }}
-        >
-          Spara
-        </button>
-        <button
-          onClick={onCancel}
-          style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
-        >
-          Avbryt
-        </button>
-        {checked.size > 0 && (
-          <button
-            onClick={() => onSave([])}
-            style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" }}
-          >
-            Aterstall
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
+import { AVAILABLE_INDICES, AVAILABLE_COMMODITIES } from "./sedan-sist/constants.js";
+import Picker from "./sedan-sist/Picker.jsx";
 
 export default function SedanSist({ isMobile, onNavigate }) {
   const { userId, preferences, updatePreferences, lastSeenAt } = useUser();
@@ -123,7 +38,8 @@ export default function SedanSist({ isMobile, onNavigate }) {
                 changeToday: companyRes?.changePercent || 0,
                 news: (companyRes?.news || []).map(n => ({ ...n, ticker: item.ticker, companyName: item.name })),
               };
-            } catch {
+            } catch (err) {
+              console.error(`SedanSist: failed to load ${item.ticker}:`, err);
               return null;
             }
           })

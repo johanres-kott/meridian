@@ -151,7 +151,8 @@ export default async function handler(req, res) {
       count: items.length,
       fetchedAt: new Date().toISOString(),
     });
-  } catch {
+  } catch (err) {
+    console.error("EFN news fetch error:", err);
     // EFN is an external dependency — never let it crash the frontend
     res.status(200).json({
       id,

@@ -1,115 +1,23 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
-
-const RANGES = [
-  { id: "1m", label: "1M", days: 30 },
-  { id: "3m", label: "3M", days: 90 },
-  { id: "6m", label: "6M", days: 180 },
-  { id: "1y", label: "1Y", days: 365 },
-];
-
-const INDEXES = [
-  { id: "omxs30", ticker: "^OMX", label: "OMXS30", color: "#787b86" },
-  { id: "sp500", ticker: "^GSPC", label: "S&P 500", color: "#5b9bd5" },
-];
+import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
+import usePortfolioData from "../hooks/usePortfolioData.js";
 
 export default function PortfolioChart({ compact = false }) {
   const { userId } = useUser();
   const isMobile = useIsMobile();
   const [range, setRange] = useState("3m");
-  const [allPoints, setAllPoints] = useState([]);
-  const [indexDataMap, setIndexDataMap] = useState({}); // { omxs30: { date: close }, sp500: { date: close } }
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [activeIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]); // Which indexes to show
+  const [activeIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
 
-  useEffect(() => {
-    if (!userId) return;
-    setLoading(true);
-    setError(false);
-
-    // Fetch portfolio + all indexes in parallel
-    Promise.all([
-      fetch(`https://thesion-scraper.vercel.app/api/portfolio-history?user_id=${encodeURIComponent(userId)}`).then(r => r.ok ? r.json() : null),
-      ...INDEXES.map(idx =>
-        fetch(`/api/chart?ticker=${encodeURIComponent(idx.ticker)}&range=1y`).then(r => r.ok ? r.json() : null).catch(() => null)
-      ),
-    ]).then(([portfolioData, ...indexResults]) => {
-      // Portfolio
-      const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
-      const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
-      const threshold = maxHoldings * 0.5;
-      const pts = raw
-        .filter(p => (p.holdingsCount || 0) >= threshold)
-        .map(p => ({
-          date: p.date,
-          value: p.totalValue ?? p.value ?? 0,
-          estimated: !!p.estimated,
-        }));
-      setAllPoints(pts);
-
-      // Build index data maps
-      const idxMap = {};
-      INDEXES.forEach((idx, i) => {
-        const data = indexResults[i];
-        if (data?.points) {
-          const map = {};
-          data.points.forEach(p => { map[p.date] = p.close; });
-          idxMap[idx.id] = map;
-        }
-      });
-      setIndexDataMap(idxMap);
-
-      setLoading(false);
-    }).catch(() => {
-      setError(true);
-      setLoading(false);
-    });
-  }, [userId]);
+  const { points, indexDataMap, loading, error } = usePortfolioData(userId, range);
 
   const toggleIndex = (id) => {
     setActiveIndexes(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
-
-  const points = useMemo(() => {
-    if (allPoints.length === 0) return [];
-    const rangeDef = RANGES.find(r => r.id === range);
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - (rangeDef?.days || 90));
-    const cutoffStr = cutoff.toISOString().slice(0, 10);
-    const filtered = allPoints.filter(p => p.date >= cutoffStr);
-    if (filtered.length === 0) return [];
-
-    // Normalize to % change from first point
-    const firstVal = filtered[0].value;
-    const firstDate = filtered[0].date;
-
-    // Get first values for each index
-    const firstIndexVals = {};
-    INDEXES.forEach(idx => {
-      const data = indexDataMap[idx.id];
-      if (data) firstIndexVals[idx.id] = data[firstDate];
-    });
-
-    return filtered.map(p => {
-      const portfolioPct = firstVal > 0 ? ((p.value - firstVal) / firstVal) * 100 : 0;
-      const point = { ...p, portfolioPct };
-
-      // Add each index's % change
-      INDEXES.forEach(idx => {
-        const data = indexDataMap[idx.id];
-        const firstIdx = firstIndexVals[idx.id];
-        const close = data?.[p.date];
-        point[`${idx.id}Pct`] = (firstIdx && close) ? ((close - firstIdx) / firstIdx) * 100 : null;
-      });
-
-      return point;
-    });
-  }, [allPoints, range, indexDataMap]);
 
   const hasEstimated = points.some(p => p.estimated);
   const hasAnyIndex = activeIndexes.some(id =>

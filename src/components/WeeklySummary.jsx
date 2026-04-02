@@ -67,7 +67,8 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
               const chart = await res.json();
               const weeklyChange = calcWeeklyChange(chart.points, idx.price);
               return { ...idx, weeklyChange };
-            } catch {
+            } catch (err) {
+              console.error(`WeeklySummary: chart fetch failed for index ${idx.symbol}:`, err);
               return { ...idx, weeklyChange: null };
             }
           })
@@ -88,7 +89,8 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
                 price: companyRes.price,
                 weeklyChange,
               };
-            } catch {
+            } catch (err) {
+              console.error(`WeeklySummary: failed to load ${item.ticker}:`, err);
               return null;
             }
           })

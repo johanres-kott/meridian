@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 import { sanitizeInput } from "../lib/sanitize.js";
 
-const PROFILE_LABELS = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", mixed: "blandat", index: "indexinvesterare" };
+import { PROFILE_LABELS } from "../constants.js";
 
 function ScoreBar({ label, value }) {
   if (value == null) return null;

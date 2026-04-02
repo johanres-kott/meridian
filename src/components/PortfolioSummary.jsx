@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { Chg, StatCard } from "./SharedComponents.jsx";
-
-const STATUS_COLORS = {
-  Bevakar: "#787b86",
-  Analyserar: "#e65100",
-  Intressant: "#1b5e20",
-  Äger: "#1565c0",
-  Avstår: "#880e4f",
-};
+import { parseFxRates } from "../hooks/useFxRates.js";
 
 export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
   const [loading, setLoading] = useState(true);
@@ -49,12 +42,7 @@ export default function PortfolioSummary({ userId, isMobile, onNavigate }) {
         const priced = pricedResults;
 
         // Build FX rates to SEK from commodities API
-        const fxToSek = { SEK: 1 };
-        for (const c of commoditiesRes) {
-          if (c.display === "USD/SEK" && c.price > 0) fxToSek.USD = c.price;
-          if (c.display === "EUR/SEK" && c.price > 0) fxToSek.EUR = c.price;
-          if (c.display === "GBP/SEK" && c.price > 0) fxToSek.GBP = c.price;
-        }
+        const fxToSek = parseFxRates(commoditiesRes);
 
         // Portfolio value (only "Äger" with shares), grouped by currency
         const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);

@@ -151,11 +151,12 @@ export default function PortfolioChart({ userId, compact = false }) {
     }));
   }, [points, hasEstimated, canRender]);
 
+  // ALL hooks above this line — no early returns before here!
   if (loading) {
     return (
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
         <div style={{ height: chartHeight, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", fontSize: 12 }}>
-          Laddar portfoljutveckling...
+          Laddar portföljutveckling...
         </div>
       </div>
     );

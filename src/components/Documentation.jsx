@@ -7,6 +7,7 @@ const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, 
 const listStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 20, marginBottom: 8 };
 
 const GLOSSARY = [
+  { term: "Core-Satellite-modellen", def: "En portföljstrategi som delar upp innehaven i en stabil Kärna (core) för trygghet, en Satellit-del för tillväxt, och en liten Spekulationsdel för hög risk/hög uppsida. Thesion analyserar din portfölj automatiskt med denna modell.", example: "En medel-risk-profil siktar på 60% Kärna, 30% Satellit, 10% Spekulation." },
   { term: "DCA (Dollar Cost Averaging)", def: "En investeringsstrategi där du sprider ut dina köp över tid — till exempel lika mycket varje månad. Minskar risken att köpa allt på toppen.", example: "Du vill investera 60 000 kr. Istället för allt på en gång köper du för 20 000 kr per månad i tre månader." },
   { term: "Lump Sum (Engångsinsats)", def: "Att investera hela beloppet direkt istället för att sprida ut det. Historiskt ger detta bättre avkastning i ungefär två av tre fall, eftersom marknaden tenderar att gå uppåt över tid.", example: "Du har 60 000 kr att investera och köper för hela beloppet idag istället för att dela upp det." },
   { term: "Beta", def: "Mäter hur mycket en akties kurs svänger jämfört med marknaden. Beta 1.0 = samma som index. Under 0.8 = stabilare, över 1.2 = mer volatil.", example: "AstraZeneca har beta 0.29 (väldigt stabil), Sinch har 1.72 (svänger mycket)." },
@@ -47,6 +48,10 @@ export default function Documentation() {
             { label: "Profilviktning", id: "weighting", indent: 1 },
             { label: "Riskbedömning (Beta)", id: "risk", indent: 1 },
             { label: "Riskjustering av poäng", id: "risk-adjust", indent: 1 },
+            { label: "Portföljallokering", id: "allocation", indent: 0 },
+            { label: "Core-Satellite-modellen", id: "core-satellite", indent: 1 },
+            { label: "Klassificeringslogik", id: "classification", indent: 1 },
+            { label: "Målallokering per riskprofil", id: "target-allocation", indent: 1 },
             { label: "Investeringsstrategier", id: "strategies", indent: 0 },
             { label: "DCA vs Lump Sum", id: "dca-lump", indent: 1 },
             { label: "Nyckeltal A–Ö", id: "glossary", indent: 0 },
@@ -253,6 +258,133 @@ export default function Documentation() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Portfolio allocation — Core-Satellite */}
+      <div id="allocation" style={sectionStyle}>
+        <div style={h2Style}>Portföljallokering</div>
+        <p style={pStyle}>
+          Thesion analyserar din portfölj med <strong>Core-Satellite-modellen</strong> — en vedertagen strategi
+          som delar upp portföljen i tre delar med olika syften. Analysen visas som ett allokeringskort
+          på Portföljsidan och Mats kan kommentera din allokering i chatten.
+        </p>
+
+        <div id="core-satellite" style={h3Style}>Core-Satellite-modellen</div>
+        <p style={pStyle}>
+          Modellen bygger på att ha en stabil kärna som grund, och komplettera med mer offensiva satsningar:
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8, marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
+            <span style={{ fontSize: 16 }}>🛡️</span>
+            <div>
+              <strong style={{ color: "#089981" }}>Kärna (Core)</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
+                Stabila blue chips, defensiva bolag, låg beta (&lt;0.8), hög kvalitet.
+                Dessa ger trygghet och stabilitet till portföljen. Exempel: stora banker, telekombolag,
+                hälsovårdsjättar, investmentbolag.
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
+            <span style={{ fontSize: 16 }}>🚀</span>
+            <div>
+              <strong style={{ color: "#5b9bd5" }}>Satellit (Satellite)</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
+                Tillväxtbolag, tematiska satsningar, medelstor risk.
+                Här tar du positioner i trender och sektorer du tror på. Exempel: SaaS-bolag,
+                e-handel, fintech, mid-caps med tillväxt.
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
+            <span style={{ fontSize: 16 }}>🎲</span>
+            <div>
+              <strong style={{ color: "#f23645" }}>Spekulation (Speculation)</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
+                Hög risk, hög uppsida, turnarounds. Små positioner i bolag
+                med asymmetrisk potential. Exempel: micro-caps, pre-revenue-bolag, kryptorelaterade.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="classification" style={h3Style}>Klassificeringslogik</div>
+        <p style={pStyle}>
+          Varje innehav klassificeras med ett poängbaserat system som ackumulerar signaler.
+          Positiva poäng drar mot Kärna, negativa mot Spekulation, och mittemellan hamnar som Satellit.
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 12 }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid var(--border)" }}>
+                <th style={thStyle}>Signal</th>
+                <th style={{ ...thStyle, textAlign: "center" }}>Kärna (+)</th>
+                <th style={{ ...thStyle, textAlign: "center" }}>Spekulation (−)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Risk (låg/hög)", "+3", "−2"],
+                ["Beta < 0.7 / > 2.0", "+3", "−3"],
+                ["Beta < 1.0 / > 1.5", "+1", "−2"],
+                ["Kvalitetspoäng ≥ 70 / < 30", "+2", "−1"],
+                ["Piotroski F-Score ≥ 7 / ≤ 2", "+2", "−1"],
+                ["Defensiv / Spekulativ sektor", "+1", "−3"],
+                ["Mega-cap (>100B) / Micro-cap (<1B)", "+2", "−2"],
+                ["Large-cap (>20B) / Small-cap (<5B)", "+1", "−1"],
+              ].map(([signal, core, spec], i) => (
+                <tr key={i} style={{ borderBottom: "1px solid #f0f3fa" }}>
+                  <td style={{ ...tdStyle, color: "var(--text)" }}>{signal}</td>
+                  <td style={{ ...tdStyle, textAlign: "center", color: "#089981" }}>{core}</td>
+                  <td style={{ ...tdStyle, textAlign: "center", color: "#f23645" }}>{spec}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={pStyle}>
+          <strong>Tröskel:</strong> Totalpoäng ≥ 3 → Kärna. Totalpoäng ≤ −3 → Spekulation. Allt däremellan → Satellit.
+        </p>
+        <p style={pStyle}>
+          <strong>Saknas scoredata?</strong> Innehavet hamnar som Satellit (inte Spekulation) och klassificeras
+          utifrån sektor och namn. Detta undviker att bolag felaktigt pekas ut som spekulativa bara
+          för att de inte finns i vår scoredatabas.
+        </p>
+
+        <div id="target-allocation" style={h3Style}>Målallokering per riskprofil</div>
+        <p style={pStyle}>
+          Allokeringskortet jämför din nuvarande fördelning mot en målallokering baserad på din riskprofil:
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 12 }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid var(--border)" }}>
+                <th style={thStyle}>Riskprofil</th>
+                <th style={{ ...thStyle, textAlign: "center", color: "#089981" }}>Kärna</th>
+                <th style={{ ...thStyle, textAlign: "center", color: "#5b9bd5" }}>Satellit</th>
+                <th style={{ ...thStyle, textAlign: "center", color: "#f23645" }}>Spekulation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Låg risk", "75%", "20%", "5%"],
+                ["Medel risk", "60%", "30%", "10%"],
+                ["Hög risk", "40%", "35%", "25%"],
+              ].map(([profile, ...pcts], i) => (
+                <tr key={i} style={{ borderBottom: "1px solid #f0f3fa" }}>
+                  <td style={{ ...tdStyle, fontWeight: 500, color: "var(--text)" }}>{profile}</td>
+                  <td style={{ ...tdStyle, textAlign: "center" }}>{pcts[0]}</td>
+                  <td style={{ ...tdStyle, textAlign: "center" }}>{pcts[1]}</td>
+                  <td style={{ ...tdStyle, textAlign: "center" }}>{pcts[2]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={pStyle}>
+          Avvikelser visas i procentenheter (pp). Portföljen räknas som <strong>balanserad</strong> om
+          Kärna avviker max ±10pp och Spekulation max ±5pp från målet.
+        </p>
       </div>
 
       {/* Investment strategies */}

@@ -1,21 +1,18 @@
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = "https://acostgikldxkdmcoavkf.supabase.co";
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjb3N0Z2lrbGR4a2RtY29hdmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDUzMTgsImV4cCI6MjA4ODcyMTMxOH0.lgIR-b3FpyTaO5Aa9SPnUHl-gyy5hloBvMTmnOfSLpw";
+import { getSupabase } from "./_supabase.js";
 
 export default async function handler(req, res) {
   if (setCors(req, res)) return;
   if (rateLimit(req, res, 30)) return;
 
-  const supabase = createClient(SUPABASE_URL, ANON_KEY);
+  const supabase = getSupabase();
 
   const profile = req.query.profile || "mixed";
   const risk = req.query.risk;
   const sector = req.query.sector;
   const market = req.query.market;
-  const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+  const limit = Math.min(parseInt(req.query.limit) || 10, 300);
   const exclude = (req.query.exclude || "").split(",").filter(Boolean).map(t => t.toUpperCase());
 
   const scoreCol = `score_${profile}`;

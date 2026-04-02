@@ -1,34 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
-
-function renderInline(text) {
-  const parts = [];
-  let remaining = text;
-  let key = 0;
-  while (remaining) {
-    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
-    if (!boldMatch) { parts.push(remaining); break; }
-    const idx = boldMatch.index;
-    if (idx > 0) parts.push(remaining.slice(0, idx));
-    parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
-    remaining = remaining.slice(idx + boldMatch[0].length);
-  }
-  return parts;
-}
-
-function ChatMarkdown({ text }) {
-  const lines = text.split("\n");
-  return lines.map((line, i) => {
-    if (line.startsWith("### ")) return <div key={i} style={{ fontWeight: 600, fontSize: 12, marginTop: i > 0 ? 6 : 0 }}>{renderInline(line.slice(4))}</div>;
-    if (line.startsWith("## ")) return <div key={i} style={{ fontWeight: 600, fontSize: 13, marginTop: i > 0 ? 8 : 0 }}>{renderInline(line.slice(3))}</div>;
-    if (line.startsWith("# ")) return <div key={i} style={{ fontWeight: 700, fontSize: 13, marginTop: i > 0 ? 8 : 0 }}>{renderInline(line.slice(2))}</div>;
-    if (/^---+$/.test(line.trim())) return <hr key={i} style={{ border: "none", borderTop: "1px solid currentColor", opacity: 0.15, margin: "6px 0" }} />;
-    if (/^\d+\.\s/.test(line)) return <div key={i} style={{ paddingLeft: 4, marginTop: 2 }}>{renderInline(line)}</div>;
-    if (line.startsWith("- ")) return <div key={i} style={{ paddingLeft: 4, marginTop: 2 }}>{renderInline(line)}</div>;
-    if (!line.trim()) return <div key={i} style={{ height: 4 }} />;
-    return <div key={i} style={{ marginTop: 1 }}>{renderInline(line)}</div>;
-  });
-}
+import Markdown from "./Markdown.jsx";
 
 function SaveInsightButton({ content, contextFn }) {
   const [saving, setSaving] = useState(false);
@@ -548,6 +521,7 @@ function PurchaseWizard({ onComplete, onCancel, contextFn }) {
 }
 
 export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true, onSaveStrategy, onSaveTodo }) {
+  const isMobile = useIsMobile();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -641,7 +615,10 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
 
   return (
     <div style={{
-      width: 380, height: "100%", borderLeft: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--bg-secondary)", flexShrink: 0,
+      ...(isMobile
+        ? { position: "fixed", inset: 0, zIndex: 1000, width: "100%", height: "100%" }
+        : { width: 380, height: "100%", borderLeft: "1px solid var(--border)", flexShrink: 0 }),
+      display: "flex", flexDirection: "column", background: "var(--bg-secondary)",
     }}>
       {/* Header */}
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(135deg, var(--accent), #1e88e5)", color: "#fff" }}>
@@ -733,7 +710,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
               color: msg.role === "user" ? "#fff" : "var(--text)",
             }}>
               {msg.role === "assistant" && msg.content
-                ? <ChatMarkdown text={msg.content} />
+                ? <Markdown text={msg.content} compact />
                 : (msg.content || (streaming && i === messages.length - 1 ? "..." : ""))}
             </div>
             {msg.role === "assistant" && msg.content && !streaming && (

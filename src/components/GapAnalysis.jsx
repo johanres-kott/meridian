@@ -3,20 +3,7 @@ import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import CompareView from "./CompareView.jsx";
-
-const FLAG_MAP = {
-  ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
-  OL: "\u{1F1F3}\u{1F1F4}", HK: "\u{1F1ED}\u{1F1F0}", L: "\u{1F1EC}\u{1F1E7}",
-  PA: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}", AS: "\u{1F1F3}\u{1F1F1}",
-  SW: "\u{1F1E8}\u{1F1ED}", T: "\u{1F1EF}\u{1F1F5}", TO: "\u{1F1E8}\u{1F1E6}",
-};
-
-function getFlag(ticker) {
-  if (!ticker) return "";
-  const parts = ticker.split(".");
-  if (parts.length > 1) return FLAG_MAP[parts[parts.length - 1]] || "\u{1F1FA}\u{1F1F8}";
-  return "\u{1F1FA}\u{1F1F8}";
-}
+import { getFlag } from "../constants.js";
 
 const MOBILE_COLUMNS = new Set(["name", "price", "changePercent", "peForward"]);
 

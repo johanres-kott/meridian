@@ -13,6 +13,7 @@ import ChatPanel from "./components/ChatPanel.jsx";
 import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
+import { analyzeAllocation, allocationSummary } from "./utils/portfolioAllocation.js";
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import QuickGuide from "./components/QuickGuide.jsx";
 import ScoringMethodology from "./components/ScoringMethodology.jsx";
@@ -20,6 +21,7 @@ import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
 import AboutPage from "./components/AboutPage.jsx";
 import { sanitizeInput } from "./lib/sanitize.js";
+import { parseFxRates } from "./hooks/useFxRates.js";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -210,6 +212,31 @@ export default function App() {
             })).sort((a, b) => b.value - a.value)
           : [];
 
+        // Build allocation analysis for Mats
+        const riskProfile = preferences.investorProfile?.riskProfile || "medium";
+        const allocItems = enrichedPortfolio.filter(p => p.shares > 0).map(p => ({
+          ticker: p.ticker, name: p.name, shares: p.shares,
+        }));
+        const allocScores = {};
+        enrichedPortfolio.forEach(p => {
+          if (p.score) {
+            allocScores[p.ticker.toUpperCase()] = {
+              beta: p.score.data?.beta,
+              risk: p.score.risk,
+              sector: p.sector,
+              marketCap: p.score.data?.marketCap,
+              subScores: { qualityScore: p.score.scores?.quality, piotroski: p.score.scores?.piotroski?.raw },
+            };
+          }
+        });
+        const allocPrices = {};
+        enrichedPortfolio.forEach(p => {
+          allocPrices[p.ticker] = { price: p.price, currency: p.currency };
+        });
+        const fxRatesForAlloc = parseFxRates(commoditiesRes);
+        const allocation = analyzeAllocation(allocItems, allocScores, allocPrices, fxRatesForAlloc, riskProfile);
+        const allocationText = allocationSummary(allocation);
+
         chatContextRef.current = {
           portfolio: enrichedPortfolio,
           portfolioSummary: {
@@ -220,6 +247,7 @@ export default function App() {
             totalHoldings: enrichedPortfolio.length,
             sectorBreakdown,
           },
+          allocation: allocationText,
           indices: indicesRes.filter(i => i.price > 0),
           commodities: commoditiesRes.filter(c => c.price > 0),
           investorProfile: preferences.investorProfile || null,

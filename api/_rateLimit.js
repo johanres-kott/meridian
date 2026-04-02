@@ -24,6 +24,10 @@ function cleanup() {
  * @returns {boolean} true if rate limited (already sent 429)
  */
 export function rateLimit(req, res, maxRequests = 60, windowMs = 60_000) {
+  // Skip rate limiting in local development
+  if (process.env.NODE_ENV === "development" || !req.headers["x-forwarded-for"]) {
+    return false;
+  }
   cleanup();
 
   const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || "unknown";

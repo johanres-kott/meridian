@@ -1,9 +1,6 @@
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = "https://acostgikldxkdmcoavkf.supabase.co";
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjb3N0Z2lrbGR4a2RtY29hdmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDUzMTgsImV4cCI6MjA4ODcyMTMxOH0.lgIR-b3FpyTaO5Aa9SPnUHl-gyy5hloBvMTmnOfSLpw";
+import { getSupabase } from "./_supabase.js";
 
 export default async function handler(req, res) {
   if (setCors(req, res)) return;
@@ -13,7 +10,7 @@ export default async function handler(req, res) {
   if (!ticker) return res.status(400).json({ error: "Missing ticker" });
   if (!/^[A-Za-z0-9.\-^%]+$/.test(ticker)) return res.status(400).json({ error: "invalid ticker format" });
 
-  const supabase = createClient(SUPABASE_URL, ANON_KEY);
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from("stock_scores")
     .select("*")

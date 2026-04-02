@@ -6,16 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../lib/profileMatcher.js";
 import QuarterlyChart from "./QuarterlyChart.jsx";
 import { sanitizeInput } from "../lib/sanitize.js";
-
-const STATUS_COLORS = {
-  Bevakar: { bg: "#f0f3fa", color: "#787b86" },
-  Analyserar: { bg: "#fff8e1", color: "#e65100" },
-  Intressant: { bg: "#e8f5e9", color: "#1b5e20" },
-  "Äger": { bg: "#e3f2fd", color: "#1565c0" },
-  "Avstår": { bg: "#fce4ec", color: "#880e4f" },
-};
-
-const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
+import { STATUSES, STATUS_COLORS, PROFILE_LABELS } from "../constants.js";
 
 function NotesSection({ item, onUpdate }) {
   const [notes, setNotes] = useState(item.notes || "");
@@ -168,7 +159,6 @@ function isNeg(key, value) {
   return value < 0;
 }
 
-const PROFILE_LABELS = { value: "värdeinvesterare", growth: "tillväxtinvesterare", dividend: "utdelningsinvesterare", mixed: "blandat", index: "indexinvesterare" };
 
 const SCORE_DETAILS = {
   piotroski: {

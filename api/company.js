@@ -1,15 +1,13 @@
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "./_supabase.js";
 
 const FMP_KEY = process.env.FMP_KEY;
 const FINNHUB_KEY = process.env.FINNHUB_KEY;
-const SUPABASE_URL = "https://acostgikldxkdmcoavkf.supabase.co";
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjb3N0Z2lrbGR4a2RtY29hdmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDUzMTgsImV4cCI6MjA4ODcyMTMxOH0.lgIR-b3FpyTaO5Aa9SPnUHl-gyy5hloBvMTmnOfSLpw";
 
 async function getCalculatedBeta(ticker) {
   try {
-    const sb = createClient(SUPABASE_URL, ANON_KEY);
+    const sb = getSupabase();
     const { data } = await sb
       .from("stock_scores")
       .select("beta_calculated, beta_index, market_cap_sek")
@@ -148,7 +146,7 @@ async function getFinnhubNews(ticker) {
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (rateLimit(req, res)) return;
+  if (rateLimit(req, res, 200)) return;
   res.setHeader("Cache-Control", "s-maxage=300");
 
   const { ticker } = req.query;

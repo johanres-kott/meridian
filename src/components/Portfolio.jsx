@@ -8,75 +8,16 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { matchStock } from "../lib/profileMatcher.js";
 import { sanitizeInput } from "../lib/sanitize.js";
 import PortfolioChart from "./PortfolioChart.jsx";
-function SimpleMarkdown({ text }) {
-  const lines = text.split("\n");
-  const elements = [];
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    // Headers
-    if (line.startsWith("### ")) { elements.push(<div key={i} style={{ fontWeight: 600, fontSize: 12, marginTop: i > 0 ? 8 : 0, marginBottom: 2 }}>{renderInline(line.slice(4))}</div>); continue; }
-    if (line.startsWith("## ")) { elements.push(<div key={i} style={{ fontWeight: 600, fontSize: 13, marginTop: i > 0 ? 10 : 0, marginBottom: 2 }}>{renderInline(line.slice(3))}</div>); continue; }
-    if (line.startsWith("# ")) { elements.push(<div key={i} style={{ fontWeight: 700, fontSize: 14, marginTop: i > 0 ? 10 : 0, marginBottom: 4 }}>{renderInline(line.slice(2))}</div>); continue; }
-    // Horizontal rule
-    if (/^---+$/.test(line.trim())) { elements.push(<hr key={i} style={{ border: "none", borderTop: "1px solid var(--border, #e0e3eb)", margin: "8px 0" }} />); continue; }
-    // List items
-    if (/^\d+\.\s/.test(line)) { elements.push(<div key={i} style={{ paddingLeft: 8, marginTop: 2 }}>{renderInline(line)}</div>); continue; }
-    if (line.startsWith("- ")) { elements.push(<div key={i} style={{ paddingLeft: 8, marginTop: 2 }}>{renderInline(line)}</div>); continue; }
-    // Empty line
-    if (!line.trim()) { elements.push(<div key={i} style={{ height: 6 }} />); continue; }
-    // Normal text
-    elements.push(<div key={i} style={{ marginTop: 1 }}>{renderInline(line)}</div>);
-  }
-  return <>{elements}</>;
-}
-
-function renderInline(text) {
-  // Bold: **text**
-  const parts = [];
-  let remaining = text;
-  let key = 0;
-  while (remaining) {
-    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
-    if (!boldMatch) { parts.push(remaining); break; }
-    const idx = boldMatch.index;
-    if (idx > 0) parts.push(remaining.slice(0, idx));
-    parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
-    remaining = remaining.slice(idx + boldMatch[0].length);
-  }
-  return parts;
-}
-
-const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstår"];
-
-const STATUS_COLORS = {
-  Bevakar: { bg: "var(--bg-secondary)", color: "var(--text-secondary)" },
-  Analyserar: { bg: "rgba(255,152,0,0.15)", color: "#e65100" },
-  Intressant: { bg: "rgba(8,153,129,0.15)", color: "#089981" },
-  Äger: { bg: "rgba(41,98,255,0.15)", color: "var(--accent)" },
-  Avstår: { bg: "rgba(242,54,69,0.15)", color: "#f23645" },
-};
-
-const FLAG_MAP = {
-  ST: "\u{1F1F8}\u{1F1EA}", HE: "\u{1F1EB}\u{1F1EE}", CO: "\u{1F1E9}\u{1F1F0}",
-  OL: "\u{1F1F3}\u{1F1F4}", HK: "\u{1F1ED}\u{1F1F0}", L: "\u{1F1EC}\u{1F1E7}",
-  PA: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}", AS: "\u{1F1F3}\u{1F1F1}",
-  SW: "\u{1F1E8}\u{1F1ED}", T: "\u{1F1EF}\u{1F1F5}", TO: "\u{1F1E8}\u{1F1E6}",
-};
-
-function getFlag(ticker) {
-  if (!ticker) return "";
-  const parts = ticker.split(".");
-  if (parts.length > 1) {
-    return FLAG_MAP[parts[parts.length - 1]] || "\u{1F1FA}\u{1F1F8}";
-  }
-  return "\u{1F1FA}\u{1F1F8}";
-}
+import AllocationCard from "./AllocationCard.jsx";
+import Markdown from "./Markdown.jsx";
+import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
+import { useFxRates } from "../hooks/useFxRates.js";
 
 async function fetchPrice(ticker) {
   try {
     const res = await fetch(`/api/company?ticker=${encodeURIComponent(ticker)}`);
-    const data = await res.json();
-    return data;
+    if (!res.ok) return null;
+    return await res.json();
   } catch {
     return null;
   }
@@ -413,7 +354,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
   const [showImport, setShowImport] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [fxRates, setFxRates] = useState({ SEK: 1 });
+  const { fxRates } = useFxRates();
   const [activeGroup, setActiveGroup] = useState(null); // null = "Alla"
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
@@ -422,17 +363,16 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
 
   const groups = preferences.groups || [];
 
-  useEffect(() => { load(); loadFxRates(); loadScores(); }, []);
+  useEffect(() => { load(); loadScores(); }, []);
 
   async function loadScores() {
     try {
       const res = await fetch("/api/suggestions?limit=300");
       const data = await res.json();
-      if (Array.isArray(data)) {
-        const map = {};
-        data.forEach(s => { map[s.ticker?.toUpperCase()] = s; });
-        setScores(map);
-      }
+      const list = data?.suggestions || (Array.isArray(data) ? data : []);
+      const map = {};
+      list.forEach(s => { map[s.ticker?.toUpperCase()] = s; });
+      setScores(map);
     } catch {}
   }
 
@@ -453,29 +393,22 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
     setItems(data || []);
     setLoading(false);
     if (data && data.length > 0) {
-      Promise.all(data.map(item =>
-        fetchPrice(item.ticker).then(d => d?.price ? [item.ticker, d] : null)
-      )).then(results => {
+      // Only fetch prices for items with shares (needed for treemap + allocation)
+      // This avoids hitting rate limits (58 items → ~8 with shares)
+      const withShares = data.filter(item => item.shares > 0);
+      if (withShares.length > 0) {
+        const results = await Promise.all(
+          withShares.map(item =>
+            fetchPrice(item.ticker).then(d => d?.price ? [item.ticker, d] : null)
+          )
+        );
         const map = {};
         for (const r of results) { if (r) map[r[0]] = r[1]; }
         setPrices(map);
-      });
+      }
     }
   }
 
-  async function loadFxRates() {
-    try {
-      const res = await fetch("/api/commodities");
-      const data = await res.json();
-      const rates = { SEK: 1 };
-      for (const c of data) {
-        if (c.display === "USD/SEK" && c.price > 0) rates.USD = c.price;
-        if (c.display === "EUR/SEK" && c.price > 0) rates.EUR = c.price;
-        if (c.display === "GBP/SEK" && c.price > 0) rates.GBP = c.price;
-      }
-      setFxRates(rates);
-    } catch {}
-  }
 
   async function addCompany({ ticker, name }) {
     const { data: { user } } = await supabase.auth.getUser();
@@ -676,31 +609,31 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
                   Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
                 </div>
               </div>
-              {preamble && <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}><SimpleMarkdown text={preamble} /></div>}
+              {preamble && <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}><Markdown text={preamble} /></div>}
               {sections.varfor && (
                 <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 12, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Varför</div>
-                  <SimpleMarkdown text={sections.varfor} />
+                  <Markdown text={sections.varfor} />
                 </div>
               )}
               <div style={{ display: isMobile ? "flex" : "grid", flexDirection: isMobile ? "column" : undefined, gridTemplateColumns: isMobile ? undefined : "1fr 1fr", gap: 12, marginBottom: 12 }}>
                 {sections.vad && (
                   <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Vad</div>
-                    <SimpleMarkdown text={sections.vad} />
+                    <Markdown text={sections.vad} />
                   </div>
                 )}
                 {sections.hur && (
                   <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Hur</div>
-                    <SimpleMarkdown text={sections.hur} />
+                    <Markdown text={sections.hur} />
                   </div>
                 )}
               </div>
               {sections.motivering && (
                 <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)", marginBottom: 8 }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Motivering</div>
-                  <SimpleMarkdown text={sections.motivering} />
+                  <Markdown text={sections.motivering} />
                 </div>
               )}
               <button
@@ -728,7 +661,7 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
               </div>
             </div>
             <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6 }}>
-              <SimpleMarkdown text={text} />
+              <Markdown text={text} />
             </div>
             <button
               onClick={() => onUpdatePreferences({ investmentPlan: null })}
@@ -739,6 +672,16 @@ export default function Portfolio({ preferences = {}, onUpdatePreferences, deepL
           </div>
         );
       })()}
+
+      {/* Allocation analysis */}
+      <AllocationCard
+        items={items}
+        scores={scores}
+        prices={prices}
+        fxRates={fxRates}
+        riskProfile={preferences.investorProfile?.riskProfile || "medium"}
+        isMobile={isMobile}
+      />
 
       {/* Group filter bar */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : undefined, WebkitOverflowScrolling: isMobile ? "touch" : undefined, paddingBottom: isMobile ? 4 : undefined }}>

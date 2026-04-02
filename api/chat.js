@@ -1,11 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@supabase/supabase-js";
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
+import { getSupabase } from "./_supabase.js";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const SUPABASE_URL = "https://acostgikldxkdmcoavkf.supabase.co";
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjb3N0Z2lrbGR4a2RtY29hdmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNDUzMTgsImV4cCI6MjA4ODcyMTMxOH0.lgIR-b3FpyTaO5Aa9SPnUHl-gyy5hloBvMTmnOfSLpw";
 
 export default async function handler(req, res) {
   setCors(req, res);
@@ -19,7 +17,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Authentication required" });
   }
   try {
-    const supabase = createClient(SUPABASE_URL, ANON_KEY, {
+    const supabase = getSupabase({
       global: { headers: { Authorization: authHeader } },
     });
     const { data: { user }, error } = await supabase.auth.getUser();
@@ -68,6 +66,7 @@ Mån 2: Bolag C — 6 000 kr, Bolag D — 4 000 kr
 NÄR ANVÄNDAREN FRÅGAR OM PORTFÖLJEN:
 - Analysera vilka aktier som dragit ner/upp mest (P&L)
 - Kommentera sektörfördelning och risk
+- Kommentera Core-Satellite-allokeringen om data finns (Kärna = stabila blue chips, Satellit = tillväxt, Spekulation = hög risk). Jämför med målallokeringen baserat på risktolerans.
 - Ge 1-2 konkreta åtgärdsförslag
 
 EXEMPEL PÅ BRA SVAR (bolagen är exempel — välj ALLTID från toppförslagslistan):
@@ -141,6 +140,9 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
     }
     if (context.savedTodos?.length > 0) {
       parts.push(`ANVÄNDARENS ATT-GÖRA-LISTA (dessa är redan givna råd):\n${context.savedTodos.join("\n")}`);
+    }
+    if (context.allocation) {
+      parts.push(context.allocation);
     }
     if (context.topSuggestions?.length > 0) {
       parts.push(`THESIONS TOPPFÖRSLAG (utgå från dessa, men du kan komplettera med andra bolag om användaren ber om det):\n${context.topSuggestions.map((s, i) =>

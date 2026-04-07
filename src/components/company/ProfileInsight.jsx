@@ -2,59 +2,59 @@ import { useState, useEffect } from "react";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../../lib/profileMatcher.js";
 import { PROFILE_LABELS } from "../../constants.js";
 
-const SCORE_DETAILS = {
+export const SCORE_DETAILS = {
   piotroski: {
-    title: "Piotroski F-Score (0\u20139)",
-    description: "M\u00e4ter finansiell styrka baserat p\u00e5 9 kriterier inom l\u00f6nsamhet, skulds\u00e4ttning och effektivitet. H\u00f6gre po\u00e4ng = starkare finansiell h\u00e4lsa.",
+    title: "Piotroski F-Score (0–9)",
+    description: "Mäter finansiell styrka baserat på 9 kriterier inom lönsamhet, skuldsättning och effektivitet. Högre poäng = starkare finansiell hälsa.",
     items: [
       "Positivt nettoresultat",
-      "Positivt operativt kassafl\u00f6de",
-      "Stigande avkastning p\u00e5 tillg\u00e5ngar (ROA)",
-      "Kassafl\u00f6de \u00f6verstiger nettoresultat",
-      "Minskande skulds\u00e4ttning",
+      "Positivt operativt kassaflöde",
+      "Stigande avkastning på tillgångar (ROA)",
+      "Kassaflöde överstiger nettoresultat",
+      "Minskande skuldsättning",
       "Stigande likviditetskvot",
       "Inga nya aktier emitterade",
       "Stigande bruttomarginal",
-      "Stigande tillg\u00e5ngsomsättning",
+      "Stigande tillgångsomsättning",
     ],
     formatRaw: (raw) => raw != null ? `${raw}/9` : null,
   },
   magicFormula: {
     title: "Magic Formula",
-    description: "Kombinerar Earnings Yield (vinstavkastning) och ROIC (avkastning p\u00e5 investerat kapital) f\u00f6r att hitta billiga kvalitetsbolag.",
+    description: "Kombinerar Earnings Yield (vinstavkastning) och ROIC (avkastning på investerat kapital) för att hitta billiga kvalitetsbolag.",
     items: [
-      "Earnings Yield \u2014 h\u00f6g vinst relativt priset",
-      "ROIC \u2014 effektiv kapitalanv\u00e4ndning",
+      "Earnings Yield — hög vinst relativt priset",
+      "ROIC — effektiv kapitalanvändning",
     ],
   },
   growth: {
-    title: "Tillv\u00e4xt",
-    description: "Bed\u00f6mer bolagets tillv\u00e4xttakt baserat p\u00e5 oms\u00e4ttningsutveckling och tillv\u00e4xttrend.",
+    title: "Tillväxt",
+    description: "Bedömer bolagets tillväxttakt baserat på omsättningsutveckling och tillväxttrend.",
     items: [
-      "Oms\u00e4ttningstillv\u00e4xt",
-      "Tillv\u00e4xtens stabilitet och trend",
+      "Omsättningstillväxt",
+      "Tillväxtens stabilitet och trend",
     ],
   },
   dividend: {
     title: "Utdelning",
-    description: "Utv\u00e4rderar utdelningens niv\u00e5 och stabilitet \u00f6ver tid.",
+    description: "Utvärderar utdelningens nivå och stabilitet över tid.",
     items: [
       "Direktavkastning",
-      "Utdelningens stabilitet och tillv\u00e4xt",
+      "Utdelningens stabilitet och tillväxt",
     ],
   },
   quality: {
     title: "Kvalitet",
-    description: "Helhetsbild av bolagets kvalitet baserat p\u00e5 marginaler, kapitaleffektivitet och skulds\u00e4ttning.",
+    description: "Helhetsbild av bolagets kvalitet baserat på marginaler, kapitaleffektivitet och skuldsättning.",
     items: [
-      "Marginaler (brutto, r\u00f6relse, EBITDA)",
-      "ROIC \u2014 avkastning p\u00e5 investerat kapital",
-      "Skulds\u00e4ttningsgrad",
+      "Marginaler (brutto, rörelse, EBITDA)",
+      "ROIC — avkastning på investerat kapital",
+      "Skuldsättningsgrad",
     ],
   },
 };
 
-function ScoreDetail({ scoreKey, scoreData }) {
+export function ScoreDetail({ scoreKey, scoreData }) {
   const detail = SCORE_DETAILS[scoreKey];
   if (!detail) return null;
 
@@ -71,14 +71,14 @@ function ScoreDetail({ scoreKey, scoreData }) {
       <div style={{ fontWeight: 500, color: "var(--text)", marginBottom: 4, fontSize: 12 }}>{detail.title}</div>
       {rawScore && (
         <div style={{ marginBottom: 6, fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, color: "var(--text)" }}>
-          Po\u00e4ng: {rawScore}
+          {"Poäng: "}{rawScore}
         </div>
       )}
       <div style={{ marginBottom: 8 }}>{detail.description}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {detail.items.map((item, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
-            <span style={{ flexShrink: 0, color: "var(--text-muted)", fontSize: 10, marginTop: 1 }}>\u2022</span>
+            <span style={{ flexShrink: 0, color: "var(--text-muted)", fontSize: 10, marginTop: 1 }}>{"•"}</span>
             <span>{item}</span>
           </div>
         ))}
@@ -87,7 +87,7 @@ function ScoreDetail({ scoreKey, scoreData }) {
   );
 }
 
-function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle }) {
+export function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle }) {
   if (value == null) return null;
   const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
   const hasDetail = !!SCORE_DETAILS[scoreKey];
@@ -216,27 +216,27 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
         );
       })()}
       <details style={{ marginTop: 10 }}>
-        <summary style={{ fontSize: 10, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>Hur vi bed\u00f6mer risk (Beta)</summary>
+        <summary style={{ fontSize: 10, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>{"Hur vi bedömer risk (Beta)"}</summary>
         <div style={{ marginTop: 6, fontSize: 10, color: "var(--text-secondary)", lineHeight: 1.6 }}>
           <div style={{ marginBottom: 4 }}>
-            <strong>Beta</strong> m\u00e4ter en akties volatilitet j\u00e4mf\u00f6rt med marknaden (index). Beta 1.0 = samma som marknaden.
+            <strong>Beta</strong> {"mäter en akties volatilitet jämfört med marknaden (index). Beta 1.0 = samma som marknaden."}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#089981", fontSize: 11, width: 14, textAlign: "center" }}>\u25C9</span>
-              <strong>L\u00e5g risk</strong> \u2014 Beta &lt; 0.8. Aktien r\u00f6r sig mindre \u00e4n marknaden. Stabilare kursutveckling.
+              <span style={{ color: "#089981", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
+              <strong>{"Låg risk"}</strong> {" — Beta < 0.8. Aktien rör sig mindre än marknaden. Stabilare kursutveckling."}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#ff9800", fontSize: 11, width: 14, textAlign: "center" }}>\u25C9</span>
-              <strong>Medel risk</strong> \u2014 Beta 0.8\u20131.2. F\u00f6ljer marknaden relativt n\u00e4ra.
+              <span style={{ color: "#ff9800", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
+              <strong>{"Medel risk"}</strong> {" — Beta 0.8–1.2. Följer marknaden relativt nära."}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#f23645", fontSize: 11, width: 14, textAlign: "center" }}>\u25C9</span>
-              <strong>H\u00f6g risk</strong> \u2014 Beta &gt; 1.2. St\u00f6rre kurssv\u00e4ngningar \u00e4n marknaden.
+              <span style={{ color: "#f23645", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
+              <strong>{"Hög risk"}</strong> {" — Beta > 1.2. Större kurssvängningar än marknaden."}
             </div>
           </div>
           <div style={{ marginTop: 6, color: "var(--text-muted)" }}>
-            Beta ber\u00e4knas fr\u00e5n 5 \u00e5rs kurshistorik mot S&P 500 (k\u00e4lla: Yahoo Finance). Utg\u00f6r inte finansiell r\u00e5dgivning.
+            {"Beta beräknas från 5 års kurshistorik mot S&P 500 (källa: Yahoo Finance). Utgör inte finansiell rådgivning."}
           </div>
         </div>
       </details>

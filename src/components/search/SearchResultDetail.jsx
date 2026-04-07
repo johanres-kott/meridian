@@ -5,25 +5,13 @@ import { useIsMobile } from "../../hooks/useIsMobile.js";
 import { useUser } from "../../contexts/UserContext.jsx";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../../lib/profileMatcher.js";
 import { PROFILE_LABELS } from "../../constants.js";
-
-function ScoreBar({ label, value }) {
-  if (value == null) return null;
-  const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
-      <span style={{ width: 90, color: "var(--text-secondary)", flexShrink: 0 }}>{label}</span>
-      <div style={{ flex: 1, height: 6, background: "var(--border-light)", borderRadius: 3, overflow: "hidden" }}>
-        <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
-      </div>
-      <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
-    </div>
-  );
-}
+import { ScoreBar } from "../company/ProfileInsight.jsx";
 
 export default function SearchResultDetail({ result, scoreData, added, onAddToPortfolio }) {
   const { preferences } = useUser();
   const isMobile = useIsMobile();
   const [showAllMetrics, setShowAllMetrics] = useState(false);
+  const [expandedScore, setExpandedScore] = useState(null);
 
   return (
     <div style={{ border: "1px solid var(--border)", borderRadius: 4, padding: isMobile ? 12 : 24 }}>
@@ -133,11 +121,11 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
                 <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
                   <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} />
-                    <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} />
-                    <ScoreBar label="Tillväxt" value={scoreData.scores.growth} />
-                    <ScoreBar label="Utdelning" value={scoreData.scores.dividend} />
-                    <ScoreBar label="Kvalitet" value={scoreData.scores.quality} />
+                    <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} scoreKey="piotroski" scoreData={scoreData.scores} expanded={expandedScore === "piotroski"} onToggle={() => setExpandedScore(expandedScore === "piotroski" ? null : "piotroski")} />
+                    <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} scoreKey="magicFormula" scoreData={scoreData.scores} expanded={expandedScore === "magicFormula"} onToggle={() => setExpandedScore(expandedScore === "magicFormula" ? null : "magicFormula")} />
+                    <ScoreBar label="Tillväxt" value={scoreData.scores.growth} scoreKey="growth" scoreData={scoreData.scores} expanded={expandedScore === "growth"} onToggle={() => setExpandedScore(expandedScore === "growth" ? null : "growth")} />
+                    <ScoreBar label="Utdelning" value={scoreData.scores.dividend} scoreKey="dividend" scoreData={scoreData.scores} expanded={expandedScore === "dividend"} onToggle={() => setExpandedScore(expandedScore === "dividend" ? null : "dividend")} />
+                    <ScoreBar label="Kvalitet" value={scoreData.scores.quality} scoreKey="quality" scoreData={scoreData.scores} expanded={expandedScore === "quality"} onToggle={() => setExpandedScore(expandedScore === "quality" ? null : "quality")} />
                   </div>
                   {scoreData.composite && (() => {
                     const profileType = profile?.investorType || "mixed";

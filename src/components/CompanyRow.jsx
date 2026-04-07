@@ -66,8 +66,10 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
   const currency = price?.currency || "SEK";
   const fxRate = fxRates[currency] || null;
   const priceSek = (price?.price && fxRate) ? price.price * fxRate : null;
-  const pl = (item.gav && item.shares && priceSek) ? ((priceSek - item.gav) * item.shares) : null;
-  const plPct = (item.gav && priceSek) ? ((priceSek - item.gav) / item.gav * 100) : null;
+  // P/L: compare price and GAV in original currency, then convert to SEK
+  const plLocal = (item.gav && item.shares && price?.price) ? ((price.price - item.gav) * item.shares) : null;
+  const pl = (plLocal !== null && fxRate) ? plLocal * fxRate : plLocal;
+  const plPct = (item.gav && price?.price) ? ((price.price - item.gav) / item.gav * 100) : null;
 
   const itemGroups = groups.filter(g => (g.members || []).includes(item.id));
   const tdBase = { padding: isMobile ? "6px 8px" : "10px 14px", borderBottom: "1px solid var(--border-light)" };
@@ -160,7 +162,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
             {currency !== "SEK" && fxRate ? (
               <>
                 <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{(totalValue * fxRate).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{item.shares} st à {price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {currency}</div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{item.shares} st{item.gav ? ` à ${item.gav.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}` : ""}</div>
               </>
             ) : (
               <>

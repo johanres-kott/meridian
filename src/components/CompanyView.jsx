@@ -8,6 +8,7 @@ import { useUser } from "../contexts/UserContext.jsx";
 import NotesSection from "./company/NotesSection.jsx";
 import ProfileInsight from "./company/ProfileInsight.jsx";
 import InsiderSection from "./company/InsiderSection.jsx";
+import OwnershipChart from "./company/OwnershipChart.jsx";
 
 // Beginner sees 4 key metrics, intermediate 6, advanced all 8-9
 const BEGINNER_METRICS = ["peForward", "dividendYield", "revenueGrowth", "roic"];
@@ -249,6 +250,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
           {/* Right column: Profile insight + Notes + GAV */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <ProfileInsight ticker={item.ticker} company={company} investorProfile={investorProfile} />
+            <OwnershipChart ticker={item.ticker} />
             <NotesSection item={item} onUpdate={onUpdate} />
           </div>
         </div>

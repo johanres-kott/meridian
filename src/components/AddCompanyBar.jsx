@@ -68,7 +68,16 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
                   onMouseLeave={e => e.currentTarget.style.background = "var(--bg-card)"}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 500, color: "var(--text)", fontSize: 13 }}>{r.legalName || r.name}</span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontWeight: 500, color: "var(--text)", fontSize: 13 }}>{r.legalName || r.name}</span>
+                      <span style={{
+                        fontSize: 9, padding: "1px 5px", borderRadius: 3, fontWeight: 500,
+                        background: r.indexFund ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
+                        color: r.indexFund ? "#1976d2" : "#7b1fa2",
+                      }}>
+                        {r.indexFund ? "Index" : "Aktiv"}
+                      </span>
+                    </span>
                     {r.starRating && (
                       <span style={{ fontSize: 11, color: "#f5a623" }}>{"★".repeat(r.starRating)}</span>
                     )}

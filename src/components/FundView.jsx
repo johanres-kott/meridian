@@ -162,13 +162,13 @@ export default function FundView({ item, onBack, onUpdate }) {
               <ReturnBar label="3 månader" value={fund.returnM3} />
               <ReturnBar label="6 månader" value={fund.returnM6} />
               <ReturnBar label="1 år" value={fund.returnM12} />
-              <ReturnBar label="3 år" value={fund.returnM36} />
-              <ReturnBar label="5 år" value={fund.returnM60} />
-              <ReturnBar label="10 år" value={fund.returnM120} />
+              <ReturnBar label="3 år (per år)" value={fund.returnM36} />
+              <ReturnBar label="5 år (per år)" value={fund.returnM60} />
+              <ReturnBar label="10 år (per år)" value={fund.returnM120} />
             </div>
 
             <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>
-              Källa: Morningstar · Avkastning i {fund.currency || "SEK"}
+              Källa: Morningstar · Avkastning i {fund.currency || "SEK"} · Perioder &ge;3 år visas som genomsnittlig årlig avkastning
             </div>
           </div>
 

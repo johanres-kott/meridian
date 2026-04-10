@@ -9,8 +9,9 @@ const CATEGORIES = [
   { id: "rantefond", label: "Räntefonder" },
 ];
 
-export default function FundSuggestions({ isMobile }) {
+export default function FundSuggestions({ isMobile, onNavigate }) {
   const [category, setCategory] = useState("aktie_sverige");
+  const [typeFilter, setTypeFilter] = useState("all"); // "all" | "index" | "active"
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(new Set());
@@ -37,7 +38,17 @@ export default function FundSuggestions({ isMobile }) {
     if (!error) setAdded(prev => new Set([...prev, fund.secId]));
   }
 
+  async function openFund(fund) {
+    if (!added.has(fund.secId)) {
+      await addToWatchlist(fund);
+    }
+    onNavigate?.("portfolio", { ticker: fund.secId });
+  }
+
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const filtered = (data?.results || []).filter(f =>
+    typeFilter === "all" ? true : typeFilter === "index" ? f.indexFund : !f.indexFund
+  );
 
   return (
     <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
@@ -46,7 +57,7 @@ export default function FundSuggestions({ isMobile }) {
         background: "var(--bg-secondary)",
       }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Toppfonder</div>
-        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
           {CATEGORIES.map(cat => (
             <button
               key={cat.id}
@@ -62,12 +73,36 @@ export default function FundSuggestions({ isMobile }) {
             </button>
           ))}
         </div>
+        <div style={{ display: "flex", gap: 4 }}>
+          {[
+            { id: "all", label: "Alla" },
+            { id: "index", label: "Index" },
+            { id: "active", label: "Aktiv" },
+          ].map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => setTypeFilter(opt.id)}
+              style={{
+                fontSize: 10, padding: "3px 8px", borderRadius: 3, border: "1px solid var(--border)",
+                cursor: "pointer", fontFamily: "inherit", fontWeight: typeFilter === opt.id ? 600 : 400,
+                background: typeFilter === opt.id
+                  ? (opt.id === "index" ? "rgba(33,150,243,0.15)" : opt.id === "active" ? "rgba(156,39,176,0.12)" : "var(--bg-card)")
+                  : "var(--bg-card)",
+                color: typeFilter === opt.id
+                  ? (opt.id === "index" ? "#1976d2" : opt.id === "active" ? "#7b1fa2" : "var(--text)")
+                  : "var(--text-muted)",
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
           <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Hämtar fonder...</div>
-        ) : !data?.results?.length ? (
+        ) : !filtered.length ? (
           <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Inga fonder hittades</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 11 : 12 }}>
@@ -84,7 +119,7 @@ export default function FundSuggestions({ isMobile }) {
               </tr>
             </thead>
             <tbody>
-              {data.results.map((fund, idx) => {
+              {filtered.map((fund, idx) => {
                 const isAdding = adding.has(fund.secId);
                 const isAdded = added.has(fund.secId);
                 return (
@@ -95,9 +130,21 @@ export default function FundSuggestions({ isMobile }) {
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>{idx + 1}</td>
-                    <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), color: "var(--text)", maxWidth: isMobile ? 140 : undefined }}>
-                      <div style={{ fontWeight: 500, ...(isMobile ? { fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } : {}) }}>
-                        {fund.legalName || fund.name}
+                    <td
+                      onClick={() => openFund(fund)}
+                      style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), color: "var(--text)", maxWidth: isMobile ? 140 : undefined, cursor: "pointer" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontWeight: 500, ...(isMobile ? { fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } : {}) }}>
+                          {fund.legalName || fund.name}
+                        </span>
+                        <span style={{
+                          fontSize: 9, padding: "1px 5px", borderRadius: 3, fontWeight: 500, flexShrink: 0,
+                          background: fund.indexFund ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
+                          color: fund.indexFund ? "#1976d2" : "#7b1fa2",
+                        }}>
+                          {fund.indexFund ? "Index" : "Aktiv"}
+                        </span>
                       </div>
                       {!isMobile && <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>{fund.category}</div>}
                     </td>
@@ -163,9 +210,9 @@ export default function FundSuggestions({ isMobile }) {
           </table>
         )}
 
-        {data?.results?.length > 0 && (
+        {filtered.length > 0 && (
           <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "8px 20px 12px" }}>
-            Källa: Morningstar · Sorterat efter betyg · {data.results.length} fonder
+            Källa: Morningstar · Sorterat efter betyg · {filtered.length} fonder
           </div>
         )}
       </div>

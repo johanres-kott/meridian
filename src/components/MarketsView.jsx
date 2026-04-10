@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const COMMODITY_GROUPS = ["Precious Metals", "Energy", "Industrial Metals", "Agriculture", "FX vs SEK"];
 
-export default function Commodities({ deepLink, onClearDeepLink }) {
+export default function MarketsView({ deepLink, onClearDeepLink }) {
   const isMobile = useIsMobile();
   const [indices, setIndices] = useState([]);
   const [idxLoading, setIdxLoading] = useState(true);

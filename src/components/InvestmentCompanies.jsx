@@ -12,6 +12,7 @@ import InfoCard from "./investment/InfoCard.jsx";
 import CompanySelector, { COMPANIES } from "./investment/CompanySelector.jsx";
 import HoldingsTable from "./investment/HoldingsTable.jsx";
 import FundSuggestions from "./FundSuggestions.jsx";
+import FundEducation from "./FundEducation.jsx";
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
@@ -92,7 +93,10 @@ export default function InvestmentCompanies({ onNavigate }) {
           </div>
         </div>
         {suggestMode === "fund" ? (
-          <FundSuggestions isMobile={isMobile} />
+          <>
+            <FundSuggestions isMobile={isMobile} onNavigate={onNavigate} />
+            <FundEducation />
+          </>
         ) : preferences.investorProfile ? (
           <SmartSuggestions
             profile={preferences.investorProfile}

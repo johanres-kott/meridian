@@ -4,15 +4,9 @@
     {
       "name": "dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--port", "5173"],
-      "port": 5173
-    },
-    {
-      "name": "dev-main",
-      "runtimeExecutable": "/usr/local/bin/node",
-      "runtimeArgs": ["/Users/johanresare/meridian/node_modules/vite/bin/vite.js", "--port", "5174"],
-      "port": 5174,
-      "cwd": "/Users/johanresare/meridian"
+      "runtimeArgs": ["vercel", "dev", "--yes"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

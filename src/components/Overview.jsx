@@ -15,7 +15,7 @@ class SafeCard extends Component {
   render() { return this.state.hasError ? null : this.props.children; }
 }
 
-export default function Markets({ onNavigate }) {
+export default function Overview({ onNavigate }) {
   const { userId, preferences, updatePreferences, lastSeenAt, displayName } = useUser();
   const isMobile = useIsMobile();
 

@@ -5,11 +5,11 @@ import { useTheme } from "./hooks/useTheme.js";
 import { UserProvider, useUser } from "./contexts/UserContext.jsx";
 import Login from "./components/Login.jsx";
 import LandingPage from "./components/LandingPage.jsx";
-import Markets from "./components/Markets.jsx";
+import Overview from "./components/Overview.jsx";
 import Portfolio from "./components/Portfolio.jsx";
 import GapAnalysis from "./components/GapAnalysis.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
-import Commodities from "./components/Commodities.jsx";
+import MarketsView from "./components/MarketsView.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
 import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
@@ -356,8 +356,8 @@ function AppContent() {
       {/* Content + Chat */}
       <div style={{ display: "flex", height: isMobile ? "calc(100vh - 82px)" : "calc(100vh - 42px)" }}>
         <div style={{ flex: 1, overflow: "auto", padding: isMobile ? "16px 12px" : "24px 32px", paddingBottom: isMobile ? "calc(16px + env(safe-area-inset-bottom, 0px))" : "24px", paddingLeft: isMobile ? "calc(12px + env(safe-area-inset-left, 0px))" : "32px", paddingRight: isMobile ? "calc(12px + env(safe-area-inset-right, 0px))" : "32px" }}>
-          {tab === "markets" && <Markets onNavigate={navigate} />}
-          {tab === "commodities" && <Commodities deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+          {tab === "markets" && <Overview onNavigate={navigate} />}
+          {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "analysis" && <GapAnalysis onNavigate={navigate} />}
           {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}

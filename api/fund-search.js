@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       languageId: "sv-SE",
       currencyId: "SEK",
       universeIds: "FOALL$$ALL",
-      securityDataPoints: "SecId|Name|PriceCurrency|LegalName|ClosePrice|StarRatingM255|CategoryName|OngoingCharge|ReturnM1|ReturnM12|ReturnM36|ReturnM60",
+      securityDataPoints: "SecId|Name|PriceCurrency|LegalName|ClosePrice|StarRatingM255|CategoryName|OngoingCharge|ReturnM1|ReturnM12|ReturnM36|ReturnM60|IndexFund",
       term: q,
     });
 
@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       returnM12: r.ReturnM12,
       returnM36: r.ReturnM36,
       returnM60: r.ReturnM60,
+      indexFund: r.IndexFund || false,
     }));
 
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=60");

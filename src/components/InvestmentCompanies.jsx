@@ -11,6 +11,7 @@ import LeadershipPanel from "./investment/LeadershipPanel.jsx";
 import InfoCard from "./investment/InfoCard.jsx";
 import CompanySelector, { COMPANIES } from "./investment/CompanySelector.jsx";
 import HoldingsTable from "./investment/HoldingsTable.jsx";
+import FundSuggestions from "./FundSuggestions.jsx";
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
@@ -19,6 +20,7 @@ export default function InvestmentCompanies({ onNavigate }) {
   const isMobile = useIsMobile();
   const [selectedId, setSelectedId] = useState("investor");
   const [tickers, setTickers] = useState([]);
+  const [suggestMode, setSuggestMode] = useState("stock"); // "stock" | "fund"
   const company = COMPANIES.find(c => c.id === selectedId);
 
   useEffect(() => {
@@ -65,17 +67,45 @@ export default function InvestmentCompanies({ onNavigate }) {
       </div>
 
       {/* ── Smart Suggestions ── */}
-      {preferences.investorProfile && (
-        <div id="toppforslag" style={{ marginBottom: 32 }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Toppförslag</div>
+      <div id="toppforslag" style={{ marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)" }}>Toppförslag</div>
+          <div style={{ display: "flex", gap: 4 }}>
+            {[
+              { id: "stock", label: "Aktier" },
+              { id: "fund", label: "Fonder" },
+            ].map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setSuggestMode(opt.id)}
+                style={{
+                  fontSize: 11, padding: "4px 12px", borderRadius: 4,
+                  border: "1px solid var(--border)", cursor: "pointer", fontFamily: "inherit",
+                  fontWeight: suggestMode === opt.id ? 600 : 400,
+                  background: suggestMode === opt.id ? "var(--accent)" : "var(--bg-card)",
+                  color: suggestMode === opt.id ? "#fff" : "var(--text-secondary)",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {suggestMode === "fund" ? (
+          <FundSuggestions isMobile={isMobile} />
+        ) : preferences.investorProfile ? (
           <SmartSuggestions
             profile={preferences.investorProfile}
             existingTickers={tickers}
             isMobile={isMobile}
             onNavigate={onNavigate}
           />
-        </div>
-      )}
+        ) : (
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: 20, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
+            Skapa en investerarprofil för att få aktieförslag anpassade efter dig.
+          </div>
+        )}
+      </div>
 
       {/* ── Investment companies section ── */}
       <div id="investmentbolag" style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Investera som investmentbolag</div>

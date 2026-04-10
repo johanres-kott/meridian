@@ -31,6 +31,22 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "messages required" });
   }
 
+  // Input validation: limit payload size to prevent abuse
+  if (messages.length > 30) {
+    return res.status(400).json({ error: "Too many messages (max 30)" });
+  }
+  for (const m of messages) {
+    if (!m.role || !["user", "assistant"].includes(m.role)) {
+      return res.status(400).json({ error: "Invalid message role" });
+    }
+    if (typeof m.content !== "string" || m.content.length > 5000) {
+      return res.status(400).json({ error: "Message too long (max 5000 chars)" });
+    }
+  }
+  if (context && JSON.stringify(context).length > 20000) {
+    return res.status(400).json({ error: "Context too large" });
+  }
+
   let systemPrompt = `Du heter Mats och är en AI-driven finansassistent i appen Thesion. Du är inte en människa — var tydlig med att du är en AI om någon frågar.
 
 Du har tillgång till användarens portfölj med nyckeltal, scoring och sektörfördelning.
@@ -243,10 +259,11 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
     res.write("data: [DONE]\n\n");
     res.end();
   } catch (err) {
+    console.error("Chat error:", err.message);
     if (!res.headersSent) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "Internal server error" });
     } else {
-      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      res.write(`data: ${JSON.stringify({ error: "Internal server error" })}\n\n`);
       res.end();
     }
   }

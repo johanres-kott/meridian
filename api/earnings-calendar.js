@@ -53,6 +53,7 @@ export default async function handler(req, res) {
 
     res.status(200).json(filtered);
   } catch (err) {
-    res.status(500).json({ error: err.message || "Failed to fetch earnings calendar" });
+    console.error("Earnings calendar error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 }

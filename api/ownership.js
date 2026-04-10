@@ -184,6 +184,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ ticker, ...ownership });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Ownership error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 }

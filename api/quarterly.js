@@ -71,6 +71,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ ticker, quarters });
   } catch (err) {
-    res.status(500).json({ error: err.message || "Failed to fetch quarterly data" });
+    console.error("Quarterly error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 }

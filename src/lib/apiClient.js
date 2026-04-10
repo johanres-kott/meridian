@@ -36,3 +36,36 @@ export async function searchStocks(query, limit = 6) {
     return [];
   }
 }
+
+/**
+ * Search for funds by query string via Morningstar.
+ * Returns an array of fund results.
+ */
+export async function searchFunds(query, limit = 8) {
+  if (!query || query.length < 2) return [];
+  try {
+    const res = await fetch(`/api/fund-search?q=${encodeURIComponent(query)}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.results || []).slice(0, limit);
+  } catch (err) {
+    console.error(`searchFunds failed for "${query}":`, err);
+    return [];
+  }
+}
+
+/**
+ * Fetch fund data (NAV, returns, rating, fees) for a Morningstar SecId.
+ * Returns null on error.
+ */
+export async function fetchFund(secId) {
+  if (!secId) return null;
+  try {
+    const res = await fetch(`/api/fund?secId=${encodeURIComponent(secId)}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error(`fetchFund failed for ${secId}:`, err);
+    return null;
+  }
+}

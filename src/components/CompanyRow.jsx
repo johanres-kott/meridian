@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { formatHoldingValue } from "./PortfolioTreemap.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
-import { fetchCompany } from "../lib/apiClient.js";
+import { fetchCompany, fetchFund } from "../lib/apiClient.js";
 
 function GroupTagPopover({ item, groups, onToggle, onClose }) {
   const ref = useRef(null);
@@ -56,8 +56,14 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
 
   useEffect(() => {
     if (priceData) { setPrice(priceData); return; }
-    fetchCompany(item.ticker).then(d => { if (d && d.price) setPrice(d); });
-  }, [item.ticker, priceData]);
+    if (item.type === "fund") {
+      fetchFund(item.ticker).then(d => {
+        if (d?.nav) setPrice({ price: d.nav, currency: d.currency || "SEK", changePercent: d.returnD1 });
+      });
+    } else {
+      fetchCompany(item.ticker).then(d => { if (d && d.price) setPrice(d); });
+    }
+  }, [item.ticker, item.type, priceData]);
 
   const chg = price?.changePercent;
   const chgColor = chg > 0 ? "#089981" : chg < 0 ? "#f23645" : "var(--text-secondary)";
@@ -81,11 +87,15 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
       onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
       onMouseLeave={e => e.currentTarget.style.background = ""}
     >
-      <td style={{ ...tdBase, width: 36 }}>{getFlag(item.ticker)}</td>
+      <td style={{ ...tdBase, width: 36 }}>
+        {item.type === "fund"
+          ? <span style={{ fontSize: 16 }} title="Fond">📊</span>
+          : getFlag(item.ticker)}
+      </td>
       <td style={tdBase}>
         <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{item.name || item.ticker}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>
+          {item.type !== "fund" && <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>}
           {scoreData && (() => {
             const profileType = investorProfile?.investorType || "mixed";
             const compositeScore = scoreData.composite?.[profileType] ?? scoreData.composite?.mixed;

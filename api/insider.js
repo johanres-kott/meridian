@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   if (rateLimit(req, res, 30)) return;
 
   const { ticker } = req.query;
-  if (!ticker || ticker.length < 2 || ticker.length > 20) {
+  if (!ticker || ticker.length < 2 || ticker.length > 20 || !/^[A-Za-z0-9.\-^%]+$/.test(ticker)) {
     return res.status(400).json({ error: "Invalid ticker" });
   }
 

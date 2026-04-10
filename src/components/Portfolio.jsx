@@ -5,7 +5,8 @@ import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
-import { fetchCompany } from "../lib/apiClient.js";
+import { fetchCompany, fetchFund } from "../lib/apiClient.js";
+import FundView from "./FundView.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";
 import AllocationCard from "./AllocationCard.jsx";
 import StrategyCard from "./StrategyCard.jsx";
@@ -54,9 +55,12 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       const withShares = data.filter(item => item.shares > 0);
       if (withShares.length > 0) {
         const results = await Promise.all(
-          withShares.map(item =>
-            fetchCompany(item.ticker).then(d => d?.price ? [item.ticker, d] : null)
-          )
+          withShares.map(item => {
+            if (item.type === "fund") {
+              return fetchFund(item.ticker).then(d => d?.nav ? [item.ticker, { price: d.nav, currency: d.currency || "SEK", changePercent: d.returnD1 }] : null);
+            }
+            return fetchCompany(item.ticker).then(d => d?.price ? [item.ticker, d] : null);
+          })
         );
         const map = {};
         for (const r of results) { if (r) map[r[0]] = r[1]; }
@@ -65,9 +69,9 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
     }
   }
 
-  async function addCompany({ ticker, name }) {
+  async function addCompany({ ticker, name, type = "stock" }) {
     const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase.from("watchlist").insert({ ticker, name, user_id: user.id, status: "Bevakar" }).select().single();
+    const { data, error } = await supabase.from("watchlist").insert({ ticker, name, user_id: user.id, status: "Bevakar", type }).select().single();
     if (!error) {
       setItems(prev => [...prev, data]);
       if (activeGroup && data) {
@@ -134,6 +138,9 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
 
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
+    if (freshItem.type === "fund") {
+      return <FundView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
+    }
     return <CompanyView item={freshItem} onBack={() => setSelected(null)} onUpdate={updateItem} />;
   }
 
@@ -169,7 +176,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>Portfölj</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-            {activeGroup ? `${filteredItems.length} bolag i ${activeGroup}` : `${items.length} bolag`}
+            {activeGroup ? `${filteredItems.length} innehav i ${activeGroup}` : `${items.length} innehav`}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexDirection: "row" }}>

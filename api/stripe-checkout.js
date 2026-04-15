@@ -22,9 +22,11 @@ export default async function handler(req, res) {
   if (authError || !user) return res.status(401).json({ error: "Not authenticated" });
 
   try {
-    const stripe = new Stripe(stripeKey);
+    const stripe = new Stripe(stripeKey, {
+      httpClient: Stripe.createFetchHttpClient(),
+    });
 
-    const origin = req.headers.origin || "http://localhost:3000";
+    const origin = req.headers.origin || "https://thesion.tech";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -51,7 +53,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ url: session.url });
   } catch (err) {
     console.error("Stripe checkout error:", err.message, err.type, err.code);
-    const keyPrefix = stripeKey ? stripeKey.slice(0, 10) + "..." : "MISSING";
-    return res.status(500).json({ error: err.message || "Internal server error", keyPrefix });
+    return res.status(500).json({ error: err.message || "Internal server error" });
   }
 }

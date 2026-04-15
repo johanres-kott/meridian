@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   if (!stripeKey) return res.status(200).json({ premium: false });
 
   try {
-    const stripe = new Stripe(stripeKey);
+    const stripe = new Stripe(stripeKey, { httpClient: Stripe.createFetchHttpClient() });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     if (customers.data.length > 0) {

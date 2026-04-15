@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     return res.status(500).end();
   }
 
-  const stripe = new Stripe(stripeKey);
+  const stripe = new Stripe(stripeKey, { httpClient: Stripe.createFetchHttpClient() });
   const buf = await buffer(req);
   const sig = req.headers["stripe-signature"];
 

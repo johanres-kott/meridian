@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         const stripeKey = process.env.STRIPE_SECRET_KEY;
         if (stripeKey) {
           try {
-            const stripe = new Stripe(stripeKey);
+            const stripe = new Stripe(stripeKey, { httpClient: Stripe.createFetchHttpClient() });
             const customers = await stripe.customers.list({ email: user.email, limit: 1 });
             if (customers.data.length > 0) {
               const subs = await stripe.subscriptions.list({ customer: customers.data[0].id, status: "active", limit: 1 });

@@ -64,7 +64,7 @@ export default function OnboardingModal({ onComplete }) {
               </button>
             </div>
           </>
-        ) : (
+        ) : current ? (
         <>
         {/* Progress */}
         <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
@@ -156,7 +156,7 @@ export default function OnboardingModal({ onComplete }) {
           </button>
         </div>
         </>
-        )}
+        ) : null}
 
         {/* Summary screen */}
         {isSummary && (

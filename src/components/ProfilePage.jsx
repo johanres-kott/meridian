@@ -139,6 +139,58 @@ export default function ProfilePage({ onResetProfile }) {
         )}
       </div>
 
+      {/* Pension */}
+      <div style={cardStyle}>
+        <div style={labelStyle}>Pensionssparande</div>
+        {preferences.pension?.itpType ? (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12, marginBottom: preferences.pension.funds?.length ? 12 : 0 }}>
+              <div>
+                <div style={fieldLabel}>ITP-typ</div>
+                <div style={fieldValue}>{preferences.pension.itpType}</div>
+              </div>
+              <div>
+                <div style={fieldLabel}>Bolag</div>
+                <div style={fieldValue}>{preferences.pension.provider || "–"}</div>
+              </div>
+              <div>
+                <div style={fieldLabel}>Försäkringsform</div>
+                <div style={fieldValue}>
+                  {preferences.pension.insuranceType === "fond" ? "Fondförsäkring" : preferences.pension.insuranceType === "trad" ? "Traditionell" : "–"}
+                </div>
+              </div>
+              {preferences.pension.currentValue != null && (
+                <div>
+                  <div style={fieldLabel}>Aktuellt värde</div>
+                  <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {Number(preferences.pension.currentValue).toLocaleString("sv-SE")} kr
+                  </div>
+                </div>
+              )}
+            </div>
+            {preferences.pension.funds?.length > 0 && (
+              <div style={{ marginBottom: 8 }}>
+                <div style={fieldLabel}>Fonder</div>
+                {preferences.pension.funds.map((f, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-secondary)", padding: "2px 0" }}>
+                    <span>{f.name}</span>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button onClick={() => updatePreferences({ pension: {} })}
+              style={{ fontSize: 11, color: "#c62828", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
+              Rensa pensionsdata
+            </button>
+          </>
+        ) : (
+          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+            Ingen pensionsdata registrerad. Gå till Investera → Pension → Tjänstepension för att fylla i.
+          </div>
+        )}
+      </div>
+
       {/* Account type */}
       <div style={cardStyle}>
         <div style={labelStyle}>Kontotyp</div>

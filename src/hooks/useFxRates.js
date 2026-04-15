@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
  *
  * Replaces duplicated FX parsing in Portfolio.jsx, PortfolioSummary.jsx, and App.jsx.
  */
-const DEFAULT_RATES = { SEK: 1 };
+const DEFAULT_RATES = { SEK: 1, USD: 10.0, EUR: 11.0, GBP: 13.0, HKD: 1.3, DKK: 1.5, NOK: 1.0, CHF: 12.0 };
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // Module-level cache so multiple components share the same data

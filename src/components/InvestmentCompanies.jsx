@@ -23,6 +23,7 @@ export default function InvestmentCompanies({ onNavigate }) {
   const [selectedId, setSelectedId] = useState("investor");
   const [tickers, setTickers] = useState([]);
   const [suggestMode, setSuggestMode] = useState("stock"); // "stock" | "fund"
+  const [subTab, setSubTab] = useState("toppforslag");
   const company = COMPANIES.find(c => c.id === selectedId);
 
   useEffect(() => {
@@ -54,15 +55,16 @@ export default function InvestmentCompanies({ onNavigate }) {
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => document.getElementById(tab.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            onClick={() => setSubTab(tab.id)}
             style={{
-              fontSize: isMobile ? 12 : 13, fontWeight: 500, padding: isMobile ? "8px 12px" : "10px 20px",
-              background: "none", border: "none", borderBottom: "2px solid transparent",
-              color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit",
+              fontSize: isMobile ? 12 : 13, fontWeight: subTab === tab.id ? 600 : 500,
+              padding: isMobile ? "8px 12px" : "10px 20px",
+              background: "none", border: "none",
+              borderBottom: `2px solid ${subTab === tab.id ? "var(--accent)" : "transparent"}`,
+              color: subTab === tab.id ? "var(--accent)" : "var(--text-secondary)",
+              cursor: "pointer", fontFamily: "inherit",
               transition: "all 0.15s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.borderBottomColor = "var(--accent)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.borderBottomColor = "transparent"; }}
           >
             {tab.label}
           </button>
@@ -70,7 +72,7 @@ export default function InvestmentCompanies({ onNavigate }) {
       </div>
 
       {/* ── Smart Suggestions ── */}
-      <div id="toppforslag" style={{ marginBottom: 32 }}>
+      {subTab === "toppforslag" && <div style={{ marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
           <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)" }}>Toppförslag</div>
           <div style={{ display: "flex", gap: 4 }}>
@@ -111,16 +113,16 @@ export default function InvestmentCompanies({ onNavigate }) {
             Skapa en investerarprofil för att få aktieförslag anpassade efter dig.
           </div>
         )}
-      </div>
+      </div>}
 
       {/* ── Pension section ── */}
-      <div id="pension" style={{ marginBottom: 32 }}>
+      {subTab === "pension" && <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Pensionssparande</div>
         <PensionInvest isMobile={isMobile} />
-      </div>
+      </div>}
 
       {/* ── Investment companies section ── */}
-      <div id="investmentbolag" style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Investera som investmentbolag</div>
+      {subTab === "investmentbolag" && <><div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Investera som investmentbolag</div>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>
@@ -276,6 +278,7 @@ export default function InvestmentCompanies({ onNavigate }) {
           </div>
         </div>
       </div>
+      </>}
     </div>
   );
 }

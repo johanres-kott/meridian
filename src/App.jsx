@@ -7,7 +7,7 @@ import Login from "./components/Login.jsx";
 import LandingPage from "./components/LandingPage.jsx";
 import Overview from "./components/Overview.jsx";
 import Portfolio from "./components/Portfolio.jsx";
-import GapAnalysis from "./components/GapAnalysis.jsx";
+import AnalysisTab from "./components/AnalysisTab.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
 import MarketsView from "./components/MarketsView.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
@@ -22,6 +22,7 @@ import Documentation from "./components/Documentation.jsx";
 import AboutPage from "./components/AboutPage.jsx";
 import { sanitizeInput } from "./lib/sanitize.js";
 import { useChatContext } from "./hooks/useChatContext.js";
+import { usePremium } from "./hooks/usePremium.js";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
@@ -70,6 +71,8 @@ function AppContent() {
   const { userId, preferences, updatePreferences, lastSeenAt, displayName, session } = useUser();
   const isMobile = useIsMobile();
   const { theme, toggleTheme, isDark } = useTheme();
+  const { premium, loading: premiumLoading } = usePremium();
+  const [portalLoading, setPortalLoading] = useState(false);
   const [tab, setTab] = useState("markets");
   const [deepLink, setDeepLink] = useState(null);
 
@@ -90,6 +93,20 @@ function AppContent() {
   function startEditingName() {
     setNameInput(preferences.display_name || "");
     setEditingName(true);
+  }
+
+  async function openStripePortal() {
+    setPortalLoading(true);
+    try {
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      const res = await fetch("/api/stripe-portal", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${authSession?.access_token}` },
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {}
+    setPortalLoading(false);
   }
 
   function saveDisplayName() {
@@ -247,6 +264,34 @@ function AppContent() {
                     </button>
                   </div>
                 )}
+                <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Prenumeration</div>
+                    {premium && (
+                      <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 3, background: "rgba(8,153,129,0.1)", color: "#089981", fontWeight: 600 }}>
+                        ★ Premium
+                      </span>
+                    )}
+                  </div>
+                  {premiumLoading ? (
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Laddar...</div>
+                  ) : premium ? (
+                    <button
+                      onClick={openStripePortal}
+                      disabled={portalLoading}
+                      style={{ fontSize: 11, color: "#2962ff", background: "none", border: "none", cursor: portalLoading ? "default" : "pointer", fontFamily: "inherit", padding: 0, marginTop: 4 }}
+                    >
+                      {portalLoading ? "Öppnar..." : "Hantera prenumeration →"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { setTab("analysis"); setProfileOpen(false); }}
+                      style={{ fontSize: 11, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginTop: 4 }}
+                    >
+                      Uppgradera till Premium →
+                    </button>
+                  )}
+                </div>
                 <button
                   onClick={() => { setTab("profile"); setProfileOpen(false); }}
                   style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
@@ -359,7 +404,7 @@ function AppContent() {
           {tab === "markets" && <Overview onNavigate={navigate} />}
           {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-          {tab === "analysis" && <GapAnalysis onNavigate={navigate} />}
+          {tab === "analysis" && <AnalysisTab onNavigate={navigate} isMobile={isMobile} />}
           {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
           {tab === "investment" && <InvestmentCompanies onNavigate={navigate} />}
           {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}

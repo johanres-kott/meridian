@@ -13,6 +13,7 @@ import CompanySelector, { COMPANIES } from "./investment/CompanySelector.jsx";
 import HoldingsTable from "./investment/HoldingsTable.jsx";
 import FundSuggestions from "./FundSuggestions.jsx";
 import FundEducation from "./FundEducation.jsx";
+import PensionInvest from "./PensionInvest.jsx";
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
@@ -48,6 +49,7 @@ export default function InvestmentCompanies({ onNavigate }) {
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 24 }}>
         {[
           { id: "toppforslag", label: "Toppförslag" },
+          { id: "pension", label: "Pension" },
           { id: "investmentbolag", label: "Investmentbolag" },
         ].map(tab => (
           <button
@@ -109,6 +111,12 @@ export default function InvestmentCompanies({ onNavigate }) {
             Skapa en investerarprofil för att få aktieförslag anpassade efter dig.
           </div>
         )}
+      </div>
+
+      {/* ── Pension section ── */}
+      <div id="pension" style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Pensionssparande</div>
+        <PensionInvest isMobile={isMobile} />
       </div>
 
       {/* ── Investment companies section ── */}

@@ -1,6 +1,7 @@
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import ScoringDocs from "./docs/ScoringDocs.jsx";
 import AllocationDocs from "./docs/AllocationDocs.jsx";
+import PensionDocs from "./docs/PensionDocs.jsx";
 import ReferenceDocs from "./docs/ReferenceDocs.jsx";
 
 const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 24, marginBottom: 16 };
@@ -31,6 +32,11 @@ export default function Documentation() {
             { label: "Nyckeltal A–Ö", id: "glossary", indent: 0 },
             { label: "Datakällor", id: "sources", indent: 0 },
             { label: "Uppdateringsfrekvens", id: "frequency", indent: 0 },
+            { label: "Pensionssparande", id: "pension", indent: 0 },
+            { label: "Premiepensionen", id: "premiepension", indent: 1 },
+            { label: "Tjänstepension — ITP", id: "itp", indent: 1 },
+            { label: "Avgiftens påverkan", id: "pension-fees", indent: 1 },
+            { label: "Åldersanpassad placering", id: "pension-allocation", indent: 1 },
             { label: "Ansvarsfriskrivning", id: "disclaimer", indent: 0 },
           ].map((item, i) => (
             <a key={i} href={`#${item.id}`} onClick={e => { e.preventDefault(); document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
@@ -46,6 +52,7 @@ export default function Documentation() {
 
       <ScoringDocs />
       <AllocationDocs />
+      <PensionDocs />
       <ReferenceDocs isMobile={isMobile} />
     </div>
   );

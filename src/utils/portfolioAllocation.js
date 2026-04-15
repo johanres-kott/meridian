@@ -135,6 +135,27 @@ export function classifyHolding(item, scoreData, priceData, fxRates) {
   const shares = item.shares || 0;
   const valueSek = shares * price * fxRate;
 
+  // Funds get special classification based on type
+  if (item.type === "fund") {
+    // Index/passive funds → Core (stable, diversified, low cost)
+    // Active funds → Satellite (manager risk, thematic exposure)
+    const bucket = item.indexFund ? "core" : "satellite";
+    const points = item.indexFund ? 5 : 0;
+    return {
+      ticker: item.ticker,
+      name: item.name,
+      bucket,
+      points,
+      valueSek,
+      shares,
+      sector: "Fund",
+      beta: null,
+      risk: item.indexFund ? "low" : "medium",
+      quality: null,
+      marketCap: null,
+    };
+  }
+
   const { points, sector, beta, risk, quality, marketCap } = classificationScore(
     scoreData, priceData, item.name
   );

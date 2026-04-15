@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       languageId: "sv-SE",
       currencyId: "SEK",
       universeIds: "FOALL$$ALL",
-      securityDataPoints: "SecId|Name|PriceCurrency|LegalName|ClosePrice|StarRatingM255|CategoryName|OngoingCharge|ReturnD1|ReturnW1|ReturnM1|ReturnM3|ReturnM6|ReturnM12|ReturnM36|ReturnM60|ReturnM120|Yield_M12",
+      securityDataPoints: "SecId|Name|PriceCurrency|LegalName|ClosePrice|StarRatingM255|CategoryName|OngoingCharge|ReturnD1|ReturnW1|ReturnM1|ReturnM3|ReturnM6|ReturnM12|ReturnM36|ReturnM60|ReturnM120|Yield_M12|IndexFund",
       term: secId,
     });
 
@@ -61,6 +61,7 @@ export default async function handler(req, res) {
       returnM36: match.ReturnM36,
       returnM60: match.ReturnM60,
       returnM120: match.ReturnM120,
+      indexFund: match.IndexFund === "True" || match.IndexFund === true,
     });
   } catch (err) {
     console.error("Fund error:", err.message);

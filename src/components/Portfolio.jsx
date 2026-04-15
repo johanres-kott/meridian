@@ -57,14 +57,26 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         const results = await Promise.all(
           withShares.map(item => {
             if (item.type === "fund") {
-              return fetchFund(item.ticker).then(d => d?.nav ? [item.ticker, { price: d.nav, currency: d.currency || "SEK", changePercent: d.returnD1 }] : null);
+              return fetchFund(item.ticker).then(d => d?.nav ? [item.ticker, { price: d.nav, currency: d.currency || "SEK", changePercent: d.returnD1, _indexFund: d.indexFund }] : null);
             }
             return fetchCompany(item.ticker).then(d => d?.price ? [item.ticker, d] : null);
           })
         );
         const map = {};
-        for (const r of results) { if (r) map[r[0]] = r[1]; }
+        const fundMeta = {};
+        for (const r of results) {
+          if (!r) continue;
+          map[r[0]] = r[1];
+          if (r[1]._indexFund != null) {
+            fundMeta[r[0]] = r[1]._indexFund;
+            delete r[1]._indexFund;
+          }
+        }
         setPrices(map);
+        // Enrich fund items with indexFund from API
+        if (Object.keys(fundMeta).length > 0) {
+          setItems(prev => prev.map(i => fundMeta[i.ticker] != null ? { ...i, indexFund: fundMeta[i.ticker] } : i));
+        }
       }
     }
   }

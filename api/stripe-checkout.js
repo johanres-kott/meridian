@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ url: session.url });
   } catch (err) {
-    console.error("Stripe checkout error:", err.message);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Stripe checkout error:", err.message, err.type, err.code);
+    return res.status(500).json({ error: err.message || "Internal server error" });
   }
 }

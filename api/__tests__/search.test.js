@@ -11,7 +11,7 @@ process.env.FINNHUB_KEY = "test-key";
 const { default: handler } = await import("../search.js");
 
 function createReq(query = {}) {
-  return { method: "GET", query };
+  return { method: "GET", query, headers: {} };
 }
 
 function createRes() {

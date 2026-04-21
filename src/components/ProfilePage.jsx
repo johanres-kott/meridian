@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import { getPensionEntries, getPensionTotalValue } from "../lib/pension.js";
 
 const INVESTOR_LABELS = { value: "Värdeinvesterare", growth: "Tillväxtinvesterare", dividend: "Utdelningsinvesterare", index: "Indexinvesterare", mixed: "Blandat" };
 const RISK_LABELS = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" };
@@ -142,43 +143,55 @@ export default function ProfilePage({ onResetProfile }) {
       {/* Pension */}
       <div style={cardStyle}>
         <div style={labelStyle}>Pensionssparande</div>
-        {preferences.pension?.itpType ? (
+        {(preferences.pension?.itpType || getPensionEntries(preferences.pension).length > 0) ? (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12, marginBottom: preferences.pension.funds?.length ? 12 : 0 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 12, marginBottom: 12 }}>
               <div>
                 <div style={fieldLabel}>ITP-typ</div>
-                <div style={fieldValue}>{preferences.pension.itpType}</div>
+                <div style={fieldValue}>{preferences.pension?.itpType || "–"}</div>
               </div>
               <div>
-                <div style={fieldLabel}>Bolag</div>
-                <div style={fieldValue}>{preferences.pension.provider || "–"}</div>
+                <div style={fieldLabel}>Månadsinbetalning</div>
+                <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                  {preferences.pension?.monthlyContribution != null
+                    ? `${Number(preferences.pension.monthlyContribution).toLocaleString("sv-SE")} kr`
+                    : "–"}
+                </div>
               </div>
               <div>
-                <div style={fieldLabel}>Försäkringsform</div>
-                <div style={fieldValue}>
-                  {preferences.pension.insuranceType === "fond" ? "Fondförsäkring" : preferences.pension.insuranceType === "trad" ? "Traditionell" : "–"}
+                <div style={fieldLabel}>Totalt kapital</div>
+                <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                  {getPensionTotalValue(preferences.pension) != null
+                    ? `${getPensionTotalValue(preferences.pension).toLocaleString("sv-SE")} kr`
+                    : "–"}
                 </div>
               </div>
-              {preferences.pension.currentValue != null && (
-                <div>
-                  <div style={fieldLabel}>Aktuellt värde</div>
-                  <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
-                    {Number(preferences.pension.currentValue).toLocaleString("sv-SE")} kr
-                  </div>
-                </div>
-              )}
             </div>
-            {preferences.pension.funds?.length > 0 && (
-              <div style={{ marginBottom: 8 }}>
-                <div style={fieldLabel}>Fonder</div>
-                {preferences.pension.funds.map((f, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-secondary)", padding: "2px 0" }}>
-                    <span>{f.name}</span>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
+              {getPensionEntries(preferences.pension).map((e, i) => (
+                <div key={e.id || i} style={{ padding: 10, border: "1px solid var(--border)", borderRadius: 6 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: e.funds?.length ? 6 : 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>
+                      {e.provider || "Okänt bolag"}
+                      <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8, fontWeight: 400 }}>
+                        {e.insuranceType === "fond" ? "Fondförsäkring" : e.insuranceType === "trad" ? "Traditionell" : ""}
+                      </span>
+                    </div>
+                    {e.currentValue != null && (
+                      <span style={{ fontSize: 12, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {Number(e.currentValue).toLocaleString("sv-SE")} kr
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                  {e.funds?.length > 0 && e.funds.map((f, fi) => (
+                    <div key={fi} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-secondary)", padding: "2px 0" }}>
+                      <span>{f.name}</span>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
             <button onClick={() => updatePreferences({ pension: {} })}
               style={{ fontSize: 11, color: "#c62828", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
               Rensa pensionsdata

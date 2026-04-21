@@ -17,6 +17,7 @@ import AddCompanyBar from "./AddCompanyBar.jsx";
 import { useFxRates } from "../hooks/useFxRates.js";
 import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import MyITPSection from "./MyITPSection.jsx";
 
 export default function Portfolio({ deepLink, onClearDeepLink }) {
   const { userId, preferences, updatePreferences } = useUser();
@@ -30,6 +31,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
   const [activeGroup, setActiveGroup] = useState(null);
   const { scores } = useScores();
   const [prices, setPrices] = useState({});
+  const [subTab, setSubTab] = useState("innehav");
 
   const groups = preferences.groups || [];
 
@@ -167,6 +169,15 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
   const hasAnyShares = filteredItems.some(i => i.shares);
   const hasAnyPL = filteredItems.some(i => i.gav && i.shares);
 
+  const tabStyle = (id) => ({
+    fontSize: isMobile ? 12 : 13, fontWeight: subTab === id ? 600 : 500,
+    padding: isMobile ? "8px 12px" : "10px 20px",
+    background: "none", border: "none",
+    borderBottom: `2px solid ${subTab === id ? "var(--accent)" : "transparent"}`,
+    color: subTab === id ? "var(--accent)" : "var(--text-secondary)",
+    cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+  });
+
   return (
     <div>
       {showImport && (
@@ -184,14 +195,31 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       )}
 
       {/* Header */}
-      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 20, gap: isMobile ? 12 : 0 }}>
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 4, gap: isMobile ? 12 : 0 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>Portfölj</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
             {activeGroup ? `${filteredItems.length} innehav i ${activeGroup}` : `${items.length} innehav`}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8, flexDirection: "row" }}>
+      </div>
+
+      {/* Sub-tabs */}
+      <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 20 }}>
+        {[
+          { id: "innehav", label: "Innehav" },
+          { id: "oversikt", label: "Översikt" },
+          { id: "pension", label: "Pension" },
+        ].map(tab => (
+          <button key={tab.id} onClick={() => setSubTab(tab.id)} style={tabStyle(tab.id)}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Innehav tab ── */}
+      {subTab === "innehav" && <>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
           <button onClick={() => {
             const rows = [["Bolag", "Ticker", "Status", "Antal", "GAV", "Kurs", "Valuta"].join(";")];
             items.forEach(i => {
@@ -218,87 +246,95 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
             ?
           </button>
         </div>
-      </div>
 
-      <StrategyCard isMobile={isMobile} />
+        <GroupFilterBar items={items} activeGroup={activeGroup} setActiveGroup={setActiveGroup} isMobile={isMobile} />
 
-      <AllocationCard
-        items={items}
-        scores={scores}
-        prices={prices}
-        fxRates={fxRates}
-        riskProfile={preferences.investorProfile?.riskProfile || "medium"}
-        isMobile={isMobile}
-      />
+        <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
+        <PortfolioTreemap items={filteredItems} prices={prices} fxRates={fxRates} onSelect={setSelected} isMobile={isMobile} />
 
-      <GroupFilterBar items={items} activeGroup={activeGroup} setActiveGroup={setActiveGroup} isMobile={isMobile} />
-
-      <AddCompanyBar onAdd={addCompany} isMobile={isMobile} />
-      <PortfolioTreemap items={filteredItems} prices={prices} fxRates={fxRates} onSelect={setSelected} isMobile={isMobile} />
-
-      {items.some(i => i.shares) && userId && <PortfolioChart />}
-
-      {filteredItems.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
-          {activeGroup
-            ? `Inga bolag i "${activeGroup}" — klicka + på en rad för att lägga till`
-            : "Inga bolag ännu — sök efter ett bolag ovan för att lägga till"}
-        </div>
-      ) : (
-        <div style={{ border: "1px solid var(--border)", borderRadius: 4, overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
-            <thead>
-              <tr>
-                {["", "Bolag", "Status", ...(isMobile ? [] : ["Grupper"]), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(!isMobile && hasAnyPL ? ["P&L"] : []), " "].map(h => (
-                  <th key={h || "flag"} style={{
-                    padding: isMobile ? "6px 8px" : "8px 14px",
-                    textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
-                    fontSize: 11, fontWeight: 500, color: "var(--text-secondary)",
-                    borderBottom: "1px solid var(--border)",
-                  }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredItems.map(item => (
-                <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} scoreData={scores[item.ticker?.toUpperCase()]} priceData={prices[item.ticker] || null} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Profile matching legend */}
-      {preferences.investorProfile && filteredItems.length > 0 && (
-        <details style={{ marginTop: 16 }}>
-          <summary style={{ fontSize: 11, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>
-            Hur vi poängsätter bolag
-          </summary>
-          <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--bg-secondary)", borderRadius: 6, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
-                Totalpoäng 70–100: Stark matchning med din profil
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
-                Totalpoäng 40–69: Okej matchning
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(242,54,69,0.15)", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
-                Totalpoäng 0–39: Svag matchning
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
-                Piotroski F-Score ≥ 7 — hög finansiell kvalitet
-              </div>
-            </div>
-            <div style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)" }}>
-              Poäng baseras på Piotroski F-Score, Magic Formula, tillväxt, utdelning och kvalitet. Viktas efter din investerarprofil. Utgör inte finansiell rådgivning.
-            </div>
+        {filteredItems.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
+            {activeGroup
+              ? `Inga bolag i "${activeGroup}" — klicka + på en rad för att lägga till`
+              : "Inga bolag ännu — sök efter ett bolag ovan för att lägga till"}
           </div>
-        </details>
-      )}
+        ) : (
+          <div style={{ border: "1px solid var(--border)", borderRadius: 4, overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
+              <thead>
+                <tr>
+                  {["", "Bolag", "Status", ...(isMobile ? [] : ["Grupper"]), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(!isMobile && hasAnyPL ? ["P&L"] : []), " "].map(h => (
+                    <th key={h || "flag"} style={{
+                      padding: isMobile ? "6px 8px" : "8px 14px",
+                      textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
+                      fontSize: 11, fontWeight: 500, color: "var(--text-secondary)",
+                      borderBottom: "1px solid var(--border)",
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredItems.map(item => (
+                  <CompanyRow key={item.id} item={item} onUpdate={updateItem} onSelect={setSelected} onDelete={deleteItem} fxRates={fxRates} groups={groups} onToggleGroup={toggleGroupMember} isMobile={isMobile} scoreData={scores[item.ticker?.toUpperCase()]} priceData={prices[item.ticker] || null} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Profile matching legend */}
+        {preferences.investorProfile && filteredItems.length > 0 && (
+          <details style={{ marginTop: 16 }}>
+            <summary style={{ fontSize: 11, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>
+              Hur vi poängsätter bolag
+            </summary>
+            <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--bg-secondary)", borderRadius: 6, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
+                  Totalpoäng 70–100: Stark matchning med din profil
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
+                  Totalpoäng 40–69: Okej matchning
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(242,54,69,0.15)", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
+                  Totalpoäng 0–39: Svag matchning
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
+                  Piotroski F-Score ≥ 7 — hög finansiell kvalitet
+                </div>
+              </div>
+              <div style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)" }}>
+                Poäng baseras på Piotroski F-Score, Magic Formula, tillväxt, utdelning och kvalitet. Viktas efter din investerarprofil. Utgör inte finansiell rådgivning.
+              </div>
+            </div>
+          </details>
+        )}
+      </>}
+
+      {/* ── Översikt tab ── */}
+      {subTab === "oversikt" && <>
+        <StrategyCard isMobile={isMobile} />
+
+        <AllocationCard
+          items={items}
+          scores={scores}
+          prices={prices}
+          fxRates={fxRates}
+          riskProfile={preferences.investorProfile?.riskProfile || "medium"}
+          isMobile={isMobile}
+        />
+
+        {items.some(i => i.shares) && userId && <PortfolioChart />}
+      </>}
+
+      {/* ── Pension tab ── */}
+      {subTab === "pension" && <>
+        <MyITPSection pension={preferences.pension || {}} updatePreferences={updatePreferences} isMobile={isMobile} />
+      </>}
     </div>
   );
 }

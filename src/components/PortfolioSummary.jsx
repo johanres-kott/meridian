@@ -6,7 +6,7 @@ import { STATUS_COLORS } from "../constants.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
 export default function PortfolioSummary({ isMobile, onNavigate }) {
-  const { userId } = useUser();
+  const { userId, preferences } = useUser();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
@@ -103,6 +103,9 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
           .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
           .slice(0, 5);
 
+        // Pension value from preferences
+        const pensionValue = preferences?.pension?.currentValue ? Number(preferences.pension.currentValue) : null;
+
         setData({
           currencyGroups,
           totalSek,
@@ -112,6 +115,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
           totalCount: watchlist.length,
           movers,
           hasHoldings: holdings.length > 0,
+          pensionValue,
         });
       } catch (err) {
         console.error("PortfolioSummary load error:", err);
@@ -144,7 +148,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
         <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>{data.totalCount} bolag</span>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : (data.hasHoldings ? "1fr 1fr 1fr" : "1fr 1fr"), gap: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : `repeat(${(data.hasHoldings ? 1 : 0) + 1 + (data.pensionValue != null ? 1 : 0) + 1}, 1fr)`, gap: 0 }}>
         {/* Holdings value by currency */}
         {data.hasHoldings && (
           <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
@@ -183,6 +187,27 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
             </div>
           ))}
         </div>
+
+        {/* Pension */}
+        {data.pensionValue != null && (
+          <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
+            <div style={sectionHeader}>Tjänstepension</div>
+            <div style={{ ...mono, fontSize: 14, fontWeight: 500, color: "var(--text)" }}>
+              {data.pensionValue.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
+            </div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>
+              {preferences?.pension?.itpType || "ITP"} — {preferences?.pension?.provider || ""}
+            </div>
+            {data.totalSek != null && (
+              <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 2 }}>Totalt (inkl. pension)</div>
+                <div style={{ ...mono, fontSize: 16, fontWeight: 500, color: "var(--text)" }}>
+                  {(data.totalSek + data.pensionValue).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Top movers today */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>

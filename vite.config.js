@@ -87,6 +87,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: [],
+    setupFiles: ['./src/test/setup.js'],
+    // e2e/ contains Playwright specs — they use @playwright/test, not vitest,
+    // so exclude them from the unit-test run (npm test). They run via
+    // `npm run test:e2e` instead.
+    exclude: ['**/node_modules/**', '**/dist/**', '.idea', '.git', '.cache', 'e2e/**', '.claude/**'],
   },
 })

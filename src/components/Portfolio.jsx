@@ -18,6 +18,7 @@ import { useFxRates } from "../hooks/useFxRates.js";
 import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
+import OwnershipOverlay from "./OwnershipOverlay.jsx";
 
 export default function Portfolio({ deepLink, onClearDeepLink }) {
   const { userId, preferences, updatePreferences } = useUser();
@@ -209,6 +210,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         {[
           { id: "innehav", label: "Innehav" },
           { id: "oversikt", label: "Översikt" },
+          { id: "agarstruktur", label: "Ägarstruktur" },
           { id: "pension", label: "Pension" },
         ].map(tab => (
           <button key={tab.id} onClick={() => setSubTab(tab.id)} style={tabStyle(tab.id)}>
@@ -329,6 +331,11 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         />
 
         {items.some(i => i.shares) && userId && <PortfolioChart />}
+      </>}
+
+      {/* ── Ägarstruktur tab ── */}
+      {subTab === "agarstruktur" && <>
+        <OwnershipOverlay items={filteredItems} onSelect={setSelected} isMobile={isMobile} />
       </>}
 
       {/* ── Pension tab ── */}

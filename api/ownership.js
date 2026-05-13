@@ -4,6 +4,64 @@ import { getSupabase } from "./_supabase.js";
 
 const UA = "Mozilla/5.0";
 
+// Holders at or above this % are treated as strategic / non-float.
+// Matches the 5% disclosure threshold most major markets use to flag controlling stakes.
+const STRATEGIC_THRESHOLD_PCT = 5;
+const LOW_FLOAT_PCT = 15;
+const SPIN_OFF_LARGEST_HOLDER_PCT = 30;
+
+function round1(n) {
+  return parseFloat(n.toFixed(1));
+}
+
+// Compute free float and spin-off signals from a normalized ownership result.
+// For curated (Swedish) data: holders >=5% plus insiders are excluded from float —
+// most Swedish large caps have named strategic owners (Wallenbergs, Douglas, foundations) here.
+// For Yahoo data: passive institutional holdings are part of float by industry convention,
+// so float ≈ 100 - insiders.
+export function computeOwnershipSignals(ownership) {
+  const { source, insidersPercent, topHolders } = ownership;
+  // Curated source attaches the full holder list (incl. insiders) so we can find the
+  // largest controlling owner — Wallenbergs/Douglas etc. are commonly tagged "insider".
+  const allHolders = ownership._signalHolders ?? topHolders;
+  const insiders = insidersPercent ?? 0;
+
+  let strategicPercent;
+  if (source === "curated") {
+    // Insiders are already counted; only count non-insider strategic holders here.
+    const strategicHolders = allHolders.filter(
+      h => h.type !== "insider" && h.pctHeld >= STRATEGIC_THRESHOLD_PCT
+    );
+    strategicPercent = strategicHolders.reduce((s, h) => s + h.pctHeld, 0);
+  } else {
+    strategicPercent = 0;
+  }
+
+  const freeFloatPercent = Math.max(0, Math.min(100, 100 - insiders - strategicPercent));
+  const sortedAll = [...allHolders].sort((a, b) => b.pctHeld - a.pctHeld);
+  const largest = sortedAll[0] ?? null;
+  const largestHolder = largest
+    ? { name: largest.name, pctHeld: largest.pctHeld, pctVotes: largest.pctVotes ?? null }
+    : null;
+
+  const isLowFloat = freeFloatPercent < LOW_FLOAT_PCT;
+  // Only trust the spin-off signal when we have curated holder data — Yahoo
+  // does not see Swedish strategic owners (Wallenberg, Douglas, etc.), so its
+  // free-float estimate would generate false positives on .ST tickers.
+  const isSpinOffCandidate = source === "curated"
+    && isLowFloat
+    && largestHolder != null
+    && largestHolder.pctHeld >= SPIN_OFF_LARGEST_HOLDER_PCT;
+
+  return {
+    freeFloatPercent: round1(freeFloatPercent),
+    strategicHoldersPercent: round1(strategicPercent),
+    largestHolder,
+    isLowFloat,
+    isSpinOffCandidate,
+  };
+}
+
 // --- Supabase source (curated Swedish ownership data) ---
 
 async function getSupabaseOwnership(ticker) {
@@ -41,6 +99,7 @@ async function getSupabaseOwnership(ticker) {
       retailPercent,
       otherInstitutionalPercent: 0,
       topHolders: topHolders.filter(h => h.type !== "insider"),
+      _signalHolders: topHolders,
       lastUpdated: data[0]?.updated_at ?? null,
     };
   } catch {
@@ -182,7 +241,11 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: `Ingen ägardata hittades för ${ticker}` });
     }
 
-    res.status(200).json({ ticker, ...ownership });
+    const signals = computeOwnershipSignals(ownership);
+    // Strip internal-only field used for signal computation.
+    const { _signalHolders, ...publicOwnership } = ownership;
+    void _signalHolders;
+    res.status(200).json({ ticker, ...publicOwnership, ...signals });
   } catch (err) {
     console.error("Ownership error:", err.message);
     res.status(500).json({ error: "Internal server error" });

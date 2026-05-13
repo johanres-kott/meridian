@@ -55,6 +55,22 @@ export async function searchFunds(query, limit = 8) {
 }
 
 /**
+ * Fetch ownership data (top holders, free float, spin-off signals) for a ticker.
+ * Returns null on error or 404.
+ */
+export async function fetchOwnership(ticker) {
+  if (!ticker) return null;
+  try {
+    const res = await fetch(`/api/ownership?ticker=${encodeURIComponent(ticker)}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error(`fetchOwnership failed for ${ticker}:`, err);
+    return null;
+  }
+}
+
+/**
  * Fetch fund data (NAV, returns, rating, fees) for a Morningstar SecId.
  * Returns null on error.
  */

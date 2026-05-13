@@ -18,6 +18,7 @@ import { useFxRates } from "../hooks/useFxRates.js";
 import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
+import OwnershipOverlay from "./OwnershipOverlay.jsx";
 import ThesisReview from "./ThesisReview.jsx";
 
 export default function Portfolio({ deepLink, onClearDeepLink }) {
@@ -210,6 +211,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         {[
           { id: "innehav", label: "Innehav" },
           { id: "oversikt", label: "Översikt" },
+          { id: "agarstruktur", label: "Ägarstruktur" },
           { id: "tesgranskning", label: "Tesgranskning" },
           { id: "pension", label: "Pension" },
         ].map(tab => (
@@ -331,6 +333,11 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         />
 
         {items.some(i => i.shares) && userId && <PortfolioChart />}
+      </>}
+
+      {/* ── Ägarstruktur tab ── */}
+      {subTab === "agarstruktur" && <>
+        <OwnershipOverlay items={filteredItems} onSelect={setSelected} isMobile={isMobile} />
       </>}
 
       {/* ── Tesgranskning tab ── */}

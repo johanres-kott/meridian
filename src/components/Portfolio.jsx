@@ -342,7 +342,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
 
       {/* ── Tesgranskning tab ── */}
       {subTab === "tesgranskning" && <>
-        <ThesisReview items={filteredItems} prices={prices} onSelect={setSelected} isMobile={isMobile} />
+        <ThesisReview items={filteredItems} prices={prices} onUpdate={updateItem} onSelect={setSelected} isMobile={isMobile} />
       </>}
 
       {/* ── Pension tab ── */}

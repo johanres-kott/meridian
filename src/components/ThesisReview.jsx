@@ -24,10 +24,10 @@ const STATUS_COLORS = {
 };
 
 const REVIEW_QUESTIONS = [
-  "Ar intaktstillvaxten och marginalerna pa banan jag antog nar jag kopte?",
-  "Har konkurrenslaget eller marknaden forandrats sedan kopet?",
-  "Har ledningen levererat pa det de lovade?",
-  "Vad skulle fa mig att salja imorgon?",
+  "Är intäktstillväxten och marginalerna på banan jag antog när jag köpte?",
+  "Har konkurrensläget eller marknaden förändrats sedan köpet?",
+  "Har ledningen levererat på det de lovade?",
+  "Vad skulle få mig att sälja imorgon?",
 ];
 
 export default function ThesisReview({ items, prices = {}, onSelect, isMobile }) {
@@ -77,7 +77,7 @@ export default function ThesisReview({ items, prices = {}, onSelect, isMobile })
   if (stocks.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
-        Inga aktier i bevakningslistan att granska tesen for.
+        Inga aktier i bevakningslistan att granska tesen för.
       </div>
     );
   }
@@ -105,9 +105,9 @@ export default function ThesisReview({ items, prices = {}, onSelect, isMobile })
       </div>
 
       <div style={{ marginTop: 12, fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5 }}>
-        Tesgranskningen ar ett verktyg for reflektion, inte ett kop/salj-signal.
-        Vinnar-/forlorartroskeln gar pa {thresholdPct}% sedan kop. En tes anses
-        farsk om den granskats inom {reviewMonths} manader.
+        Tesgranskningen är ett verktyg för reflektion, inte en köp/sälj-signal.
+        Vinnar-/förlorartröskeln går på {thresholdPct}% sedan köp. En tes anses
+        färsk om den granskats inom {reviewMonths} månader.
       </div>
     </div>
   );
@@ -143,12 +143,12 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
             Tesgranskning
           </div>
           <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-            Behall bolag dar tesen halller. Salj dar tesen ar bruten — inte for att kursen rort sig.
+            Behåll bolag där tesen håller. Sälj där tesen är bruten — inte för att kursen rört sig.
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-muted)" }}>
-          <span>Vinnar-/forlorartroskel:</span>
+          <span>Vinnar-/förlorartröskel:</span>
           {editingThreshold ? (
             <>
               <input
@@ -178,22 +178,22 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
         {hasWinnerWarning && (
           <NudgeRow
             tone="warning"
-            title={`${counts.winner_stale} vinnare ej granskad pa ${reviewMonths}+ man`}
-            body={`Du har bolag som gatt upp >${thresholdPct}% men vars tes du inte gatt igenom pa lange. Riskerar du att salja for tidigt? Las pa innan du agerar.`}
+            title={`${counts.winner_stale} vinnare ej granskade på ${reviewMonths}+ mån`}
+            body={`Du har bolag som gått upp >${thresholdPct}% men vars tes du inte gått igenom på länge. Riskerar du att sälja för tidigt? Läs på innan du agerar.`}
           />
         )}
         {hasLoserWarning && (
           <NudgeRow
             tone="danger"
-            title={`${counts.loser_stale} forlorare med aktiv tes utan granskning`}
-            body={`Du sitter pa bolag som gatt ner >${thresholdPct}% och har du fortfarande markerat tesen som aktiv. Verifiera att tesen halller — annars markera den som forsvagad eller bruten.`}
+            title={`${counts.loser_stale} förlorare med aktiv tes utan granskning`}
+            body={`Du sitter på bolag som gått ner >${thresholdPct}% och har fortfarande markerat tesen som aktiv. Verifiera att tesen håller — annars markera den som försvagad eller bruten.`}
           />
         )}
         {!hasWinnerWarning && !hasLoserWarning && counts.winner_fresh + counts.loser_fresh > 0 && (
           <NudgeRow
             tone="ok"
             title="Inga akuta granskningar"
-            body="Alla dina vinnare och forlorare har antingen granskats nyligen eller har en uppdaterad tes-status. Bra disciplin."
+            body="Alla dina vinnare och förlorare har antingen granskats nyligen eller har en uppdaterad tes-status. Bra disciplin."
           />
         )}
       </div>
@@ -203,7 +203,7 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
         <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)", display: "flex", gap: 24, flexWrap: "wrap" }}>
           {avgWinnerReturnPct != null && (
             <div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vagt snitt, vinnare</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vägt snitt, vinnare</div>
               <div style={{ fontSize: 15, fontWeight: 500, color: "#089981", fontFamily: "'IBM Plex Mono', monospace" }}>
                 +{avgWinnerReturnPct.toFixed(1)}%
               </div>
@@ -211,7 +211,7 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
           )}
           {avgLoserReturnPct != null && (
             <div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vagt snitt, forlorare</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vägt snitt, förlorare</div>
               <div style={{ fontSize: 15, fontWeight: 500, color: "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>
                 {avgLoserReturnPct.toFixed(1)}%
               </div>
@@ -300,7 +300,7 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
     ? "Aldrig granskad"
     : monthsSinceReview < 1
       ? "Granskad nyligen"
-      : `Granskad for ${Math.round(monthsSinceReview)} man sedan`;
+      : `Granskad för ${Math.round(monthsSinceReview)} mån sedan`;
 
   const monthsColor = monthsSinceReview == null || monthsSinceReview >= reviewMonths
     ? "#ff9800"
@@ -323,7 +323,7 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
             {item.ticker}
             {item.shares > 0 && item.gav && (
-              <span style={{ marginLeft: 8 }}>· {item.shares} st a {item.gav.toLocaleString("sv-SE", { maximumFractionDigits: 2 })}</span>
+              <span style={{ marginLeft: 8 }}>· {item.shares} st à {item.gav.toLocaleString("sv-SE", { maximumFractionDigits: 2 })}</span>
             )}
           </div>
         </div>
@@ -331,7 +331,7 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
           {returnPct != null && (
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Sedan kop</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Sedan köp</div>
               <div style={{
                 fontSize: 15, fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace",
                 color: returnPct >= 0 ? "#089981" : "#f23645",
@@ -389,7 +389,7 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
             value={thesisText}
             onChange={e => setThesisText(e.target.value)}
             autoFocus
-            placeholder="Varfor agde du detta bolag fran borjan? Vad var trigger-punkten?"
+            placeholder="Varför ägde du detta bolag från början? Vad var trigger-punkten?"
             style={{ width: "100%", minHeight: 100, padding: "10px 12px", border: "1px solid var(--accent)", borderRadius: 4, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box" }}
           />
 
@@ -398,7 +398,7 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
               onClick={() => setShowQuestions(!showQuestions)}
               style={{ fontSize: 11, padding: "3px 8px", border: "none", background: "transparent", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}
             >
-              {showQuestions ? "Dolj" : "Visa"} fragor att fundera pa
+              {showQuestions ? "Dölj" : "Visa"} frågor att fundera på
             </button>
             {showQuestions && (
               <ul style={{ marginTop: 6, paddingLeft: 18, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
@@ -431,7 +431,7 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
             color: thesisText ? "var(--text)" : "var(--text-muted)",
             whiteSpace: "pre-wrap", minHeight: 24,
           }}>
-            {thesisText || "Ingen tes nedskriven annu. Klicka Redigera for att lagga till varfor du kopte."}
+            {thesisText || "Ingen tes nedskriven ännu. Klicka Redigera för att lägga till varför du köpte."}
           </div>
           <button
             onClick={() => setEditing(true)}

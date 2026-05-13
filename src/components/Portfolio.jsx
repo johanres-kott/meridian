@@ -19,6 +19,7 @@ import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import OwnershipOverlay from "./OwnershipOverlay.jsx";
+import ThesisReview from "./ThesisReview.jsx";
 
 export default function Portfolio({ deepLink, onClearDeepLink }) {
   const { userId, preferences, updatePreferences } = useUser();
@@ -211,6 +212,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
           { id: "innehav", label: "Innehav" },
           { id: "oversikt", label: "Översikt" },
           { id: "agarstruktur", label: "Ägarstruktur" },
+          { id: "tesgranskning", label: "Tesgranskning" },
           { id: "pension", label: "Pension" },
         ].map(tab => (
           <button key={tab.id} onClick={() => setSubTab(tab.id)} style={tabStyle(tab.id)}>
@@ -336,6 +338,11 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       {/* ── Ägarstruktur tab ── */}
       {subTab === "agarstruktur" && <>
         <OwnershipOverlay items={filteredItems} onSelect={setSelected} isMobile={isMobile} />
+      </>}
+
+      {/* ── Tesgranskning tab ── */}
+      {subTab === "tesgranskning" && <>
+        <ThesisReview items={filteredItems} prices={prices} onSelect={setSelected} isMobile={isMobile} />
       </>}
 
       {/* ── Pension tab ── */}

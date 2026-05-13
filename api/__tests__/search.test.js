@@ -11,7 +11,9 @@ process.env.FINNHUB_KEY = "test-key";
 const { default: handler } = await import("../search.js");
 
 function createReq(query = {}) {
-  return { method: "GET", query };
+  // setCors reads req.headers.origin; supply an empty headers bag so the
+  // CORS helper doesn't blow up in unit tests.
+  return { method: "GET", query, headers: {} };
 }
 
 function createRes() {

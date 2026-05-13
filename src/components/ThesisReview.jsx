@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import { sanitizeInput } from "../lib/sanitize.js";
 import {
@@ -30,7 +29,7 @@ const REVIEW_QUESTIONS = [
   "Vad skulle få mig att sälja imorgon?",
 ];
 
-export default function ThesisReview({ items, prices = {}, onSelect, isMobile }) {
+export default function ThesisReview({ items, prices = {}, onUpdate, onSelect, isMobile }) {
   const { preferences, updatePreferences } = useUser();
 
   const thresholdPct = preferences.thesisThresholdPct ?? DEFAULT_THRESHOLD_PCT;
@@ -98,6 +97,7 @@ export default function ThesisReview({ items, prices = {}, onSelect, isMobile })
             key={row.item.id}
             row={row}
             reviewMonths={reviewMonths}
+            onUpdate={onUpdate}
             onSelect={onSelect}
             isMobile={isMobile}
           />
@@ -251,9 +251,8 @@ function NudgeRow({ tone, title, body }) {
   );
 }
 
-function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
+function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
   const { item, returnPct, monthsSinceReview, category, currentPrice } = row;
-  const { userId } = useUser();
   const [thesisText, setThesisText] = useState(item.thesis_text || "");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -261,15 +260,12 @@ function ThesisCard({ row, reviewMonths, onSelect, isMobile }) {
   const [status, setStatus] = useState(item.thesis_status || null);
 
   async function persistUpdate(updates) {
-    if (!userId) return;
+    if (!onUpdate) return;
     setSaving(true);
-    await supabase
-      .from("watchlist")
-      .update(updates)
-      .eq("id", item.id)
-      .eq("user_id", userId);
-    // Mutate local item reference so subsequent renders see new state without a refetch.
-    Object.assign(item, updates);
+    // Parent (Portfolio.updateItem) handles both the Supabase write and the
+    // React state update — never mutate `item` directly since it comes in as
+    // a (frozen) prop in React 19.
+    await onUpdate(item.id, updates);
     setSaving(false);
   }
 

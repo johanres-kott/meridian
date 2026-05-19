@@ -235,50 +235,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
         Lock-up perioder och förvärvsplaner är inte tillgängliga i strukturerad form och visas därför inte.
       </div>
 
-      <ShareClassExplainer />
     </div>
-  );
-}
-
-function ShareClassExplainer() {
-  return (
-    <details style={{ marginTop: 16, fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-      <summary style={{ cursor: "pointer", userSelect: "none", color: "var(--text)", fontWeight: 500, padding: "6px 0" }}>
-        Vad är A- och B-aktier?
-      </summary>
-      <div style={{ padding: "8px 0 4px", display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ margin: 0 }}>
-          <strong style={{ color: "var(--text)" }}>Svenska marknaden.</strong> De flesta större svenska bolag har två (ibland fler)
-          aktieklasser med samma rätt till utdelning och kapital, men olika röststyrka på bolagsstämman.
-          A-aktien har typiskt <em>10 röster</em>, B-aktien <em>1 röst</em>. Vissa bolag har även C- eller
-          D-aktier, oftast utan rösträtt eller med särskild utdelning. Strukturen gör att grundarfamiljer
-          och stiftelser kan behålla kontrollen över röstmajoriteten utan att äga majoriteten av kapitalet.
-        </p>
-        <p style={{ margin: 0 }}>
-          <strong style={{ color: "var(--text)" }}>Konsekvens för bolagen.</strong> Långsiktigt ägande
-          möjliggörs — Wallenbergsstiftelserna (Investor, Atlas Copco, SEB, Ericsson), Lundbergs
-          (Hufvudstaden, Industrivärden), Stenbecks (Kinnevik) och Douglas/Latour-sfären kan driva strategier
-          över decennier utan att tvingas till kortsiktiga vinster av aktivistägare. Baksidan är att
-          minoritetsägare har mindre att säga till om, och bolagsledningen är mindre disciplinerad av
-          marknaden vid sämre prestation.
-        </p>
-        <p style={{ margin: 0 }}>
-          <strong style={{ color: "var(--text)" }}>Praktiskt för dig som investerare.</strong> Utdelning,
-          vinst per aktie och fundamenta är identiska — det är samma bolag. B-aktien är nästan alltid
-          mer likvid (lägre spread, mer omsättning) och brukar därför vara förstahandsvalet för retail.
-          A-aktien handlas ibland med en liten premie för rösträtten, ibland med rabatt på grund av sämre
-          likviditet — gapet är typiskt 0–5%.
-        </p>
-        <p style={{ margin: 0 }}>
-          <strong style={{ color: "var(--text)" }}>Andra länder.</strong> USA har samma typ av dubbel-klass
-          struktur men främst hos techbolag (Meta, Alphabet, Snap, Berkshire Hathaway) — för Alphabet
-          är t.ex. GOOGL röstberättigad medan GOOG inte är det. UK och Tyskland har mestadels singelklass
-          med "one share, one vote". Finland (.HE-tickers) använder en annan teckenkodning, t.ex.
-          WRT1V.HE för Wärtsilä — men strukturen liknar den svenska. Hong Kong och Kina förbjöd
-          länge dubbel-klass men har lättat på reglerna sedan 2018.
-        </p>
-      </div>
-    </details>
   );
 }
 

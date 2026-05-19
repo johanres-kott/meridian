@@ -1,6 +1,7 @@
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import ScoringDocs from "./docs/ScoringDocs.jsx";
 import AllocationDocs from "./docs/AllocationDocs.jsx";
+import OwnershipDocs from "./docs/OwnershipDocs.jsx";
 import PensionDocs from "./docs/PensionDocs.jsx";
 import ReferenceDocs from "./docs/ReferenceDocs.jsx";
 
@@ -29,6 +30,11 @@ export default function Documentation() {
             { label: "Målallokering per riskprofil", id: "target-allocation", indent: 1 },
             { label: "Investeringsstrategier", id: "strategies", indent: 0 },
             { label: "DCA vs Lump Sum", id: "dca-lump", indent: 1 },
+            { label: "Ägarstruktur och aktieklasser", id: "ownership", indent: 0 },
+            { label: "Svenska A- och B-aktier", id: "share-class", indent: 1 },
+            { label: "Konsekvens för bolagsstyrning", id: "dual-class-consequences", indent: 1 },
+            { label: "Praktiskt för dig som investerare", id: "share-class-practical", indent: 1 },
+            { label: "Andra länder", id: "share-class-international", indent: 1 },
             { label: "Nyckeltal A–Ö", id: "glossary", indent: 0 },
             { label: "Datakällor", id: "sources", indent: 0 },
             { label: "Uppdateringsfrekvens", id: "frequency", indent: 0 },
@@ -52,6 +58,7 @@ export default function Documentation() {
 
       <ScoringDocs />
       <AllocationDocs />
+      <OwnershipDocs />
       <PensionDocs />
       <ReferenceDocs isMobile={isMobile} />
     </div>

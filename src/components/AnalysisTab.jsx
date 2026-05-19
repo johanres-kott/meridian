@@ -1,9 +1,11 @@
 import { useState } from "react";
 import GapAnalysis from "./GapAnalysis.jsx";
 import PremiumAnalyses from "./PremiumAnalyses.jsx";
+import OwnershipOverlay from "./OwnershipOverlay.jsx";
 
 const SUB_TABS = [
   { id: "nyckeltal", label: "Nyckeltal" },
+  { id: "agarstruktur", label: "Ägarstruktur" },
   { id: "rapporter", label: "Rapporter ★" },
 ];
 
@@ -36,6 +38,12 @@ export default function AnalysisTab({ onNavigate, isMobile }) {
       </div>
 
       {sub === "nyckeltal" && <GapAnalysis onNavigate={onNavigate} />}
+      {sub === "agarstruktur" && (
+        <OwnershipOverlay
+          onSelect={item => onNavigate?.("portfolio", { ticker: item.ticker })}
+          isMobile={isMobile}
+        />
+      )}
       {sub === "rapporter" && <PremiumAnalyses isMobile={isMobile} />}
     </div>
   );

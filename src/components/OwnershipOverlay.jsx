@@ -1,14 +1,41 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchOwnership } from "../lib/apiClient.js";
+import { supabase } from "../supabase.js";
+import { useUser } from "../contexts/UserContext.jsx";
 
 const SORT_OPTIONS = [
   { id: "spinoff", label: "Spin-off-flagga" },
   { id: "freefloat", label: "Free float (lågt först)" },
   { id: "largest", label: "Största ägare (störst först)" },
+  { id: "votegap", label: "Röst/kapital-gap" },
   { id: "name", label: "Namn (A→Ö)" },
 ];
 
-export default function OwnershipOverlay({ items, onSelect, isMobile }) {
+// A holder has a meaningful A/B asymmetry when voting share clearly exceeds capital share.
+// 1.3× threshold filters out rounding noise — true A/B structures (Wallenberg, Stenbeck,
+// Douglas, Lundberg etc.) typically sit at 2–5×.
+const DUAL_CLASS_RATIO = 1.3;
+const DUAL_CLASS_MIN_CAPITAL_PCT = 3;
+
+function isDualClassHolder(h) {
+  return h.pctVotes != null
+    && h.pctHeld >= DUAL_CLASS_MIN_CAPITAL_PCT
+    && h.pctVotes / Math.max(h.pctHeld, 0.01) >= DUAL_CLASS_RATIO;
+}
+
+function maxVoteGap(holders) {
+  let max = 0;
+  for (const h of holders || []) {
+    if (h.pctVotes == null) continue;
+    const gap = h.pctVotes - h.pctHeld;
+    if (gap > max) max = gap;
+  }
+  return max;
+}
+
+export default function OwnershipOverlay({ onSelect, isMobile }) {
+  const { userId } = useUser();
+  const [items, setItems] = useState([]);
   const stocks = useMemo(
     () => items.filter(i => i.type !== "fund"),
     [items]
@@ -17,6 +44,16 @@ export default function OwnershipOverlay({ items, onSelect, isMobile }) {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [sort, setSort] = useState("spinoff");
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.from("watchlist").select("*").eq("user_id", userId).order("created_at");
+      if (!cancelled) setItems(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [userId]);
 
   useEffect(() => {
     if (stocks.length === 0) return;
@@ -63,6 +100,8 @@ export default function OwnershipOverlay({ items, onSelect, isMobile }) {
           return (oa.freeFloatPercent ?? 100) - (ob.freeFloatPercent ?? 100);
         case "largest":
           return (ob.largestHolder?.pctHeld ?? 0) - (oa.largestHolder?.pctHeld ?? 0);
+        case "votegap":
+          return maxVoteGap(ob.topHolders) - maxVoteGap(oa.topHolders);
         case "name":
           return (a.item.name || a.item.ticker).localeCompare(
             b.item.name || b.item.ticker, "sv"
@@ -141,7 +180,7 @@ export default function OwnershipOverlay({ items, onSelect, isMobile }) {
                 { label: "Bolag", align: "left" },
                 { label: "Free float", align: "right" },
                 { label: "Största ägare", align: "left" },
-                { label: "% kapital", align: "right" },
+                { label: "Kapital / röster", align: "left" },
                 ...(isMobile ? [] : [{ label: "Top 3", align: "left" }]),
                 { label: "Flaggor", align: "left" },
               ].map(h => (
@@ -169,10 +208,43 @@ export default function OwnershipOverlay({ items, onSelect, isMobile }) {
       </div>
 
       <div style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <DualBar pctCapital={20} pctVotes={45} width={50} />
+          <span>Övre stapel = kapital, undre = röster. Orange undre stapel = ägaren har fler röster än kapital (A/B-struktur).</span>
+        </div>
         Free float = 100% − insiders − strategiska ägare ≥5% (svensk kurerad data) eller 100% − insiders (Yahoo).
         Spin-off-flaggan sätts bara på bolag med kurerad data eftersom Yahoo inte ser svenska huvudägare som Wallenberg eller Douglas.
         Lock-up perioder och förvärvsplaner är inte tillgängliga i strukturerad form och visas därför inte.
       </div>
+    </div>
+  );
+}
+
+// Compact dual bar: capital (gray) above, votes (orange when higher, green when equal/lower).
+// When pctVotes is null or matches pctCapital, only the capital bar shows — keeps non-dual-class
+// companies visually quiet so the A/B asymmetry pops on companies that have it.
+function DualBar({ pctCapital, pctVotes, width = 70 }) {
+  const cap = pctCapital ?? 0;
+  const votes = pctVotes;
+  const showVotes = votes != null && Math.abs(votes - cap) >= 0.5;
+  const votesHigher = showVotes && votes > cap;
+
+  return (
+    <div style={{ width, display: "inline-block", verticalAlign: "middle" }}>
+      <div style={{ height: 4, background: "var(--bg-secondary)", borderRadius: 2, overflow: "hidden" }}>
+        <div style={{
+          width: `${Math.min(cap, 100)}%`, height: "100%",
+          background: "var(--text-muted)",
+        }} />
+      </div>
+      {showVotes && (
+        <div style={{ height: 4, marginTop: 2, background: "var(--bg-secondary)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{
+            width: `${Math.min(votes, 100)}%`, height: "100%",
+            background: votesHigher ? "#ff9800" : "#089981",
+          }} />
+        </div>
+      )}
     </div>
   );
 }
@@ -226,20 +298,53 @@ function OwnershipRow({ item, ownership, onSelect, isMobile }) {
           </div>
         ) : "—"}
       </td>
-      <td style={numStyle}>
-        {largest ? `${largest.pctHeld.toFixed(1)}%` : "—"}
+      <td style={cellStyle}>
+        {largest ? (
+          <div
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
+            title={largest.pctVotes != null
+              ? `${largest.pctHeld.toFixed(1)}% kapital · ${largest.pctVotes.toFixed(1)}% röster`
+              : `${largest.pctHeld.toFixed(1)}% kapital`}
+          >
+            <DualBar pctCapital={largest.pctHeld} pctVotes={largest.pctVotes} width={isMobile ? 50 : 70} />
+            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, lineHeight: 1.2, color: "var(--text-secondary)" }}>
+              <div style={{ color: "var(--text)" }}>{largest.pctHeld.toFixed(1)}%</div>
+              {largest.pctVotes != null && Math.abs(largest.pctVotes - largest.pctHeld) >= 0.5 && (
+                <div style={{ color: largest.pctVotes > largest.pctHeld ? "#ff9800" : "var(--text-muted)" }}>
+                  {largest.pctVotes.toFixed(1)}%
+                </div>
+              )}
+            </div>
+          </div>
+        ) : "—"}
       </td>
       {!isMobile && (
         <td style={cellStyle}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.4 }}>
-            {top3.length > 0 ? top3.map((h, i) => (
-              <div key={i} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 240 }}>
-                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: "var(--text-muted)", marginRight: 6 }}>
-                  {h.pctHeld.toFixed(1)}%
-                </span>
-                {h.name}
-              </div>
-            )) : "—"}
+            {top3.length > 0 ? top3.map((h, i) => {
+              const showVotes = h.pctVotes != null && Math.abs(h.pctVotes - h.pctHeld) >= 0.5;
+              const votesHigher = showVotes && h.pctVotes > h.pctHeld;
+              return (
+                <div
+                  key={i}
+                  style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: i < top3.length - 1 ? 3 : 0 }}
+                  title={showVotes ? `${h.pctHeld.toFixed(1)}% kapital · ${h.pctVotes.toFixed(1)}% röster` : `${h.pctHeld.toFixed(1)}% kapital`}
+                >
+                  <DualBar pctCapital={h.pctHeld} pctVotes={h.pctVotes} width={50} />
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: "var(--text-muted)", minWidth: 32 }}>
+                    {h.pctHeld.toFixed(1)}%
+                    {showVotes && (
+                      <span style={{ color: votesHigher ? "#ff9800" : "var(--text-muted)", marginLeft: 3 }}>
+                        /{h.pctVotes.toFixed(1)}
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>
+                    {h.name}
+                  </span>
+                </div>
+              );
+            }) : "—"}
           </div>
         </td>
       )}
@@ -248,6 +353,14 @@ function OwnershipRow({ item, ownership, onSelect, isMobile }) {
           {ownership.isSpinOffCandidate && (
             <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600 }}>
               Spin-off
+            </span>
+          )}
+          {(isDualClassHolder(ownership.largestHolder || {}) || (ownership.topHolders || []).some(isDualClassHolder)) && (
+            <span
+              title="Största ägaren har väsentligt fler röster än kapital (A/B-struktur)"
+              style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.12)", color: "#ff9800", fontWeight: 600 }}
+            >
+              A/B-struktur
             </span>
           )}
           {ownership.isLowFloat && !ownership.isSpinOffCandidate && (

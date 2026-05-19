@@ -198,7 +198,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       {/* Header */}
       <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 4, gap: isMobile ? 12 : 0 }}>
         <div>
-          <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>Portfölj</div>
+          <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>Min Portfölj</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
             {activeGroup ? `${filteredItems.length} innehav i ${activeGroup}` : `${items.length} innehav`}
           </div>

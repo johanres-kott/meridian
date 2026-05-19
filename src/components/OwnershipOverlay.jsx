@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchOwnership } from "../lib/apiClient.js";
 import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import { baseTicker, shareClass } from "../lib/shareClass.js";
+import ShareClassBadge from "./ShareClassBadge.jsx";
 
 const SORT_OPTIONS = [
   { id: "spinoff", label: "Spin-off-flagga" },
@@ -31,22 +33,6 @@ function maxVoteGap(holders) {
     if (gap > max) max = gap;
   }
   return max;
-}
-
-// Strips Swedish A/B/C/D/PREF share-class suffix so we can group share classes of the
-// same underlying company. Non-Swedish or single-class tickers pass through unchanged
-// (we don't know how other exchanges encode share classes).
-const SE_SHARE_CLASS_RE = /^([A-Z0-9]+)-(A|B|C|D|PREF)\.ST$/;
-
-function baseTicker(ticker) {
-  if (!ticker) return ticker;
-  const match = ticker.toUpperCase().match(SE_SHARE_CLASS_RE);
-  return match ? `${match[1]}.ST` : ticker.toUpperCase();
-}
-
-function shareClass(ticker) {
-  const match = (ticker || "").toUpperCase().match(SE_SHARE_CLASS_RE);
-  return match ? match[2] : null;
 }
 
 export default function OwnershipOverlay({ onSelect, isMobile }) {
@@ -248,7 +234,51 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
         Spin-off-flaggan sätts bara på bolag med kurerad data eftersom Yahoo inte ser svenska huvudägare som Wallenberg eller Douglas.
         Lock-up perioder och förvärvsplaner är inte tillgängliga i strukturerad form och visas därför inte.
       </div>
+
+      <ShareClassExplainer />
     </div>
+  );
+}
+
+function ShareClassExplainer() {
+  return (
+    <details style={{ marginTop: 16, fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+      <summary style={{ cursor: "pointer", userSelect: "none", color: "var(--text)", fontWeight: 500, padding: "6px 0" }}>
+        Vad är A- och B-aktier?
+      </summary>
+      <div style={{ padding: "8px 0 4px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <p style={{ margin: 0 }}>
+          <strong style={{ color: "var(--text)" }}>Svenska marknaden.</strong> De flesta större svenska bolag har två (ibland fler)
+          aktieklasser med samma rätt till utdelning och kapital, men olika röststyrka på bolagsstämman.
+          A-aktien har typiskt <em>10 röster</em>, B-aktien <em>1 röst</em>. Vissa bolag har även C- eller
+          D-aktier, oftast utan rösträtt eller med särskild utdelning. Strukturen gör att grundarfamiljer
+          och stiftelser kan behålla kontrollen över röstmajoriteten utan att äga majoriteten av kapitalet.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong style={{ color: "var(--text)" }}>Konsekvens för bolagen.</strong> Långsiktigt ägande
+          möjliggörs — Wallenbergsstiftelserna (Investor, Atlas Copco, SEB, Ericsson), Lundbergs
+          (Hufvudstaden, Industrivärden), Stenbecks (Kinnevik) och Douglas/Latour-sfären kan driva strategier
+          över decennier utan att tvingas till kortsiktiga vinster av aktivistägare. Baksidan är att
+          minoritetsägare har mindre att säga till om, och bolagsledningen är mindre disciplinerad av
+          marknaden vid sämre prestation.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong style={{ color: "var(--text)" }}>Praktiskt för dig som investerare.</strong> Utdelning,
+          vinst per aktie och fundamenta är identiska — det är samma bolag. B-aktien är nästan alltid
+          mer likvid (lägre spread, mer omsättning) och brukar därför vara förstahandsvalet för retail.
+          A-aktien handlas ibland med en liten premie för rösträtten, ibland med rabatt på grund av sämre
+          likviditet — gapet är typiskt 0–5%.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong style={{ color: "var(--text)" }}>Andra länder.</strong> USA har samma typ av dubbel-klass
+          struktur men främst hos techbolag (Meta, Alphabet, Snap, Berkshire Hathaway) — för Alphabet
+          är t.ex. GOOGL röstberättigad medan GOOG inte är det. UK och Tyskland har mestadels singelklass
+          med "one share, one vote". Finland (.HE-tickers) använder en annan teckenkodning, t.ex.
+          WRT1V.HE för Wärtsilä — men strukturen liknar den svenska. Hong Kong och Kina förbjöd
+          länge dubbel-klass men har lättat på reglerna sedan 2018.
+        </p>
+      </div>
+    </details>
   );
 }
 
@@ -299,11 +329,7 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
         <td style={cellStyle}>
           <div style={{ fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
             {item.name || item.ticker}
-            {isGrouped && (
-              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "var(--bg-secondary)", color: "var(--text-secondary)", fontWeight: 600, letterSpacing: "0.04em" }}>
-                {classes.join("/")}
-              </span>
-            )}
+            <ShareClassBadge ticker={item.ticker} classes={isGrouped ? classes : undefined} />
           </div>
           <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{tickerLabel}</div>
         </td>
@@ -326,8 +352,11 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
       onMouseLeave={e => { e.currentTarget.style.background = ""; }}
     >
       <td style={cellStyle}>
-        <div style={{ fontWeight: 500 }}>{item.name || item.ticker}</div>
-        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{item.ticker}</div>
+        <div style={{ fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+          {item.name || item.ticker}
+          <ShareClassBadge ticker={item.ticker} classes={isGrouped ? classes : undefined} />
+        </div>
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{tickerLabel}</div>
       </td>
       <td style={{ ...numStyle, color: ownership.isLowFloat ? "#ff9800" : "var(--text)", fontWeight: ownership.isLowFloat ? 600 : 500 }}>
         {float != null ? `${float.toFixed(1)}%` : "—"}

@@ -3,6 +3,7 @@ import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { formatHoldingValue } from "./PortfolioTreemap.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 import { fetchCompany, fetchFund } from "../lib/apiClient.js";
+import ShareClassBadge from "./ShareClassBadge.jsx";
 
 function GroupTagPopover({ item, groups, onToggle, onClose }) {
   const ref = useRef(null);
@@ -93,7 +94,10 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
           : getFlag(item.ticker)}
       </td>
       <td style={tdBase}>
-        <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{item.name || item.ticker}</div>
+        <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
+          {item.name || item.ticker}
+          {item.type !== "fund" && <ShareClassBadge ticker={item.ticker} />}
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           {item.type !== "fund" && <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>}
           {scoreData && (() => {

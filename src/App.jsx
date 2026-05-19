@@ -26,7 +26,7 @@ import { usePremium } from "./hooks/usePremium.js";
 
 const TABS = [
   { id: "markets", label: "Översikt" },
-  { id: "portfolio", label: "Portfölj" },
+  { id: "portfolio", label: "Min Portfölj" },
   { id: "investment", label: "Investera" },
   { id: "analysis", label: "Analys" },
   { id: "commodities", label: "Marknader" },

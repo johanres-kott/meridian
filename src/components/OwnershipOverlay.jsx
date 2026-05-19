@@ -33,6 +33,22 @@ function maxVoteGap(holders) {
   return max;
 }
 
+// Strips Swedish A/B/C/D/PREF share-class suffix so we can group share classes of the
+// same underlying company. Non-Swedish or single-class tickers pass through unchanged
+// (we don't know how other exchanges encode share classes).
+const SE_SHARE_CLASS_RE = /^([A-Z0-9]+)-(A|B|C|D|PREF)\.ST$/;
+
+function baseTicker(ticker) {
+  if (!ticker) return ticker;
+  const match = ticker.toUpperCase().match(SE_SHARE_CLASS_RE);
+  return match ? `${match[1]}.ST` : ticker.toUpperCase();
+}
+
+function shareClass(ticker) {
+  const match = (ticker || "").toUpperCase().match(SE_SHARE_CLASS_RE);
+  return match ? match[2] : null;
+}
+
 export default function OwnershipOverlay({ onSelect, isMobile }) {
   const { userId } = useUser();
   const [items, setItems] = useState([]);
@@ -76,11 +92,26 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
     return () => { cancelled = true; };
   }, [stocks]);
 
+  // Group stocks by base ticker so A and B shares of the same company collapse to one row.
+  // Ownership data is functionally identical across share classes (same company, same holders);
+  // we use the first non-null result. Click prefers the share class the user actually owns.
+  const groups = useMemo(() => {
+    const map = new Map();
+    for (const s of stocks) {
+      const key = baseTicker(s.ticker);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(s);
+    }
+    return [...map.entries()].map(([base, classItems]) => {
+      const primary = classItems.find(i => i.shares > 0) ?? classItems[0];
+      const ownership = classItems.map(i => data[i.ticker]).find(Boolean) ?? null;
+      const classes = classItems.map(i => shareClass(i.ticker)).filter(Boolean).sort();
+      return { base, primary, classItems, classes, ownership };
+    });
+  }, [stocks, data]);
+
   const rows = useMemo(() => {
-    const arr = stocks.map(item => ({
-      item,
-      ownership: data[item.ticker] ?? null,
-    }));
+    const arr = groups.map(g => ({ ...g, item: g.primary }));
 
     const cmp = (a, b) => {
       const oa = a.ownership;
@@ -111,7 +142,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
       }
     };
     return arr.slice().sort(cmp);
-  }, [stocks, data, sort]);
+  }, [groups, sort]);
 
   const candidateCount = rows.filter(r => r.ownership?.isSpinOffCandidate).length;
 
@@ -194,11 +225,12 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map(({ item, ownership }) => (
+            {rows.map(({ item, ownership, classes }) => (
               <OwnershipRow
                 key={item.id}
                 item={item}
                 ownership={ownership}
+                classes={classes}
                 onSelect={onSelect}
                 isMobile={isMobile}
               />
@@ -249,7 +281,9 @@ function DualBar({ pctCapital, pctVotes, width = 70 }) {
   );
 }
 
-function OwnershipRow({ item, ownership, onSelect, isMobile }) {
+function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
+  const isGrouped = classes.length > 1;
+  const tickerLabel = isGrouped ? `${baseTicker(item.ticker)} · ${classes.join("/")}` : item.ticker;
   const cellStyle = {
     padding: isMobile ? "8px 8px" : "10px 14px",
     borderBottom: "1px solid var(--border-light)",
@@ -263,8 +297,15 @@ function OwnershipRow({ item, ownership, onSelect, isMobile }) {
     return (
       <tr onClick={handleClick} style={{ cursor: "pointer" }}>
         <td style={cellStyle}>
-          <div style={{ fontWeight: 500 }}>{item.name || item.ticker}</div>
-          <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{item.ticker}</div>
+          <div style={{ fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+            {item.name || item.ticker}
+            {isGrouped && (
+              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "var(--bg-secondary)", color: "var(--text-secondary)", fontWeight: 600, letterSpacing: "0.04em" }}>
+                {classes.join("/")}
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{tickerLabel}</div>
         </td>
         <td colSpan={isMobile ? 4 : 5} style={{ ...cellStyle, color: "var(--text-muted)", fontStyle: "italic", fontSize: 11 }}>
           Ingen ägardata

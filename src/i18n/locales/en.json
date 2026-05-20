@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "somethingWrong": "Something went wrong. Please reload the page."
+  },
+  "nav": {
+    "markets": "Overview",
+    "portfolio": "My Portfolio",
+    "investment": "Invest",
+    "analysis": "Analysis",
+    "commodities": "Markets",
+    "search": "Search"
+  },
+  "profile": {
+    "language": "Language"
+  },
+  "portfolio": {
+    "title": "My Portfolio",
+    "holdingsCount_one": "{{count}} holding",
+    "holdingsCount_other": "{{count}} holdings",
+    "holdingsCountInGroup_one": "{{count}} holding in {{group}}",
+    "holdingsCountInGroup_other": "{{count}} holdings in {{group}}",
+    "tabs": {
+      "holdings": "Holdings",
+      "overview": "Overview",
+      "thesisReview": "Thesis review",
+      "pension": "Pension"
+    },
+    "exportCsv": "Export CSV",
+    "exportCsvShort": "⬇ CSV",
+    "importPortfolio": "Import portfolio",
+    "importPortfolioShort": "⬆ Import",
+    "importHelp": "How do I import?",
+    "emptyInGroup": "No companies in \"{{group}}\" — click + on a row to add",
+    "emptyNoCompanies": "No companies yet — search for a company above to add",
+    "table": {
+      "company": "Company",
+      "status": "Status",
+      "groups": "Groups",
+      "price": "Price",
+      "value": "Value",
+      "pl": "P&L"
+    },
+    "scoring": {
+      "summary": "How we score companies",
+      "strong": "Total score 70–100: Strong match with your profile",
+      "ok": "Total score 40–69: Decent match",
+      "weak": "Total score 0–39: Weak match",
+      "fscore": "Piotroski F-Score ≥ 7 — high financial quality",
+      "disclaimer": "Scores are based on the Piotroski F-Score, Magic Formula, growth, dividends and quality. Weighted by your investor profile. Not financial advice."
+    }
+  }
+}

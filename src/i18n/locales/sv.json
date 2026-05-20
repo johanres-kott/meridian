@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Laddar...",
+    "somethingWrong": "Något gick fel. Ladda om sidan."
+  },
+  "nav": {
+    "markets": "Översikt",
+    "portfolio": "Min Portfölj",
+    "investment": "Investera",
+    "analysis": "Analys",
+    "commodities": "Marknader",
+    "search": "Sök"
+  },
+  "profile": {
+    "language": "Språk"
+  },
+  "portfolio": {
+    "title": "Min Portfölj",
+    "holdingsCount_one": "{{count}} innehav",
+    "holdingsCount_other": "{{count}} innehav",
+    "holdingsCountInGroup_one": "{{count}} innehav i {{group}}",
+    "holdingsCountInGroup_other": "{{count}} innehav i {{group}}",
+    "tabs": {
+      "holdings": "Innehav",
+      "overview": "Översikt",
+      "thesisReview": "Tesgranskning",
+      "pension": "Pension"
+    },
+    "exportCsv": "Exportera CSV",
+    "exportCsvShort": "⬇ CSV",
+    "importPortfolio": "Importera portfölj",
+    "importPortfolioShort": "⬆ Import",
+    "importHelp": "Hur importerar jag?",
+    "emptyInGroup": "Inga bolag i \"{{group}}\" — klicka + på en rad för att lägga till",
+    "emptyNoCompanies": "Inga bolag ännu — sök efter ett bolag ovan för att lägga till",
+    "table": {
+      "company": "Bolag",
+      "status": "Status",
+      "groups": "Grupper",
+      "price": "Kurs",
+      "value": "Värde",
+      "pl": "P&L"
+    },
+    "scoring": {
+      "summary": "Hur vi poängsätter bolag",
+      "strong": "Totalpoäng 70–100: Stark matchning med din profil",
+      "ok": "Totalpoäng 40–69: Okej matchning",
+      "weak": "Totalpoäng 0–39: Svag matchning",
+      "fscore": "Piotroski F-Score ≥ 7 — hög finansiell kvalitet",
+      "disclaimer": "Poäng baseras på Piotroski F-Score, Magic Formula, tillväxt, utdelning och kvalitet. Viktas efter din investerarprofil. Utgör inte finansiell rådgivning."
+    }
+  }
+}

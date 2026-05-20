@@ -19,9 +19,11 @@ import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import ThesisReview from "./ThesisReview.jsx";
+import { useTranslation } from "react-i18next";
 
 export default function Portfolio({ deepLink, onClearDeepLink }) {
   const { userId, preferences, updatePreferences } = useUser();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +130,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
     updatePreferences({ groups: updated });
   }
 
-  if (loading) return <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>Laddar...</div>;
+  if (loading) return <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>{t("common.loading")}</div>;
 
   async function importHoldings(holdings) {
     const { data: { user } } = await supabase.auth.getUser();
@@ -198,9 +200,11 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       {/* Header */}
       <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 4, gap: isMobile ? 12 : 0 }}>
         <div>
-          <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>Min Portfölj</div>
+          <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>{t("portfolio.title")}</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-            {activeGroup ? `${filteredItems.length} innehav i ${activeGroup}` : `${items.length} innehav`}
+            {activeGroup
+              ? t("portfolio.holdingsCountInGroup", { count: filteredItems.length, group: activeGroup })
+              : t("portfolio.holdingsCount", { count: items.length })}
           </div>
         </div>
       </div>
@@ -208,10 +212,10 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       {/* Sub-tabs */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 20 }}>
         {[
-          { id: "innehav", label: "Innehav" },
-          { id: "oversikt", label: "Översikt" },
-          { id: "tesgranskning", label: "Tesgranskning" },
-          { id: "pension", label: "Pension" },
+          { id: "innehav", label: t("portfolio.tabs.holdings") },
+          { id: "oversikt", label: t("portfolio.tabs.overview") },
+          { id: "tesgranskning", label: t("portfolio.tabs.thesisReview") },
+          { id: "pension", label: t("portfolio.tabs.pension") },
         ].map(tab => (
           <button key={tab.id} onClick={() => setSubTab(tab.id)} style={tabStyle(tab.id)}>
             {tab.label}
@@ -233,17 +237,17 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
             a.href = url; a.download = "thesion-portfolj.csv"; a.click();
             URL.revokeObjectURL(url);
           }}
-            title="Exportera CSV"
+            title={t("portfolio.exportCsv")}
             style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
-            {isMobile ? "⬇ CSV" : "Exportera CSV"}
+            {isMobile ? t("portfolio.exportCsvShort") : t("portfolio.exportCsv")}
           </button>
           <button onClick={() => setShowImport(true)}
-            title="Importera portfölj"
+            title={t("portfolio.importPortfolio")}
             style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
-            {isMobile ? "⬆ Import" : "Importera portfölj"}
+            {isMobile ? t("portfolio.importPortfolioShort") : t("portfolio.importPortfolio")}
           </button>
           <button onClick={() => setShowGuide(true)}
-            title="Hur importerar jag?"
+            title={t("portfolio.importHelp")}
             style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
             ?
           </button>
@@ -257,21 +261,30 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         {filteredItems.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
             {activeGroup
-              ? `Inga bolag i "${activeGroup}" — klicka + på en rad för att lägga till`
-              : "Inga bolag ännu — sök efter ett bolag ovan för att lägga till"}
+              ? t("portfolio.emptyInGroup", { group: activeGroup })
+              : t("portfolio.emptyNoCompanies")}
           </div>
         ) : (
           <div style={{ border: "1px solid var(--border)", borderRadius: 4, overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
               <thead>
                 <tr>
-                  {["", "Bolag", "Status", ...(isMobile ? [] : ["Grupper"]), "Kurs", ...(hasAnyShares ? ["Värde"] : []), ...(!isMobile && hasAnyPL ? ["P&L"] : []), " "].map(h => (
-                    <th key={h || "flag"} style={{
+                  {[
+                    { id: "flag", label: "" },
+                    { id: "company", label: t("portfolio.table.company") },
+                    { id: "status", label: t("portfolio.table.status") },
+                    ...(isMobile ? [] : [{ id: "groups", label: t("portfolio.table.groups") }]),
+                    { id: "price", label: t("portfolio.table.price"), align: "right" },
+                    ...(hasAnyShares ? [{ id: "value", label: t("portfolio.table.value"), align: "right" }] : []),
+                    ...(!isMobile && hasAnyPL ? [{ id: "pl", label: t("portfolio.table.pl"), align: "right" }] : []),
+                    { id: "actions", label: " " },
+                  ].map(h => (
+                    <th key={h.id} style={{
                       padding: isMobile ? "6px 8px" : "8px 14px",
-                      textAlign: ["Kurs", "Värde", "P&L"].includes(h) ? "right" : "left",
+                      textAlign: h.align || "left",
                       fontSize: 11, fontWeight: 500, color: "var(--text-secondary)",
                       borderBottom: "1px solid var(--border)",
-                    }}>{h}</th>
+                    }}>{h.label}</th>
                   ))}
                 </tr>
               </thead>
@@ -288,29 +301,29 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         {preferences.investorProfile && filteredItems.length > 0 && (
           <details style={{ marginTop: 16 }}>
             <summary style={{ fontSize: 11, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>
-              Hur vi poängsätter bolag
+              {t("portfolio.scoring.summary")}
             </summary>
             <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--bg-secondary)", borderRadius: 6, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
-                  Totalpoäng 70–100: Stark matchning med din profil
+                  {t("portfolio.scoring.strong")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
-                  Totalpoäng 40–69: Okej matchning
+                  {t("portfolio.scoring.ok")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(242,54,69,0.15)", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
-                  Totalpoäng 0–39: Svag matchning
+                  {t("portfolio.scoring.weak")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
-                  Piotroski F-Score ≥ 7 — hög finansiell kvalitet
+                  {t("portfolio.scoring.fscore")}
                 </div>
               </div>
               <div style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)" }}>
-                Poäng baseras på Piotroski F-Score, Magic Formula, tillväxt, utdelning och kvalitet. Viktas efter din investerarprofil. Utgör inte finansiell rådgivning.
+                {t("portfolio.scoring.disclaimer")}
               </div>
             </div>
           </details>

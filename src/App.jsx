@@ -23,14 +23,16 @@ import AboutPage from "./components/AboutPage.jsx";
 import { sanitizeInput } from "./lib/sanitize.js";
 import { useChatContext } from "./hooks/useChatContext.js";
 import { usePremium } from "./hooks/usePremium.js";
+import { useTranslation } from "react-i18next";
+import { LANGUAGES, setLanguage } from "./i18n/index.js";
 
 const TABS = [
-  { id: "markets", label: "Översikt" },
-  { id: "portfolio", label: "Min Portfölj" },
-  { id: "investment", label: "Investera" },
-  { id: "analysis", label: "Analys" },
-  { id: "commodities", label: "Marknader" },
-  { id: "search", label: "Sök" },
+  { id: "markets", key: "nav.markets" },
+  { id: "portfolio", key: "nav.portfolio" },
+  { id: "investment", key: "nav.investment" },
+  { id: "analysis", key: "nav.analysis" },
+  { id: "commodities", key: "nav.commodities" },
+  { id: "search", key: "nav.search" },
 ];
 
 export default function App() {
@@ -69,8 +71,24 @@ export default function App() {
 
 function AppContent() {
   const { userId, preferences, updatePreferences, lastSeenAt, displayName, session } = useUser();
+  const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
   const { theme, toggleTheme, isDark } = useTheme();
+
+  // Sync language from saved preferences once they load from Supabase. localStorage
+  // already gave us the right language on first paint; this catches the case where
+  // the user set their language on another device.
+  useEffect(() => {
+    const lang = preferences.language;
+    if (lang && lang !== i18n.language && LANGUAGES.some(l => l.code === lang)) {
+      setLanguage(lang);
+    }
+  }, [preferences.language, i18n.language]);
+
+  function changeLanguage(code) {
+    setLanguage(code);
+    updatePreferences({ language: code });
+  }
   const { premium, loading: premiumLoading } = usePremium();
   const [portalLoading, setPortalLoading] = useState(false);
   const [tab, setTab] = useState("markets");
@@ -118,8 +136,8 @@ function AppContent() {
   }
 
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -165,9 +183,9 @@ function AppContent() {
             </div>
           )}
           <div style={{ display: "flex", overflow: "auto", msOverflowStyle: "none", scrollbarWidth: "none" }}>
-            {TABS.map(t => (
-              <button key={t.id} className={`tab-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)} style={isMobile ? { padding: "8px 8px", fontSize: 11 } : undefined}>
-                {t.label}
+            {TABS.map(tabItem => (
+              <button key={tabItem.id} className={`tab-btn${tab === tabItem.id ? " active" : ""}`} onClick={() => setTab(tabItem.id)} style={isMobile ? { padding: "8px 8px", fontSize: 11 } : undefined}>
+                {t(tabItem.key)}
               </button>
             ))}
           </div>
@@ -316,6 +334,30 @@ function AppContent() {
                 >
                   Om Thesion
                 </button>
+                <div style={{ padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("profile.language")}</span>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {LANGUAGES.map(l => {
+                      const active = i18n.language === l.code;
+                      return (
+                        <button
+                          key={l.code}
+                          onClick={() => changeLanguage(l.code)}
+                          title={l.label}
+                          style={{
+                            fontSize: 11, padding: "3px 8px", borderRadius: 12, cursor: "pointer", fontFamily: "inherit",
+                            border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+                            background: active ? "var(--accent-light)" : "var(--bg-card)",
+                            color: active ? "var(--accent)" : "var(--text-secondary)",
+                            fontWeight: active ? 600 : 500,
+                          }}
+                        >
+                          {l.flag} {l.code.toUpperCase()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <button
                   onClick={toggleTheme}
                   style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}

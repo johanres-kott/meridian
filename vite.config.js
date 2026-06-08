@@ -87,6 +87,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: [],
+    setupFiles: ['./src/test-setup.js'],
+    // Don't pick up sibling worktrees' test files — they may run against
+    // mismatched dependency versions and produce confusing failures.
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/worktrees/**', 'e2e/**'],
   },
 })

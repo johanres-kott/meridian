@@ -49,5 +49,40 @@
       "fscore": "Piotroski F-Score ≥ 7 — hög finansiell kvalitet",
       "disclaimer": "Poäng baseras på Piotroski F-Score, Magic Formula, tillväxt, utdelning och kvalitet. Viktas efter din investerarprofil. Utgör inte finansiell rådgivning."
     }
+  },
+  "overview": {
+    "greeting": "Hej, {{name}}!",
+    "profileType": {
+      "value": "Värdeinvesterare",
+      "growth": "Tillväxtinvesterare",
+      "dividend": "Utdelningsinvesterare",
+      "index": "Indexinvesterare",
+      "mixed": "Blandat"
+    },
+    "profileRisk": {
+      "low": "Låg risk",
+      "medium": "Medel risk",
+      "high": "Hög risk"
+    },
+    "profileFocus": {
+      "dividends": "Utdelning",
+      "appreciation": "Kursökning",
+      "both": "Totalavkastning"
+    }
+  },
+  "sedanSist": {
+    "loading": "Sammanställer vad som hänt sedan sist...",
+    "title": "Sedan sist",
+    "subtitle": "sedan {{date}}",
+    "close": "Stäng",
+    "yourPortfolio": "Din portfölj",
+    "noCompanies": "Inga bolag i bevakning",
+    "markets": "Marknader",
+    "top4Suffix": " (topp 4)",
+    "commodities": "Råvaror & FX",
+    "news": "Nyheter",
+    "noNews": "Inga nyheter",
+    "customize": "Anpassa",
+    "cancel": "Avbryt"
   }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
@@ -7,6 +8,11 @@ import Picker from "./sedan-sist/Picker.jsx";
 
 export default function SedanSist({ isMobile, onNavigate }) {
   const { userId, preferences, updatePreferences, lastSeenAt } = useUser();
+  const { t, i18n } = useTranslation();
+  // Map UI language to the BCP-47 tag used by toLocaleDateString/toLocaleString.
+  // sv-SE for Swedish, en-GB for English (European number/date conventions fit
+  // the app's Sweden focus better than en-US).
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [loading, setLoading] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [data, setData] = useState(null);
@@ -77,7 +83,7 @@ export default function SedanSist({ isMobile, onNavigate }) {
   if (!lastSeenAt || dismissed) return null;
   if (loading) return (
     <div style={{ padding: "20px 24px", marginBottom: 24, background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontSize: 12 }}>
-      Sammanstaller vad som hant sedan sist...
+      {t("sedanSist.loading")}
     </div>
   );
   if (!data) return null;
@@ -96,7 +102,7 @@ export default function SedanSist({ isMobile, onNavigate }) {
     : [...data.allCommodities].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 4);
 
   const lastDate = new Date(lastSeenAt);
-  const formattedDate = lastDate.toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
+  const formattedDate = lastDate.toLocaleDateString(numberLocale, { day: "numeric", month: "short" });
 
   const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10, display: "flex", justifyContent: "space-between", alignItems: "center" };
   const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid var(--border-light)" };
@@ -110,14 +116,14 @@ export default function SedanSist({ isMobile, onNavigate }) {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Sedan sist</span>
-          <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>sedan {formattedDate}</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("sedanSist.title")}</span>
+          <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{t("sedanSist.subtitle", { date: formattedDate })}</span>
         </div>
         <button
           onClick={() => setDismissed(true)}
           style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "3px 10px", cursor: "pointer", fontFamily: "inherit" }}
         >
-          Stang
+          {t("sedanSist.close")}
         </button>
       </div>
 
@@ -126,9 +132,9 @@ export default function SedanSist({ isMobile, onNavigate }) {
 
         {/* Portfolio movers */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
-          <div style={sectionHeader}><span>Din portfolj</span></div>
+          <div style={sectionHeader}><span>{t("sedanSist.yourPortfolio")}</span></div>
           {data.movers.length === 0 ? (
-            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga bolag i bevakning</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>{t("sedanSist.noCompanies")}</div>
           ) : (
             data.movers.slice(0, 5).map(c => (
               <div key={c.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("search", { ticker: c.ticker })}>
@@ -147,9 +153,9 @@ export default function SedanSist({ isMobile, onNavigate }) {
         {/* Market highlights */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
           <div style={sectionHeader}>
-            <span>Marknader{pinnedIndices.length > 0 ? "" : " (topp 4)"}</span>
+            <span>{t("sedanSist.markets")}{pinnedIndices.length > 0 ? "" : t("sedanSist.top4Suffix")}</span>
             <button style={editBtn} onClick={() => { setEditingIndices(!editingIndices); setEditingCommodities(false); }}>
-              {editingIndices ? "Avbryt" : "Anpassa"}
+              {editingIndices ? t("sedanSist.cancel") : t("sedanSist.customize")}
             </button>
           </div>
           {editingIndices ? (
@@ -168,7 +174,7 @@ export default function SedanSist({ isMobile, onNavigate }) {
                   <div style={{ ...subtext, ...mono }}>{idx.symbol}</div>
                 </div>
                 <div style={{ ...mono, fontSize: 12, textAlign: "right" }}>
-                  <div style={{ fontWeight: 500, color: "var(--text)" }}>{idx.price?.toLocaleString("sv-SE", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontWeight: 500, color: "var(--text)" }}>{idx.price?.toLocaleString(numberLocale, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</div>
                   <Chg value={idx.change} />
                 </div>
               </div>
@@ -179,9 +185,9 @@ export default function SedanSist({ isMobile, onNavigate }) {
         {/* Commodity highlights */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
           <div style={sectionHeader}>
-            <span>Ravaror & FX{pinnedCommodities.length > 0 ? "" : " (topp 4)"}</span>
+            <span>{t("sedanSist.commodities")}{pinnedCommodities.length > 0 ? "" : t("sedanSist.top4Suffix")}</span>
             <button style={editBtn} onClick={() => { setEditingCommodities(!editingCommodities); setEditingIndices(false); }}>
-              {editingCommodities ? "Avbryt" : "Anpassa"}
+              {editingCommodities ? t("sedanSist.cancel") : t("sedanSist.customize")}
             </button>
           </div>
           {editingCommodities ? (
@@ -200,7 +206,7 @@ export default function SedanSist({ isMobile, onNavigate }) {
                   <div style={{ ...subtext, ...mono }}>{c.display || c.symbol}</div>
                 </div>
                 <div style={{ ...mono, fontSize: 12, textAlign: "right" }}>
-                  <div style={{ fontWeight: 500, color: "var(--text)" }}>{c.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {c.unit || ""}</div>
+                  <div style={{ fontWeight: 500, color: "var(--text)" }}>{c.price?.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {c.unit || ""}</div>
                   <Chg value={c.change} />
                 </div>
               </div>
@@ -210,9 +216,9 @@ export default function SedanSist({ isMobile, onNavigate }) {
 
         {/* News */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
-          <div style={sectionHeader}><span>Nyheter</span></div>
+          <div style={sectionHeader}><span>{t("sedanSist.news")}</span></div>
           {data.news.length === 0 ? (
-            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga nyheter</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>{t("sedanSist.noNews")}</div>
           ) : (
             data.news.map((n, i) => (
               <div key={i} style={{ padding: "5px 0", borderBottom: "1px solid var(--border-light)" }}>

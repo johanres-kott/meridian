@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import SedanSist from "./SedanSist.jsx";
@@ -17,20 +18,22 @@ class SafeCard extends Component {
 
 export default function Overview({ onNavigate }) {
   const { userId, preferences, updatePreferences, lastSeenAt, displayName } = useUser();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   return (
     <div>
       <div style={{ marginBottom: isMobile ? 12 : 20 }}>
         <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>
-          Hej, {displayName}!
+          {t("overview.greeting", { name: displayName })}
         </h1>
         {preferences.investorProfile && (() => {
           const p = preferences.investorProfile;
-          const typeMap = { value: "Värdeinvesterare", growth: "Tillväxtinvesterare", dividend: "Utdelningsinvesterare", index: "Indexinvesterare", mixed: "Blandat" };
-          const riskMap = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" };
-          const focusMap = { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" };
-          const parts = [typeMap[p.investorType], riskMap[p.riskProfile], focusMap[p.focus]].filter(Boolean);
+          const parts = [
+            p.investorType ? t(`overview.profileType.${p.investorType}`, { defaultValue: "" }) : null,
+            p.riskProfile ? t(`overview.profileRisk.${p.riskProfile}`, { defaultValue: "" }) : null,
+            p.focus ? t(`overview.profileFocus.${p.focus}`, { defaultValue: "" }) : null,
+          ].filter(Boolean);
           return parts.length > 0 ? (
             <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{parts.join(" · ")}</div>
           ) : null;

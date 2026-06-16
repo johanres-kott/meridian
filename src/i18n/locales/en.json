@@ -49,5 +49,40 @@
       "fscore": "Piotroski F-Score ≥ 7 — high financial quality",
       "disclaimer": "Scores are based on the Piotroski F-Score, Magic Formula, growth, dividends and quality. Weighted by your investor profile. Not financial advice."
     }
+  },
+  "overview": {
+    "greeting": "Hi, {{name}}!",
+    "profileType": {
+      "value": "Value investor",
+      "growth": "Growth investor",
+      "dividend": "Dividend investor",
+      "index": "Index investor",
+      "mixed": "Mixed"
+    },
+    "profileRisk": {
+      "low": "Low risk",
+      "medium": "Medium risk",
+      "high": "High risk"
+    },
+    "profileFocus": {
+      "dividends": "Dividends",
+      "appreciation": "Capital appreciation",
+      "both": "Total return"
+    }
+  },
+  "sedanSist": {
+    "loading": "Compiling what happened since your last visit...",
+    "title": "Since last visit",
+    "subtitle": "since {{date}}",
+    "close": "Close",
+    "yourPortfolio": "Your portfolio",
+    "noCompanies": "No companies on watchlist",
+    "markets": "Markets",
+    "top4Suffix": " (top 4)",
+    "commodities": "Commodities & FX",
+    "news": "News",
+    "noNews": "No news",
+    "customize": "Customize",
+    "cancel": "Cancel"
   }
 }

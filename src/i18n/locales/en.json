@@ -70,6 +70,13 @@
       "both": "Total return"
     }
   },
+  "upcomingEarnings": {
+    "loading": "Loading upcoming earnings...",
+    "title": "Upcoming earnings",
+    "sectionHeader": "UPCOMING EARNINGS",
+    "noEarnings": "No upcoming earnings",
+    "unknownDate": "Unknown"
+  },
   "sedanSist": {
     "loading": "Compiling what happened since your last visit...",
     "title": "Since last visit",

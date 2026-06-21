@@ -70,6 +70,12 @@
       "both": "Totalavkastning"
     }
   },
+  "todoList": {
+    "title": "Att göra",
+    "clearDone": "Rensa klara",
+    "show": "Visa ▼",
+    "hide": "Dölj ▲"
+  },
   "sedanSist": {
     "loading": "Sammanställer vad som hänt sedan sist...",
     "title": "Sedan sist",

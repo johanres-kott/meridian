@@ -70,6 +70,15 @@
       "both": "Total return"
     }
   },
+  "weeklySummary": {
+    "loading": "Loading weekly summary...",
+    "title": "Past week",
+    "sectionIndex": "Index",
+    "sectionCommodities": "Commodities & FX",
+    "sectionPortfolio": "Your portfolio",
+    "week": "week",
+    "today": "today"
+  },
   "upcomingEarnings": {
     "loading": "Loading upcoming earnings...",
     "title": "Upcoming earnings",

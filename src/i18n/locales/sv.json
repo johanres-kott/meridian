@@ -70,6 +70,15 @@
       "both": "Totalavkastning"
     }
   },
+  "weeklySummary": {
+    "loading": "Laddar veckosammanfattning...",
+    "title": "Senaste veckan",
+    "sectionIndex": "Index",
+    "sectionCommodities": "Råvaror & FX",
+    "sectionPortfolio": "Din portfölj",
+    "week": "vecka",
+    "today": "idag"
+  },
   "upcomingEarnings": {
     "loading": "Laddar kommande rapporter...",
     "title": "Kommande rapporter",

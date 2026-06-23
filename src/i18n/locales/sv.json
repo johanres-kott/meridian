@@ -70,6 +70,20 @@
       "both": "Totalavkastning"
     }
   },
+  "portfolioSummary": {
+    "loading": "Laddar portfölj...",
+    "title": "Din portfölj",
+    "companiesCount": "{{count}} bolag",
+    "holdings": "Innehav",
+    "convertedToSek": "Omräknat till SEK",
+    "today": "idag",
+    "statusSection": "Status",
+    "statusCount": "{{count}} st",
+    "pension": "Tjänstepension",
+    "totalInclPension": "Totalt (inkl. pension)",
+    "topMovers": "Största rörelser idag",
+    "noMovers": "Inga rörelser"
+  },
   "weeklySummary": {
     "loading": "Laddar veckosammanfattning...",
     "title": "Senaste veckan",

@@ -70,6 +70,20 @@
       "both": "Total return"
     }
   },
+  "portfolioSummary": {
+    "loading": "Loading portfolio...",
+    "title": "Your portfolio",
+    "companiesCount": "{{count}} companies",
+    "holdings": "Holdings",
+    "convertedToSek": "Converted to SEK",
+    "today": "today",
+    "statusSection": "Status",
+    "statusCount": "{{count}}",
+    "pension": "Occupational pension",
+    "totalInclPension": "Total (incl. pension)",
+    "topMovers": "Top movers today",
+    "noMovers": "No movers"
+  },
   "weeklySummary": {
     "loading": "Loading weekly summary...",
     "title": "Past week",

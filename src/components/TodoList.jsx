@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function TodoList({ todos = [], onUpdate, isMobile }) {
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
 
   if (todos.length === 0) return null;
@@ -32,7 +34,7 @@ export default function TodoList({ todos = [], onUpdate, isMobile }) {
         background: "var(--bg-secondary)", display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Att göra</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("todoList.title")}</span>
           {pending.length > 0 && (
             <span style={{
               fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 10,
@@ -46,12 +48,12 @@ export default function TodoList({ todos = [], onUpdate, isMobile }) {
           {done.length > 0 && (
             <button onClick={clearDone}
               style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-              Rensa klara
+              {t("todoList.clearDone")}
             </button>
           )}
           <button onClick={() => setCollapsed(!collapsed)}
             style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-            {collapsed ? "Visa ▼" : "Dölj ▲"}
+            {collapsed ? t("todoList.show") : t("todoList.hide")}
           </button>
         </div>
       </div>

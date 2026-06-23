@@ -4,15 +4,15 @@
     "src/App.jsx",
     "src/components/Portfolio.jsx",
     "src/components/Overview.jsx",
-    "src/components/SedanSist.jsx"
+    "src/components/SedanSist.jsx",
+    "src/components/TodoList.jsx",
+    "src/components/UpcomingEarnings.jsx"
   ],
   "inReview": [
     "src/components/PortfolioSummary.jsx",
-    "src/components/WeeklySummary.jsx",
-    "src/components/UpcomingEarnings.jsx"
+    "src/components/WeeklySummary.jsx"
   ],
   "pending": [
-    "src/components/TodoList.jsx",
     "src/components/InvestmentPlanTracker.jsx",
     "src/components/AnalysisTab.jsx",
     "src/components/OwnershipOverlay.jsx",

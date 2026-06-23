@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
@@ -19,6 +20,7 @@ function calcWeeklyChange(points, currentPrice) {
 }
 
 export default function WeeklySummary({ isMobile, onNavigate }) {
+  const { t } = useTranslation();
   const { userId, preferences } = useUser();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
@@ -119,7 +121,7 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
   if (loading) {
     return (
       <div style={{ padding: "20px 24px", marginBottom: 24, background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontSize: 12 }}>
-        Laddar veckosammanfattning...
+        {t("weeklySummary.loading")}
       </div>
     );
   }
@@ -135,13 +137,13 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
   return (
     <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Senaste veckan</span>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("weeklySummary.title")}</span>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : (data.portfolio.length > 0 ? "1fr 1fr 1fr" : "1fr 1fr"), gap: 0 }}>
         {/* Index weekly */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
-          <div style={sectionHeader}>Index</div>
+          <div style={sectionHeader}>{t("weeklySummary.sectionIndex")}</div>
           {data.indices.map(idx => (
             <div key={idx.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities", { symbol: idx.symbol })}>
               <div>
@@ -152,12 +154,12 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
                 {idx.weeklyChange !== null ? (
                   <>
                     <div style={{ fontSize: 12 }}><Chg value={parseFloat(idx.weeklyChange.toFixed(2))} /></div>
-                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>vecka</div>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("weeklySummary.week")}</div>
                   </>
                 ) : (
                   <>
                     <div style={{ fontSize: 12 }}><Chg value={idx.change} /></div>
-                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>idag</div>
+                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("weeklySummary.today")}</div>
                   </>
                 )}
               </div>
@@ -167,7 +169,7 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
 
         {/* Commodities weekly */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : (data.portfolio.length > 0 ? "1px solid var(--border-light)" : "none"), borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
-          <div style={sectionHeader}>Råvaror & FX</div>
+          <div style={sectionHeader}>{t("weeklySummary.sectionCommodities")}</div>
           {data.commodities.map(c => (
             <div key={c.symbol} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("commodities", { symbol: c.display || c.symbol })}>
               <div>
@@ -176,7 +178,7 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
               </div>
               <div style={{ textAlign: "right", ...mono }}>
                 <div style={{ fontSize: 12 }}><Chg value={c.change} /></div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>idag</div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("weeklySummary.today")}</div>
               </div>
             </div>
           ))}
@@ -185,7 +187,7 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
         {/* Portfolio weekly */}
         {data.portfolio.length > 0 && (
           <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
-            <div style={sectionHeader}>Din portfolj</div>
+            <div style={sectionHeader}>{t("weeklySummary.sectionPortfolio")}</div>
             {data.portfolio.map(item => (
               <div key={item.ticker} style={{ ...listItem, cursor: "pointer" }} onClick={() => onNavigate?.("search", { ticker: item.ticker })}>
                 <div>
@@ -194,7 +196,7 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
                 </div>
                 <div style={{ textAlign: "right", ...mono }}>
                   <div style={{ fontSize: 12 }}><Chg value={parseFloat(item.weeklyChange.toFixed(2))} /></div>
-                  <div style={{ fontSize: 10, color: "var(--text-muted)" }}>vecka</div>
+                  <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("weeklySummary.week")}</div>
                 </div>
               </div>
             ))}

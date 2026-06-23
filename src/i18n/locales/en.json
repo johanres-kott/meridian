@@ -84,6 +84,28 @@
     "topMovers": "Top movers today",
     "noMovers": "No movers"
   },
+  "weeklySummary": {
+    "loading": "Loading weekly summary...",
+    "title": "Past week",
+    "sectionIndex": "Index",
+    "sectionCommodities": "Commodities & FX",
+    "sectionPortfolio": "Your portfolio",
+    "week": "week",
+    "today": "today"
+  },
+  "upcomingEarnings": {
+    "loading": "Loading upcoming earnings...",
+    "title": "Upcoming earnings",
+    "sectionHeader": "UPCOMING EARNINGS",
+    "noEarnings": "No upcoming earnings",
+    "unknownDate": "Unknown"
+  },
+  "todoList": {
+    "title": "To do",
+    "clearDone": "Clear done",
+    "show": "Show ▼",
+    "hide": "Hide ▲"
+  },
   "sedanSist": {
     "loading": "Compiling what happened since your last visit...",
     "title": "Since last visit",

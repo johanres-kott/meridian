@@ -71,8 +71,8 @@
     }
   },
   "portfolioSummary": {
-    "loading": "Laddar portfolj...",
-    "title": "Din portfolj",
+    "loading": "Laddar portfölj...",
+    "title": "Din portfölj",
     "companiesCount": "{{count}} bolag",
     "holdings": "Innehav",
     "convertedToSek": "Omräknat till SEK",
@@ -83,6 +83,28 @@
     "totalInclPension": "Totalt (inkl. pension)",
     "topMovers": "Största rörelser idag",
     "noMovers": "Inga rörelser"
+  },
+  "weeklySummary": {
+    "loading": "Laddar veckosammanfattning...",
+    "title": "Senaste veckan",
+    "sectionIndex": "Index",
+    "sectionCommodities": "Råvaror & FX",
+    "sectionPortfolio": "Din portfölj",
+    "week": "vecka",
+    "today": "idag"
+  },
+  "upcomingEarnings": {
+    "loading": "Laddar kommande rapporter...",
+    "title": "Kommande rapporter",
+    "sectionHeader": "KOMMANDE RAPPORTER",
+    "noEarnings": "Inga kommande rapporter",
+    "unknownDate": "Okänt"
+  },
+  "todoList": {
+    "title": "Att göra",
+    "clearDone": "Rensa klara",
+    "show": "Visa ▼",
+    "hide": "Dölj ▲"
   },
   "sedanSist": {
     "loading": "Sammanställer vad som hänt sedan sist...",

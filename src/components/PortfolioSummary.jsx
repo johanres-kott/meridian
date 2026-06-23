@@ -5,6 +5,7 @@ import { Chg, StatCard } from "./SharedComponents.jsx";
 import { parseFxRates } from "../hooks/useFxRates.js";
 import { STATUS_COLORS } from "../constants.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import { getPensionTotalValue } from "../lib/pension.js";
 
 export default function PortfolioSummary({ isMobile, onNavigate }) {
   const { userId, preferences } = useUser();
@@ -107,7 +108,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
           .slice(0, 5);
 
         // Pension value from preferences
-        const pensionValue = preferences?.pension?.currentValue ? Number(preferences.pension.currentValue) : null;
+        const pensionValue = getPensionTotalValue(preferences?.pension);
 
         setData({
           currencyGroups,

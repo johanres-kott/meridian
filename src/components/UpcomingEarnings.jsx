@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
 export default function UpcomingEarnings({ isMobile }) {
+  const { t, i18n } = useTranslation();
   const { userId } = useUser();
   const [loading, setLoading] = useState(true);
   const [earnings, setEarnings] = useState([]);
@@ -59,7 +61,7 @@ export default function UpcomingEarnings({ isMobile }) {
   if (loading) {
     return (
       <div style={{ padding: "20px 24px", marginBottom: 24, background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-secondary)", fontSize: 12 }}>
-        Laddar kommande rapporter...
+        {t("upcomingEarnings.loading")}
       </div>
     );
   }
@@ -86,7 +88,7 @@ export default function UpcomingEarnings({ isMobile }) {
   // Group earnings by date
   const grouped = {};
   for (const e of earnings) {
-    const key = e.date || "Okant";
+    const key = e.date || t("upcomingEarnings.unknownDate");
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(e);
   }
@@ -94,7 +96,8 @@ export default function UpcomingEarnings({ isMobile }) {
   function formatDate(dateStr) {
     try {
       const d = new Date(dateStr + "T00:00:00");
-      return d.toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
+      const locale = i18n.language === "en" ? "en-GB" : "sv-SE";
+      return d.toLocaleDateString(locale, { day: "numeric", month: "short" });
     } catch {
       return dateStr;
     }
@@ -103,14 +106,14 @@ export default function UpcomingEarnings({ isMobile }) {
   return (
     <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>Kommande rapporter</span>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("upcomingEarnings.title")}</span>
       </div>
 
       <div style={{ padding: isMobile ? "12px 12px" : "16px 20px" }}>
-        <div style={sectionHeader}>KOMMANDE RAPPORTER</div>
+        <div style={sectionHeader}>{t("upcomingEarnings.sectionHeader")}</div>
 
         {earnings.length === 0 ? (
-          <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>Inga kommande rapporter</div>
+          <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>{t("upcomingEarnings.noEarnings")}</div>
         ) : (
           Object.entries(grouped).map(([date, items]) => (
             <div key={date}>

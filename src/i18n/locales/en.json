@@ -106,6 +106,17 @@
     "show": "Show ▼",
     "hide": "Hide ▲"
   },
+  "investmentPlanTracker": {
+    "planCompleted": "Plan completed!",
+    "title": "Your investment plan",
+    "subtitle": "{{amount}} SEK over {{months}} months",
+    "steps": "{{done}}/{{total}} steps",
+    "monthDone": "✅ Done for this month!",
+    "monthTodo": "To do — Month {{month}}",
+    "showOtherMonths": "Show other months ({{count}})",
+    "hideOtherMonths": "Hide other months ({{count}})",
+    "monthLabel": "Month {{month}} — {{monthName}} {{year}}"
+  },
   "sedanSist": {
     "loading": "Compiling what happened since your last visit...",
     "title": "Since last visit",

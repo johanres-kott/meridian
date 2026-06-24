@@ -106,6 +106,17 @@
     "show": "Visa ▼",
     "hide": "Dölj ▲"
   },
+  "investmentPlanTracker": {
+    "planCompleted": "Plan genomförd!",
+    "title": "Din investeringsplan",
+    "subtitle": "{{amount}} SEK över {{months}} månader",
+    "steps": "{{done}}/{{total}} steg",
+    "monthDone": "✅ Klart för denna månad!",
+    "monthTodo": "Att göra — Månad {{month}}",
+    "showOtherMonths": "Visa övriga månader ({{count}})",
+    "hideOtherMonths": "Dölj övriga månader ({{count}})",
+    "monthLabel": "Månad {{month}} — {{monthName}} {{year}}"
+  },
   "sedanSist": {
     "loading": "Sammanställer vad som hänt sedan sist...",
     "title": "Sedan sist",

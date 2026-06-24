@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
 import parseDCAPlan from "../lib/parseDCAPlan.js";
 
@@ -7,7 +8,9 @@ import parseDCAPlan from "../lib/parseDCAPlan.js";
  * Shows current month's actions from a DCA plan.
  */
 export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
+  const { t, i18n } = useTranslation();
   const { preferences, updatePreferences } = useUser();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const plan = preferences?.investmentPlan;
   const dcaPlan = useMemo(
     () => plan?.text ? parseDCAPlan(plan.text, plan.savedAt) : null,
@@ -46,8 +49,6 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
   const doneSteps = completedSteps.length;
   const progressPct = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0;
 
-  const monthLabels = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
-
   return (
     <div style={{
       marginBottom: isMobile ? 12 : 20,
@@ -64,16 +65,16 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
           <span style={{ fontSize: 16 }}>{allDone ? "✅" : "📋"}</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
-              {allDone ? "Plan genomförd!" : "Din investeringsplan"}
+              {allDone ? t("investmentPlanTracker.planCompleted") : t("investmentPlanTracker.title")}
             </div>
             <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-              {dcaPlan.totalAmount.toLocaleString("sv-SE")} SEK över {dcaPlan.totalMonths} månader
+              {t("investmentPlanTracker.subtitle", { amount: dcaPlan.totalAmount.toLocaleString(numberLocale), months: dcaPlan.totalMonths })}
             </div>
           </div>
         </div>
         <div style={{ fontSize: 11, color: "var(--text-secondary)", textAlign: "right" }}>
           <div style={{ fontWeight: 500 }}>{progressPct}%</div>
-          <div style={{ fontSize: 10 }}>{doneSteps}/{totalSteps} steg</div>
+          <div style={{ fontSize: 10 }}>{t("investmentPlanTracker.steps", { done: doneSteps, total: totalSteps })}</div>
         </div>
       </div>
 
@@ -107,13 +108,13 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
               border: isCurrent ? "1px solid var(--accent)" : "1px solid transparent",
             }}>
               <div style={{ fontSize: 10, color: isCurrent ? "var(--accent)" : "var(--text-secondary)", fontWeight: isCurrent ? 600 : 400 }}>
-                {monthLabels[monthDate.getMonth()]}
+                {monthDate.toLocaleString(numberLocale, { month: "short" })}
               </div>
               <div style={{ fontSize: 14, marginTop: 2 }}>
                 {monthAllDone ? "✅" : isCurrent ? "👉" : isPast ? "⚠️" : "⏳"}
               </div>
               <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>
-                {m.totalAmount.toLocaleString("sv-SE")}
+                {m.totalAmount.toLocaleString(numberLocale)}
               </div>
             </div>
           );
@@ -124,7 +125,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
       {currentMonthData && !allDone && (
         <div style={{ background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)", padding: "10px 12px" }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>
-            {currentMonthAllDone ? "✅ Klart för denna månad!" : `Att göra — Månad ${currentMonthData.month}`}
+            {currentMonthAllDone ? t("investmentPlanTracker.monthDone") : t("investmentPlanTracker.monthTodo", { month: currentMonthData.month })}
           </div>
           {currentMonthData.purchases.map((p, pi) => {
             const done = isComplete(currentMonthData.month, pi);
@@ -169,7 +170,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
                   color: done ? "#089981" : "var(--text)",
                   textDecoration: done ? "line-through" : "none",
                 }}>
-                  {p.amount.toLocaleString("sv-SE")} kr
+                  {p.amount.toLocaleString(numberLocale)} kr
                 </div>
               </div>
             );
@@ -184,15 +185,16 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
           dcaPlan={dcaPlan}
           isComplete={isComplete}
           markStepComplete={markStepComplete}
-          monthLabels={monthLabels}
         />
       )}
     </div>
   );
 }
 
-function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, monthLabels }) {
+function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete }) {
   const [expanded, setExpanded] = useState(false);
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
 
   return (
     <div style={{ marginTop: 10 }}>
@@ -205,7 +207,9 @@ function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, month
         }}
       >
         <span style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.15s", display: "inline-block" }}>▸</span>
-        {expanded ? "Dölj" : "Visa"} övriga månader ({months.length})
+        {expanded
+          ? t("investmentPlanTracker.hideOtherMonths", { count: months.length })
+          : t("investmentPlanTracker.showOtherMonths", { count: months.length })}
       </button>
       {expanded && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
@@ -222,7 +226,7 @@ function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, month
                 opacity: monthAllDone ? 0.7 : 1,
               }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: isPast && !monthAllDone ? "#f23645" : "var(--text-secondary)", marginBottom: 6 }}>
-                  {monthAllDone ? "✅" : isPast ? "⚠️" : "⏳"} Månad {m.month} — {monthLabels[monthDate.getMonth()]} {monthDate.getFullYear()}
+                  {monthAllDone ? "✅" : isPast ? "⚠️" : "⏳"} {t("investmentPlanTracker.monthLabel", { month: m.month, monthName: monthDate.toLocaleString(numberLocale, { month: "short" }), year: monthDate.getFullYear() })}
                 </div>
                 {m.purchases.map((p, pi) => {
                   const done = isComplete(m.month, pi);
@@ -248,7 +252,7 @@ function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, month
                         {p.name}
                       </span>
                       <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                        {p.amount.toLocaleString("sv-SE")} kr
+                        {p.amount.toLocaleString(numberLocale)} kr
                       </span>
                     </div>
                   );

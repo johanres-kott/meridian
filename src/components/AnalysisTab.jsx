@@ -1,16 +1,18 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import GapAnalysis from "./GapAnalysis.jsx";
 import PremiumAnalyses from "./PremiumAnalyses.jsx";
 import OwnershipOverlay from "./OwnershipOverlay.jsx";
 
-const SUB_TABS = [
-  { id: "nyckeltal", label: "Nyckeltal" },
-  { id: "agarstruktur", label: "Ägarstruktur" },
-  { id: "rapporter", label: "Rapporter ★" },
-];
-
 export default function AnalysisTab({ onNavigate, isMobile }) {
+  const { t } = useTranslation();
   const [sub, setSub] = useState("nyckeltal");
+
+  const SUB_TABS = [
+    { id: "nyckeltal", label: t("analysisTab.tabs.keyMetrics") },
+    { id: "agarstruktur", label: t("analysisTab.tabs.ownership") },
+    { id: "rapporter", label: t("analysisTab.tabs.reports") },
+  ];
 
   return (
     <div>

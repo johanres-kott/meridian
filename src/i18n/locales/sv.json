@@ -106,6 +106,13 @@
     "show": "Visa ▼",
     "hide": "Dölj ▲"
   },
+  "analysisTab": {
+    "tabs": {
+      "keyMetrics": "Nyckeltal",
+      "ownership": "Ägarstruktur",
+      "reports": "Rapporter ★"
+    }
+  },
   "sedanSist": {
     "loading": "Sammanställer vad som hänt sedan sist...",
     "title": "Sedan sist",

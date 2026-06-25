@@ -106,6 +106,13 @@
     "show": "Show ▼",
     "hide": "Hide ▲"
   },
+  "analysisTab": {
+    "tabs": {
+      "keyMetrics": "Key metrics",
+      "ownership": "Ownership structure",
+      "reports": "Reports ★"
+    }
+  },
   "sedanSist": {
     "loading": "Compiling what happened since your last visit...",
     "title": "Since last visit",

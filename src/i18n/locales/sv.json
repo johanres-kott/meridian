@@ -120,5 +120,45 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "ownershipOverlay": {
+    "noStocks": "Inga aktier i bevakningslistan — lägg till ett bolag för att se ägarstrukturen.",
+    "sectionTitle": "Ägarstruktur",
+    "spinOffCriteria": "Free float < 15% + största ägare ≥ 30% flaggas som spin-off-kandidat",
+    "spinOffCandidates_one": "{{count}} spin-off-kandidat",
+    "spinOffCandidates_other": "{{count}} spin-off-kandidater",
+    "loadingData": "Hämtar ägardata...",
+    "sort": {
+      "label": "Sortera:",
+      "spinoff": "Spin-off-flagga",
+      "freefloat": "Free float (lågt först)",
+      "largest": "Största ägare (störst först)",
+      "votegap": "Röst/kapital-gap",
+      "name": "Namn (A→Ö)"
+    },
+    "table": {
+      "company": "Bolag",
+      "freeFloat": "Free float",
+      "largestHolder": "Största ägare",
+      "capitalVotes": "Kapital / röster",
+      "top3": "Top 3",
+      "flags": "Flaggor"
+    },
+    "noData": "Ingen ägardata",
+    "titleCapitalVotes": "{{capital}}% kapital · {{votes}}% röster",
+    "titleCapitalOnly": "{{capital}}% kapital",
+    "flags": {
+      "spinOff": "Spin-off",
+      "dualClassTitle": "Största ägaren har väsentligt fler röster än kapital (A/B-struktur)",
+      "dualClass": "A/B-struktur",
+      "lowFloat": "Lågt float",
+      "curated": "Kurerad"
+    },
+    "legend": {
+      "barExplain": "Övre stapel = kapital, undre = röster. Orange undre stapel = ägaren har fler röster än kapital (A/B-struktur).",
+      "freeFloatDef": "Free float = 100% − insiders − strategiska ägare ≥5% (svensk kurerad data) eller 100% − insiders (Yahoo).",
+      "spinOffNote": "Spin-off-flaggan sätts bara på bolag med kurerad data eftersom Yahoo inte ser svenska huvudägare som Wallenberg eller Douglas.",
+      "lockupNote": "Lock-up perioder och förvärvsplaner är inte tillgängliga i strukturerad form och visas därför inte."
+    }
   }
 }

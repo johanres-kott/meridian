@@ -120,5 +120,45 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "ownershipOverlay": {
+    "noStocks": "No stocks on your watchlist — add a company to see the ownership structure.",
+    "sectionTitle": "Ownership structure",
+    "spinOffCriteria": "Free float < 15% + largest holder ≥ 30% flagged as spin-off candidate",
+    "spinOffCandidates_one": "{{count}} spin-off candidate",
+    "spinOffCandidates_other": "{{count}} spin-off candidates",
+    "loadingData": "Fetching ownership data...",
+    "sort": {
+      "label": "Sort:",
+      "spinoff": "Spin-off flag",
+      "freefloat": "Free float (lowest first)",
+      "largest": "Largest holder (biggest first)",
+      "votegap": "Vote/capital gap",
+      "name": "Name (A→Z)"
+    },
+    "table": {
+      "company": "Company",
+      "freeFloat": "Free float",
+      "largestHolder": "Largest holder",
+      "capitalVotes": "Capital / votes",
+      "top3": "Top 3",
+      "flags": "Flags"
+    },
+    "noData": "No ownership data",
+    "titleCapitalVotes": "{{capital}}% capital · {{votes}}% votes",
+    "titleCapitalOnly": "{{capital}}% capital",
+    "flags": {
+      "spinOff": "Spin-off",
+      "dualClassTitle": "The largest holder has significantly more votes than capital (A/B structure)",
+      "dualClass": "A/B structure",
+      "lowFloat": "Low float",
+      "curated": "Curated"
+    },
+    "legend": {
+      "barExplain": "Upper bar = capital, lower = votes. Orange lower bar = holder has more votes than capital (A/B structure).",
+      "freeFloatDef": "Free float = 100% − insiders − strategic holders ≥5% (Swedish curated data) or 100% − insiders (Yahoo).",
+      "spinOffNote": "The spin-off flag is only set for companies with curated data since Yahoo does not recognise Swedish major shareholders such as Wallenberg or Douglas.",
+      "lockupNote": "Lock-up periods and acquisition plans are not available in structured form and are therefore not shown."
+    }
   }
 }

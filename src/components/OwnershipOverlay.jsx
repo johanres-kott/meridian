@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { fetchOwnership } from "../lib/apiClient.js";
 import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
@@ -6,11 +7,11 @@ import { baseTicker, shareClass } from "../lib/shareClass.js";
 import ShareClassBadge from "./ShareClassBadge.jsx";
 
 const SORT_OPTIONS = [
-  { id: "spinoff", label: "Spin-off-flagga" },
-  { id: "freefloat", label: "Free float (lågt först)" },
-  { id: "largest", label: "Största ägare (störst först)" },
-  { id: "votegap", label: "Röst/kapital-gap" },
-  { id: "name", label: "Namn (A→Ö)" },
+  { id: "spinoff" },
+  { id: "freefloat" },
+  { id: "largest" },
+  { id: "votegap" },
+  { id: "name" },
 ];
 
 // A holder has a meaningful A/B asymmetry when voting share clearly exceeds capital share.
@@ -36,6 +37,7 @@ function maxVoteGap(holders) {
 }
 
 export default function OwnershipOverlay({ onSelect, isMobile }) {
+  const { t } = useTranslation();
   const { userId } = useUser();
   const [items, setItems] = useState([]);
   const stocks = useMemo(
@@ -135,7 +137,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
   if (stocks.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
-        Inga aktier i bevakningslistan — lägg till ett bolag för att se ägarstrukturen.
+        {t("ownershipOverlay.noStocks")}
       </div>
     );
   }
@@ -150,21 +152,21 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", flexDirection: isMobile ? "column" : "row", gap: 8, marginBottom: 8 }}>
           <div>
             <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
-              Ägarstruktur
+              {t("ownershipOverlay.sectionTitle")}
             </div>
             <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-              Free float &lt; 15% + största ägare ≥ 30% flaggas som spin-off-kandidat
+              {t("ownershipOverlay.spinOffCriteria")}
             </div>
           </div>
           {candidateCount > 0 && (
             <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 12, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600 }}>
-              {candidateCount} spin-off-kandidat{candidateCount === 1 ? "" : "er"}
+              {t("ownershipOverlay.spinOffCandidates", { count: candidateCount })}
             </span>
           )}
         </div>
 
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Sortera:</span>
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{t("ownershipOverlay.sort.label")}</span>
           {SORT_OPTIONS.map(opt => (
             <button
               key={opt.id}
@@ -177,7 +179,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
                 fontFamily: "inherit",
               }}
             >
-              {opt.label}
+              {t(`ownershipOverlay.sort.${opt.id}`)}
             </button>
           ))}
         </div>
@@ -185,7 +187,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
 
       {loading && Object.keys(data).length === 0 && (
         <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text-muted)", fontSize: 12 }}>
-          Hämtar ägardata...
+          {t("ownershipOverlay.loadingData")}
         </div>
       )}
 
@@ -194,14 +196,14 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
           <thead>
             <tr>
               {[
-                { label: "Bolag", align: "left" },
-                { label: "Free float", align: "right" },
-                { label: "Största ägare", align: "left" },
-                { label: "Kapital / röster", align: "left" },
-                ...(isMobile ? [] : [{ label: "Top 3", align: "left" }]),
-                { label: "Flaggor", align: "left" },
+                { key: "company", label: t("ownershipOverlay.table.company"), align: "left" },
+                { key: "freeFloat", label: t("ownershipOverlay.table.freeFloat"), align: "right" },
+                { key: "largestHolder", label: t("ownershipOverlay.table.largestHolder"), align: "left" },
+                { key: "capitalVotes", label: t("ownershipOverlay.table.capitalVotes"), align: "left" },
+                ...(isMobile ? [] : [{ key: "top3", label: t("ownershipOverlay.table.top3"), align: "left" }]),
+                { key: "flags", label: t("ownershipOverlay.table.flags"), align: "left" },
               ].map(h => (
-                <th key={h.label} style={{
+                <th key={h.key} style={{
                   padding: isMobile ? "6px 8px" : "8px 14px",
                   textAlign: h.align,
                   fontSize: 11, fontWeight: 500, color: "var(--text-secondary)",
@@ -228,11 +230,11 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
       <div style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <DualBar pctCapital={20} pctVotes={45} width={50} />
-          <span>Övre stapel = kapital, undre = röster. Orange undre stapel = ägaren har fler röster än kapital (A/B-struktur).</span>
+          <span>{t("ownershipOverlay.legend.barExplain")}</span>
         </div>
-        Free float = 100% − insiders − strategiska ägare ≥5% (svensk kurerad data) eller 100% − insiders (Yahoo).
-        Spin-off-flaggan sätts bara på bolag med kurerad data eftersom Yahoo inte ser svenska huvudägare som Wallenberg eller Douglas.
-        Lock-up perioder och förvärvsplaner är inte tillgängliga i strukturerad form och visas därför inte.
+        {t("ownershipOverlay.legend.freeFloatDef")}{" "}
+        {t("ownershipOverlay.legend.spinOffNote")}{" "}
+        {t("ownershipOverlay.legend.lockupNote")}
       </div>
 
     </div>
@@ -269,6 +271,7 @@ function DualBar({ pctCapital, pctVotes, width = 70 }) {
 }
 
 function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
+  const { t } = useTranslation();
   const isGrouped = classes.length > 1;
   const tickerLabel = isGrouped ? `${baseTicker(item.ticker)} · ${classes.join("/")}` : item.ticker;
   const cellStyle = {
@@ -291,7 +294,7 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
           <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{tickerLabel}</div>
         </td>
         <td colSpan={isMobile ? 4 : 5} style={{ ...cellStyle, color: "var(--text-muted)", fontStyle: "italic", fontSize: 11 }}>
-          Ingen ägardata
+          {t("ownershipOverlay.noData")}
         </td>
       </tr>
     );
@@ -330,8 +333,8 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
           <div
             style={{ display: "flex", alignItems: "center", gap: 8 }}
             title={largest.pctVotes != null
-              ? `${largest.pctHeld.toFixed(1)}% kapital · ${largest.pctVotes.toFixed(1)}% röster`
-              : `${largest.pctHeld.toFixed(1)}% kapital`}
+              ? t("ownershipOverlay.titleCapitalVotes", { capital: largest.pctHeld.toFixed(1), votes: largest.pctVotes.toFixed(1) })
+              : t("ownershipOverlay.titleCapitalOnly", { capital: largest.pctHeld.toFixed(1) })}
           >
             <DualBar pctCapital={largest.pctHeld} pctVotes={largest.pctVotes} width={isMobile ? 50 : 70} />
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, lineHeight: 1.2, color: "var(--text-secondary)" }}>
@@ -355,7 +358,9 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
                 <div
                   key={i}
                   style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: i < top3.length - 1 ? 3 : 0 }}
-                  title={showVotes ? `${h.pctHeld.toFixed(1)}% kapital · ${h.pctVotes.toFixed(1)}% röster` : `${h.pctHeld.toFixed(1)}% kapital`}
+                  title={showVotes
+                    ? t("ownershipOverlay.titleCapitalVotes", { capital: h.pctHeld.toFixed(1), votes: h.pctVotes.toFixed(1) })
+                    : t("ownershipOverlay.titleCapitalOnly", { capital: h.pctHeld.toFixed(1) })}
                 >
                   <DualBar pctCapital={h.pctHeld} pctVotes={h.pctVotes} width={50} />
                   <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: "var(--text-muted)", minWidth: 32 }}>
@@ -379,25 +384,25 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {ownership.isSpinOffCandidate && (
             <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600 }}>
-              Spin-off
+              {t("ownershipOverlay.flags.spinOff")}
             </span>
           )}
           {(isDualClassHolder(ownership.largestHolder || {}) || (ownership.topHolders || []).some(isDualClassHolder)) && (
             <span
-              title="Största ägaren har väsentligt fler röster än kapital (A/B-struktur)"
+              title={t("ownershipOverlay.flags.dualClassTitle")}
               style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.12)", color: "#ff9800", fontWeight: 600 }}
             >
-              A/B-struktur
+              {t("ownershipOverlay.flags.dualClass")}
             </span>
           )}
           {ownership.isLowFloat && !ownership.isSpinOffCandidate && (
             <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(242,54,69,0.12)", color: "#f23645", fontWeight: 600 }}>
-              Lågt float
+              {t("ownershipOverlay.flags.lowFloat")}
             </span>
           )}
           {ownership.source === "curated" && (
             <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(8,153,129,0.12)", color: "#089981", fontWeight: 500 }}>
-              Kurerad
+              {t("ownershipOverlay.flags.curated")}
             </span>
           )}
         </div>

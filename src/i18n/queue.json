@@ -10,12 +10,13 @@
     "src/components/WeeklySummary.jsx",
     "src/components/PortfolioSummary.jsx"
   ],
-  "inReview": [],
-  "pending": [
+  "inReview": [
     "src/components/InvestmentPlanTracker.jsx",
     "src/components/AnalysisTab.jsx",
     "src/components/OwnershipOverlay.jsx",
-    "src/components/GapAnalysis.jsx",
+    "src/components/GapAnalysis.jsx"
+  ],
+  "pending": [
     "src/components/PremiumAnalyses.jsx",
     "src/components/ThesisReview.jsx",
     "src/components/InvestmentCompanies.jsx",

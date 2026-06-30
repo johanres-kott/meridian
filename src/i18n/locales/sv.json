@@ -120,5 +120,42 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "gapAnalysis": {
+    "title": "Analys",
+    "subtitle": "Fundamentala nyckeltal för {{count}} bolag",
+    "subtitleGroup": "Fundamentala nyckeltal för {{count}} bolag i {{group}}",
+    "compare": "Jämför ({{count}})",
+    "all": "Alla ({{count}})",
+    "loading": "Laddar nyckeltal...",
+    "emptyWatchlist": "Inga bolag i watchlisten — lägg till bolag på Portfölj-sidan",
+    "emptyGroup": "Inga bolag i \"{{group}}\"",
+    "columns": {
+      "name": "Bolag",
+      "price": "Kurs",
+      "changePercent": "Δ Idag",
+      "peForward": "P/E Fwd",
+      "peTrailing": "P/E Trail",
+      "ebitdaMargin": "EBITDA %",
+      "operatingMargin": "Rör.marg",
+      "grossMargin": "Brutto %",
+      "revenueGrowth": "Tillväxt",
+      "roic": "ROIC",
+      "debtEbitda": "Skuld/EBITDA",
+      "dividendYield": "Utdelning"
+    },
+    "tips": {
+      "price": "Aktiens senaste pris",
+      "changePercent": "Kursförändring idag i procent",
+      "peForward": "Price/Earnings Forward — aktiekursen delat med förväntad vinst per aktie. Lägre = billigare.",
+      "peTrailing": "Price/Earnings Trailing — aktiekursen delat med senaste årets vinst per aktie.",
+      "ebitdaMargin": "Vinst före räntor, skatt och avskrivningar som andel av omsättningen. Mäter operativ lönsamhet.",
+      "operatingMargin": "Rörelsemarginal — rörelseresultat delat med omsättning. Visar hur mycket av varje krona som blir vinst.",
+      "grossMargin": "Bruttomarginal — omsättning minus varukostnad, delat med omsättning. Högre = bättre prisförmåga.",
+      "revenueGrowth": "Omsättningstillväxt jämfört med föregående år.",
+      "roic": "Return on Invested Capital — avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar.",
+      "debtEbitda": "Nettoskuld delat med EBITDA. Över 3x anses högt belånat.",
+      "dividendYield": "Direktavkastning — årlig utdelning delat med aktiekursen. Högre = mer pengar tillbaka varje år."
+    }
   }
 }

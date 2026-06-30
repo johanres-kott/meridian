@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { fmt } from "./shared.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -8,21 +9,6 @@ import { getFlag } from "../constants.js";
 
 const MOBILE_COLUMNS = new Set(["name", "price", "changePercent", "peForward"]);
 
-const ALL_COLUMNS = {
-  name: { key: "name", label: "Bolag", align: "left" },
-  price: { key: "price", label: "Kurs", align: "right", tip: "Aktiens senaste pris", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
-  changePercent: { key: "changePercent", label: "\u0394 Idag", align: "right", tip: "Kursf\u00f6r\u00e4ndring idag i procent", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "var(--text-secondary)" },
-  peForward: { key: "peForward", label: "P/E Fwd", align: "right", tip: "Price/Earnings Forward \u2014 aktiekursen delat med f\u00f6rv\u00e4ntad vinst per aktie. L\u00e4gre = billigare.", fmt: v => fmt(v, "x") },
-  peTrailing: { key: "peTrailing", label: "P/E Trail", align: "right", tip: "Price/Earnings Trailing \u2014 aktiekursen delat med senaste \u00e5rets vinst per aktie.", fmt: v => fmt(v, "x") },
-  ebitdaMargin: { key: "ebitdaMargin", label: "EBITDA %", align: "right", tip: "Vinst f\u00f6re r\u00e4ntor, skatt och avskrivningar som andel av oms\u00e4ttningen. M\u00e4ter operativ l\u00f6nsamhet.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  operatingMargin: { key: "operatingMargin", label: "R\u00f6r.marg", align: "right", tip: "R\u00f6relsemarginal \u2014 r\u00f6relseresultat delat med oms\u00e4ttning. Visar hur mycket av varje krona som blir vinst.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  grossMargin: { key: "grossMargin", label: "Brutto %", align: "right", tip: "Bruttomarginal \u2014 oms\u00e4ttning minus varukostnad, delat med oms\u00e4ttning. H\u00f6gre = b\u00e4ttre prisf\u00f6rm\u00e5ga.", fmt: v => fmt(v, "%") },
-  revenueGrowth: { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", tip: "Oms\u00e4ttningstillv\u00e4xt j\u00e4mf\u00f6rt med f\u00f6reg\u00e5ende \u00e5r.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
-  roic: { key: "roic", label: "ROIC", align: "right", tip: "Return on Invested Capital \u2014 avkastning p\u00e5 investerat kapital. Visar hur effektivt bolaget anv\u00e4nder sina pengar.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  debtEbitda: { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", tip: "Nettoskuld delat med EBITDA. \u00d6ver 3x anses h\u00f6gt bel\u00e5nat.", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
-  dividendYield: { key: "dividendYield", label: "Utdelning", align: "right", tip: "Direktavkastning \u2014 \u00e5rlig utdelning delat med aktiekursen. H\u00f6gre = mer pengar tillbaka varje \u00e5r.", fmt: v => fmt(v, "%"), color: v => v > 3 ? "#089981" : null },
-};
-
 const COLUMN_ORDERS = {
   value: ["name", "price", "changePercent", "peForward", "peTrailing", "debtEbitda", "grossMargin", "roic", "operatingMargin", "ebitdaMargin", "revenueGrowth", "dividendYield"],
   growth: ["name", "price", "changePercent", "revenueGrowth", "roic", "operatingMargin", "peForward", "ebitdaMargin", "grossMargin", "peTrailing", "debtEbitda", "dividendYield"],
@@ -30,15 +16,35 @@ const COLUMN_ORDERS = {
   default: ["name", "price", "changePercent", "peForward", "peTrailing", "ebitdaMargin", "operatingMargin", "grossMargin", "revenueGrowth", "roic", "debtEbitda", "dividendYield"],
 };
 
-function getColumns(investorType) {
+function getAllColumns(t, numberLocale) {
+  return {
+    name: { key: "name", label: t("gapAnalysis.columns.name"), align: "left" },
+    price: { key: "price", label: t("gapAnalysis.columns.price"), align: "right", tip: t("gapAnalysis.tips.price"), fmt: (v, d) => v ? `${v.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "—" },
+    changePercent: { key: "changePercent", label: t("gapAnalysis.columns.changePercent"), align: "right", tip: t("gapAnalysis.tips.changePercent"), fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "—", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "var(--text-secondary)" },
+    peForward: { key: "peForward", label: t("gapAnalysis.columns.peForward"), align: "right", tip: t("gapAnalysis.tips.peForward"), fmt: v => fmt(v, "x") },
+    peTrailing: { key: "peTrailing", label: t("gapAnalysis.columns.peTrailing"), align: "right", tip: t("gapAnalysis.tips.peTrailing"), fmt: v => fmt(v, "x") },
+    ebitdaMargin: { key: "ebitdaMargin", label: t("gapAnalysis.columns.ebitdaMargin"), align: "right", tip: t("gapAnalysis.tips.ebitdaMargin"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+    operatingMargin: { key: "operatingMargin", label: t("gapAnalysis.columns.operatingMargin"), align: "right", tip: t("gapAnalysis.tips.operatingMargin"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+    grossMargin: { key: "grossMargin", label: t("gapAnalysis.columns.grossMargin"), align: "right", tip: t("gapAnalysis.tips.grossMargin"), fmt: v => fmt(v, "%") },
+    revenueGrowth: { key: "revenueGrowth", label: t("gapAnalysis.columns.revenueGrowth"), align: "right", tip: t("gapAnalysis.tips.revenueGrowth"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
+    roic: { key: "roic", label: t("gapAnalysis.columns.roic"), align: "right", tip: t("gapAnalysis.tips.roic"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+    debtEbitda: { key: "debtEbitda", label: t("gapAnalysis.columns.debtEbitda"), align: "right", tip: t("gapAnalysis.tips.debtEbitda"), fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
+    dividendYield: { key: "dividendYield", label: t("gapAnalysis.columns.dividendYield"), align: "right", tip: t("gapAnalysis.tips.dividendYield"), fmt: v => fmt(v, "%"), color: v => v > 3 ? "#089981" : null },
+  };
+}
+
+function getColumns(investorType, allCols) {
   const order = COLUMN_ORDERS[investorType] || COLUMN_ORDERS.default;
-  return order.map(key => ALL_COLUMNS[key]).filter(Boolean);
+  return order.map(key => allCols[key]).filter(Boolean);
 }
 
 export default function GapAnalysis({ onNavigate }) {
+  const { t, i18n } = useTranslation();
   const { preferences } = useUser();
   const isMobile = useIsMobile();
-  const allColumns = getColumns(preferences.investorProfile?.investorType);
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
+  const allColumnsDef = getAllColumns(t, numberLocale);
+  const allColumns = getColumns(preferences.investorProfile?.investorType, allColumnsDef);
   const columns = isMobile ? allColumns.filter(c => MOBILE_COLUMNS.has(c.key)) : allColumns;
   const [items, setItems] = useState([]);
   const [companyData, setCompanyData] = useState({});
@@ -58,7 +64,6 @@ export default function GapAnalysis({ onNavigate }) {
       const { data } = await supabase.from("watchlist").select("*").eq("user_id", user.id).order("created_at");
       setItems(data || []);
 
-      // Fetch company data for all items
       const results = await Promise.all(
         (data || []).map(async (item) => {
           try {
@@ -88,7 +93,6 @@ export default function GapAnalysis({ onNavigate }) {
     }
   }
 
-  // Filter items by active group
   const filteredItems = activeGroup
     ? items.filter(item => {
         const group = groups.find(g => g.name === activeGroup);
@@ -161,9 +165,11 @@ export default function GapAnalysis({ onNavigate }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 500 }}>Analys</h1>
+        <h1 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 500 }}>{t("gapAnalysis.title")}</h1>
         <p style={{ fontSize: isMobile ? 11 : 12, color: "var(--text-secondary)", marginTop: 2 }}>
-          Fundamentala nyckeltal f&ouml;r {filteredItems.length} bolag{activeGroup ? ` i ${activeGroup}` : ""}
+          {activeGroup
+            ? t("gapAnalysis.subtitleGroup", { count: filteredItems.length, group: activeGroup })
+            : t("gapAnalysis.subtitle", { count: filteredItems.length })}
         </p>
         {selectedForCompare.size >= 2 && (
           <button
@@ -175,12 +181,11 @@ export default function GapAnalysis({ onNavigate }) {
               width: isMobile ? "100%" : "auto",
             }}
           >
-            J&auml;mf&ouml;r ({selectedForCompare.size})
+            {t("gapAnalysis.compare", { count: selectedForCompare.size })}
           </button>
         )}
       </div>
 
-      {/* Group filter bar */}
       {groups.length > 0 && !loading && items.length > 0 && (
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
           <button
@@ -193,7 +198,7 @@ export default function GapAnalysis({ onNavigate }) {
               cursor: "pointer", fontFamily: "inherit", fontWeight: activeGroup === null ? 500 : 400,
             }}
           >
-            Alla ({items.length})
+            {t("gapAnalysis.all", { count: items.length })}
           </button>
           {groups.map(g => {
             const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
@@ -218,14 +223,14 @@ export default function GapAnalysis({ onNavigate }) {
       )}
 
       {loading ? (
-        <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Laddar nyckeltal...</div>
+        <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>{t("gapAnalysis.loading")}</div>
       ) : items.length === 0 ? (
         <div style={{ padding: "60px 0", textAlign: "center", color: "var(--text-secondary)", fontSize: 13 }}>
-          Inga bolag i watchlisten &mdash; l&auml;gg till bolag p&aring; Portf&ouml;lj-sidan
+          {t("gapAnalysis.emptyWatchlist")}
         </div>
       ) : filteredItems.length === 0 ? (
         <div style={{ padding: "60px 0", textAlign: "center", color: "var(--text-secondary)", fontSize: 13 }}>
-          Inga bolag i &ldquo;{activeGroup}&rdquo;
+          {t("gapAnalysis.emptyGroup", { group: activeGroup })}
         </div>
       ) : (
         <div style={{ border: "1px solid var(--border)", borderRadius: 4, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
@@ -238,7 +243,7 @@ export default function GapAnalysis({ onNavigate }) {
                   <th key={col.key} onClick={() => handleSort(col.key)} style={thStyle(col)} title={col.tip || ""}>
                     {col.label}
                     {col.tip && <span style={{ marginLeft: 2, fontSize: 9, color: "var(--text-muted)", cursor: "help" }}>?</span>}
-                    {sortKey === col.key && <span style={{ marginLeft: 4 }}>{sortAsc ? "\u25B2" : "\u25BC"}</span>}
+                    {sortKey === col.key && <span style={{ marginLeft: 4 }}>{sortAsc ? "▲" : "▼"}</span>}
                   </th>
                 ))}
               </tr>
@@ -277,7 +282,7 @@ export default function GapAnalysis({ onNavigate }) {
                         );
                       }
 
-                      const formatted = col.fmt ? col.fmt(val, d) : (val ?? "\u2014");
+                      const formatted = col.fmt ? col.fmt(val, d) : (val ?? "—");
 
                       return (
                         <td key={col.key} style={{ ...tdStyle(col), color: cellColor || "var(--text)" }}>

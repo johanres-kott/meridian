@@ -120,5 +120,42 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "gapAnalysis": {
+    "title": "Analysis",
+    "subtitle": "Key metrics for {{count}} companies",
+    "subtitleGroup": "Key metrics for {{count}} companies in {{group}}",
+    "compare": "Compare ({{count}})",
+    "all": "All ({{count}})",
+    "loading": "Loading key metrics...",
+    "emptyWatchlist": "No companies in your watchlist — add companies on the Portfolio page",
+    "emptyGroup": "No companies in \"{{group}}\"",
+    "columns": {
+      "name": "Company",
+      "price": "Price",
+      "changePercent": "Δ Today",
+      "peForward": "P/E Fwd",
+      "peTrailing": "P/E Trail",
+      "ebitdaMargin": "EBITDA %",
+      "operatingMargin": "Op. margin",
+      "grossMargin": "Gross %",
+      "revenueGrowth": "Growth",
+      "roic": "ROIC",
+      "debtEbitda": "Debt/EBITDA",
+      "dividendYield": "Dividend"
+    },
+    "tips": {
+      "price": "Latest share price",
+      "changePercent": "Price change today in percent",
+      "peForward": "Price/Earnings Forward — share price divided by expected earnings per share. Lower = cheaper.",
+      "peTrailing": "Price/Earnings Trailing — share price divided by last year's earnings per share.",
+      "ebitdaMargin": "Earnings before interest, tax, and depreciation as a share of revenue. Measures operating profitability.",
+      "operatingMargin": "Operating margin — operating income divided by revenue. Shows how much of each unit of revenue becomes profit.",
+      "grossMargin": "Gross margin — revenue minus cost of goods, divided by revenue. Higher = better pricing power.",
+      "revenueGrowth": "Revenue growth compared to the previous year.",
+      "roic": "Return on Invested Capital. Shows how efficiently the company uses its capital.",
+      "debtEbitda": "Net debt divided by EBITDA. Above 3x is considered highly leveraged.",
+      "dividendYield": "Dividend yield — annual dividend divided by the share price. Higher = more cash returned each year."
+    }
   }
 }

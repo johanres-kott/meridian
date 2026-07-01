@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { usePremium } from "../hooks/usePremium.js";
 import { supabase } from "../supabase.js";
 import PremiumGate from "./PremiumGate.jsx";
@@ -38,6 +39,7 @@ function AnalysisCard({ analysis, onSelect }) {
 }
 
 function CompanyAnalysis({ company }) {
+  const { t } = useTranslation();
   if (!company) return null;
   return (
     <div style={{
@@ -82,7 +84,7 @@ function CompanyAnalysis({ company }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {company.strengths?.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#089981", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Styrkor</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#089981", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>{t("premiumAnalyses.strengths")}</div>
               <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
                 {company.strengths.map((s, i) => <li key={i}>{s}</li>)}
               </ul>
@@ -90,7 +92,7 @@ function CompanyAnalysis({ company }) {
           )}
           {company.risks?.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#f23645", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Risker</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#f23645", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>{t("premiumAnalyses.risks")}</div>
               <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
                 {company.risks.map((r, i) => <li key={i}>{r}</li>)}
               </ul>
@@ -103,6 +105,7 @@ function CompanyAnalysis({ company }) {
 }
 
 function PdfButton({ slug }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   async function openPdf() {
@@ -131,18 +134,19 @@ function PdfButton({ slug }) {
         borderRadius: 6, cursor: loading ? "default" : "pointer", fontFamily: "inherit",
       }}
     >
-      {loading ? "Laddar..." : "Läs hela rapporten (PDF)"}
+      {loading ? t("common.loading") : t("premiumAnalyses.pdfButton")}
     </button>
   );
 }
 
 function AnalysisDetail({ analysis, onBack }) {
+  const { t } = useTranslation();
   if (!analysis) return null;
   return (
     <div>
       <button onClick={onBack}
         style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 16 }}>
-        &larr; Tillbaka till analyser
+        {t("premiumAnalyses.backToAnalyses")}
       </button>
 
       <div style={{ marginBottom: 24 }}>
@@ -160,7 +164,7 @@ function AnalysisDetail({ analysis, onBack }) {
           background: "rgba(8,153,129,0.04)", border: "1px solid rgba(8,153,129,0.15)",
           borderRadius: 8, padding: 20, marginTop: 8,
         }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Slutsats</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>{t("premiumAnalyses.conclusion")}</div>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
             {analysis.conclusion}
           </p>
@@ -170,14 +174,14 @@ function AnalysisDetail({ analysis, onBack }) {
       {analysis.pdf_url && <PdfButton slug={analysis.slug} />}
 
       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 12 }}>
-        Denna analys är framtagen med AI-stöd och verifierad mot publika finansiella datakällor.
-        Den utgör inte investeringsrådgivning. Gör alltid din egen research.
+        {t("premiumAnalyses.disclaimer")}
       </div>
     </div>
   );
 }
 
 export default function PremiumAnalyses({ isMobile }) {
+  const { t } = useTranslation();
   const { premium, loading, checkoutLoading, error, startCheckout } = usePremium();
   const [analyses, setAnalyses] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -202,7 +206,7 @@ export default function PremiumAnalyses({ isMobile }) {
           setAnalyses([data]);
         }
       } catch (err) {
-        setFetchError("Kunde inte ladda analyser");
+        setFetchError(true);
       }
       setFetchLoading(false);
     }
@@ -233,9 +237,9 @@ export default function PremiumAnalyses({ isMobile }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div>
-          <h2 style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", margin: 0 }}>Rapporter</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", margin: 0 }}>{t("premiumAnalyses.title")}</h2>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
-            Djupanalyser och sektorrapporter
+            {t("premiumAnalyses.subtitle")}
           </div>
         </div>
         {premium && (
@@ -251,15 +255,15 @@ export default function PremiumAnalyses({ isMobile }) {
       <PremiumGate premium={premium} loading={loading} checkoutLoading={checkoutLoading} error={error} onSubscribe={startCheckout}>
         {fetchLoading ? (
           <div style={{ textAlign: "center", padding: 40, color: "var(--text-muted)", fontSize: 13 }}>
-            Laddar analyser...
+            {t("premiumAnalyses.loading")}
           </div>
         ) : fetchError ? (
           <div style={{ textAlign: "center", padding: 40, color: "#f23645", fontSize: 13 }}>
-            {fetchError}
+            {t("premiumAnalyses.loadError")}
           </div>
         ) : analyses.length === 0 ? (
           <div style={{ textAlign: "center", padding: 40, color: "var(--text-muted)", fontSize: 13 }}>
-            Inga analyser tillgängliga ännu.
+            {t("premiumAnalyses.noAnalyses")}
           </div>
         ) : selected ? (
           <AnalysisDetail analysis={selected} onBack={() => setSelected(null)} />

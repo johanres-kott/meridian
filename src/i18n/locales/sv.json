@@ -120,5 +120,18 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "premiumAnalyses": {
+    "title": "Rapporter",
+    "subtitle": "Djupanalyser och sektorrapporter",
+    "loading": "Laddar analyser...",
+    "loadError": "Kunde inte ladda analyser",
+    "noAnalyses": "Inga analyser tillgängliga ännu.",
+    "strengths": "Styrkor",
+    "risks": "Risker",
+    "pdfButton": "Läs hela rapporten (PDF)",
+    "backToAnalyses": "← Tillbaka till analyser",
+    "conclusion": "Slutsats",
+    "disclaimer": "Denna analys är framtagen med AI-stöd och verifierad mot publika finansiella datakällor. Den utgör inte investeringsrådgivning. Gör alltid din egen research."
   }
 }

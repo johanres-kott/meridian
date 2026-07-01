@@ -120,5 +120,18 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "premiumAnalyses": {
+    "title": "Reports",
+    "subtitle": "In-depth analyses and sector reports",
+    "loading": "Loading analyses...",
+    "loadError": "Could not load analyses",
+    "noAnalyses": "No analyses available yet.",
+    "strengths": "Strengths",
+    "risks": "Risks",
+    "pdfButton": "Read the full report (PDF)",
+    "backToAnalyses": "← Back to analyses",
+    "conclusion": "Conclusion",
+    "disclaimer": "This analysis was produced with AI assistance and verified against public financial data sources. It does not constitute investment advice. Always do your own research."
   }
 }

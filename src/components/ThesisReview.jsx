@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
 import { sanitizeInput } from "../lib/sanitize.js";
 import {
@@ -10,26 +11,14 @@ import {
   DEFAULT_REVIEW_MONTHS,
 } from "../lib/thesisReview.js";
 
-const STATUS_LABELS = {
-  active: "Aktiv tes",
-  weakening: "Försvagad",
-  broken: "Bruten",
-};
-
 const STATUS_COLORS = {
   active: { bg: "rgba(8,153,129,0.12)", fg: "#089981" },
   weakening: { bg: "rgba(255,152,0,0.15)", fg: "#ff9800" },
   broken: { bg: "rgba(242,54,69,0.15)", fg: "#f23645" },
 };
 
-const REVIEW_QUESTIONS = [
-  "Är intäktstillväxten och marginalerna på banan jag antog när jag köpte?",
-  "Har konkurrensläget eller marknaden förändrats sedan köpet?",
-  "Har ledningen levererat på det de lovade?",
-  "Vad skulle få mig att sälja imorgon?",
-];
-
 export default function ThesisReview({ items, prices = {}, onUpdate, onSelect, isMobile }) {
+  const { t } = useTranslation();
   const { preferences, updatePreferences } = useUser();
 
   const thresholdPct = preferences.thesisThresholdPct ?? DEFAULT_THRESHOLD_PCT;
@@ -76,7 +65,7 @@ export default function ThesisReview({ items, prices = {}, onUpdate, onSelect, i
   if (stocks.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text-secondary)", fontSize: 13 }}>
-        Inga aktier i bevakningslistan att granska tesen för.
+        {t("thesisReview.noStocks")}
       </div>
     );
   }
@@ -105,15 +94,14 @@ export default function ThesisReview({ items, prices = {}, onUpdate, onSelect, i
       </div>
 
       <div style={{ marginTop: 12, fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5 }}>
-        Tesgranskningen är ett verktyg för reflektion, inte en köp/sälj-signal.
-        Vinnar-/förlorartröskeln går på {thresholdPct}% sedan köp. En tes anses
-        färsk om den granskats inom {reviewMonths} månader.
+        {t("thesisReview.disclaimer", { thresholdPct, reviewMonths })}
       </div>
     </div>
   );
 }
 
 function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChange, isMobile }) {
+  const { t } = useTranslation();
   const { counts, avgWinnerReturnPct, avgLoserReturnPct } = summary;
   const hasWinnerWarning = counts.winner_stale > 0;
   const hasLoserWarning = counts.loser_stale > 0;
@@ -140,15 +128,15 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", flexDirection: isMobile ? "column" : "row", gap: 8, marginBottom: 12 }}>
         <div>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
-            Tesgranskning
+            {t("thesisReview.sectionTitle")}
           </div>
           <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-            Behåll bolag där tesen håller. Sälj där tesen är bruten — inte för att kursen rört sig.
+            {t("thesisReview.sectionSubtitle")}
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-muted)" }}>
-          <span>Vinnar-/förlorartröskel:</span>
+          <span>{t("thesisReview.thresholdLabel")}</span>
           {editingThreshold ? (
             <>
               <input
@@ -178,22 +166,22 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
         {hasWinnerWarning && (
           <NudgeRow
             tone="warning"
-            title={`${counts.winner_stale} vinnare ej granskade på ${reviewMonths}+ mån`}
-            body={`Du har bolag som gått upp >${thresholdPct}% men vars tes du inte gått igenom på länge. Riskerar du att sälja för tidigt? Läs på innan du agerar.`}
+            title={t("thesisReview.winnerWarningTitle", { count: counts.winner_stale, months: reviewMonths })}
+            body={t("thesisReview.winnerWarningBody", { threshold: thresholdPct })}
           />
         )}
         {hasLoserWarning && (
           <NudgeRow
             tone="danger"
-            title={`${counts.loser_stale} förlorare med aktiv tes utan granskning`}
-            body={`Du sitter på bolag som gått ner >${thresholdPct}% och har fortfarande markerat tesen som aktiv. Verifiera att tesen håller — annars markera den som försvagad eller bruten.`}
+            title={t("thesisReview.loserWarningTitle", { count: counts.loser_stale })}
+            body={t("thesisReview.loserWarningBody", { threshold: thresholdPct })}
           />
         )}
         {!hasWinnerWarning && !hasLoserWarning && counts.winner_fresh + counts.loser_fresh > 0 && (
           <NudgeRow
             tone="ok"
-            title="Inga akuta granskningar"
-            body="Alla dina vinnare och förlorare har antingen granskats nyligen eller har en uppdaterad tes-status. Bra disciplin."
+            title={t("thesisReview.allGoodTitle")}
+            body={t("thesisReview.allGoodBody")}
           />
         )}
       </div>
@@ -203,7 +191,7 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
         <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)", display: "flex", gap: 24, flexWrap: "wrap" }}>
           {avgWinnerReturnPct != null && (
             <div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vägt snitt, vinnare</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("thesisReview.avgWinner")}</div>
               <div style={{ fontSize: 15, fontWeight: 500, color: "#089981", fontFamily: "'IBM Plex Mono', monospace" }}>
                 +{avgWinnerReturnPct.toFixed(1)}%
               </div>
@@ -211,14 +199,14 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
           )}
           {avgLoserReturnPct != null && (
             <div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vägt snitt, förlorare</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("thesisReview.avgLoser")}</div>
               <div style={{ fontSize: 15, fontWeight: 500, color: "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>
                 {avgLoserReturnPct.toFixed(1)}%
               </div>
             </div>
           )}
           <div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Bolag att granska</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("thesisReview.toReview")}</div>
             <div style={{ fontSize: 15, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
               {counts.winner_stale + counts.loser_stale}
             </div>
@@ -252,6 +240,8 @@ function NudgeRow({ tone, title, body }) {
 }
 
 function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { item, returnPct, monthsSinceReview, category, currentPrice } = row;
   const [thesisText, setThesisText] = useState(item.thesis_text || "");
   const [editing, setEditing] = useState(false);
@@ -293,10 +283,10 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
     : "var(--border)";
 
   const monthsLabel = monthsSinceReview == null
-    ? "Aldrig granskad"
+    ? t("thesisReview.neverReviewed")
     : monthsSinceReview < 1
-      ? "Granskad nyligen"
-      : `Granskad för ${Math.round(monthsSinceReview)} mån sedan`;
+      ? t("thesisReview.reviewedRecently")
+      : t("thesisReview.reviewedMonthsAgo", { months: Math.round(monthsSinceReview) });
 
   const monthsColor = monthsSinceReview == null || monthsSinceReview >= reviewMonths
     ? "#ff9800"
@@ -319,7 +309,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
             {item.ticker}
             {item.shares > 0 && item.gav && (
-              <span style={{ marginLeft: 8 }}>· {item.shares} st à {item.gav.toLocaleString("sv-SE", { maximumFractionDigits: 2 })}</span>
+              <span style={{ marginLeft: 8 }}>· {t("thesisReview.sharesAt", { shares: item.shares, gav: item.gav.toLocaleString(numberLocale, { maximumFractionDigits: 2 }) })}</span>
             )}
           </div>
         </div>
@@ -327,7 +317,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
           {returnPct != null && (
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Sedan köp</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("thesisReview.sincePurchase")}</div>
               <div style={{
                 fontSize: 15, fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace",
                 color: returnPct >= 0 ? "#089981" : "#f23645",
@@ -336,13 +326,13 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
               </div>
               {currentPrice != null && (
                 <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-                  {currentPrice.toLocaleString("sv-SE", { maximumFractionDigits: 2 })}
+                  {currentPrice.toLocaleString(numberLocale, { maximumFractionDigits: 2 })}
                 </div>
               )}
             </div>
           )}
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Granskning</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("thesisReview.reviewHeader")}</div>
             <div style={{ fontSize: 11, fontWeight: 500, color: monthsColor }}>
               {monthsLabel}
             </div>
@@ -372,7 +362,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
                 opacity: saving ? 0.6 : 1,
               }}
             >
-              {STATUS_LABELS[s]}
+              {t(`thesisReview.status_${s}`)}
             </button>
           );
         })}
@@ -385,7 +375,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
             value={thesisText}
             onChange={e => setThesisText(e.target.value)}
             autoFocus
-            placeholder="Varför ägde du detta bolag från början? Vad var trigger-punkten?"
+            placeholder={t("thesisReview.thesisPlaceholder")}
             style={{ width: "100%", minHeight: 100, padding: "10px 12px", border: "1px solid var(--accent)", borderRadius: 4, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box" }}
           />
 
@@ -394,11 +384,13 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
               onClick={() => setShowQuestions(!showQuestions)}
               style={{ fontSize: 11, padding: "3px 8px", border: "none", background: "transparent", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}
             >
-              {showQuestions ? "Dölj" : "Visa"} frågor att fundera på
+              {t(showQuestions ? "thesisReview.hideQuestionsBtn" : "thesisReview.showQuestionsBtn")}
             </button>
             {showQuestions && (
               <ul style={{ marginTop: 6, paddingLeft: 18, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-                {REVIEW_QUESTIONS.map((q, i) => <li key={i}>{q}</li>)}
+                {["reviewQ1", "reviewQ2", "reviewQ3", "reviewQ4"].map((key, i) => (
+                  <li key={i}>{t(`thesisReview.${key}`)}</li>
+                ))}
               </ul>
             )}
           </div>
@@ -409,14 +401,14 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
               disabled={saving}
               style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "#2962ff", color: "#fff", cursor: saving ? "default" : "pointer", fontFamily: "inherit", opacity: saving ? 0.6 : 1 }}
             >
-              {saving ? "Sparar..." : "Spara & markera granskad"}
+              {t(saving ? "thesisReview.saving" : "thesisReview.saveAndMarkReviewed")}
             </button>
             <button
               onClick={() => { setThesisText(item.thesis_text || ""); setEditing(false); }}
               disabled={saving}
               style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}
             >
-              Avbryt
+              {t("thesisReview.cancel")}
             </button>
           </div>
         </div>
@@ -427,13 +419,13 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
             color: thesisText ? "var(--text)" : "var(--text-muted)",
             whiteSpace: "pre-wrap", minHeight: 24,
           }}>
-            {thesisText || "Ingen tes nedskriven ännu. Klicka Redigera för att lägga till varför du köpte."}
+            {thesisText || t("thesisReview.noThesisText")}
           </div>
           <button
             onClick={() => setEditing(true)}
             style={{ marginTop: 8, fontSize: 11, padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 3, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit", color: "var(--text)" }}
           >
-            {thesisText ? "Granska & redigera tes" : "Skriv tes"}
+            {t(thesisText ? "thesisReview.editThesisBtn" : "thesisReview.writeThesisBtn")}
           </button>
         </div>
       )}

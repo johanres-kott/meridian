@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { PriceChart } from "./SharedComponents.jsx";
 import SmartSuggestions from "./SmartSuggestions.jsx";
@@ -20,6 +21,8 @@ import PensionInvest from "./PensionInvest.jsx";
 export default function InvestmentCompanies({ onNavigate }) {
   const { userId, preferences } = useUser();
   const isMobile = useIsMobile();
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [selectedId, setSelectedId] = useState("investor");
   const [tickers, setTickers] = useState([]);
   const [suggestMode, setSuggestMode] = useState("stock"); // "stock" | "fund"
@@ -49,9 +52,9 @@ export default function InvestmentCompanies({ onNavigate }) {
       {/* ── Sub-navigation ── */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 24 }}>
         {[
-          { id: "toppforslag", label: "Toppförslag" },
-          { id: "pension", label: "Pension" },
-          { id: "investmentbolag", label: "Investmentbolag" },
+          { id: "toppforslag", label: t("investmentCompanies.tabSuggestions") },
+          { id: "pension", label: t("investmentCompanies.tabPension") },
+          { id: "investmentbolag", label: t("investmentCompanies.tabCompanies") },
         ].map(tab => (
           <button
             key={tab.id}
@@ -74,11 +77,11 @@ export default function InvestmentCompanies({ onNavigate }) {
       {/* ── Smart Suggestions ── */}
       {subTab === "toppforslag" && <div style={{ marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)" }}>Toppförslag</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)" }}>{t("investmentCompanies.suggestionsTitle")}</div>
           <div style={{ display: "flex", gap: 4 }}>
             {[
-              { id: "stock", label: "Aktier" },
-              { id: "fund", label: "Fonder" },
+              { id: "stock", label: t("investmentCompanies.filterStocks") },
+              { id: "fund", label: t("investmentCompanies.filterFunds") },
             ].map(opt => (
               <button
                 key={opt.id}
@@ -110,24 +113,24 @@ export default function InvestmentCompanies({ onNavigate }) {
           />
         ) : (
           <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: 20, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
-            Skapa en investerarprofil för att få aktieförslag anpassade efter dig.
+            {t("investmentCompanies.noProfilePrompt")}
           </div>
         )}
       </div>}
 
       {/* ── Pension section ── */}
       {subTab === "pension" && <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Pensionssparande</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>{t("investmentCompanies.pensionTitle")}</div>
         <PensionInvest isMobile={isMobile} />
       </div>}
 
       {/* ── Investment companies section ── */}
-      {subTab === "investmentbolag" && <><div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>Investera som investmentbolag</div>
+      {subTab === "investmentbolag" && <><div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>{t("investmentCompanies.companiesTitle")}</div>
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8, letterSpacing: "0.04em" }}>
-          Investmentbolag <span style={{ margin: "0 4px" }}>›</span> {company.name}
+          {t("investmentCompanies.breadcrumb")} <span style={{ margin: "0 4px" }}>›</span> {company.name}
         </div>
         <CompanySelector selected={selectedId} onSelect={setSelectedId} isMobile={isMobile} />
       </div>
@@ -166,7 +169,7 @@ export default function InvestmentCompanies({ onNavigate }) {
           {companyData?.price != null && (
             <div style={{ textAlign: isMobile ? "left" : "right" }}>
               <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "var(--text)" }}>
-                {companyData.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {companyData.price.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 4 }}>{companyData.currency}</span>
               </div>
               {companyData.changePercent != null && (
@@ -194,19 +197,19 @@ export default function InvestmentCompanies({ onNavigate }) {
 
           {/* Leadership */}
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
-            <SectionLabel>Ledning</SectionLabel>
+            <SectionLabel>{t("investmentCompanies.sectionLeadership")}</SectionLabel>
             <LeadershipPanel companyId={selectedId} isMobile={isMobile} />
           </div>
 
           {/* Price chart */}
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
-            <SectionLabel>Kursutveckling</SectionLabel>
+            <SectionLabel>{t("investmentCompanies.sectionPrice")}</SectionLabel>
             <PriceChart ticker={fullTicker} />
           </div>
 
           {/* Holdings */}
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
-            <SectionLabel>Innehav</SectionLabel>
+            <SectionLabel>{t("investmentCompanies.sectionHoldings")}</SectionLabel>
             <HoldingsTable companyId={selectedId} />
           </div>
 
@@ -214,14 +217,14 @@ export default function InvestmentCompanies({ onNavigate }) {
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
-                <Badge text="Pressreleaser" color="var(--text-secondary)" bg="var(--border-light)" />
+                <Badge text={t("investmentCompanies.badgePressReleases")} color="var(--text-secondary)" bg="var(--border-light)" />
               }
             >
-              Senaste händelser
+              {t("investmentCompanies.sectionLatestEvents")}
             </SectionLabel>
             <EventList
               url={`/api/company-news?id=${selectedId}&count=8`}
-              emptyMsg="Inga pressreleaser hittade"
+              emptyMsg={t("investmentCompanies.noPressReleases")}
             />
           </div>
 
@@ -232,11 +235,11 @@ export default function InvestmentCompanies({ onNavigate }) {
                 <Badge text="EFN.se" color="var(--accent)" bg="var(--accent-light)" />
               }
             >
-              Nyheter &amp; Analyser
+              {t("investmentCompanies.sectionNews")}
             </SectionLabel>
             <EventList
               url={`/api/efn-news?id=${selectedId}&count=8`}
-              emptyMsg="Inga EFN-artiklar hittade"
+              emptyMsg={t("investmentCompanies.noEfnArticles")}
             />
           </div>
         </div>
@@ -248,16 +251,16 @@ export default function InvestmentCompanies({ onNavigate }) {
           {/* Quick links */}
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px" }}>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 10 }}>
-              Snabblänkar
+              {t("investmentCompanies.quickLinks")}
             </div>
             {[
-              { label: "Pressreleaser", href: `https://www.${company.url}/press` },
-              { label: "IR-sida",       href: `https://www.${company.url}/investor-relations` },
-              { label: "Bolagsstyrning",href: `https://www.${company.url}/bolagsstyrning` },
-              { label: "EFN-sök",       href: `https://efn.se/sok/alla?q=${encodeURIComponent(company.name)}&index=artiklar` },
+              { label: t("investmentCompanies.linkPressReleases"), href: `https://www.${company.url}/press` },
+              { label: t("investmentCompanies.linkIR"),             href: `https://www.${company.url}/investor-relations` },
+              { label: t("investmentCompanies.linkGovernance"),     href: `https://www.${company.url}/bolagsstyrning` },
+              { label: t("investmentCompanies.linkEfn"),            href: `https://efn.se/sok/alla?q=${encodeURIComponent(company.name)}&index=artiklar` },
             ].map(link => (
               <a
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"

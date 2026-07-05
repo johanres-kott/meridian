@@ -120,5 +120,30 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "investmentCompanies": {
+    "tabSuggestions": "Top suggestions",
+    "tabPension": "Pension",
+    "tabCompanies": "Investment companies",
+    "suggestionsTitle": "Top suggestions",
+    "filterStocks": "Stocks",
+    "filterFunds": "Funds",
+    "noProfilePrompt": "Create an investor profile to get stock suggestions tailored to you.",
+    "pensionTitle": "Pension savings",
+    "companiesTitle": "Invest like an investment company",
+    "breadcrumb": "Investment companies",
+    "sectionLeadership": "Leadership",
+    "sectionPrice": "Price performance",
+    "sectionHoldings": "Holdings",
+    "badgePressReleases": "Press releases",
+    "sectionLatestEvents": "Latest events",
+    "noPressReleases": "No press releases found",
+    "sectionNews": "News & Analysis",
+    "noEfnArticles": "No EFN articles found",
+    "quickLinks": "Quick links",
+    "linkPressReleases": "Press releases",
+    "linkIR": "IR page",
+    "linkGovernance": "Corporate governance",
+    "linkEfn": "EFN search"
   }
 }

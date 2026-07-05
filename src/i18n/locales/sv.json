@@ -120,5 +120,30 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "investmentCompanies": {
+    "tabSuggestions": "Toppförslag",
+    "tabPension": "Pension",
+    "tabCompanies": "Investmentbolag",
+    "suggestionsTitle": "Toppförslag",
+    "filterStocks": "Aktier",
+    "filterFunds": "Fonder",
+    "noProfilePrompt": "Skapa en investerarprofil för att få aktieförslag anpassade efter dig.",
+    "pensionTitle": "Pensionssparande",
+    "companiesTitle": "Investera som investmentbolag",
+    "breadcrumb": "Investmentbolag",
+    "sectionLeadership": "Ledning",
+    "sectionPrice": "Kursutveckling",
+    "sectionHoldings": "Innehav",
+    "badgePressReleases": "Pressreleaser",
+    "sectionLatestEvents": "Senaste händelser",
+    "noPressReleases": "Inga pressreleaser hittade",
+    "sectionNews": "Nyheter & Analyser",
+    "noEfnArticles": "Inga EFN-artiklar hittade",
+    "quickLinks": "Snabblänkar",
+    "linkPressReleases": "Pressreleaser",
+    "linkIR": "IR-sida",
+    "linkGovernance": "Bolagsstyrning",
+    "linkEfn": "EFN-sök"
   }
 }

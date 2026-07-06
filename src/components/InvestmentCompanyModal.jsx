@@ -1,19 +1,22 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { INVESTMENT_COMPANIES } from "../lib/investmentCompanies.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
 const HOLDINGS_API = "/api/holdings";
 
-function formatValue(msek) {
+function formatValue(msek, locale) {
   if (msek >= 1000) {
     const mdkr = msek / 1000;
     return `${mdkr % 1 === 0 ? mdkr.toFixed(0) : mdkr.toFixed(1)} Mdkr`;
   }
-  return `${msek.toLocaleString("sv-SE")} Mkr`;
+  return `${msek.toLocaleString(locale)} Mkr`;
 }
 
 export default function InvestmentCompanyModal({ onClose, existingItems, onImport, groups, onSetActiveGroup }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { updatePreferences } = useUser();
   const isMobile = useIsMobile();
   const [selected, setSelected] = useState(null);
@@ -50,7 +53,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
   async function doCreate() {
     if (!groupName.trim()) return;
     if (groupNames.has(groupName.trim())) {
-      setError(`Gruppen "${groupName.trim()}" finns redan. Välj ett annat namn.`);
+      setError(t("investmentCompanyModal.errorDuplicateGroup", { name: groupName.trim() }));
       return;
     }
     setError(null);
@@ -72,7 +75,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
           ticker: h.ticker, name: h.name, shares: null, gav: null,
         })));
         if (result?.error) {
-          setError("Kunde inte lägga till bolag: " + result.error.message);
+          setError(t("investmentCompanyModal.errorAddCompany", { message: result.error.message }));
           setImporting(false);
           return;
         }
@@ -85,7 +88,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
       onSetActiveGroup(groupName.trim());
       onClose();
     } catch (err) {
-      setError(err.message || "Något gick fel.");
+      setError(err.message || t("investmentCompanyModal.errorGeneric"));
       setImporting(false);
     }
   }
@@ -102,10 +105,10 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
 
         {!selected ? (
           <>
-            <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 4 }}>Skapa grupp från investmentbolag</div>
+            <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 4 }}>{t("investmentCompanyModal.title")}</div>
             <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 20 }}>
-              Välj ett investmentbolag för att skapa en grupp med deras noterade innehav.
-              {loading && " Hämtar data..."}
+              {t("investmentCompanyModal.subtitle")}
+              {loading && ` ${t("investmentCompanyModal.loadingData")}`}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -125,23 +128,23 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text)" }}>{company.name}</div>
                     <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
-                      {company.holdings.length} noterade innehav
+                      {t("investmentCompanyModal.holdingsCount", { count: company.holdings.length })}
                     </div>
                   </div>
                   <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                    Uppdaterad {company.lastUpdated}
+                    {t("investmentCompanyModal.updatedAt", { date: company.lastUpdated })}
                   </div>
                 </button>
               ))}
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-              <button onClick={onClose} style={btnSecondary}>Avbryt</button>
+              <button onClick={onClose} style={btnSecondary}>{t("investmentCompanyModal.cancel")}</button>
             </div>
           </>
         ) : importing ? (
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <div style={{ fontSize: 13, color: "var(--text)" }}>Skapar grupp...</div>
+            <div style={{ fontSize: 13, color: "var(--text)" }}>{t("investmentCompanyModal.creating")}</div>
           </div>
         ) : (() => {
           const hasValues = selected.holdings.some(h => h.valueMSEK != null);
@@ -160,16 +163,17 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
               </div>
             </div>
             <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 16 }}>
-              {selected.holdings.length} noterade innehav{totalWeight > 0 ? ` — ${totalWeight.toFixed(1).replace(".0", "")}% av totala tillgångar` : ""}
+              {t("investmentCompanyModal.holdingsCount", { count: selected.holdings.length })}
+              {totalWeight > 0 ? ` ${t("investmentCompanyModal.weightSuffix", { weight: totalWeight.toFixed(1).replace(".0", "") })}` : ""}
             </div>
 
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 20 }}>
               <thead>
                 <tr style={{ borderBottom: "2px solid var(--border)" }}>
-                  <th style={{ ...thStyle, textAlign: "left" }}>Bolag</th>
-                  <th style={{ ...thStyle, textAlign: "right" }}>Vikt</th>
-                  {hasValues && <th style={{ ...thStyle, textAlign: "right" }}>Värde</th>}
-                  <th style={{ ...thStyle, textAlign: "left" }}>Status</th>
+                  <th style={{ ...thStyle, textAlign: "left" }}>{t("investmentCompanyModal.colCompany")}</th>
+                  <th style={{ ...thStyle, textAlign: "right" }}>{t("investmentCompanyModal.colWeight")}</th>
+                  {hasValues && <th style={{ ...thStyle, textAlign: "right" }}>{t("investmentCompanyModal.colValue")}</th>}
+                  <th style={{ ...thStyle, textAlign: "left" }}>{t("investmentCompanyModal.colStatus")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -186,14 +190,14 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                       </td>
                       {hasValues && (
                         <td style={{ ...tdStyle, textAlign: "right", color: "var(--text)", fontVariantNumeric: "tabular-nums" }}>
-                          {h.valueMSEK != null ? formatValue(h.valueMSEK) : "–"}
+                          {h.valueMSEK != null ? formatValue(h.valueMSEK, numberLocale) : "–"}
                         </td>
                       )}
                       <td style={tdStyle}>
                         {exists ? (
-                          <span style={{ color: "#1b5e20", fontSize: 11 }}>Finns i portfölj</span>
+                          <span style={{ color: "#1b5e20", fontSize: 11 }}>{t("investmentCompanyModal.inPortfolio")}</span>
                         ) : (
-                          <span style={{ color: "var(--accent)", fontSize: 11 }}>Läggs till</span>
+                          <span style={{ color: "var(--accent)", fontSize: 11 }}>{t("investmentCompanyModal.willBeAdded")}</span>
                         )}
                       </td>
                     </tr>
@@ -203,7 +207,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
             </table>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 4 }}>Gruppnamn</label>
+              <label style={{ fontSize: 12, color: "var(--text-secondary)", display: "block", marginBottom: 4 }}>{t("investmentCompanyModal.groupNameLabel")}</label>
               <input
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
@@ -212,13 +216,13 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
             </div>
 
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={onClose} style={btnSecondary}>Avbryt</button>
+              <button onClick={onClose} style={btnSecondary}>{t("investmentCompanyModal.cancel")}</button>
               <button
                 onClick={doCreate}
                 disabled={!groupName.trim()}
                 style={{ ...btnPrimary, opacity: !groupName.trim() ? 0.5 : 1 }}
               >
-                Skapa grupp med {selected.holdings.length} bolag
+                {t("investmentCompanyModal.createButton", { count: selected.holdings.length })}
               </button>
             </div>
           </>

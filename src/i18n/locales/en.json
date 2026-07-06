@@ -106,6 +106,27 @@
     "show": "Show ▼",
     "hide": "Hide ▲"
   },
+  "investmentCompanyModal": {
+    "title": "Create group from investment company",
+    "subtitle": "Select an investment company to create a group with their listed holdings.",
+    "loadingData": "Fetching data...",
+    "holdingsCount": "{{count}} listed holdings",
+    "updatedAt": "Updated {{date}}",
+    "cancel": "Cancel",
+    "creating": "Creating group...",
+    "weightSuffix": "— {{weight}}% of total assets",
+    "colCompany": "Company",
+    "colWeight": "Weight",
+    "colValue": "Value",
+    "colStatus": "Status",
+    "inPortfolio": "Already in portfolio",
+    "willBeAdded": "Will be added",
+    "groupNameLabel": "Group name",
+    "createButton": "Create group with {{count}} companies",
+    "errorDuplicateGroup": "The group \"{{name}}\" already exists. Choose a different name.",
+    "errorAddCompany": "Could not add companies: {{message}}",
+    "errorGeneric": "Something went wrong."
+  },
   "sedanSist": {
     "loading": "Compiling what happened since your last visit...",
     "title": "Since last visit",

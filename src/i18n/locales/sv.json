@@ -106,6 +106,27 @@
     "show": "Visa ▼",
     "hide": "Dölj ▲"
   },
+  "investmentCompanyModal": {
+    "title": "Skapa grupp från investmentbolag",
+    "subtitle": "Välj ett investmentbolag för att skapa en grupp med deras noterade innehav.",
+    "loadingData": "Hämtar data...",
+    "holdingsCount": "{{count}} noterade innehav",
+    "updatedAt": "Uppdaterad {{date}}",
+    "cancel": "Avbryt",
+    "creating": "Skapar grupp...",
+    "weightSuffix": "— {{weight}}% av totala tillgångar",
+    "colCompany": "Bolag",
+    "colWeight": "Vikt",
+    "colValue": "Värde",
+    "colStatus": "Status",
+    "inPortfolio": "Finns i portfölj",
+    "willBeAdded": "Läggs till",
+    "groupNameLabel": "Gruppnamn",
+    "createButton": "Skapa grupp med {{count}} bolag",
+    "errorDuplicateGroup": "Gruppen \"{{name}}\" finns redan. Välj ett annat namn.",
+    "errorAddCompany": "Kunde inte lägga till bolag: {{message}}",
+    "errorGeneric": "Något gick fel."
+  },
   "sedanSist": {
     "loading": "Sammanställer vad som hänt sedan sist...",
     "title": "Sedan sist",

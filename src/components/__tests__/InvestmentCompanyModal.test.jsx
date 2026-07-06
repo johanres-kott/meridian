@@ -1,6 +1,24 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import InvestmentCompanyModal from "../InvestmentCompanyModal.jsx";
+import sv from "../../i18n/locales/sv.json";
+
+function resolveTKey(key, params) {
+  const parts = key.split(".");
+  let val = sv;
+  for (const p of parts) val = val?.[p];
+  if (typeof val === "string" && params) {
+    return val.replace(/\{\{(\w+)\}\}/g, (_, k) => params[k] ?? `{{${k}}}`);
+  }
+  return typeof val === "string" ? val : key;
+}
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: resolveTKey,
+    i18n: { language: "sv" },
+  }),
+}));
 
 // Mock useUser hook
 vi.mock("../../contexts/UserContext.jsx", () => ({

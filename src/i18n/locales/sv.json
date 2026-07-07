@@ -120,5 +120,21 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "smartSuggestions": {
+    "title": "Toppförslag för dig",
+    "scoringInfo": "Hur fungerar poängsättningen? →",
+    "loading": "Beräknar förslag...",
+    "colCompany": "Bolag",
+    "colScore": "Poäng",
+    "colTags": "Taggar",
+    "colSector": "Sektor",
+    "colRisk": "Risk",
+    "riskLow": "Låg",
+    "riskMedium": "Medel",
+    "riskHigh": "Hög",
+    "added": "✓ Tillagd",
+    "watch": "+ Bevaka",
+    "scoredAt": "Poäng beräknade: {{date}} · {{count}} bolag"
   }
 }

@@ -120,5 +120,21 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "smartSuggestions": {
+    "title": "Top suggestions for you",
+    "scoringInfo": "How does the scoring work? →",
+    "loading": "Calculating suggestions...",
+    "colCompany": "Company",
+    "colScore": "Score",
+    "colTags": "Tags",
+    "colSector": "Sector",
+    "colRisk": "Risk",
+    "riskLow": "Low",
+    "riskMedium": "Medium",
+    "riskHigh": "High",
+    "added": "✓ Added",
+    "watch": "+ Watch",
+    "scoredAt": "Scores calculated: {{date}} · {{count}} companies"
   }
 }

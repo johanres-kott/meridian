@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { Chg } from "./SharedComponents.jsx";
 import { getFlag, SECTOR_EMOJI, SECTOR_SV, PROFILE_LABELS } from "../constants.js";
@@ -21,6 +22,9 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(new Set());
   const [added, setAdded] = useState(new Set());
+
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
 
   const investorType = profile?.investorType || "mixed";
   const riskProfile = profile?.riskProfile;
@@ -61,7 +65,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
         background: "var(--bg-secondary)", display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <div>
-          <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>Toppförslag för dig</span>
+          <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{t("smartSuggestions.title")}</span>
           <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>
             {PROFILE_LABELS[investorType] || investorType}
           </span>
@@ -70,24 +74,24 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
           onClick={() => onNavigate?.("methodology")}
           style={{ fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
         >
-          Hur fungerar poängsättningen? →
+          {t("smartSuggestions.scoringInfo")}
         </button>
       </div>
 
       <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Beräknar förslag...</div>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>{t("smartSuggestions.loading")}</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 11 : 12, minWidth: isMobile ? 0 : undefined }}>
             <thead>
               <tr style={{ borderBottom: "2px solid var(--border)" }}>
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 24 : 30, textAlign: "center" }}>#</th>
                 {!isMobile && <th style={{ ...thStyle, width: 28 }}></th>}
-                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "left" }}>Bolag</th>
-                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "center", width: isMobile ? 40 : 50 }}>Poäng</th>
-                {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>Taggar</th>}
-                {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>Sektor</th>}
-                {!isMobile && <th style={{ ...thStyle, textAlign: "center" }}>Risk</th>}
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "left" }}>{t("smartSuggestions.colCompany")}</th>
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "center", width: isMobile ? 40 : 50 }}>{t("smartSuggestions.colScore")}</th>
+                {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>{t("smartSuggestions.colTags")}</th>}
+                {!isMobile && <th style={{ ...thStyle, textAlign: "left" }}>{t("smartSuggestions.colSector")}</th>}
+                {!isMobile && <th style={{ ...thStyle, textAlign: "center" }}>{t("smartSuggestions.colRisk")}</th>}
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "right" }}>Kurs</th>
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 56 : 70 }}></th>
               </tr>
@@ -145,17 +149,17 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                           background: item.risk === "low" ? "rgba(8,153,129,0.15)" : item.risk === "medium" ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)",
                           color: item.risk === "low" ? "#089981" : item.risk === "medium" ? "#e65100" : "#f23645",
                         }}>
-                          {item.risk === "low" ? "Låg" : item.risk === "medium" ? "Medel" : "Hög"}
+                          {item.risk === "low" ? t("smartSuggestions.riskLow") : item.risk === "medium" ? t("smartSuggestions.riskMedium") : t("smartSuggestions.riskHigh")}
                         </span>
                       </td>
                     )}
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
-                      {item.price != null ? item.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "–"}
+                      {item.price != null ? item.price.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "–"}
                       {!isMobile && <div style={{ fontSize: 9, color: "var(--text-secondary)" }}>{item.currency || "SEK"}</div>}
                     </td>
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       {isAdded ? (
-                        <span style={{ fontSize: 10, color: "#089981" }}>✓ Tillagd</span>
+                        <span style={{ fontSize: 10, color: "#089981" }}>{t("smartSuggestions.added")}</span>
                       ) : (
                         <button
                           onClick={(e) => { e.stopPropagation(); addToWatchlist(item); }}
@@ -167,7 +171,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                             opacity: isAdding ? 0.5 : 1,
                           }}
                         >
-                          {isAdding ? "..." : "+ Bevaka"}
+                          {isAdding ? "..." : t("smartSuggestions.watch")}
                         </button>
                       )}
                     </td>
@@ -180,7 +184,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
 
         {data?.scoredAt && (
           <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "8px 20px 12px" }}>
-            Poäng beräknade: {new Date(data.scoredAt).toLocaleDateString("sv-SE")} · {data.suggestions?.length || 0} bolag
+            {t("smartSuggestions.scoredAt", { date: new Date(data.scoredAt).toLocaleDateString(numberLocale), count: data.suggestions?.length || 0 })}
           </div>
         )}
       </div>

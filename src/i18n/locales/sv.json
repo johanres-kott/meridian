@@ -120,5 +120,27 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "fundSuggestions": {
+    "title": "Toppfonder",
+    "catSweden": "Sverige",
+    "catGlobal": "Global",
+    "catEmerging": "Tillväxtmarknader",
+    "catMixed": "Blandfonder",
+    "catFixed": "Räntefonder",
+    "filterAll": "Alla",
+    "filterIndex": "Index",
+    "filterActive": "Aktiv",
+    "colFund": "Fond",
+    "colRating": "Betyg",
+    "colFee": "Avgift",
+    "col1y": "1 år",
+    "col3y": "3 år",
+    "col5y": "5 år",
+    "loading": "Hämtar fonder...",
+    "noFunds": "Inga fonder hittades",
+    "added": "✓ Tillagd",
+    "watch": "+ Bevaka",
+    "source": "Källa: Morningstar · Sorterat efter betyg · {{count}} fonder"
   }
 }

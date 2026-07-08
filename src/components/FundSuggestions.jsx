@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 
-const CATEGORIES = [
-  { id: "aktie_sverige", label: "Sverige" },
-  { id: "aktie_global", label: "Global" },
-  { id: "aktie_tillvaxt", label: "Tillväxtmarknader" },
-  { id: "blandfond", label: "Blandfonder" },
-  { id: "rantefond", label: "Räntefonder" },
-];
-
 export default function FundSuggestions({ isMobile, onNavigate }) {
+  const { t } = useTranslation();
   const [category, setCategory] = useState("aktie_sverige");
   const [typeFilter, setTypeFilter] = useState("all"); // "all" | "index" | "active"
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(new Set());
   const [added, setAdded] = useState(new Set());
+
+  const categories = [
+    { id: "aktie_sverige", label: t("fundSuggestions.catSweden") },
+    { id: "aktie_global", label: t("fundSuggestions.catGlobal") },
+    { id: "aktie_tillvaxt", label: t("fundSuggestions.catEmerging") },
+    { id: "blandfond", label: t("fundSuggestions.catMixed") },
+    { id: "rantefond", label: t("fundSuggestions.catFixed") },
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -56,9 +58,9 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
         padding: isMobile ? "10px 12px" : "14px 20px", borderBottom: "1px solid var(--border-light)",
         background: "var(--bg-secondary)",
       }}>
-        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Toppfonder</div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>{t("fundSuggestions.title")}</div>
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
-          {CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <button
               key={cat.id}
               onClick={() => setCategory(cat.id)}
@@ -75,9 +77,9 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
         </div>
         <div style={{ display: "flex", gap: 4 }}>
           {[
-            { id: "all", label: "Alla" },
-            { id: "index", label: "Index" },
-            { id: "active", label: "Aktiv" },
+            { id: "all", label: t("fundSuggestions.filterAll") },
+            { id: "index", label: t("fundSuggestions.filterIndex") },
+            { id: "active", label: t("fundSuggestions.filterActive") },
           ].map(opt => (
             <button
               key={opt.id}
@@ -101,20 +103,20 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
 
       <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Hämtar fonder...</div>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>{t("fundSuggestions.loading")}</div>
         ) : !filtered.length ? (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Inga fonder hittades</div>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>{t("fundSuggestions.noFunds")}</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 11 : 12 }}>
             <thead>
               <tr style={{ borderBottom: "2px solid var(--border)" }}>
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 24 : 30, textAlign: "center" }}>#</th>
-                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "left" }}>Fond</th>
-                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "center", width: 60 }}>Betyg</th>
-                {!isMobile && <th style={{ ...thStyle, textAlign: "right", width: 60 }}>Avgift</th>}
-                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "right", width: 60 }}>1 år</th>
-                {!isMobile && <th style={{ ...thStyle, textAlign: "right", width: 60 }}>3 år</th>}
-                {!isMobile && <th style={{ ...thStyle, textAlign: "right", width: 60 }}>5 år</th>}
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "left" }}>{t("fundSuggestions.colFund")}</th>
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "center", width: 60 }}>{t("fundSuggestions.colRating")}</th>
+                {!isMobile && <th style={{ ...thStyle, textAlign: "right", width: 60 }}>{t("fundSuggestions.colFee")}</th>}
+                <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), textAlign: "right", width: 60 }}>{t("fundSuggestions.col1y")}</th>
+                {!isMobile && <th style={{ ...thStyle, textAlign: "right", width: 60 }}>{t("fundSuggestions.col3y")}</th>}
+                {!isMobile && <th style={{ ...thStyle, textAlign: "right", width: 60 }}>{t("fundSuggestions.col5y")}</th>}
                 <th style={{ ...thStyle, ...(isMobile ? thMobile : {}), width: isMobile ? 56 : 70 }}></th>
               </tr>
             </thead>
@@ -143,7 +145,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                           background: fund.indexFund ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
                           color: fund.indexFund ? "#1976d2" : "#7b1fa2",
                         }}>
-                          {fund.indexFund ? "Index" : "Aktiv"}
+                          {fund.indexFund ? t("fundSuggestions.filterIndex") : t("fundSuggestions.filterActive")}
                         </span>
                       </div>
                       {!isMobile && <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>{fund.category}</div>}
@@ -187,7 +189,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                     )}
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       {isAdded ? (
-                        <span style={{ fontSize: 10, color: "#089981" }}>✓ Tillagd</span>
+                        <span style={{ fontSize: 10, color: "#089981" }}>{t("fundSuggestions.added")}</span>
                       ) : (
                         <button
                           onClick={(e) => { e.stopPropagation(); addToWatchlist(fund); }}
@@ -199,7 +201,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                             opacity: isAdding ? 0.5 : 1,
                           }}
                         >
-                          {isAdding ? "..." : "+ Bevaka"}
+                          {isAdding ? "..." : t("fundSuggestions.watch")}
                         </button>
                       )}
                     </td>
@@ -212,7 +214,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
 
         {filtered.length > 0 && (
           <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "8px 20px 12px" }}>
-            Källa: Morningstar · Sorterat efter betyg · {filtered.length} fonder
+            {t("fundSuggestions.source", { count: filtered.length })}
           </div>
         )}
       </div>

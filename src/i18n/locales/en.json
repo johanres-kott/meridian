@@ -120,5 +120,27 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "fundSuggestions": {
+    "title": "Top funds",
+    "catSweden": "Sweden",
+    "catGlobal": "Global",
+    "catEmerging": "Emerging markets",
+    "catMixed": "Mixed funds",
+    "catFixed": "Fixed income",
+    "filterAll": "All",
+    "filterIndex": "Index",
+    "filterActive": "Active",
+    "colFund": "Fund",
+    "colRating": "Rating",
+    "colFee": "Fee",
+    "col1y": "1Y",
+    "col3y": "3Y",
+    "col5y": "5Y",
+    "loading": "Loading funds...",
+    "noFunds": "No funds found",
+    "added": "✓ Added",
+    "watch": "+ Watch",
+    "source": "Source: Morningstar · Sorted by rating · {{count}} funds"
   }
 }

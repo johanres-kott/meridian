@@ -120,5 +120,44 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "fundEducation": {
+    "summary": "Förstå fonder — passiv vs aktiv, avgifter & betyg",
+    "feeCalculator": {
+      "title": "Avgiftens påverkan",
+      "labelAmount": "Startbelopp",
+      "amount50k": "50 000 kr",
+      "amount100k": "100 000 kr",
+      "amount500k": "500 000 kr",
+      "amount1m": "1 000 000 kr",
+      "labelHorizon": "Sparhorisont",
+      "years": "{{n}} år",
+      "labelReturn": "Årlig avkastning (före avgift)",
+      "feeLabel": "{{fee}}% avgift",
+      "note": "Röd siffra = så mycket kostar avgiften dig jämfört med 0.2%. Ränta-på-ränta gör att små skillnader blir stora över tid."
+    },
+    "passive": {
+      "title": "Passiv (index) vs aktiv förvaltning",
+      "indexLabel": "Indexfonder (passiva)",
+      "indexDesc": " följer ett index, t.ex. OMXS30 eller MSCI World. De försöker inte slå marknaden — de är marknaden. Avgiften är låg (ofta 0.1–0.4%) eftersom ingen förvaltare behöver fatta aktiva beslut.",
+      "activeLabel": "Aktiva fonder",
+      "activeDesc": " har en förvaltare som väljer vilka bolag som ska ingå. Målet är att slå index. Avgiften är högre (ofta 0.8–1.5%) för att betala förvaltarens arbete.",
+      "researchLabel": "Vad säger forskningen?",
+      "researchDesc": " Enligt William Sharpes lag (1991) måste det genomsnittliga resultatet för aktiva fonder vara sämre än index — med exakt avgiftsskillnaden. S&P:s SPIVA-mätningar bekräftar detta: ca 85–90% av aktiva fonder underpresterar sitt index över 10 år. Det betyder inte att alla aktiva fonder är dåliga, men oddsen är emot dig."
+    },
+    "morningstar": {
+      "title": "Morningstar-betyg",
+      "desc1": "Betyget (1–5 stjärnor) baseras på riskjusterad historisk avkastning jämfört med fonder i samma kategori. 5 stjärnor = topp 10%, 1 stjärna = botten 10%.",
+      "importantLabel": "Viktigt:",
+      "importantDesc": " Betyget tittar bakåt, inte framåt. En fond med 5 stjärnor har presterat bra historiskt, men det garanterar inte framtida avkastning. Avgiften är ofta en bättre prediktor för framtida resultat."
+    },
+    "tips": {
+      "title": "Tumregler",
+      "tip1": "Jämför alltid avgiften — det är det enda du kan kontrollera",
+      "tip2": "En indexfond med 0.2% avgift behöver ingen förvaltare som \"slår marknaden\"",
+      "tip3": "Väljer du aktivt förvaltad fond — kräv att den historiskt slagit index efter avgifter",
+      "tip4": "Sprid riskerna: blanda geografi (Sverige + Global) och tillgångsslag (aktier + räntor)",
+      "tip5": "Lång sparhorisont? Mer aktier. Kort? Mer räntor."
+    }
   }
 }

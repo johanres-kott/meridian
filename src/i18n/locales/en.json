@@ -120,5 +120,44 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "fundEducation": {
+    "summary": "Understand funds — passive vs active, fees & ratings",
+    "feeCalculator": {
+      "title": "The impact of fees",
+      "labelAmount": "Starting amount",
+      "amount50k": "SEK 50,000",
+      "amount100k": "SEK 100,000",
+      "amount500k": "SEK 500,000",
+      "amount1m": "SEK 1,000,000",
+      "labelHorizon": "Investment horizon",
+      "years": "{{n}} years",
+      "labelReturn": "Annual return (before fees)",
+      "feeLabel": "{{fee}}% fee",
+      "note": "Red number = how much the fee costs you compared to 0.2%. Compound interest means small differences grow large over time."
+    },
+    "passive": {
+      "title": "Passive (index) vs active management",
+      "indexLabel": "Index funds (passive)",
+      "indexDesc": " track an index, e.g. OMXS30 or MSCI World. They don't try to beat the market — they are the market. Fees are low (typically 0.1–0.4%) because no manager needs to make active decisions.",
+      "activeLabel": "Active funds",
+      "activeDesc": " have a manager who selects which companies to include. The goal is to beat the index. Fees are higher (typically 0.8–1.5%) to cover the manager's work.",
+      "researchLabel": "What does the research say?",
+      "researchDesc": " According to William Sharpe's arithmetic (1991), the average active fund must underperform the index by exactly the fee difference. S&P's SPIVA data confirms this: roughly 85–90% of active funds underperform their benchmark over 10 years. That doesn't mean all active funds are bad, but the odds are against you."
+    },
+    "morningstar": {
+      "title": "Morningstar rating",
+      "desc1": "The rating (1–5 stars) is based on risk-adjusted historical return compared to funds in the same category. 5 stars = top 10%, 1 star = bottom 10%.",
+      "importantLabel": "Important:",
+      "importantDesc": " The rating looks backwards, not forwards. A fund with 5 stars has performed well historically, but that doesn't guarantee future returns. The fee is often a better predictor of future performance."
+    },
+    "tips": {
+      "title": "Rules of thumb",
+      "tip1": "Always compare the fee — it's the only thing you can control",
+      "tip2": "An index fund with 0.2% fee needs no manager to \"beat the market\"",
+      "tip3": "If you choose an actively managed fund — require that it has historically beaten the index after fees",
+      "tip4": "Spread the risks: mix geography (Sweden + Global) and asset classes (equities + bonds)",
+      "tip5": "Long investment horizon? More equities. Short? More bonds."
+    }
   }
 }

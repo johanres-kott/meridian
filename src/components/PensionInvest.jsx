@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { searchFunds } from "../lib/apiClient.js";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import { useItpProviders } from "../hooks/useItpProviders.js";
@@ -9,53 +9,57 @@ const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--borde
 
 // ─── PPM fund suggestions (real funds available on Pensionsmyndighetens fondtorg) ───
 
-const PPM_SUGGESTIONS = [
-  { name: "AP7 Aktiefond", fee: 0.05, type: "index", note: "Statens defaultval. Mycket låg avgift, global aktieexponering med hävstång." },
-  { name: "AP7 Räntefond", fee: 0.05, type: "index", note: "Statens räntefond. Låg risk, obligationer." },
-  { name: "Avanza Zero", fee: 0.00, type: "index", note: "OMX Stockholm 30-index. Nollavgift." },
-  { name: "Länsförsäkringar Global Indexnära", fee: 0.22, type: "index", note: "Brett globalt index. Låg avgift." },
-  { name: "SPP Aktiefond Global", fee: 0.14, type: "index", note: "Global indexfond via SPP." },
-  { name: "Swedbank Robur Access Global", fee: 0.20, type: "index", note: "Bred global exponering." },
-];
+function getPpmSuggestions(t) {
+  return [
+    { name: "AP7 Aktiefond", fee: 0.05, type: "index", note: t("pensionInvest.ppmFunds.ap7EquityNote") },
+    { name: "AP7 Räntefond", fee: 0.05, type: "index", note: t("pensionInvest.ppmFunds.ap7BondNote") },
+    { name: "Avanza Zero", fee: 0.00, type: "index", note: t("pensionInvest.ppmFunds.avanzaZeroNote") },
+    { name: "Länsförsäkringar Global Indexnära", fee: 0.22, type: "index", note: t("pensionInvest.ppmFunds.lansforsakringarNote") },
+    { name: "SPP Aktiefond Global", fee: 0.14, type: "index", note: t("pensionInvest.ppmFunds.sppGlobalNote") },
+    { name: "Swedbank Robur Access Global", fee: 0.20, type: "index", note: t("pensionInvest.ppmFunds.swedbankRoburNote") },
+  ];
+}
 
 // ITP providers loaded from Supabase via useItpProviders hook
 
 // ─── Age-based model portfolios ───
 
-const MODEL_PORTFOLIOS = [
-  {
-    label: "Ung (25–40 år)",
-    icon: "🚀",
-    color: "#089981",
-    allocation: "90–100% aktier",
-    suggestion: "AP7 Såfa eller 100% global indexfond",
-    detail: "Lång horisont — maximera tillväxt. Nedgångar hinner återhämta sig.",
-  },
-  {
-    label: "Mitt i karriären (40–55)",
-    icon: "⚖️",
-    color: "#5b9bd5",
-    allocation: "60–80% aktier, 20–40% räntor",
-    suggestion: "Blanda globalfond + räntefond",
-    detail: "Börja trappa ner risk. Behåll tillväxtfokus men skydda en del.",
-  },
-  {
-    label: "Nära pension (55–65)",
-    icon: "🛡️",
-    color: "#ff9800",
-    allocation: "40–60% aktier, 40–60% räntor",
-    suggestion: "Trad.försäkring eller balanserad mix",
-    detail: "Prioritera kapitalskydd. Kortare tid att återhämta sig från nedgångar.",
-  },
-  {
-    label: "Pensionär (65+)",
-    icon: "🏖️",
-    color: "#9c27b0",
-    allocation: "20–40% aktier, 60–80% räntor",
-    suggestion: "Räntefonder + lite aktiefond",
-    detail: "Fokus på stabilitet och löpande utbetalning.",
-  },
-];
+function getModelPortfolios(t) {
+  return [
+    {
+      label: t("pensionInvest.models.youngLabel"),
+      icon: "🚀",
+      color: "#089981",
+      allocation: t("pensionInvest.models.youngAllocation"),
+      suggestion: t("pensionInvest.models.youngSuggestion"),
+      detail: t("pensionInvest.models.youngDetail"),
+    },
+    {
+      label: t("pensionInvest.models.midCareerLabel"),
+      icon: "⚖️",
+      color: "#5b9bd5",
+      allocation: t("pensionInvest.models.midCareerAllocation"),
+      suggestion: t("pensionInvest.models.midCareerSuggestion"),
+      detail: t("pensionInvest.models.midCareerDetail"),
+    },
+    {
+      label: t("pensionInvest.models.nearRetirementLabel"),
+      icon: "🛡️",
+      color: "#ff9800",
+      allocation: t("pensionInvest.models.nearRetirementAllocation"),
+      suggestion: t("pensionInvest.models.nearRetirementSuggestion"),
+      detail: t("pensionInvest.models.nearRetirementDetail"),
+    },
+    {
+      label: t("pensionInvest.models.retireeLabel"),
+      icon: "🏖️",
+      color: "#9c27b0",
+      allocation: t("pensionInvest.models.retireeAllocation"),
+      suggestion: t("pensionInvest.models.retireeSuggestion"),
+      detail: t("pensionInvest.models.retireeDetail"),
+    },
+  ];
+}
 
 function PensionPillarCard({ icon, title, pct, children, color }) {
   return (
@@ -76,6 +80,7 @@ function PensionPillarCard({ icon, title, pct, children, color }) {
 }
 
 function FundTable({ funds }) {
+  const { t } = useTranslation();
   const thStyle = { fontSize: 10, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--border)" };
   const tdStyle = { fontSize: 12, color: "var(--text-secondary)", padding: "8px 10px", borderBottom: "1px solid var(--border)" };
 
@@ -84,10 +89,10 @@ function FundTable({ funds }) {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th style={thStyle}>Fond</th>
-            <th style={{ ...thStyle, textAlign: "right" }}>Avgift</th>
-            <th style={thStyle}>Typ</th>
-            <th style={thStyle}>Kommentar</th>
+            <th style={thStyle}>{t("pensionInvest.fundTable.colFund")}</th>
+            <th style={{ ...thStyle, textAlign: "right" }}>{t("pensionInvest.fundTable.colFee")}</th>
+            <th style={thStyle}>{t("pensionInvest.fundTable.colType")}</th>
+            <th style={thStyle}>{t("pensionInvest.fundTable.colNote")}</th>
           </tr>
         </thead>
         <tbody>
@@ -103,7 +108,7 @@ function FundTable({ funds }) {
                   background: f.type === "index" ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
                   color: f.type === "index" ? "#1976d2" : "#7b1fa2",
                 }}>
-                  {f.type === "index" ? "Index" : "Aktiv"}
+                  {f.type === "index" ? t("pensionInvest.fundTable.typeIndex") : t("pensionInvest.fundTable.typeActive")}
                 </span>
               </td>
               <td style={{ ...tdStyle, fontSize: 11, maxWidth: 200 }}>{f.note}</td>
@@ -116,6 +121,7 @@ function FundTable({ funds }) {
 }
 
 function ProviderTable({ providers }) {
+  const { t } = useTranslation();
   const thStyle = { fontSize: 10, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--border)" };
   const tdStyle = { fontSize: 12, color: "var(--text-secondary)", padding: "8px 10px", borderBottom: "1px solid var(--border)" };
   const dot = (ok) => <span style={{ color: ok ? "#089981" : "var(--text-muted)" }}>{ok ? "✓" : "—"}</span>;
@@ -125,10 +131,10 @@ function ProviderTable({ providers }) {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th style={thStyle}>Försäkringsbolag</th>
-            <th style={{ ...thStyle, textAlign: "center" }}>Fondförsäkring</th>
-            <th style={{ ...thStyle, textAlign: "center" }}>Traditionell</th>
-            <th style={thStyle}>Kommentar</th>
+            <th style={thStyle}>{t("pensionInvest.providerTable.colInsurer")}</th>
+            <th style={{ ...thStyle, textAlign: "center" }}>{t("pensionInvest.providerTable.colUnitLinked")}</th>
+            <th style={{ ...thStyle, textAlign: "center" }}>{t("pensionInvest.providerTable.colTraditional")}</th>
+            <th style={thStyle}>{t("pensionInvest.providerTable.colNote")}</th>
           </tr>
         </thead>
         <tbody>
@@ -147,20 +153,23 @@ function ProviderTable({ providers }) {
 }
 
 export default function PensionInvest({ isMobile }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "ppm" | "itp"
   const { preferences, updatePreferences } = useUser();
   const pension = preferences.pension || {};
   const { providers } = useItpProviders();
 
+  const tabs = [
+    { id: "overview", label: t("pensionInvest.tabs.overview") },
+    { id: "ppm", label: t("pensionInvest.tabs.ppm") },
+    { id: "itp", label: t("pensionInvest.tabs.itp") },
+  ];
+
   return (
     <div>
       {/* Sub-tabs */}
       <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
-        {[
-          { id: "overview", label: "Överblick" },
-          { id: "ppm", label: "Premiepension" },
-          { id: "itp", label: "Tjänstepension (ITP)" },
-        ].map(tab => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -187,36 +196,35 @@ export default function PensionInvest({ isMobile }) {
 // ─── Overview ────────────────────────────────────────────────────────────────
 
 function OverviewTab({ isMobile }) {
+  const { t } = useTranslation();
+  const modelPortfolios = getModelPortfolios(t);
+
   return (
     <>
       <div style={cardStyle}>
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-          Pensionens tre delar
+          {t("pensionInvest.overview.pillarsTitle")}
         </div>
         <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 16 }}>
-          Din framtida pension byggs upp av tre delar. Genom att göra aktiva val i premiepensionen och
-          tjänstepensionen kan du påverka hur stor din pension blir.
+          {t("pensionInvest.overview.pillarsDesc")}
         </p>
 
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <PensionPillarCard icon="🏛️" title="Allmän pension" pct="~55% av pensionen" color="8,153,129">
+          <PensionPillarCard icon="🏛️" title={t("pensionInvest.overview.pillar1Title")} pct={t("pensionInvest.overview.pillar1Pct")} color="8,153,129">
             <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
-              Inkomstpension (16%) + premiepension (2.5%). Du kan välja fonder för premiepensionsdelen
-              via Pensionsmyndigheten.
+              {t("pensionInvest.overview.pillar1Desc")}
             </p>
           </PensionPillarCard>
 
-          <PensionPillarCard icon="🏢" title="Tjänstepension" pct="~30% av pensionen" color="91,155,213">
+          <PensionPillarCard icon="🏢" title={t("pensionInvest.overview.pillar2Title")} pct={t("pensionInvest.overview.pillar2Pct")} color="91,155,213">
             <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
-              Arbetsgivaren betalar in. ITP1 (premiebestämd) eller ITP2 (förmånsbestämd).
-              Du väljer ofta hur pengarna placeras via Collectum.
+              {t("pensionInvest.overview.pillar2Desc")}
             </p>
           </PensionPillarCard>
 
-          <PensionPillarCard icon="🏦" title="Privat sparande" pct="~15% av pensionen" color="156,39,176">
+          <PensionPillarCard icon="🏦" title={t("pensionInvest.overview.pillar3Title")} pct={t("pensionInvest.overview.pillar3Pct")} color="156,39,176">
             <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
-              ISK, kapitalförsäkring, aktier, fonder. Det du sparar själv utöver pensionen.
-              Behövs för att behålla levnadsstandarden.
+              {t("pensionInvest.overview.pillar3Desc")}
             </p>
           </PensionPillarCard>
         </div>
@@ -225,14 +233,14 @@ function OverviewTab({ isMobile }) {
       {/* Age-based portfolios */}
       <div style={cardStyle}>
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-          Modellportföljer efter ålder
+          {t("pensionInvest.overview.agePortfoliosTitle")}
         </div>
         <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 16 }}>
-          Pensionssparande handlar om tidshorisonten. Ju längre tid kvar, desto mer risk kan du ta.
+          {t("pensionInvest.overview.agePortfoliosSubtitle")}
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-          {MODEL_PORTFOLIOS.map(mp => (
+          {modelPortfolios.map(mp => (
             <div key={mp.label} style={{
               background: "var(--bg-secondary)", borderRadius: 6, padding: 16,
               borderLeft: `3px solid ${mp.color}`,
@@ -255,13 +263,13 @@ function OverviewTab({ isMobile }) {
         background: "rgba(8,153,129,0.04)", border: "1px solid rgba(8,153,129,0.15)",
       }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-          💡 Det viktigaste att komma ihåg
+          {t("pensionInvest.overview.keyInsightTitle")}
         </div>
         <ul style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, paddingLeft: 18, margin: 0 }}>
-          <li>Allmän pension + tjänstepension ger ofta bara 50–60% av slutlönen</li>
-          <li>Avgiften är den enskilt viktigaste faktorn — 0.2% vs 1.5% kan skilja miljoner</li>
-          <li>AP7 Såfa slår de flesta aktiva fonder på lång sikt</li>
-          <li>Gör ditt ITP-val — defaultvalet (Alecta trad) är sällan optimalt för unga</li>
+          <li>{t("pensionInvest.overview.keyInsight1")}</li>
+          <li>{t("pensionInvest.overview.keyInsight2")}</li>
+          <li>{t("pensionInvest.overview.keyInsight3")}</li>
+          <li>{t("pensionInvest.overview.keyInsight4")}</li>
         </ul>
       </div>
     </>
@@ -271,15 +279,17 @@ function OverviewTab({ isMobile }) {
 // ─── Premiepension ───────────────────────────────────────────────────────────
 
 function PPMTab({ isMobile }) {
+  const { t } = useTranslation();
+  const ppmSuggestions = getPpmSuggestions(t);
+
   return (
     <>
       <div style={cardStyle}>
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-          Premiepensionen
+          {t("pensionInvest.ppm.title")}
         </div>
         <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 12 }}>
-          2.5% av din pensionsgrundande inkomst går till premiepensionen. Du väljer själv
-          bland fonderna på Pensionsmyndighetens fondtorg.
+          {t("pensionInvest.ppm.desc")}
         </p>
 
         <div style={{
@@ -287,35 +297,33 @@ function PPMTab({ isMobile }) {
           borderRadius: 6, padding: 16, marginBottom: 16,
         }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-            📊 AP7 Såfa — statens defaultval
+            {t("pensionInvest.ppm.ap7Title")}
           </div>
           <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: "4px 0 0 0" }}>
-            Om du inte gör ett aktivt val placeras allt i AP7 Såfa — en generationsfond med 0.05% avgift
-            som automatiskt minskar aktieandelen från 55 års ålder. Historisk avkastning: ca 10–12% per år
-            sedan start. Svårslagen av de flesta aktiva fonder.
+            {t("pensionInvest.ppm.ap7Desc")}
           </p>
         </div>
       </div>
 
       <div style={cardStyle}>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-          Rekommenderade PPM-fonder
+          {t("pensionInvest.ppm.fundsTitle")}
         </div>
-        <FundTable funds={PPM_SUGGESTIONS} />
+        <FundTable funds={ppmSuggestions} />
         <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8 }}>
-          Fonderna ovan finns på Pensionsmyndighetens fondtorg. Avgifterna kan ha ändrats.
+          {t("pensionInvest.ppm.fundsDisclaimer")}
         </p>
       </div>
 
       <div style={cardStyle}>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
-          Så byter du PPM-fonder
+          {t("pensionInvest.ppm.switchTitle")}
         </div>
         <ol style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 2, paddingLeft: 18, margin: 0 }}>
-          <li>Logga in på <strong>pensionsmyndigheten.se</strong> eller <strong>minpension.se</strong> med BankID</li>
-          <li>Gå till "Premiepension" → "Byt fond"</li>
-          <li>Sök efter fonder — prioritera låg avgift och brett index</li>
-          <li>Bekräfta bytet — genomförs inom 2–3 bankdagar</li>
+          <li>{t("pensionInvest.ppm.step1")}</li>
+          <li>{t("pensionInvest.ppm.step2")}</li>
+          <li>{t("pensionInvest.ppm.step3")}</li>
+          <li>{t("pensionInvest.ppm.step4")}</li>
         </ol>
       </div>
 
@@ -324,13 +332,13 @@ function PPMTab({ isMobile }) {
         background: "rgba(255,152,0,0.04)", border: "1px solid rgba(255,152,0,0.15)",
       }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-          ⚠️ Vanliga misstag
+          {t("pensionInvest.ppm.mistakesTitle")}
         </div>
         <ul style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, paddingLeft: 18, margin: 0 }}>
-          <li>Välja fonder med avgift över 1% — äter din pension</li>
-          <li>Byta fonder ofta — tajming fungerar sällan, kostar i form av utanför-marknaden-dagar</li>
-          <li>Glömma att man valt — kolla en gång per år att fonden fortfarande fungerar</li>
-          <li>Tro att aktiv förvaltning slår index — 80–90% av aktiva fonder underpresterar på 10+ år</li>
+          <li>{t("pensionInvest.ppm.mistake1")}</li>
+          <li>{t("pensionInvest.ppm.mistake2")}</li>
+          <li>{t("pensionInvest.ppm.mistake3")}</li>
+          <li>{t("pensionInvest.ppm.mistake4")}</li>
         </ul>
       </div>
     </>
@@ -340,34 +348,36 @@ function PPMTab({ isMobile }) {
 // ─── ITP / Tjänstepension ────────────────────────────────────────────────────
 
 function ITPTab({ isMobile, pension, updatePreferences, providers }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <MyITPSection pension={pension} updatePreferences={updatePreferences} isMobile={isMobile} />
 
       <div style={cardStyle}>
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-          Tjänstepension — ITP
+          {t("pensionInvest.itp.title")}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
           <div style={{ background: "var(--bg-secondary)", borderRadius: 6, padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>ITP1 — premiebestämd</div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>Födda 1979 eller senare</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>{t("pensionInvest.itp.itp1Title")}</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>{t("pensionInvest.itp.itp1Born")}</div>
             <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
-              <li>4.5% på lön upp till 7.5 inkomstbasbelopp</li>
-              <li>30% på lön över 7.5 inkomstbasbelopp</li>
-              <li>Du väljer själv hur pengarna placeras</li>
-              <li>Slutsumman beror helt på avkastning + avgifter</li>
+              <li>{t("pensionInvest.itp.itp1Bullet1")}</li>
+              <li>{t("pensionInvest.itp.itp1Bullet2")}</li>
+              <li>{t("pensionInvest.itp.itp1Bullet3")}</li>
+              <li>{t("pensionInvest.itp.itp1Bullet4")}</li>
             </ul>
           </div>
           <div style={{ background: "var(--bg-secondary)", borderRadius: 6, padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>ITP2 — förmånsbestämd</div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>Födda 1978 eller tidigare</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>{t("pensionInvest.itp.itp2Title")}</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>{t("pensionInvest.itp.itp2Born")}</div>
             <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
-              <li>Garanterad pension som andel av slutlönen</li>
-              <li>10% av lön upp till 7.5 inkomstbasbelopp</li>
-              <li>65% av lön mellan 7.5–20 basbelopp</li>
-              <li>ITPK-delen (2%) kan du välja placering för</li>
+              <li>{t("pensionInvest.itp.itp2Bullet1")}</li>
+              <li>{t("pensionInvest.itp.itp2Bullet2")}</li>
+              <li>{t("pensionInvest.itp.itp2Bullet3")}</li>
+              <li>{t("pensionInvest.itp.itp2Bullet4")}</li>
             </ul>
           </div>
         </div>
@@ -376,7 +386,7 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
       {/* Fondförsäkring vs Traditionell */}
       <div style={cardStyle}>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-          Fondförsäkring vs Traditionell försäkring
+          {t("pensionInvest.itp.insuranceTitle")}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
@@ -384,24 +394,24 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
             padding: 16, borderRadius: 6,
             border: "1px solid rgba(8,153,129,0.2)", background: "rgba(8,153,129,0.04)",
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#089981", marginBottom: 8 }}>Fondförsäkring</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#089981", marginBottom: 8 }}>{t("pensionInvest.itp.unitLinkedTitle")}</div>
             <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
-              <li>Du väljer fonder själv</li>
-              <li>Högre potentiell avkastning</li>
-              <li>Ingen garanti — du bär risken</li>
-              <li><strong>Bäst för:</strong> under ~55 år med lång horisont</li>
+              <li>{t("pensionInvest.itp.unitLinkedBullet1")}</li>
+              <li>{t("pensionInvest.itp.unitLinkedBullet2")}</li>
+              <li>{t("pensionInvest.itp.unitLinkedBullet3")}</li>
+              <li><strong>{t("pensionInvest.itp.unitLinkedBullet4Prefix")}</strong> {t("pensionInvest.itp.unitLinkedBullet4Desc")}</li>
             </ul>
           </div>
           <div style={{
             padding: 16, borderRadius: 6,
             border: "1px solid rgba(91,155,213,0.2)", background: "rgba(91,155,213,0.04)",
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#5b9bd5", marginBottom: 8 }}>Traditionell försäkring</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#5b9bd5", marginBottom: 8 }}>{t("pensionInvest.itp.traditionalTitle")}</div>
             <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
-              <li>Bolaget sköter placeringen</li>
-              <li>Garanterad miniminivå</li>
-              <li>Lägre men säkrare avkastning</li>
-              <li><strong>Bäst för:</strong> nära pension, vill ha trygghet</li>
+              <li>{t("pensionInvest.itp.traditionalBullet1")}</li>
+              <li>{t("pensionInvest.itp.traditionalBullet2")}</li>
+              <li>{t("pensionInvest.itp.traditionalBullet3")}</li>
+              <li><strong>{t("pensionInvest.itp.traditionalBullet4Prefix")}</strong> {t("pensionInvest.itp.traditionalBullet4Desc")}</li>
             </ul>
           </div>
         </div>
@@ -411,11 +421,10 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
           borderRadius: 6, padding: 14,
         }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-            ⚠️ Gör ett aktivt val!
+            {t("pensionInvest.itp.warningTitle")}
           </div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-            Utan aktivt val hamnar din ITP1-pension i traditionell försäkring hos Alecta.
-            Som ung med 30+ år kvar kan fondförsäkring ge betydligt mer.
+            {t("pensionInvest.itp.warningDesc")}
           </div>
         </div>
       </div>
@@ -423,10 +432,10 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
       {/* Försäkringsbolag */}
       <div style={cardStyle}>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-          Försäkringsbolag via Collectum
+          {t("pensionInvest.itp.providersTitle")}
         </div>
         <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
-          Du väljer bolag och placeringsform på <strong>collectum.se</strong> med BankID.
+          {t("pensionInvest.itp.providersDesc")}
         </p>
         <ProviderTable providers={providers} />
       </div>
@@ -434,14 +443,14 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
       {/* Steg-för-steg */}
       <div style={cardStyle}>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
-          Så gör du ditt ITP-val
+          {t("pensionInvest.itp.howTitle")}
         </div>
         <ol style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 2, paddingLeft: 18, margin: 0 }}>
-          <li>Logga in på <strong>collectum.se</strong> med BankID</li>
-          <li>Välj försäkringsbolag (t.ex. Avanza Pension, Nordnet, AMF)</li>
-          <li>Välj <strong>fondförsäkring</strong> om du är under ~55 år</li>
-          <li>Välj globala indexfonder med avgifter under 0.3%</li>
-          <li>Fördelningsförslag: 70% global aktieindex, 20% Sverige-index, 10% räntefond</li>
+          <li>{t("pensionInvest.itp.howStep1")}</li>
+          <li>{t("pensionInvest.itp.howStep2")}</li>
+          <li><strong>{t("pensionInvest.itp.howStep3")}</strong></li>
+          <li>{t("pensionInvest.itp.howStep4")}</li>
+          <li>{t("pensionInvest.itp.howStep5")}</li>
         </ol>
       </div>
 
@@ -450,13 +459,13 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
         background: "rgba(8,153,129,0.04)", border: "1px solid rgba(8,153,129,0.15)",
       }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-          📌 Sammanfattning
+          {t("pensionInvest.itp.summaryTitle")}
         </div>
         <ul style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, paddingLeft: 18, margin: 0 }}>
-          <li><strong>ITP1:</strong> Välj fondförsäkring med globala indexfonder om du har 15+ år kvar</li>
-          <li><strong>ITP2/ITPK:</strong> Samma logik — indexfonder med låga avgifter</li>
-          <li><strong>Avgiften avgör:</strong> 0.2% vs 1.5% kan skilja hundratusentals kronor</li>
-          <li><strong>Kolla en gång per år</strong> att dina val fortfarande passar</li>
+          <li><strong>{t("pensionInvest.itp.summaryLine1Prefix")}</strong> {t("pensionInvest.itp.summaryLine1Desc")}</li>
+          <li><strong>{t("pensionInvest.itp.summaryLine2Prefix")}</strong> {t("pensionInvest.itp.summaryLine2Desc")}</li>
+          <li><strong>{t("pensionInvest.itp.summaryLine3Prefix")}</strong> {t("pensionInvest.itp.summaryLine3Desc")}</li>
+          <li><strong>{t("pensionInvest.itp.summaryLine4Prefix")}</strong> {t("pensionInvest.itp.summaryLine4Desc")}</li>
         </ul>
       </div>
     </>

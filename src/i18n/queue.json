@@ -8,10 +8,10 @@
     "src/components/TodoList.jsx",
     "src/components/UpcomingEarnings.jsx",
     "src/components/WeeklySummary.jsx",
-    "src/components/PortfolioSummary.jsx"
+    "src/components/PortfolioSummary.jsx",
+    "src/components/PensionInvest.jsx"
   ],
-  "inReview": [],
-  "pending": [
+  "inReview": [
     "src/components/InvestmentPlanTracker.jsx",
     "src/components/AnalysisTab.jsx",
     "src/components/OwnershipOverlay.jsx",
@@ -22,8 +22,9 @@
     "src/components/InvestmentCompanyModal.jsx",
     "src/components/SmartSuggestions.jsx",
     "src/components/FundSuggestions.jsx",
-    "src/components/FundEducation.jsx",
-    "src/components/PensionInvest.jsx",
+    "src/components/FundEducation.jsx"
+  ],
+  "pending": [
     "src/components/MarketsView.jsx",
     "src/components/MarketDetailView.jsx",
     "src/components/CompanySearch.jsx",

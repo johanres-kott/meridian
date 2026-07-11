@@ -120,5 +120,18 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "marketsView": {
+    "title": "Markets",
+    "refresh": "↻ Refresh",
+    "loadingIndices": "Loading indices...",
+    "indexError": "Error: {{error}}",
+    "commoditiesTitle": "Commodities & Currencies",
+    "loadingCommodities": "Loading commodity data...",
+    "colCurrency": "Currency",
+    "colPrice": "Price",
+    "colChange": "Change",
+    "colCommodity": "Commodity",
+    "colUnit": "Unit"
   }
 }

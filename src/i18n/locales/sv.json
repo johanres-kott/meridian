@@ -120,5 +120,18 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "marketsView": {
+    "title": "Marknader",
+    "refresh": "↻ Uppdatera",
+    "loadingIndices": "Hämtar index...",
+    "indexError": "Fel: {{error}}",
+    "commoditiesTitle": "Råvaror & Valutor",
+    "loadingCommodities": "Hämtar råvarudata...",
+    "colCurrency": "Valuta",
+    "colPrice": "Pris",
+    "colChange": "Förändring",
+    "colCommodity": "Råvara",
+    "colUnit": "Enhet"
   }
 }

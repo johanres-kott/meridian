@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { REGIONS } from "./shared.js";
 import { Chg } from "./SharedComponents.jsx";
 import MarketDetailView from "./MarketDetailView.jsx";
@@ -8,6 +9,7 @@ const COMMODITY_GROUPS = ["Precious Metals", "Energy", "Industrial Metals", "Agr
 
 export default function MarketsView({ deepLink, onClearDeepLink }) {
   const isMobile = useIsMobile();
+  const { t, i18n } = useTranslation();
   const [indices, setIndices] = useState([]);
   const [idxLoading, setIdxLoading] = useState(true);
   const [idxError, setIdxError] = useState(null);
@@ -73,19 +75,26 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
     return <MarketDetailView item={selected} onBack={() => setSelected(null)} isMobile={isMobile} />;
   }
 
-  const today = new Date().toLocaleDateString("sv-SE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  const dateLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
+  const today = new Date().toLocaleDateString(dateLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
   const grouped = COMMODITY_GROUPS.map(group => ({
     label: group,
     items: commodities.filter(d => d.group === group),
   })).filter(g => g.items.length > 0);
 
+  const colCurrency = t("marketsView.colCurrency");
+  const colCommodity = t("marketsView.colCommodity");
+  const colPrice = t("marketsView.colPrice");
+  const colChange = t("marketsView.colChange");
+  const colUnit = t("marketsView.colUnit");
+
   return (
     <div>
       {/* Header */}
       <div style={{ marginBottom: isMobile ? 12 : 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
-          <h1 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 500 }}>Marknader</h1>
+          <h1 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 500 }}>{t("marketsView.title")}</h1>
           <p style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
             {today}
             <span style={{ marginLeft: 12, color: "#089981" }}>· Yahoo Finance</span>
@@ -93,14 +102,14 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
         </div>
         {lastUpdated && (
           <button onClick={fetchAll} style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer" }}>
-            ↻ Uppdatera
+            {t("marketsView.refresh")}
           </button>
         )}
       </div>
 
       {/* Global Indices */}
-      {idxLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hamtar index...</div>}
-      {idxError && <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "#f23645", marginBottom: 20 }}>Fel: {idxError}</div>}
+      {idxLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>{t("marketsView.loadingIndices")}</div>}
+      {idxError && <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "#f23645", marginBottom: 20 }}>{t("marketsView.indexError", { error: idxError })}</div>}
 
       {!idxLoading && !idxError && REGIONS.map(region => {
         const items = indices.filter(i => i.region === region);
@@ -114,8 +123,8 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 600 : undefined }}>
               <thead>
                 <tr>
-                  {(isMobile ? ["Symbol", "Price", "Change %", "Change"] : ["Symbol", "Name", "Price", "Valuta", "Change %", "Change", "High", "Low"]).map(h => (
-                    <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 10px", textAlign: ["Symbol","Name","Valuta"].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" }}>{h}</th>
+                  {(isMobile ? ["Symbol", "Price", "Change %", "Change"] : ["Symbol", "Name", "Price", colCurrency, "Change %", "Change", "High", "Low"]).map(h => (
+                    <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 10px", textAlign: ["Symbol","Name", colCurrency].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -155,10 +164,10 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
 
       {/* Commodities & FX */}
       <div style={{ marginTop: 8, marginBottom: isMobile ? 12 : 20 }}>
-        <h2 style={{ fontSize: isMobile ? 13 : 15, fontWeight: 500 }}>Ravaror & Valutor</h2>
+        <h2 style={{ fontSize: isMobile ? 13 : 15, fontWeight: 500 }}>{t("marketsView.commoditiesTitle")}</h2>
       </div>
 
-      {comLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hamtar ravarudata...</div>}
+      {comLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>{t("marketsView.loadingCommodities")}</div>}
 
       {!comLoading && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 12 : 16 }}>
@@ -171,8 +180,8 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 400 : undefined }}>
                 <thead>
                   <tr>
-                    {(isMobile ? ["Symbol", "Pris", "Forandring"] : ["Symbol", "Ravara", "Pris", "Forandring", "Enhet"]).map(h => (
-                      <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 12px", textAlign: ["Symbol","Ravara","Enhet"].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>{h}</th>
+                    {(isMobile ? ["Symbol", colPrice, colChange] : ["Symbol", colCommodity, colPrice, colChange, colUnit]).map(h => (
+                      <th key={h} style={{ padding: isMobile ? "4px 6px" : "6px 12px", textAlign: ["Symbol", colCommodity, colUnit].includes(h) ? "left" : "right", fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>

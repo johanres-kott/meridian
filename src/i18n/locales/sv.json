@@ -120,5 +120,10 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "marketDetailView": {
+    "backToMarkets": "Tillbaka till marknader",
+    "dailyHigh": "Dagens högsta",
+    "dailyLow": "Dagens lägsta"
   }
 }

@@ -1,7 +1,10 @@
 import { PriceChart } from "./SharedComponents.jsx";
 import { Chg } from "./SharedComponents.jsx";
+import { useTranslation } from "react-i18next";
 
 export default function MarketDetailView({ item, onBack, isMobile }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const name = item.name;
   const symbol = item.display || item.symbol;
   const yahooSymbol = item.yahooSymbol;
@@ -18,7 +21,7 @@ export default function MarketDetailView({ item, onBack, isMobile }) {
       <div style={{ marginBottom: isMobile ? 12 : 20 }}>
         <button onClick={onBack}
           style={{ fontSize: isMobile ? 11 : 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: isMobile ? 8 : 12 }}>
-          &larr; Tillbaka till marknader
+          &larr; {t("marketDetailView.backToMarkets")}
         </button>
 
         <div>
@@ -30,7 +33,7 @@ export default function MarketDetailView({ item, onBack, isMobile }) {
 
         <div style={{ display: "flex", alignItems: "baseline", gap: isMobile ? 8 : 12, marginTop: isMobile ? 4 : 8 }}>
           <span style={{ fontSize: isMobile ? 22 : 28, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
-            {price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+            {price?.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
           </span>
           <span style={{ fontSize: isMobile ? 11 : 13, color: "var(--text-secondary)" }}>{unit}</span>
           {change != null && (
@@ -56,18 +59,18 @@ export default function MarketDetailView({ item, onBack, isMobile }) {
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 10 : 24, marginTop: isMobile ? 12 : 20 }}>
           {high > 0 && (
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
-              <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginBottom: isMobile ? 4 : 6 }}>Dagens hogsta</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginBottom: isMobile ? 4 : 6 }}>{t("marketDetailView.dailyHigh")}</div>
               <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
-                {high.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                {high.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
               </div>
               <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginTop: 2 }}>{unit}</div>
             </div>
           )}
           {low > 0 && (
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
-              <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginBottom: isMobile ? 4 : 6 }}>Dagens lagsta</div>
+              <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginBottom: isMobile ? 4 : 6 }}>{t("marketDetailView.dailyLow")}</div>
               <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
-                {low.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                {low.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
               </div>
               <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginTop: 2 }}>{unit}</div>
             </div>

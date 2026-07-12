@@ -120,5 +120,10 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "marketDetailView": {
+    "backToMarkets": "Back to markets",
+    "dailyHigh": "Day's high",
+    "dailyLow": "Day's low"
   }
 }

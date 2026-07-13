@@ -120,5 +120,13 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "companySearch": {
+    "title": "Bolagssökning",
+    "description": "Sök på bolagsnamn eller ticker — t.ex. \"Ericsson\", \"Volvo\", \"Apple\"",
+    "placeholder": "Sök bolag — \"Ericsson B\", \"Volvo\", \"AAPL\"...",
+    "searching": "Söker...",
+    "searchButton": "Sök",
+    "error": "Fel: {{error}}"
   }
 }

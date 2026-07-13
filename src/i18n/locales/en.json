@@ -120,5 +120,13 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "companySearch": {
+    "title": "Company Search",
+    "description": "Search by company name or ticker — e.g. \"Ericsson\", \"Volvo\", \"Apple\"",
+    "placeholder": "Search — \"Ericsson B\", \"Volvo\", \"AAPL\"...",
+    "searching": "Searching...",
+    "searchButton": "Search",
+    "error": "Error: {{error}}"
   }
 }

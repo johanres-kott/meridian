@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
@@ -6,6 +7,7 @@ import SuggestionDropdown from "./search/SuggestionDropdown.jsx";
 import SearchResultDetail from "./search/SearchResultDetail.jsx";
 
 export default function CompanySearch({ deepLink, onClearDeepLink }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -137,9 +139,9 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 18, fontWeight: 500 }}>Company Search</h1>
+        <h1 style={{ fontSize: 18, fontWeight: 500 }}>{t("companySearch.title")}</h1>
         <p style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
-          Sök på bolagsnamn eller ticker — t.ex. "Ericsson", "Volvo", "Apple"
+          {t("companySearch.description")}
         </p>
       </div>
 
@@ -152,7 +154,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-              placeholder='Sök bolag — "Ericsson B", "Volvo", "AAPL"...'
+              placeholder={t("companySearch.placeholder")}
               style={{
                 width: "100%", padding: "10px 14px", border: "1px solid var(--border)",
                 borderRadius: 4, fontSize: 13, outline: "none",
@@ -161,7 +163,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
             />
             {suggestLoading && (
               <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--text-secondary)" }}>
-                Söker...
+                {t("companySearch.searching")}
               </div>
             )}
           </div>
@@ -170,7 +172,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
             disabled={loading}
             style={{ padding: "10px 20px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }}
           >
-            {loading ? "Söker..." : "Sök"}
+            {loading ? t("companySearch.searching") : t("companySearch.searchButton")}
           </button>
         </div>
 
@@ -187,7 +189,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
 
       {error && (
         <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "#f23645", marginBottom: 16 }}>
-          Fel: {error}
+          {t("companySearch.error", { error })}
         </div>
       )}
 

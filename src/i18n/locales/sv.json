@@ -936,5 +936,16 @@
     "step2Desc": "En personlig topplista med aktier rankade med etablerade analysmodeller.",
     "step3Title": "Analysera på djupet",
     "step3Desc": "Nyckeltal, insiderhandel, risk, kursmål och AI-assistent — allt på ett ställe."
+  },
+  "hero": {
+    "login": "Logga in",
+    "getStarted": "Kom igång",
+    "badge": "Investeringsanalys driven av data",
+    "titleLine1": "Analysera smartare.",
+    "titleLine2": "Investera tryggare.",
+    "subtitle": "Aktieförslag baserade på Piotroski, Magic Formula och fler etablerade modeller — personligt anpassade efter din investerarprofil.",
+    "getStartedFree": "Kom igång gratis",
+    "learnMore": "Läs mer",
+    "screenshotAlt": "Thesion — Översikt"
   }
 }

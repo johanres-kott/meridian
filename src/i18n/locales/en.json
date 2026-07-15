@@ -936,5 +936,16 @@
     "step2Desc": "A personal top list of stocks ranked with established analysis models.",
     "step3Title": "Analyse in depth",
     "step3Desc": "Key metrics, insider trading, risk, price targets and an AI assistant — all in one place."
+  },
+  "hero": {
+    "login": "Log in",
+    "getStarted": "Get started",
+    "badge": "Investment analysis driven by data",
+    "titleLine1": "Analyse smarter.",
+    "titleLine2": "Invest with confidence.",
+    "subtitle": "Stock suggestions based on Piotroski, Magic Formula and more established models — personally tailored to your investor profile.",
+    "getStartedFree": "Get started for free",
+    "learnMore": "Learn more",
+    "screenshotAlt": "Thesion — Overview"
   }
 }

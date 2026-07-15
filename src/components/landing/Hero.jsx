@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import Logo from "./Logo.jsx";
 
 const jakarta = "'Plus Jakarta Sans', sans-serif";
 const mono = "'IBM Plex Mono', monospace";
 
 export default function Hero({ isMobile, onLogin, onSignup }) {
+  const { t } = useTranslation();
   return (
     <div style={{ background: "linear-gradient(165deg, #0a0f1e 0%, #0f1a2e 40%, #0d1f2d 70%, #0a1628 100%)", position: "relative", overflow: "hidden" }}>
       {/* Ambient glow */}
@@ -23,14 +25,14 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button onClick={onLogin}
             style={{ padding: "8px 18px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontFamily: "inherit", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-            Logga in
+            {t("hero.login")}
           </button>
           <button onClick={onSignup}
             style={{ padding: "9px 22px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600, transition: "background 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.background = "#3d72ff"}
             onMouseLeave={e => e.currentTarget.style.background = "#2962ff"}
           >
-            Kom igång
+            {t("hero.getStarted")}
           </button>
         </div>
       </nav>
@@ -44,7 +46,7 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
             fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.6)", letterSpacing: "0.03em",
           }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
-            Investeringsanalys driven av data
+            {t("hero.badge")}
           </span>
         </div>
 
@@ -53,9 +55,9 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
           fontFamily: jakarta, lineHeight: 1.05,
           marginBottom: 24, letterSpacing: "-0.04em",
         }}>
-          Analysera smartare.{isMobile ? " " : <br />}
+          {t("hero.titleLine1")}{isMobile ? " " : <br />}
           <span style={{ background: "linear-gradient(135deg, #5b9aff 0%, #2962ff 40%, #089981 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            Investera tryggare.
+            {t("hero.titleLine2")}
           </span>
         </h1>
 
@@ -63,7 +65,7 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
           fontSize: isMobile ? 15 : 18, color: "rgba(255,255,255,0.5)", lineHeight: 1.7,
           maxWidth: 540, margin: "0 auto 40px", fontWeight: 400,
         }}>
-          Aktieförslag baserade på Piotroski, Magic Formula och fler etablerade modeller — personligt anpassade efter din investerarprofil.
+          {t("hero.subtitle")}
         </p>
 
         <div className="fu fu3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: isMobile ? 48 : 72 }}>
@@ -77,14 +79,14 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 60px rgba(41,98,255,0.4)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(41,98,255,0.3)"; }}
           >
-            Kom igång gratis →
+            {t("hero.getStartedFree")} →
           </button>
           <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
             style={{ padding: "14px 28px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, cursor: "pointer", fontSize: 15, fontFamily: "inherit", color: "rgba(255,255,255,0.6)", fontWeight: 500, transition: "border-color 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"}
             onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
           >
-            Läs mer
+            {t("hero.learnMore")}
           </button>
         </div>
 
@@ -107,7 +109,7 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
           {/* Real app screenshot */}
           <img
             src="/app-screenshot.png"
-            alt="Thesion — Översikt"
+            alt={t("hero.screenshotAlt")}
             style={{ width: "100%", borderRadius: "8px 8px 0 0", display: "block" }}
           />
         </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { searchFunds } from "../lib/apiClient.js";
 import { useItpFunds } from "../hooks/useItpFunds.js";
 
@@ -19,6 +20,7 @@ const mono = { fontFamily: "'IBM Plex Mono', monospace" };
  *   providerName   – (optional) ITP provider name to constrain search
  */
 export default function FundAutocomplete({ value, onChange, onChangeName, placeholder, style, providerName }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState(value || "");
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -124,7 +126,7 @@ export default function FundAutocomplete({ value, onChange, onChangeName, placeh
         value={query}
         onChange={handleInput}
         onFocus={() => { if (results.length > 0) setOpen(true); }}
-        placeholder={placeholder || "Sök fond..."}
+        placeholder={placeholder || t("fundAutocomplete.searchFundPlaceholder")}
         style={inputStyle}
       />
       {loading && (
@@ -160,7 +162,7 @@ export default function FundAutocomplete({ value, onChange, onChangeName, placeh
                 )}
                 {fund.ongoingCharge != null && (
                   <span style={{ fontSize: 10, color: fund.ongoingCharge <= 0.3 ? "#089981" : "var(--text-muted)", ...mono }}>
-                    avg. {fund.ongoingCharge.toFixed(2)}%
+                    {t("fundAutocomplete.fee", { value: fund.ongoingCharge.toFixed(2) })}
                   </span>
                 )}
                 {fund.starRating > 0 && (

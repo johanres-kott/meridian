@@ -283,5 +283,9 @@
     "groupNamePlaceholder": "Group name...",
     "cancel": "Cancel",
     "newGroup": "+ New group"
+  },
+  "fundAutocomplete": {
+    "searchFundPlaceholder": "Search funds...",
+    "fee": "fee {{value}}%"
   }
 }

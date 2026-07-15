@@ -283,5 +283,9 @@
     "groupNamePlaceholder": "Gruppnamn...",
     "cancel": "Avbryt",
     "newGroup": "+ Ny grupp"
+  },
+  "fundAutocomplete": {
+    "searchFundPlaceholder": "Sök fond...",
+    "fee": "avg. {{value}}%"
   }
 }

@@ -482,5 +482,101 @@
       "pensionAllocation": "Age-adjusted allocation",
       "disclaimer": "Disclaimer"
     }
+  },
+  "scoringMethodology": {
+    "back": "← Back",
+    "intro": {
+      "title": "How does the scoring work?",
+      "body": "Thesion uses a composite model based on five established financial methods.\nEach stock is scored on a scale of 0-100. Your investor profile determines how the five sub-models are weighted."
+    },
+    "piotroski": {
+      "title": "1. Piotroski F-Score (Financial health)",
+      "body": "Developed by Professor Joseph Piotroski at Stanford. Tests 9 binary criteria to assess a company's financial strength:",
+      "items": [
+        "Positive return on equity (ROE)",
+        "Positive EBITDA (cash flow proxy)",
+        "Operating margin above 10%",
+        "EBITDA exceeds operating margin (quality check)",
+        "Debt below 3x EBITDA",
+        "Gross margin above 30%",
+        "Market cap above SEK 5 billion (not micro-cap)",
+        "Positive revenue growth",
+        "Gross margin above 40% (pricing power)"
+      ],
+      "note": "Score 0-9. Companies scoring 7-9 are considered financially strong. Weighted heavily for value investors."
+    },
+    "magicFormula": {
+      "title": "2. Magic Formula (Value)",
+      "body": "Developed by Joel Greenblatt. Combines two key metrics to find undervalued quality companies:",
+      "items": [
+        "Earnings Yield — earnings return (inverted P/E ratio). Higher = cheaper stock.",
+        "ROIC — return on invested capital. Higher = better capital allocation."
+      ],
+      "note": "Sums earnings yield and ROIC into a combined score. Weighted heavily for value investors."
+    },
+    "growth": {
+      "title": "3. Growth score",
+      "body": "Assesses the company's growth potential through three components:",
+      "items": [
+        "PEG ratio — P/E divided by growth rate. Below 1.0 indicates reasonably valued growth.",
+        "Revenue growth — percentage revenue growth. Above 15% is considered strong.",
+        "Operating margin — a high margin indicates scalability and operational leverage."
+      ],
+      "note": "Weighted heavily for growth investors."
+    },
+    "dividend": {
+      "title": "4. Dividend score",
+      "body": "Assesses the quality and sustainability of the company's dividend:",
+      "items": [
+        "Dividend yield — current dividend relative to the share price. Above 3% gives a high score.",
+        "Sustainability — low debt + a good operating margin indicate that the dividend can be maintained.",
+        "Stability — low beta (volatility) suggests a stable dividend payer."
+      ],
+      "note": "Weighted heavily for dividend investors."
+    },
+    "quality": {
+      "title": "5. Quality score",
+      "body": "Universal quality indicator that works regardless of investment style:",
+      "items": [
+        "Margin quality — combines operating and gross margin. High margins = competitive advantages.",
+        "ROIC quality — return on invested capital shows how efficiently the company uses its capital.",
+        "Debt — low debt/EBITDA indicates financial strength and flexibility."
+      ],
+      "note": "Weighted evenly for all profiles but extra heavily for growth and dividend investors."
+    },
+    "weighting": {
+      "title": "Your profile determines the weighting",
+      "body": "Depending on your investor profile, the five models are weighted differently:",
+      "headers": {
+        "model": "Model",
+        "value": "Value",
+        "growth": "Growth",
+        "dividend": "Dividend",
+        "mixed": "Mixed"
+      },
+      "models": {
+        "growth": "Growth",
+        "dividend": "Dividend",
+        "quality": "Quality"
+      }
+    },
+    "riskAdjustment": {
+      "title": "Risk adjustment",
+      "body": "The final score is adjusted based on how the stock's risk matches your risk profile:",
+      "items": [
+        "Risk is assessed via Beta (volatility relative to the market). Beta < 0.8 = low risk, 0.8-1.2 = medium, > 1.2 = high.",
+        "If the stock's risk matches your profile: no adjustment.",
+        "1 step of deviation (e.g. you want low risk but the stock is medium): -8 points.",
+        "2 steps of deviation (e.g. you want low risk but the stock is high): -20 points."
+      ]
+    },
+    "dataSources": {
+      "title": "Data sources & updates",
+      "body": "All financial data is fetched from Yahoo Finance and Financial Modeling Prep (FMP). Scores are calculated daily at 07:00 CET on weekdays. The stock universe includes Nasdaq Stockholm Large Cap, Mid Cap and the 50 largest companies in the S&P 500."
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "body": "Thesion's scoring is an analysis tool, not financial advice. The models are based on historical and current financial data and cannot predict future price development. Always do your own research before investing. Thesion takes no responsibility for investment decisions based on this information."
+    }
   }
 }

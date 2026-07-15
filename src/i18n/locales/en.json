@@ -157,5 +157,28 @@
       "revenueGrowth": "Revenue growth compared to the previous year.",
       "dividendYield": "Annual dividend divided by the share price. Higher = more returned each year."
     }
+  },
+  "fundView": {
+    "backToPortfolio": "Back to portfolio",
+    "todayChange": "{{value}}% today",
+    "plLine": "{{shares}} units · P&L: {{pl}} {{currency}} ({{plPct}}%)",
+    "units": "Units",
+    "gav": "Avg. cost",
+    "loadingFundData": "Loading fund data...",
+    "morningstarTip": "Morningstar rating based on risk-adjusted return",
+    "fee": "Fee",
+    "feeTip": "Annual management fee (TER)",
+    "dividend": "Dividend",
+    "dividendTip": "Dividend yield over the last 12 months",
+    "returns": "Returns",
+    "period1w": "1 week",
+    "period1m": "1 month",
+    "period3m": "3 months",
+    "period6m": "6 months",
+    "period1y": "1 year",
+    "period3y": "3 years (per year)",
+    "period5y": "5 years (per year)",
+    "period10y": "10 years (per year)",
+    "sourceLine": "Source: Morningstar · Returns in {{currency}} · Periods ≥3 years shown as average annual return"
   }
 }

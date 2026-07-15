@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { STATUSES, STATUS_COLORS } from "../constants.js";
 import { fetchFund } from "../lib/apiClient.js";
@@ -32,6 +33,8 @@ function ReturnBar({ label, value }) {
 }
 
 export default function FundView({ item, onBack, onUpdate }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const isMobile = useIsMobile();
   const [fund, setFund] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +55,7 @@ export default function FundView({ item, onBack, onUpdate }) {
       <div style={{ marginBottom: 20 }}>
         <button onClick={onBack}
           style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 12 }}>
-          &larr; Tillbaka till portföljen
+          &larr; {t("fundView.backToPortfolio")}
         </button>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -83,12 +86,12 @@ export default function FundView({ item, onBack, onUpdate }) {
         {fund && (
           <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 12 }}>
             <span style={{ fontSize: 28, fontWeight: 600, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
-              {fund.nav?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {fund.nav?.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{fund.currency || "SEK"}</span>
             {fund.returnD1 != null && (
               <span style={{ fontSize: 14, fontWeight: 500, color: fund.returnD1 >= 0 ? "#089981" : "#f23645" }}>
-                {fund.returnD1 > 0 ? "+" : ""}{fund.returnD1.toFixed(2)}% idag
+                {t("fundView.todayChange", { value: `${fund.returnD1 > 0 ? "+" : ""}${fund.returnD1.toFixed(2)}` })}
               </span>
             )}
           </div>
@@ -97,14 +100,19 @@ export default function FundView({ item, onBack, onUpdate }) {
         {/* P&L if holdings */}
         {pl !== null && (
           <div style={{ marginTop: 8, fontSize: 13, color: pl >= 0 ? "#089981" : "#f23645" }}>
-            {item.shares} andelar · P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {fund?.currency || "SEK"} ({plPct >= 0 ? "+" : ""}{plPct.toFixed(1)}%)
+            {t("fundView.plLine", {
+              shares: item.shares,
+              pl: `${pl >= 0 ? "+" : ""}${pl.toLocaleString(numberLocale, { maximumFractionDigits: 0 })}`,
+              currency: fund?.currency || "SEK",
+              plPct: `${plPct >= 0 ? "+" : ""}${plPct.toFixed(1)}`,
+            })}
           </div>
         )}
 
         {/* Shares + GAV edit */}
         <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
           <div>
-            <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Andelar</label>
+            <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>{t("fundView.units")}</label>
             <input
               type="number"
               value={item.shares || ""}
@@ -114,7 +122,7 @@ export default function FundView({ item, onBack, onUpdate }) {
             />
           </div>
           <div>
-            <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>GAV</label>
+            <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>{t("fundView.gav")}</label>
             <input
               type="number"
               step="0.01"
@@ -127,7 +135,7 @@ export default function FundView({ item, onBack, onUpdate }) {
         </div>
       </div>
 
-      {loading && <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>Laddar fonddata...</div>}
+      {loading && <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>{t("fundView.loadingFundData")}</div>}
 
       {fund && (
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 24 }}>
@@ -138,37 +146,37 @@ export default function FundView({ item, onBack, onUpdate }) {
               <StatCard
                 label="Morningstar"
                 value={fund.starRating ? "★".repeat(fund.starRating) + "☆".repeat(5 - fund.starRating) : "–"}
-                tip="Morningstars betyg baserat på riskjusterad avkastning"
+                tip={t("fundView.morningstarTip")}
               />
               <StatCard
-                label="Avgift"
+                label={t("fundView.fee")}
                 value={fund.ongoingCharge != null ? `${fund.ongoingCharge.toFixed(2)}%` : "–"}
-                tip="Årlig förvaltningsavgift (TER)"
+                tip={t("fundView.feeTip")}
               />
               {fund.yield != null && (
                 <StatCard
-                  label="Utdelning"
+                  label={t("fundView.dividend")}
                   value={`${(fund.yield * 100).toFixed(2)}%`}
-                  tip="Direktavkastning senaste 12 mån"
+                  tip={t("fundView.dividendTip")}
                 />
               )}
             </div>
 
             {/* Return bars */}
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: 16, marginBottom: 24 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>Avkastning</div>
-              <ReturnBar label="1 vecka" value={fund.returnW1} />
-              <ReturnBar label="1 månad" value={fund.returnM1} />
-              <ReturnBar label="3 månader" value={fund.returnM3} />
-              <ReturnBar label="6 månader" value={fund.returnM6} />
-              <ReturnBar label="1 år" value={fund.returnM12} />
-              <ReturnBar label="3 år (per år)" value={fund.returnM36} />
-              <ReturnBar label="5 år (per år)" value={fund.returnM60} />
-              <ReturnBar label="10 år (per år)" value={fund.returnM120} />
+              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>{t("fundView.returns")}</div>
+              <ReturnBar label={t("fundView.period1w")} value={fund.returnW1} />
+              <ReturnBar label={t("fundView.period1m")} value={fund.returnM1} />
+              <ReturnBar label={t("fundView.period3m")} value={fund.returnM3} />
+              <ReturnBar label={t("fundView.period6m")} value={fund.returnM6} />
+              <ReturnBar label={t("fundView.period1y")} value={fund.returnM12} />
+              <ReturnBar label={t("fundView.period3y")} value={fund.returnM36} />
+              <ReturnBar label={t("fundView.period5y")} value={fund.returnM60} />
+              <ReturnBar label={t("fundView.period10y")} value={fund.returnM120} />
             </div>
 
             <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8 }}>
-              Källa: Morningstar · Avkastning i {fund.currency || "SEK"} · Perioder &ge;3 år visas som genomsnittlig årlig avkastning
+              {t("fundView.sourceLine", { currency: fund.currency || "SEK" })}
             </div>
           </div>
 

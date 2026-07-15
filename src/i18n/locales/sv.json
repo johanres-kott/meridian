@@ -157,5 +157,28 @@
       "revenueGrowth": "Omsättningstillväxt jämfört med föregående år.",
       "dividendYield": "Årlig utdelning delat med aktiekursen. Högre = mer tillbaka varje år."
     }
+  },
+  "fundView": {
+    "backToPortfolio": "Tillbaka till portföljen",
+    "todayChange": "{{value}}% idag",
+    "plLine": "{{shares}} andelar · P&L: {{pl}} {{currency}} ({{plPct}}%)",
+    "units": "Andelar",
+    "gav": "GAV",
+    "loadingFundData": "Laddar fonddata...",
+    "morningstarTip": "Morningstars betyg baserat på riskjusterad avkastning",
+    "fee": "Avgift",
+    "feeTip": "Årlig förvaltningsavgift (TER)",
+    "dividend": "Utdelning",
+    "dividendTip": "Direktavkastning senaste 12 mån",
+    "returns": "Avkastning",
+    "period1w": "1 vecka",
+    "period1m": "1 månad",
+    "period3m": "3 månader",
+    "period6m": "6 månader",
+    "period1y": "1 år",
+    "period3y": "3 år (per år)",
+    "period5y": "5 år (per år)",
+    "period10y": "10 år (per år)",
+    "sourceLine": "Källa: Morningstar · Avkastning i {{currency}} · Perioder ≥3 år visas som genomsnittlig årlig avkastning"
   }
 }

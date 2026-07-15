@@ -180,5 +180,17 @@
     "period5y": "5 år (per år)",
     "period10y": "10 år (per år)",
     "sourceLine": "Källa: Morningstar · Avkastning i {{currency}} · Perioder ≥3 år visas som genomsnittlig årlig avkastning"
+  },
+  "compareView": {
+    "back": "Tillbaka",
+    "title": "Jämförelse",
+    "operatingMargin": "Rörelsemarginal",
+    "operatingMarginShort": "Rörelsemarg.",
+    "ebitdaMargin": "EBITDA-marginal",
+    "grossMargin": "Bruttomarginal",
+    "revenueGrowth": "Tillväxt",
+    "debtEbitda": "Skuld/EBITDA",
+    "relativeStrength": "Relativt styrkeindex",
+    "keyMetrics": "Nyckeltal"
   }
 }

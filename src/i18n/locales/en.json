@@ -180,5 +180,17 @@
     "period5y": "5 years (per year)",
     "period10y": "10 years (per year)",
     "sourceLine": "Source: Morningstar · Returns in {{currency}} · Periods ≥3 years shown as average annual return"
+  },
+  "compareView": {
+    "back": "Back",
+    "title": "Comparison",
+    "operatingMargin": "Operating margin",
+    "operatingMarginShort": "Op. margin",
+    "ebitdaMargin": "EBITDA margin",
+    "grossMargin": "Gross margin",
+    "revenueGrowth": "Growth",
+    "debtEbitda": "Debt/EBITDA",
+    "relativeStrength": "Relative strength index",
+    "keyMetrics": "Key metrics"
   }
 }

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { fmt } from "./shared.js";
 import {
@@ -6,23 +7,23 @@ import {
 
 const COMPANY_COLORS = ["#2962ff", "#089981", "#f23645", "#e65100"];
 
-const METRIC_COLUMNS = [
+const getMetricColumns = (t) => [
   { key: "peForward", label: "P/E Forward", fmt: v => fmt(v, "x") },
   { key: "peTrailing", label: "P/E Trailing", fmt: v => fmt(v, "x") },
-  { key: "operatingMargin", label: "Rörelsemarginal", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "ebitdaMargin", label: "EBITDA-marginal", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "grossMargin", label: "Bruttomarginal", fmt: v => fmt(v, "%") },
-  { key: "revenueGrowth", label: "Tillväxt", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
+  { key: "operatingMargin", label: t("compareView.operatingMargin"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  { key: "ebitdaMargin", label: t("compareView.ebitdaMargin"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  { key: "grossMargin", label: t("compareView.grossMargin"), fmt: v => fmt(v, "%") },
+  { key: "revenueGrowth", label: t("compareView.revenueGrowth"), fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
   { key: "roic", label: "ROIC", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "debtEbitda", label: "Skuld/EBITDA", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
+  { key: "debtEbitda", label: t("compareView.debtEbitda"), fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
 ];
 
-const RADAR_METRICS = [
+const getRadarMetrics = (t) => [
   { key: "peForward", label: "P/E Fwd", invert: true },
-  { key: "operatingMargin", label: "Rörelsemarg.", invert: false },
-  { key: "revenueGrowth", label: "Tillväxt", invert: false },
+  { key: "operatingMargin", label: t("compareView.operatingMarginShort"), invert: false },
+  { key: "revenueGrowth", label: t("compareView.revenueGrowth"), invert: false },
   { key: "roic", label: "ROIC", invert: false },
-  { key: "debtEbitda", label: "Skuld/EBITDA", invert: true },
+  { key: "debtEbitda", label: t("compareView.debtEbitda"), invert: true },
 ];
 
 function normalize(values, invert) {
@@ -39,9 +40,11 @@ function normalize(values, invert) {
 }
 
 export default function CompareView({ companies, onBack }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const isMobile = useIsMobile();
 
-  const radarData = RADAR_METRICS.map(metric => {
+  const radarData = getRadarMetrics(t).map(metric => {
     const rawValues = companies.map(c => c[metric.key] ?? null);
     const normalized = normalize(rawValues, metric.invert);
     const entry = { metric: metric.label };
@@ -63,10 +66,10 @@ export default function CompareView({ companies, onBack }) {
             fontFamily: "inherit",
           }}
         >
-          Tillbaka
+          {t("compareView.back")}
         </button>
         <div>
-          <h1 style={{ fontSize: 18, fontWeight: 500, margin: 0 }}>Jämförelse</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 500, margin: 0 }}>{t("compareView.title")}</h1>
           <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: "2px 0 0 0" }}>
             {companies.map(c => c.name || c.ticker).join(" vs ")}
           </p>
@@ -90,7 +93,7 @@ export default function CompareView({ companies, onBack }) {
             </div>
             {c.price != null && (
               <div style={{ fontSize: 18, fontWeight: 500, marginTop: 8, color: "var(--text)" }}>
-                {c.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {c.price.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 4 }}>{c.currency || ""}</span>
               </div>
             )}
@@ -108,7 +111,7 @@ export default function CompareView({ companies, onBack }) {
 
       {/* Radar chart */}
       <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16, marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>Relativt styrkeindex</div>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>{t("compareView.relativeStrength")}</div>
         <ResponsiveContainer width="100%" height={isMobile ? 280 : 350}>
           <RadarChart data={radarData} cx="50%" cy="50%" outerRadius={isMobile ? "65%" : "70%"}>
             <PolarGrid stroke="var(--border)" />
@@ -141,7 +144,7 @@ export default function CompareView({ companies, onBack }) {
                 padding: "8px 10px", textAlign: "left", fontSize: 11, fontWeight: 500,
                 color: "var(--text-secondary)", borderBottom: "1px solid var(--border)",
               }}>
-                Nyckeltal
+                {t("compareView.keyMetrics")}
               </th>
               {companies.map((c, i) => (
                 <th key={c.ticker} style={{
@@ -154,7 +157,7 @@ export default function CompareView({ companies, onBack }) {
             </tr>
           </thead>
           <tbody>
-            {METRIC_COLUMNS.map(col => (
+            {getMetricColumns(t).map(col => (
               <tr key={col.key}>
                 <td style={{
                   padding: "8px 10px", fontSize: 12, color: "var(--text)",

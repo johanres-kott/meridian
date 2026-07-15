@@ -242,5 +242,18 @@
     "high": "High:",
     "low": "Low:",
     "estimatedNote": "Estimated based on current holdings"
+  },
+  "quarterlyChart": {
+    "loading": "Loading quarterly data...",
+    "title": "Quarterly data",
+    "revenue": "Revenue",
+    "margins": "Margins",
+    "operatingIncome": "Operating income",
+    "netIncome": "Net income",
+    "operatingMargin": "Operating margin",
+    "grossMargin": "Gross margin",
+    "netMargin": "Net margin",
+    "quarter": "Quarter",
+    "opMarginShort": "Op. margin"
   }
 }

@@ -242,5 +242,18 @@
     "high": "Högst:",
     "low": "Lägst:",
     "estimatedNote": "Estimerat baserat på nuvarande innehav"
+  },
+  "quarterlyChart": {
+    "loading": "Laddar kvartalsdata...",
+    "title": "Kvartalsdata",
+    "revenue": "Omsättning",
+    "margins": "Marginaler",
+    "operatingIncome": "Rörelseresultat",
+    "netIncome": "Nettoresultat",
+    "operatingMargin": "Rörelsemarginal",
+    "grossMargin": "Bruttomarginal",
+    "netMargin": "Nettomarginal",
+    "quarter": "Kvartal",
+    "opMarginShort": "Rör.marg"
   }
 }

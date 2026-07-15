@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
@@ -18,6 +19,7 @@ function formatQuarterLabel(dateStr) {
 }
 
 export default function QuarterlyChart({ ticker }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function QuarterlyChart({ ticker }) {
 
   if (loading) return (
     <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 20, textAlign: "center" }}>
-      <div style={{ fontSize: 12, color: "#787b86" }}>Laddar kvartalsdata...</div>
+      <div style={{ fontSize: 12, color: "#787b86" }}>{t("quarterlyChart.loading")}</div>
     </div>
   );
 
@@ -47,9 +49,9 @@ export default function QuarterlyChart({ ticker }) {
   return (
     <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Kvartalsdata</div>
+        <div style={{ fontSize: 11, color: "#787b86", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>{t("quarterlyChart.title")}</div>
         <div style={{ display: "flex", gap: 4 }}>
-          {[{ id: "revenue", label: "Omsättning" }, { id: "margins", label: "Marginaler" }].map(v => (
+          {[{ id: "revenue", label: t("quarterlyChart.revenue") }, { id: "margins", label: t("quarterlyChart.margins") }].map(v => (
             <button key={v.id} onClick={() => setView(v.id)}
               style={{
                 fontSize: 11, padding: "4px 10px", borderRadius: 3, border: "none", cursor: "pointer",
@@ -70,7 +72,7 @@ export default function QuarterlyChart({ ticker }) {
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#787b86" }} />
             <YAxis tickFormatter={formatMSEK} tick={{ fontSize: 10, fill: "#787b86" }} />
             <Tooltip
-              formatter={(v, name) => [formatMSEK(v), name === "revenue" ? "Omsättning" : name === "operatingIncome" ? "Rörelseresultat" : "Nettoresultat"]}
+              formatter={(v, name) => [formatMSEK(v), name === "revenue" ? t("quarterlyChart.revenue") : name === "operatingIncome" ? t("quarterlyChart.operatingIncome") : t("quarterlyChart.netIncome")]}
               labelStyle={{ fontSize: 11 }}
               contentStyle={{ fontSize: 11, borderRadius: 4 }}
             />
@@ -85,7 +87,7 @@ export default function QuarterlyChart({ ticker }) {
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#787b86" }} />
             <YAxis tickFormatter={v => `${v?.toFixed(0)}%`} tick={{ fontSize: 10, fill: "#787b86" }} />
             <Tooltip
-              formatter={(v, name) => [`${v?.toFixed(1)}%`, name === "operatingMargin" ? "Rörelsemarginal" : name === "grossMargin" ? "Bruttomarginal" : "Nettomarginal"]}
+              formatter={(v, name) => [`${v?.toFixed(1)}%`, name === "operatingMargin" ? t("quarterlyChart.operatingMargin") : name === "grossMargin" ? t("quarterlyChart.grossMargin") : t("quarterlyChart.netMargin")]}
               labelStyle={{ fontSize: 11 }}
               contentStyle={{ fontSize: 11, borderRadius: 4 }}
             />
@@ -101,11 +103,11 @@ export default function QuarterlyChart({ ticker }) {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
           <thead>
             <tr style={{ borderBottom: "2px solid #e0e3eb" }}>
-              <th style={thStyle}>Kvartal</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Omsättning</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Rörelseresultat</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Rör.marg</th>
-              {!isMobile && <th style={{ ...thStyle, textAlign: "right" }}>Nettoresultat</th>}
+              <th style={thStyle}>{t("quarterlyChart.quarter")}</th>
+              <th style={{ ...thStyle, textAlign: "right" }}>{t("quarterlyChart.revenue")}</th>
+              <th style={{ ...thStyle, textAlign: "right" }}>{t("quarterlyChart.operatingIncome")}</th>
+              <th style={{ ...thStyle, textAlign: "right" }}>{t("quarterlyChart.opMarginShort")}</th>
+              {!isMobile && <th style={{ ...thStyle, textAlign: "right" }}>{t("quarterlyChart.netIncome")}</th>}
               {!isMobile && <th style={{ ...thStyle, textAlign: "right" }}>EPS</th>}
             </tr>
           </thead>

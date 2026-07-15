@@ -578,5 +578,10 @@
       "title": "Disclaimer",
       "body": "Thesion's scoring is an analysis tool, not financial advice. The models are based on historical and current financial data and cannot predict future price development. Always do your own research before investing. Thesion takes no responsibility for investment decisions based on this information."
     }
+  },
+  "notificationBell": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications yet"
   }
 }

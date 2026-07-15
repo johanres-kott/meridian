@@ -578,5 +578,10 @@
       "title": "Ansvarsfriskrivning",
       "body": "Thesions poängsättning är ett analysverktyg, inte finansiell rådgivning. Modellerna baseras på historisk och aktuell finansiell data och kan inte förutsäga framtida kursutveckling. Gör alltid din egen research innan du investerar. Thesion tar inget ansvar för investeringsbeslut baserade på denna information."
     }
+  },
+  "notificationBell": {
+    "title": "Notifikationer",
+    "markAllRead": "Markera alla som lästa",
+    "empty": "Inga notifikationer ännu"
   }
 }

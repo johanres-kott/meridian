@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import NotificationItem from "./NotificationItem.jsx";
@@ -6,6 +7,7 @@ import NotificationItem from "./NotificationItem.jsx";
 const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const { userId } = useUser();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -98,7 +100,7 @@ export default function NotificationBell() {
           alignItems: "center",
           gap: 4,
         }}
-        title="Notifikationer"
+        title={t("notificationBell.title")}
       >
         <svg
           width="14"
@@ -173,7 +175,7 @@ export default function NotificationBell() {
                 color: "var(--text)",
               }}
             >
-              Notifikationer
+              {t("notificationBell.title")}
             </span>
             {unreadCount > 0 && (
               <button
@@ -190,7 +192,7 @@ export default function NotificationBell() {
                   padding: 0,
                 }}
               >
-                Markera alla som lästa
+                {t("notificationBell.markAllRead")}
               </button>
             )}
           </div>
@@ -206,7 +208,7 @@ export default function NotificationBell() {
                   fontSize: 12,
                 }}
               >
-                Inga notifikationer ännu
+                {t("notificationBell.empty")}
               </div>
             ) : (
               notifications.map((n) => (

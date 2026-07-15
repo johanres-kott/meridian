@@ -212,5 +212,14 @@
       "satellite": "Growth, thematic bets, medium risk",
       "speculation": "High risk, high upside, turnarounds"
     }
+  },
+  "strategyCard": {
+    "title": "Your investment strategy",
+    "savedAt": "Saved {{date}}",
+    "why": "Why",
+    "what": "What",
+    "how": "How",
+    "rationale": "Rationale",
+    "removeStrategy": "Remove strategy"
   }
 }

@@ -212,5 +212,14 @@
       "satellite": "Tillväxt, tematiska satsningar, medel risk",
       "speculation": "Hög risk, hög uppsida, turnarounds"
     }
+  },
+  "strategyCard": {
+    "title": "Din investeringsstrategi",
+    "savedAt": "Sparad {{date}}",
+    "why": "Varför",
+    "what": "Vad",
+    "how": "Hur",
+    "rationale": "Motivering",
+    "removeStrategy": "Ta bort strategi"
   }
 }

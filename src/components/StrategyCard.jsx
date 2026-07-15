@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import Markdown from "./Markdown.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 
 export default function StrategyCard({ isMobile }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { preferences, updatePreferences } = useUser();
 
   if (!preferences.investmentPlan?.text) return null;
@@ -33,36 +36,36 @@ export default function StrategyCard({ isMobile }) {
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
-            Din investeringsstrategi
+            {t("strategyCard.title")}
           </div>
           <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-            Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
+            {t("strategyCard.savedAt", { date: new Date(preferences.investmentPlan.savedAt).toLocaleDateString(numberLocale) })}
           </div>
         </div>
         {preamble && <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 10 }}><Markdown text={preamble} /></div>}
         {sections.varfor && (
           <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, marginBottom: 12, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Varför</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{t("strategyCard.why")}</div>
             <Markdown text={sections.varfor} />
           </div>
         )}
         <div style={{ display: isMobile ? "flex" : "grid", flexDirection: isMobile ? "column" : undefined, gridTemplateColumns: isMobile ? undefined : "1fr 1fr", gap: 12, marginBottom: 12 }}>
           {sections.vad && (
             <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Vad</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{t("strategyCard.what")}</div>
               <Markdown text={sections.vad} />
             </div>
           )}
           {sections.hur && (
             <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Hur</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{t("strategyCard.how")}</div>
               <Markdown text={sections.hur} />
             </div>
           )}
         </div>
         {sections.motivering && (
           <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.5, padding: "10px 12px", background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)", marginBottom: 8 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>Motivering</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{t("strategyCard.rationale")}</div>
             <Markdown text={sections.motivering} />
           </div>
         )}
@@ -70,7 +73,7 @@ export default function StrategyCard({ isMobile }) {
           onClick={() => updatePreferences({ investmentPlan: null })}
           style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
         >
-          Ta bort strategi
+          {t("strategyCard.removeStrategy")}
         </button>
       </div>
     );
@@ -85,10 +88,10 @@ export default function StrategyCard({ isMobile }) {
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>
-          Din investeringsstrategi
+          {t("strategyCard.title")}
         </div>
         <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-          Sparad {new Date(preferences.investmentPlan.savedAt).toLocaleDateString("sv-SE")}
+          {t("strategyCard.savedAt", { date: new Date(preferences.investmentPlan.savedAt).toLocaleDateString(numberLocale) })}
         </div>
       </div>
       <div style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.6 }}>
@@ -98,7 +101,7 @@ export default function StrategyCard({ isMobile }) {
         onClick={() => updatePreferences({ investmentPlan: null })}
         style={{ marginTop: 8, fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
       >
-        Ta bort strategi
+        {t("strategyCard.removeStrategy")}
       </button>
     </div>
   );

@@ -265,5 +265,15 @@
     "atPrice": "à {{price}} {{currency}}",
     "confirmDelete": "Ta bort {{name}} från portföljen?",
     "delete": "Ta bort"
+  },
+  "addCompanyBar": {
+    "stocks": "Aktier",
+    "funds": "Fonder",
+    "searchFundPlaceholder": "Sök fond — t.ex. SEB, Handelsbanken, Avanza...",
+    "addCompanyPlaceholder": "Lägg till bolag — sök på namn eller ticker...",
+    "index": "Index",
+    "active": "Aktiv",
+    "fee": "Avgift: {{value}}%",
+    "oneYear": "1 år: {{value}}%"
   }
 }

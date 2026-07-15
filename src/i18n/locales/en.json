@@ -265,5 +265,15 @@
     "atPrice": "at {{price}} {{currency}}",
     "confirmDelete": "Remove {{name}} from your portfolio?",
     "delete": "Remove"
+  },
+  "addCompanyBar": {
+    "stocks": "Stocks",
+    "funds": "Funds",
+    "searchFundPlaceholder": "Search funds — e.g. SEB, Handelsbanken, Avanza...",
+    "addCompanyPlaceholder": "Add a company — search by name or ticker...",
+    "index": "Index",
+    "active": "Active",
+    "fee": "Fee: {{value}}%",
+    "oneYear": "1 yr: {{value}}%"
   }
 }

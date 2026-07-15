@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { sanitizeInput } from "../lib/sanitize.js";
 import { searchStocks, searchFunds } from "../lib/apiClient.js";
 
 export default function AddCompanyBar({ onAdd, isMobile }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [mode, setMode] = useState("stock"); // "stock" | "fund"
@@ -48,13 +50,13 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
   return (
     <div style={{ position: "relative", marginBottom: 24 }}>
       <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
-        <button style={toggleStyle(mode === "stock")} onClick={() => { setMode("stock"); setQuery(""); setResults([]); }}>Aktier</button>
-        <button style={toggleStyle(mode === "fund")} onClick={() => { setMode("fund"); setQuery(""); setResults([]); }}>Fonder</button>
+        <button style={toggleStyle(mode === "stock")} onClick={() => { setMode("stock"); setQuery(""); setResults([]); }}>{t("addCompanyBar.stocks")}</button>
+        <button style={toggleStyle(mode === "fund")} onClick={() => { setMode("fund"); setQuery(""); setResults([]); }}>{t("addCompanyBar.funds")}</button>
       </div>
       <input
         value={query}
         onChange={e => setQuery(e.target.value)}
-        placeholder={mode === "fund" ? "Sök fond — t.ex. SEB, Handelsbanken, Avanza..." : "Lägg till bolag — sök på namn eller ticker..."}
+        placeholder={mode === "fund" ? t("addCompanyBar.searchFundPlaceholder") : t("addCompanyBar.addCompanyPlaceholder")}
         style={{ width: "100%", maxWidth: isMobile ? "100%" : undefined, boxSizing: isMobile ? "border-box" : undefined, padding: "10px 14px", border: "1px solid var(--border)", borderRadius: 6, fontSize: 13, fontFamily: "inherit", outline: "none", color: "var(--text)", background: "var(--bg-card)" }}
       />
       {results.length > 0 && (
@@ -75,7 +77,7 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
                         background: r.indexFund ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
                         color: r.indexFund ? "#1976d2" : "#7b1fa2",
                       }}>
-                        {r.indexFund ? "Index" : "Aktiv"}
+                        {r.indexFund ? t("addCompanyBar.index") : t("addCompanyBar.active")}
                       </span>
                     </span>
                     {r.starRating && (
@@ -84,8 +86,8 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
                   </div>
                   <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2, display: "flex", gap: 12 }}>
                     <span>{r.category}</span>
-                    {r.ongoingCharge != null && <span>Avgift: {r.ongoingCharge.toFixed(2)}%</span>}
-                    {r.returnM12 != null && <span>1 år: {r.returnM12 > 0 ? "+" : ""}{r.returnM12.toFixed(1)}%</span>}
+                    {r.ongoingCharge != null && <span>{t("addCompanyBar.fee", { value: r.ongoingCharge.toFixed(2) })}</span>}
+                    {r.returnM12 != null && <span>{t("addCompanyBar.oneYear", { value: `${r.returnM12 > 0 ? "+" : ""}${r.returnM12.toFixed(1)}` })}</span>}
                   </div>
                 </div>
               );

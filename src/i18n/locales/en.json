@@ -440,5 +440,16 @@
     "deleteAccountDesc": "All data is deleted permanently",
     "contactSupportToDelete": "Contact support to delete your account",
     "delete": "Delete"
+  },
+  "aboutPage": {
+    "title": "About Thesion",
+    "aboutProject": "About the project",
+    "aboutProjectText": "Thesion is a hobby project created by Johan Resare to explore how a production app can be built with Claude Code (AI-assisted development). The app analyses stocks using established financial models and gives you personal investment suggestions.",
+    "technology": "Technology",
+    "technologyText": "The entire app is built with AI-assisted development via Claude Code (Anthropic). The tech stack includes React for the frontend, Vercel for hosting, Supabase for database and authentication, Yahoo Finance for market data and Claude AI for the chat assistant.",
+    "contact": "Contact",
+    "contactText": "Do you have questions, feedback or suggestions? Get in touch!",
+    "disclaimer": "Disclaimer",
+    "disclaimerText": "Thesion does not provide financial advice. All information is for educational purposes. Always do your own research before investing."
   }
 }

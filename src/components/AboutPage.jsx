@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 16 : 24, marginBottom: 16 };
@@ -9,19 +11,19 @@ export default function AboutPage() {
 
   return (
     <div>
-      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 20 }}>Om Thesion</h1>
+      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 20 }}>{t("aboutPage.title")}</h1>
 
       <div style={cardStyle}>
-        <div style={labelStyle}>Om projektet</div>
+        <div style={labelStyle}>{t("aboutPage.aboutProject")}</div>
         <p style={pStyle}>
-          Thesion är ett hobbyprojekt skapat av Johan Resare för att utforska hur man kan bygga en produktionsapp med Claude Code (AI-assisterad utveckling). Appen analyserar aktier med etablerade finansiella modeller och ger personliga investeringsförslag.
+          {t("aboutPage.aboutProjectText")}
         </p>
       </div>
 
       <div style={cardStyle}>
-        <div style={labelStyle}>Teknik</div>
+        <div style={labelStyle}>{t("aboutPage.technology")}</div>
         <p style={pStyle}>
-          Hela appen är byggd med AI-assisterad utveckling via Claude Code (Anthropic). Tech-stacken inkluderar React för frontend, Vercel för hosting, Supabase för databas och autentisering, Yahoo Finance för marknadsdata och Claude AI för chattassistenten.
+          {t("aboutPage.technologyText")}
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
           {["React", "Vercel", "Supabase", "Yahoo Finance", "Claude AI"].map(tech => (
@@ -33,9 +35,9 @@ export default function AboutPage() {
       </div>
 
       <div style={cardStyle}>
-        <div style={labelStyle}>Kontakt</div>
+        <div style={labelStyle}>{t("aboutPage.contact")}</div>
         <p style={pStyle}>
-          Har du frågor, feedback eller förslag? Hör av dig!
+          {t("aboutPage.contactText")}
         </p>
         <a href="mailto:info@thesion.tech" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 500, textDecoration: "none" }}>
           info@thesion.tech
@@ -43,9 +45,9 @@ export default function AboutPage() {
       </div>
 
       <div style={cardStyle}>
-        <div style={labelStyle}>Ansvarsfriskrivning</div>
+        <div style={labelStyle}>{t("aboutPage.disclaimer")}</div>
         <p style={pStyle}>
-          Thesion ger inte finansiell rådgivning. All information är för utbildningssyfte. Gör alltid din egen research innan du investerar.
+          {t("aboutPage.disclaimerText")}
         </p>
       </div>
     </div>

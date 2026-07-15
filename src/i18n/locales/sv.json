@@ -862,5 +862,8 @@
       "title": "9. Kontakt",
       "body": "Har du frågor om din data eller vill utöva dina rättigheter? Kontakta oss på"
     }
+  },
+  "landingPage": {
+    "back": "Tillbaka"
   }
 }

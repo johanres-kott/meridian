@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import Login from "./Login.jsx";
 import Hero from "./landing/Hero.jsx";
@@ -6,6 +7,7 @@ import Features from "./landing/Features.jsx";
 import CtaAndFooter from "./landing/CtaAndFooter.jsx";
 
 export default function LandingPage({ onShowPrivacy }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [showLogin, setShowLogin] = useState(false);
   const [defaultMode, setDefaultMode] = useState("login");
@@ -15,7 +17,7 @@ export default function LandingPage({ onShowPrivacy }) {
       <div>
         <div style={{ padding: isMobile ? "12px 16px" : "12px 48px", display: "flex", alignItems: "center" }}>
           <button onClick={() => setShowLogin(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#2962ff", fontFamily: "inherit" }}>
-            ← Tillbaka
+            ← {t("landingPage.back")}
           </button>
         </div>
         <Login onShowPrivacy={onShowPrivacy} defaultMode={defaultMode} />

@@ -862,5 +862,8 @@
       "title": "9. Contact",
       "body": "Do you have questions about your data, or want to exercise your rights? Contact us at"
     }
+  },
+  "landingPage": {
+    "back": "Back"
   }
 }

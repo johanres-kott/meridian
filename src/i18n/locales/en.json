@@ -984,5 +984,24 @@
     "gav": "Avg. cost",
     "notesTitle": "Notes",
     "noNotes": "No notes yet. Click Edit to add your investment thesis, analysis, etc."
+  },
+  "ownershipChart": {
+    "capitalPct": "{{value}}% of capital",
+    "votesPct": "{{value}}% of votes",
+    "sharesCount": "{{shares}} shares",
+    "fetchError": "Could not fetch ownership data",
+    "title": "Owners",
+    "loadingData": "Fetching ownership data...",
+    "otherInstitutions": "Other institutions",
+    "otherInstitutionsFull": "Other institutional owners",
+    "insiders": "Insiders",
+    "insidersFull": "Insiders & management",
+    "other": "Other",
+    "otherFull": "Retail investors & other",
+    "institutionsCount": "({{num}} institutions)",
+    "institutional": "Institutional",
+    "retail": "Retail",
+    "sourceIR": "Source: Company IR page · Updated {{date}}",
+    "sourceYahoo": "Source: Yahoo Finance"
   }
 }

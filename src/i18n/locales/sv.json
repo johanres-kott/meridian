@@ -984,5 +984,24 @@
     "gav": "GAV",
     "notesTitle": "Anteckningar",
     "noNotes": "Inga anteckningar ännu. Klicka Redigera för att lägga till investeringstes, analys, etc."
+  },
+  "ownershipChart": {
+    "capitalPct": "{{value}}% kapital",
+    "votesPct": "{{value}}% röster",
+    "sharesCount": "{{shares}} aktier",
+    "fetchError": "Kunde inte hämta ägardata",
+    "title": "Ägare",
+    "loadingData": "Hämtar ägardata...",
+    "otherInstitutions": "Övriga institutioner",
+    "otherInstitutionsFull": "Övriga institutionella ägare",
+    "insiders": "Insiders",
+    "insidersFull": "Insiders & ledning",
+    "other": "Övriga",
+    "otherFull": "Privata investerare & övriga",
+    "institutionsCount": "({{num}} institutioner)",
+    "institutional": "Institutionellt",
+    "retail": "Privata",
+    "sourceIR": "Källa: Bolagets IR-sida · Uppdaterad {{date}}",
+    "sourceYahoo": "Källa: Yahoo Finance"
   }
 }

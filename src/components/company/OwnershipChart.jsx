@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
+import { useTranslation } from "react-i18next";
 
 const COLORS = [
   "#089981", "#2962ff", "#ff9800", "#ab47bc", "#26a69a",
@@ -13,6 +14,8 @@ const RETAIL_COLOR = "#b0bec5";
 const OTHER_INST_COLOR = "#546e7a";
 
 function CustomTooltip({ active, payload }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   if (!active || !payload?.[0]) return null;
   const d = payload[0].payload;
   return (
@@ -21,13 +24,13 @@ function CustomTooltip({ active, payload }) {
       borderRadius: 4, padding: "8px 12px", fontSize: 11, boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
     }}>
       <div style={{ fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>{d.name}</div>
-      <div style={{ color: "var(--text-secondary)" }}>{d.value.toFixed(1)}% kapital</div>
+      <div style={{ color: "var(--text-secondary)" }}>{t("ownershipChart.capitalPct", { value: d.value.toFixed(1) })}</div>
       {d.pctVotes != null && (
-        <div style={{ color: "var(--text-secondary)", fontSize: 10 }}>{d.pctVotes.toFixed(1)}% röster</div>
+        <div style={{ color: "var(--text-secondary)", fontSize: 10 }}>{t("ownershipChart.votesPct", { value: d.pctVotes.toFixed(1) })}</div>
       )}
       {d.shares > 0 && (
         <div style={{ color: "var(--text-muted)", fontSize: 10 }}>
-          {d.shares.toLocaleString("sv-SE")} aktier
+          {t("ownershipChart.sharesCount", { shares: d.shares.toLocaleString(numberLocale) })}
         </div>
       )}
     </div>
@@ -35,6 +38,8 @@ function CustomTooltip({ active, payload }) {
 }
 
 export default function OwnershipChart({ ticker }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,7 +51,7 @@ export default function OwnershipChart({ ticker }) {
     setError(null);
     fetch(`/api/ownership?ticker=${encodeURIComponent(ticker)}`)
       .then(r => {
-        if (!r.ok) throw new Error("Kunde inte hämta ägardata");
+        if (!r.ok) throw new Error(t("ownershipChart.fetchError"));
         return r.json();
       })
       .then(d => { setData(d); setLoading(false); })
@@ -56,8 +61,8 @@ export default function OwnershipChart({ ticker }) {
   if (loading) {
     return (
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
-        <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Ägare</div>
-        <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "20px 0", textAlign: "center" }}>Hämtar ägardata...</div>
+        <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>{t("ownershipChart.title")}</div>
+        <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "20px 0", textAlign: "center" }}>{t("ownershipChart.loadingData")}</div>
       </div>
     );
   }
@@ -89,8 +94,8 @@ export default function OwnershipChart({ ticker }) {
   const remainingInst = (data.institutionsPercent || 0) - shownPct;
   if (remainingInst > 0.5) {
     pieData.push({
-      name: "Övriga institutioner",
-      fullName: "Övriga institutionella ägare",
+      name: t("ownershipChart.otherInstitutions"),
+      fullName: t("ownershipChart.otherInstitutionsFull"),
       value: parseFloat(remainingInst.toFixed(1)),
       shares: 0,
       color: OTHER_INST_COLOR,
@@ -100,8 +105,8 @@ export default function OwnershipChart({ ticker }) {
   // Insiders
   if (data.insidersPercent > 0.1) {
     pieData.push({
-      name: "Insiders",
-      fullName: "Insiders & ledning",
+      name: t("ownershipChart.insiders"),
+      fullName: t("ownershipChart.insidersFull"),
       value: data.insidersPercent,
       shares: 0,
       color: INSIDER_COLOR,
@@ -111,8 +116,8 @@ export default function OwnershipChart({ ticker }) {
   // Retail / other
   if (data.retailPercent > 0.5) {
     pieData.push({
-      name: "Övriga",
-      fullName: "Privata investerare & övriga",
+      name: t("ownershipChart.other"),
+      fullName: t("ownershipChart.otherFull"),
       value: data.retailPercent,
       shares: 0,
       color: RETAIL_COLOR,
@@ -124,10 +129,10 @@ export default function OwnershipChart({ ticker }) {
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>
-        Ägare
+        {t("ownershipChart.title")}
         {data.institutionsCount && (
           <span style={{ fontSize: 10, fontWeight: 400, textTransform: "none", letterSpacing: 0, marginLeft: 6, opacity: 0.7 }}>
-            ({data.institutionsCount} institutioner)
+            {t("ownershipChart.institutionsCount", { num: data.institutionsCount })}
           </span>
         )}
       </div>
@@ -176,7 +181,7 @@ export default function OwnershipChart({ ticker }) {
       <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)", display: "flex", gap: 16, flexWrap: "wrap" }}>
         {data.institutionsPercent != null && (
           <div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Institutionellt</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("ownershipChart.institutional")}</div>
             <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
               {data.institutionsPercent.toFixed(1)}%
             </div>
@@ -184,7 +189,7 @@ export default function OwnershipChart({ ticker }) {
         )}
         {data.insidersPercent != null && (
           <div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Insiders</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("ownershipChart.insiders")}</div>
             <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
               {data.insidersPercent.toFixed(1)}%
             </div>
@@ -192,7 +197,7 @@ export default function OwnershipChart({ ticker }) {
         )}
         {data.retailPercent != null && (
           <div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Privata</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("ownershipChart.retail")}</div>
             <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
               {data.retailPercent.toFixed(1)}%
             </div>
@@ -201,12 +206,12 @@ export default function OwnershipChart({ ticker }) {
       </div>
       {data.source === "curated" && data.lastUpdated && (
         <div style={{ marginTop: 8, fontSize: 9, color: "var(--text-muted)" }}>
-          Källa: Bolagets IR-sida · Uppdaterad {new Date(data.lastUpdated).toLocaleDateString("sv-SE")}
+          {t("ownershipChart.sourceIR", { date: new Date(data.lastUpdated).toLocaleDateString(numberLocale) })}
         </div>
       )}
       {data.source === "yahoo" && (
         <div style={{ marginTop: 8, fontSize: 9, color: "var(--text-muted)" }}>
-          Källa: Yahoo Finance
+          {t("ownershipChart.sourceYahoo")}
         </div>
       )}
     </div>

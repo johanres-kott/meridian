@@ -255,5 +255,15 @@
     "netMargin": "Net margin",
     "quarter": "Quarter",
     "opMarginShort": "Op. margin"
+  },
+  "companyRow": {
+    "noGroups": "No groups created",
+    "fund": "Fund",
+    "manageGroups": "Manage groups",
+    "fetching": "Fetching...",
+    "sharesCount": "{{shares}} shares",
+    "atPrice": "at {{price}} {{currency}}",
+    "confirmDelete": "Remove {{name}} from your portfolio?",
+    "delete": "Remove"
   }
 }

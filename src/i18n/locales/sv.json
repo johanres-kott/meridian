@@ -255,5 +255,15 @@
     "netMargin": "Nettomarginal",
     "quarter": "Kvartal",
     "opMarginShort": "Rör.marg"
+  },
+  "companyRow": {
+    "noGroups": "Inga grupper skapade",
+    "fund": "Fond",
+    "manageGroups": "Hantera grupper",
+    "fetching": "Hämtar...",
+    "sharesCount": "{{shares}} st",
+    "atPrice": "à {{price}} {{currency}}",
+    "confirmDelete": "Ta bort {{name}} från portföljen?",
+    "delete": "Ta bort"
   }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { formatHoldingValue } from "./PortfolioTreemap.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
@@ -6,6 +7,7 @@ import { fetchCompany, fetchFund } from "../lib/apiClient.js";
 import ShareClassBadge from "./ShareClassBadge.jsx";
 
 function GroupTagPopover({ item, groups, onToggle, onClose }) {
+  const { t } = useTranslation();
   const ref = useRef(null);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
 
   if (!groups.length) return (
     <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 16px", zIndex: 200, minWidth: 180, marginTop: 4 }}>
-      <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>Inga grupper skapade</div>
+      <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("companyRow.noGroups")}</div>
     </div>
   );
 
@@ -50,6 +52,8 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
 }
 
 export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, scoreData = null, priceData = null }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { preferences } = useUser();
   const investorProfile = preferences.investorProfile || null;
   const [price, setPrice] = useState(priceData);
@@ -90,7 +94,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
     >
       <td style={{ ...tdBase, width: 36 }}>
         {item.type === "fund"
-          ? <span style={{ fontSize: 16 }} title="Fond">📊</span>
+          ? <span style={{ fontSize: 16 }} title={t("companyRow.fund")}>📊</span>
           : getFlag(item.ticker)}
       </td>
       <td style={tdBase}>
@@ -146,7 +150,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
             ))}
             <button onClick={() => setTagOpen(!tagOpen)}
               style={{ fontSize: 11, padding: "1px 6px", borderRadius: 10, border: "1px dashed var(--border)", background: "none", cursor: "pointer", color: "var(--text-secondary)", lineHeight: 1.4 }}
-              title="Hantera grupper"
+              title={t("companyRow.manageGroups")}
             >+</button>
             {tagOpen && <GroupTagPopover item={item} groups={groups} onToggle={onToggleGroup} onClose={() => setTagOpen(false)} />}
           </div>
@@ -165,23 +169,23 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
         {price ? (
           <>
-            <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {price.currency || ""}</div>
+            <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{price.price?.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {price.currency || ""}</div>
             {chg != null && <div style={{ fontSize: 11, color: chgColor }}>{chg > 0 ? "+" : ""}{chg.toFixed(2)}%</div>}
           </>
-        ) : <span style={{ color: "var(--text-muted)", fontSize: 11 }}>Hämtar...</span>}
+        ) : <span style={{ color: "var(--text-muted)", fontSize: 11 }}>{t("companyRow.fetching")}</span>}
       </td>
       <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
         {totalValue !== null ? (
           <>
             {currency !== "SEK" && fxRate ? (
               <>
-                <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{(totalValue * fxRate).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{item.shares} st{item.gav ? ` à ${item.gav.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}` : ""}</div>
+                <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{(totalValue * fxRate).toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK</div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{t("companyRow.sharesCount", { shares: item.shares })}{item.gav ? ` ${t("companyRow.atPrice", { price: item.gav.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), currency })}` : ""}</div>
               </>
             ) : (
               <>
-                <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{totalValue.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {currency}</div>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{item.shares} st</div>
+                <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{totalValue.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} {currency}</div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>{t("companyRow.sharesCount", { shares: item.shares })}</div>
               </>
             )}
           </>
@@ -191,7 +195,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
         <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
           {pl !== null ? (
             <>
-              <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK</div>
               <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
             </>
           ) : null}
@@ -199,8 +203,8 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
       )}
       <td style={{ ...tdBase, textAlign: "center", width: 36 }} onClick={e => e.stopPropagation()}>
         <button
-          onClick={() => { if (window.confirm(`Ta bort ${item.name || item.ticker} från portföljen?`)) onDelete(item.id); }}
-          title="Ta bort"
+          onClick={() => { if (window.confirm(t("companyRow.confirmDelete", { name: item.name || item.ticker }))) onDelete(item.id); }}
+          title={t("companyRow.delete")}
           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 14, padding: "2px 6px", lineHeight: 1 }}
           onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
           onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}

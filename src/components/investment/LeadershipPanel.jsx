@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useFetch, Skeleton } from "./primitives.jsx";
 
 export default function LeadershipPanel({ companyId, isMobile }) {
+  const { t } = useTranslation();
   const { data, loading } = useFetch(companyId ? `/api/leadership?id=${companyId}` : null);
 
   return (
@@ -8,7 +10,7 @@ export default function LeadershipPanel({ companyId, isMobile }) {
       {["boardChair", "ceo"].map(key => (
         <div key={key} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-light)", borderRadius: 6, padding: "14px 16px" }}>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 7 }}>
-            {key === "boardChair" ? "Styrelseordförande" : "Verkst. direktör"}
+            {key === "boardChair" ? t("leadershipPanel.boardChair") : t("leadershipPanel.ceo")}
           </div>
           {loading
             ? <Skeleton w="70%" h={14} />

@@ -961,5 +961,9 @@
     "founded": "Founded",
     "website": "Website",
     "leadershipData": "Leadership data"
+  },
+  "leadershipPanel": {
+    "boardChair": "Chair of the board",
+    "ceo": "CEO"
   }
 }

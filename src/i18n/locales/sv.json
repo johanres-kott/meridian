@@ -961,5 +961,9 @@
     "founded": "Grundat",
     "website": "Hemsida",
     "leadershipData": "Ledarskapsdata"
+  },
+  "leadershipPanel": {
+    "boardChair": "Styrelseordförande",
+    "ceo": "Verkst. direktör"
   }
 }

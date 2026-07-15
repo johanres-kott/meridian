@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import FundAutocomplete from "./FundAutocomplete.jsx";
 import { useItpProviders } from "../hooks/useItpProviders.js";
 import { getPensionEntries, getPensionTotalValue, newPensionEntry } from "../lib/pension.js";
@@ -6,11 +7,13 @@ import { getPensionEntries, getPensionTotalValue, newPensionEntry } from "../lib
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: 20, marginBottom: 16 };
 
-function formatKr(n) {
-  return Number(n).toLocaleString("sv-SE");
+function formatKr(n, locale) {
+  return Number(n).toLocaleString(locale);
 }
 
 export default function MyITPSection({ pension, updatePreferences, isMobile }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { providers } = useItpProviders();
 
   const initialEntries = getPensionEntries(pension).map(e => ({
@@ -99,27 +102,27 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
       <div style={{ ...cardStyle, borderLeft: "3px solid var(--accent)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>Tjänstepension (ITP)</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{t("myItpSection.title")}</div>
             {pension?.itpType && (
               <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>
                 {pension.itpType}
                 {pension.monthlyContribution != null && (
-                  <> · Månadsinbetalning <span style={mono}>{formatKr(pension.monthlyContribution)} kr</span></>
+                  <> · {t("myItpSection.monthlyContribution")} <span style={mono}>{t("myItpSection.valueKr", { value: formatKr(pension.monthlyContribution, numberLocale) })}</span></>
                 )}
               </div>
             )}
           </div>
           <button onClick={() => setEditing(true)}
             style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-            Redigera
+            {t("myItpSection.edit")}
           </button>
         </div>
 
         {totalValue != null && (
           <div style={{ marginBottom: 12, padding: "8px 12px", background: "var(--accent-light)", borderRadius: 6 }}>
-            <div style={smallLabel}>Totalt kapital</div>
+            <div style={smallLabel}>{t("myItpSection.totalCapital")}</div>
             <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", ...mono }}>
-              {formatKr(totalValue)} kr
+              {t("myItpSection.valueKr", { value: formatKr(totalValue, numberLocale) })}
             </div>
           </div>
         )}
@@ -134,41 +137,41 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
               <div key={e.id || i} style={{ padding: 12, border: "1px solid var(--border)", borderRadius: 6 }}>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 12, marginBottom: e.funds?.length ? 10 : 0 }}>
                   <div>
-                    <div style={smallLabel}>Bolag</div>
+                    <div style={smallLabel}>{t("myItpSection.provider")}</div>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{e.provider || "–"}</div>
                   </div>
                   <div>
-                    <div style={smallLabel}>Försäkringsform</div>
+                    <div style={smallLabel}>{t("myItpSection.insuranceType")}</div>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>
-                      {e.insuranceType === "fond" ? "Fondförsäkring" : e.insuranceType === "trad" ? "Traditionell" : "–"}
+                      {e.insuranceType === "fond" ? t("myItpSection.fundInsurance") : e.insuranceType === "trad" ? t("myItpSection.traditional") : "–"}
                     </div>
                   </div>
                   {e.currentValue != null && (
                     <div>
-                      <div style={smallLabel}>Värde</div>
+                      <div style={smallLabel}>{t("myItpSection.value")}</div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", ...mono }}>
-                        {formatKr(e.currentValue)} kr
+                        {t("myItpSection.valueKr", { value: formatKr(e.currentValue, numberLocale) })}
                       </div>
                     </div>
                   )}
                 </div>
                 {e.funds?.length > 0 && (
                   <div>
-                    <div style={smallLabel}>Fonder</div>
+                    <div style={smallLabel}>{t("myItpSection.funds")}</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                       {e.funds.map((f, fi) => (
                         <div key={fi} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", borderBottom: fi < e.funds.length - 1 ? "1px solid var(--border-light)" : "none" }}>
                           <span style={{ fontSize: 12, color: "var(--text)" }}>{f.name}</span>
                           <div style={{ display: "flex", gap: 12 }}>
                             <span style={{ fontSize: 11, color: "var(--text-secondary)", ...mono }}>{f.allocation}%</span>
-                            {f.fee != null && <span style={{ fontSize: 11, color: f.fee <= 0.3 ? "#089981" : "var(--text-secondary)", ...mono }}>avg. {f.fee}%</span>}
+                            {f.fee != null && <span style={{ fontSize: 11, color: f.fee <= 0.3 ? "#089981" : "var(--text-secondary)", ...mono }}>{t("myItpSection.fee", { value: f.fee })}</span>}
                           </div>
                         </div>
                       ))}
                     </div>
                     {avgFee != null && (
                       <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6, ...mono }}>
-                        Viktad snittavgift: {avgFee.toFixed(2)}%
+                        {t("myItpSection.weightedAvgFee", { value: avgFee.toFixed(2) })}
                       </div>
                     )}
                   </div>
@@ -184,27 +187,27 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
   // ----- Edit/create form -----
   return (
     <div style={{ ...cardStyle, borderLeft: "3px solid var(--accent)" }}>
-      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Tjänstepension (ITP)</div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>{t("myItpSection.title")}</div>
       <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 16 }}>
-        Fyll i dina uppgifter för att få en samlad bild av ditt pensionssparande. Dela upp fond- och traditionell del i separata poster om de ligger hos samma bolag.
+        {t("myItpSection.intro")}
       </div>
 
       {/* ITP type */}
       <div style={{ marginBottom: 14 }}>
-        <div style={smallLabel}>ITP-typ</div>
+        <div style={smallLabel}>{t("myItpSection.itpTypeLabel")}</div>
         <div style={{ display: "flex", gap: 8 }}>
-          {["ITP1", "ITP2"].map(t => (
-            <button key={t} onClick={() => setItpType(t)}
+          {["ITP1", "ITP2"].map(type => (
+            <button key={type} onClick={() => setItpType(type)}
               style={{
                 flex: 1, padding: "8px 12px", borderRadius: 6, fontSize: 13, fontFamily: "inherit", cursor: "pointer",
-                border: itpType === t ? "2px solid var(--accent)" : "2px solid var(--border)",
-                background: itpType === t ? "var(--accent-light)" : "var(--bg-card)",
-                color: itpType === t ? "var(--accent)" : "var(--text-secondary)",
-                fontWeight: itpType === t ? 600 : 400,
+                border: itpType === type ? "2px solid var(--accent)" : "2px solid var(--border)",
+                background: itpType === type ? "var(--accent-light)" : "var(--bg-card)",
+                color: itpType === type ? "var(--accent)" : "var(--text-secondary)",
+                fontWeight: itpType === type ? 600 : 400,
               }}>
-              {t}
+              {type}
               <div style={{ fontSize: 10, marginTop: 2, color: "var(--text-muted)" }}>
-                {t === "ITP1" ? "Premiebestämd (f. 1979+)" : "Förmånsbestämd (f. –1978)"}
+                {type === "ITP1" ? t("myItpSection.itp1Desc") : t("myItpSection.itp2Desc")}
               </div>
             </button>
           ))}
@@ -213,46 +216,46 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
 
       {/* Monthly contribution */}
       <div style={{ marginBottom: 18 }}>
-        <div style={smallLabel}>Månadsinbetalning (kr)</div>
-        <input type="number" placeholder="t.ex. 3500" value={monthlyContribution}
+        <div style={smallLabel}>{t("myItpSection.monthlyContributionKr")}</div>
+        <input type="number" placeholder={t("myItpSection.contributionPlaceholder")} value={monthlyContribution}
           onChange={e => setMonthlyContribution(e.target.value)} style={{ ...inputStyle, maxWidth: 200 }} />
       </div>
 
       {/* Entries */}
-      <div style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500, marginBottom: 8 }}>Pensionsposter</div>
+      <div style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500, marginBottom: 8 }}>{t("myItpSection.entries")}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {entries.map((entry, ei) => (
           <div key={entry.id} style={{ padding: 12, border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text-secondary)" }}>Post {ei + 1}</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text-secondary)" }}>{t("myItpSection.entryNumber", { number: ei + 1 })}</div>
               {entries.length > 1 && (
                 <button onClick={() => removeEntry(ei)}
                   style={{ fontSize: 11, color: "#c62828", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-                  Ta bort post
+                  {t("myItpSection.removeEntry")}
                 </button>
               )}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10, marginBottom: 10 }}>
               <div>
-                <div style={smallLabel}>Försäkringsbolag</div>
+                <div style={smallLabel}>{t("myItpSection.insuranceProvider")}</div>
                 <select value={entry.provider} onChange={e => updateEntry(ei, { provider: e.target.value })} style={selectStyle}>
-                  <option value="">Välj bolag...</option>
+                  <option value="">{t("myItpSection.selectProvider")}</option>
                   {providers.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
-                  <option value="Annat">Annat</option>
+                  <option value="Annat">{t("myItpSection.other")}</option>
                 </select>
               </div>
               <div>
-                <div style={smallLabel}>Aktuellt värde (kr)</div>
-                <input type="number" placeholder="t.ex. 267500" value={entry.currentValue}
+                <div style={smallLabel}>{t("myItpSection.currentValueKr")}</div>
+                <input type="number" placeholder={t("myItpSection.valuePlaceholder")} value={entry.currentValue}
                   onChange={e => updateEntry(ei, { currentValue: e.target.value })} style={inputStyle} />
               </div>
             </div>
 
             <div style={{ marginBottom: entry.insuranceType === "fond" ? 10 : 0 }}>
-              <div style={smallLabel}>Försäkringsform</div>
+              <div style={smallLabel}>{t("myItpSection.insuranceType")}</div>
               <div style={{ display: "flex", gap: 8 }}>
-                {[{ value: "fond", label: "Fondförsäkring" }, { value: "trad", label: "Traditionell" }].map(opt => (
+                {[{ value: "fond", label: t("myItpSection.fundInsurance") }, { value: "trad", label: t("myItpSection.traditional") }].map(opt => (
                   <button key={opt.value} onClick={() => updateEntry(ei, { insuranceType: opt.value })}
                     style={{
                       flex: 1, padding: "7px 12px", borderRadius: 6, fontSize: 12, fontFamily: "inherit", cursor: "pointer",
@@ -269,7 +272,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
 
             {entry.insuranceType === "fond" && (
               <div>
-                <div style={smallLabel}>Fonder</div>
+                <div style={smallLabel}>{t("myItpSection.funds")}</div>
                 {entry.funds.map((fund, fi) => (
                   <div key={fi} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center" }}>
                     <FundAutocomplete
@@ -281,13 +284,13 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
                         fee: selected.fee ?? fund.fee,
                         secId: selected.secId,
                       })}
-                      placeholder="Sök fond..."
+                      placeholder={t("myItpSection.searchFundPlaceholder")}
                       style={{ flex: 3 }}
                     />
                     <input placeholder="%" type="number" value={fund.allocation}
                       onChange={e => updateFund(ei, fi, { allocation: e.target.value })}
                       style={{ ...inputStyle, flex: 1, textAlign: "right" }} />
-                    <input placeholder="Avgift %" type="number" step="0.01" value={fund.fee}
+                    <input placeholder={t("myItpSection.feePercentPlaceholder")} type="number" step="0.01" value={fund.fee}
                       onChange={e => updateFund(ei, fi, { fee: e.target.value })}
                       style={{ ...inputStyle, flex: 1, textAlign: "right" }} />
                     <button onClick={() => removeFund(ei, fi)}
@@ -298,7 +301,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
                 ))}
                 <button onClick={() => addFund(ei)}
                   style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
-                  + Lägg till fond
+                  {t("myItpSection.addFund")}
                 </button>
               </div>
             )}
@@ -308,7 +311,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
 
       <button onClick={addEntry}
         style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "1px dashed var(--border)", borderRadius: 6, padding: "8px 14px", cursor: "pointer", fontFamily: "inherit", marginTop: 10, width: "100%" }}>
-        + Lägg till pensionspost
+        {t("myItpSection.addEntry")}
       </button>
 
       {/* Actions */}
@@ -321,12 +324,12 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
             color: itpType ? "#fff" : "var(--text-secondary)",
             cursor: itpType ? "pointer" : "default", fontFamily: "inherit",
           }}>
-          Spara
+          {t("myItpSection.save")}
         </button>
         {hasData && (
           <button onClick={() => setEditing(false)}
             style={{ padding: "8px 20px", fontSize: 13, borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>
-            Avbryt
+            {t("myItpSection.cancel")}
           </button>
         )}
       </div>

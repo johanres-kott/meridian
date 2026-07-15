@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { parseAvanzaPdf } from "../lib/parsePdf.js";
 import { resolveAllTickers } from "../lib/resolveTickersAvanza.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -6,6 +7,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 const PHASES = { upload: "upload", parsing: "parsing", resolving: "resolving", preview: "preview", importing: "importing" };
 
 export default function PdfImportModal({ onClose, onImport, existingTickers }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [phase, setPhase] = useState(PHASES.upload);
   const [error, setError] = useState(null);
@@ -16,7 +18,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
 
   async function handleFile(file) {
     if (!file || !file.name.toLowerCase().endsWith(".pdf")) {
-      setError("Välj en PDF-fil.");
+      setError(t("pdfImportModal.selectPdf"));
       return;
     }
     setError(null);
@@ -27,14 +29,14 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
       const holdings = await parseAvanzaPdf(buffer);
 
       if (holdings.length === 0) {
-        setError("Hittade inga innehav i PDF:en. Kontrollera att det är rätt fil.");
+        setError(t("pdfImportModal.noHoldingsFound"));
         setPhase(PHASES.upload);
         return;
       }
 
       setPhase(PHASES.resolving);
       const resolved = await resolveAllTickers(holdings, (current, total) => {
-        setProgress(`Söker ticker ${current} av ${total}...`);
+        setProgress(t("pdfImportModal.resolvingProgress", { current, total }));
       });
 
       const existingSet = new Set((existingTickers || []).map((t) => t.toUpperCase()));
@@ -47,7 +49,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
       setRows(withStatus);
       setPhase(PHASES.preview);
     } catch (err) {
-      setError(err.message || "Kunde inte tolka PDF:en.");
+      setError(err.message || t("pdfImportModal.parseError"));
       setPhase(PHASES.upload);
     }
   }
@@ -71,7 +73,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
     );
 
     if (result?.error) {
-      setError("Import misslyckades: " + result.error.message);
+      setError(t("pdfImportModal.importFailed", { message: result.error.message }));
       setPhase(PHASES.preview);
     } else {
       onClose();
@@ -83,7 +85,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
       <div style={{ background: "var(--bg-card)", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
-        <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 20 }}>Importera portfölj från PDF</div>
+        <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 20 }}>{t("pdfImportModal.title")}</div>
 
         {error && (
           <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
@@ -109,8 +111,8 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
             }}
           >
             <div style={{ fontSize: 28, marginBottom: 12 }}>PDF</div>
-            <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 6 }}>Dra och släpp en PDF från Avanza</div>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>eller klicka för att välja fil</div>
+            <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 6 }}>{t("pdfImportModal.dropHint")}</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("pdfImportModal.clickHint")}</div>
             <input
               ref={fileRef}
               type="file"
@@ -125,9 +127,9 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
         {(phase === PHASES.parsing || phase === PHASES.resolving) && (
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
             <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8 }}>
-              {phase === PHASES.parsing ? "Läser PDF..." : progress}
+              {phase === PHASES.parsing ? t("pdfImportModal.readingPdf") : progress}
             </div>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>Vänta medan filen bearbetas</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("pdfImportModal.processingWait")}</div>
           </div>
         )}
 
@@ -135,18 +137,18 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
         {phase === PHASES.preview && (
           <>
             <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
-              {rows.length} innehav hittade. Granska och justera innan import.
+              {t("pdfImportModal.previewIntro", { count: rows.length })}
             </div>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                 <thead>
                   <tr style={{ borderBottom: "2px solid var(--border)" }}>
                     <th style={thStyle}></th>
-                    <th style={{ ...thStyle, textAlign: "left" }}>Värdepapper</th>
-                    <th style={{ ...thStyle, textAlign: "left" }}>Ticker</th>
-                    <th style={{ ...thStyle, textAlign: "right" }}>Antal</th>
-                    <th style={{ ...thStyle, textAlign: "right" }}>GAV</th>
-                    <th style={{ ...thStyle, textAlign: "left" }}>Status</th>
+                    <th style={{ ...thStyle, textAlign: "left" }}>{t("pdfImportModal.colSecurity")}</th>
+                    <th style={{ ...thStyle, textAlign: "left" }}>{t("pdfImportModal.colTicker")}</th>
+                    <th style={{ ...thStyle, textAlign: "right" }}>{t("pdfImportModal.colShares")}</th>
+                    <th style={{ ...thStyle, textAlign: "right" }}>{t("pdfImportModal.colGav")}</th>
+                    <th style={{ ...thStyle, textAlign: "left" }}>{t("pdfImportModal.colStatus")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,11 +198,11 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                       </td>
                       <td style={tdStyle}>
                         {row.duplicate ? (
-                          <span style={{ color: "#e65100", fontSize: 11 }}>Finns redan</span>
+                          <span style={{ color: "#e65100", fontSize: 11 }}>{t("pdfImportModal.statusDuplicate")}</span>
                         ) : row.matched ? (
-                          <span style={{ color: "#1b5e20", fontSize: 11 }}>Ny</span>
+                          <span style={{ color: "#1b5e20", fontSize: 11 }}>{t("pdfImportModal.statusNew")}</span>
                         ) : (
-                          <span style={{ color: "#c62828", fontSize: 11 }}>Ej matchad</span>
+                          <span style={{ color: "#c62828", fontSize: 11 }}>{t("pdfImportModal.statusUnmatched")}</span>
                         )}
                       </td>
                     </tr>
@@ -210,9 +212,9 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
             </div>
 
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 20 }}>
-              <button onClick={onClose} style={btnSecondary}>Avbryt</button>
+              <button onClick={onClose} style={btnSecondary}>{t("pdfImportModal.cancel")}</button>
               <button onClick={doImport} disabled={selectedCount === 0} style={{ ...btnPrimary, opacity: selectedCount === 0 ? 0.5 : 1 }}>
-                Importera {selectedCount} bolag
+                {t("pdfImportModal.importButton", { count: selectedCount })}
               </button>
             </div>
           </>
@@ -221,14 +223,14 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
         {/* Importing phase */}
         {phase === PHASES.importing && (
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <div style={{ fontSize: 13, color: "var(--text)" }}>Importerar...</div>
+            <div style={{ fontSize: 13, color: "var(--text)" }}>{t("pdfImportModal.importing")}</div>
           </div>
         )}
 
         {/* Close button for upload phase */}
         {phase === PHASES.upload && (
           <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-            <button onClick={onClose} style={btnSecondary}>Avbryt</button>
+            <button onClick={onClose} style={btnSecondary}>{t("pdfImportModal.cancel")}</button>
           </div>
         )}
       </div>

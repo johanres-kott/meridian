@@ -721,5 +721,31 @@
     "next": "Next",
     "start": "Start Thesion →",
     "skip": "Skip the guide"
+  },
+  "pdfImportModal": {
+    "title": "Import portfolio from PDF",
+    "selectPdf": "Please choose a PDF file.",
+    "noHoldingsFound": "No holdings found in the PDF. Check that it is the right file.",
+    "resolvingProgress": "Looking up ticker {{current}} of {{total}}...",
+    "parseError": "Could not read the PDF.",
+    "importFailed": "Import failed: {{message}}",
+    "dropHint": "Drag and drop a PDF from Avanza",
+    "clickHint": "or click to choose a file",
+    "readingPdf": "Reading PDF...",
+    "processingWait": "Please wait while the file is processed",
+    "previewIntro_one": "{{count}} holding found. Review and adjust before importing.",
+    "previewIntro_other": "{{count}} holdings found. Review and adjust before importing.",
+    "colSecurity": "Security",
+    "colTicker": "Ticker",
+    "colShares": "Quantity",
+    "colGav": "Avg. cost",
+    "colStatus": "Status",
+    "statusDuplicate": "Already exists",
+    "statusNew": "New",
+    "statusUnmatched": "Not matched",
+    "cancel": "Cancel",
+    "importButton_one": "Import {{count}} company",
+    "importButton_other": "Import {{count}} companies",
+    "importing": "Importing..."
   }
 }

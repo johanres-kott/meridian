@@ -721,5 +721,31 @@
     "next": "Nästa",
     "start": "Starta Thesion →",
     "skip": "Hoppa över guiden"
+  },
+  "pdfImportModal": {
+    "title": "Importera portfölj från PDF",
+    "selectPdf": "Välj en PDF-fil.",
+    "noHoldingsFound": "Hittade inga innehav i PDF:en. Kontrollera att det är rätt fil.",
+    "resolvingProgress": "Söker ticker {{current}} av {{total}}...",
+    "parseError": "Kunde inte tolka PDF:en.",
+    "importFailed": "Import misslyckades: {{message}}",
+    "dropHint": "Dra och släpp en PDF från Avanza",
+    "clickHint": "eller klicka för att välja fil",
+    "readingPdf": "Läser PDF...",
+    "processingWait": "Vänta medan filen bearbetas",
+    "previewIntro_one": "{{count}} innehav hittat. Granska och justera innan import.",
+    "previewIntro_other": "{{count}} innehav hittade. Granska och justera innan import.",
+    "colSecurity": "Värdepapper",
+    "colTicker": "Ticker",
+    "colShares": "Antal",
+    "colGav": "GAV",
+    "colStatus": "Status",
+    "statusDuplicate": "Finns redan",
+    "statusNew": "Ny",
+    "statusUnmatched": "Ej matchad",
+    "cancel": "Avbryt",
+    "importButton_one": "Importera {{count}} bolag",
+    "importButton_other": "Importera {{count}} bolag",
+    "importing": "Importerar..."
   }
 }

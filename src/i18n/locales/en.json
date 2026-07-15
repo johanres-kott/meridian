@@ -192,5 +192,25 @@
     "debtEbitda": "Debt/EBITDA",
     "relativeStrength": "Relative strength index",
     "keyMetrics": "Key metrics"
+  },
+  "allocationCard": {
+    "title": "Portfolio allocation",
+    "subtitle": "The Core-Satellite model",
+    "balanced": "Balanced",
+    "unbalanced": "Unbalanced",
+    "current": "Now",
+    "target": "Target",
+    "atTarget": "= target",
+    "vsTarget": "{{gap}}pp vs target",
+    "bucketLabels": {
+      "core": "Core",
+      "satellite": "Satellite",
+      "speculation": "Speculation"
+    },
+    "bucketDescs": {
+      "core": "Stable blue chips, defensive companies, low risk",
+      "satellite": "Growth, thematic bets, medium risk",
+      "speculation": "High risk, high upside, turnarounds"
+    }
   }
 }

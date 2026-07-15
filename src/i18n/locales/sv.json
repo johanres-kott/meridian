@@ -192,5 +192,25 @@
     "debtEbitda": "Skuld/EBITDA",
     "relativeStrength": "Relativt styrkeindex",
     "keyMetrics": "Nyckeltal"
+  },
+  "allocationCard": {
+    "title": "Portföljallokering",
+    "subtitle": "Core-Satellite-modellen",
+    "balanced": "Balanserad",
+    "unbalanced": "Obalanserad",
+    "current": "Nu",
+    "target": "Mål",
+    "atTarget": "= mål",
+    "vsTarget": "{{gap}}pp vs mål",
+    "bucketLabels": {
+      "core": "Kärna",
+      "satellite": "Satellit",
+      "speculation": "Spekulation"
+    },
+    "bucketDescs": {
+      "core": "Stabila blue chips, defensiva bolag, låg risk",
+      "satellite": "Tillväxt, tematiska satsningar, medel risk",
+      "speculation": "Hög risk, hög uppsida, turnarounds"
+    }
   }
 }

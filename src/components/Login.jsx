@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 
 export default function Login({ onShowPrivacy, defaultMode = "login" }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState(defaultMode); // "login" | "signup" | "magic"
@@ -28,7 +30,7 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
       options: { emailRedirectTo: window.location.origin },
     });
     if (error) setError(error.message);
-    else setMessage(`Verifieringslänk skickad till ${email}. Kolla din inkorg!`);
+    else setMessage(t("login.verificationSent", { email }));
     setLoading(false);
   }
 
@@ -41,7 +43,7 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
       options: { emailRedirectTo: window.location.origin },
     });
     if (error) setError(error.message);
-    else setMessage(`Inloggningslänk skickad till ${email}`);
+    else setMessage(t("login.magicLinkSent", { email }));
     setLoading(false);
   }
 
@@ -88,16 +90,16 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
         {/* Tabs: Logga in / Skapa konto */}
         <div style={{ display: "flex", marginBottom: 24, borderBottom: "1px solid #f0f3fa" }}>
           <button style={tabStyle(mode === "login" || mode === "magic")} onClick={() => { setMode("login"); setError(null); setMessage(null); }}>
-            Logga in
+            {t("login.loginTab")}
           </button>
           <button style={tabStyle(mode === "signup")} onClick={() => { setMode("signup"); setError(null); setMessage(null); }}>
-            Skapa konto
+            {t("login.signupTab")}
           </button>
         </div>
 
         {mode === "signup" && (
           <p style={{ fontSize: 12, color: "#787b86", marginBottom: 20 }}>
-            Skapa ett gratis konto för att komma igång med Thesion.
+            {t("login.signupIntro")}
           </p>
         )}
 
@@ -126,32 +128,32 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
             onMouseLeave={e => e.currentTarget.style.borderColor = "#e0e3eb"}
           >
             <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Fortsätt med Google
+            {t("login.continueWithGoogle")}
           </button>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <div style={{ flex: 1, height: 1, background: "#e0e3eb" }} />
-          <span style={{ fontSize: 11, color: "#b2b5be" }}>eller</span>
+          <span style={{ fontSize: 11, color: "#b2b5be" }}>{t("login.or")}</span>
           <div style={{ flex: 1, height: 1, background: "#e0e3eb" }} />
         </div>
 
         <form onSubmit={mode === "signup" ? handleSignup : mode === "magic" ? handleMagicLink : handleLogin}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6, letterSpacing: "0.06em" }}>E-POST</label>
+            <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6, letterSpacing: "0.06em" }}>{t("login.emailLabel")}</label>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)} required
-              placeholder="din@email.com"
+              placeholder={t("login.emailPlaceholder")}
               style={{ width: "100%", padding: "10px 12px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none", color: "#131722" }}
             />
           </div>
 
           {(mode === "login" || mode === "signup") && (
             <div style={{ marginBottom: 24 }}>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6, letterSpacing: "0.06em" }}>LÖSENORD</label>
+              <label style={{ fontSize: 11, fontWeight: 500, color: "#787b86", display: "block", marginBottom: 6, letterSpacing: "0.06em" }}>{t("login.passwordLabel")}</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                placeholder={mode === "signup" ? "Välj ett lösenord (minst 6 tecken)" : "••••••••"}
+                placeholder={mode === "signup" ? t("login.passwordPlaceholder") : "••••••••"}
                 style={{ width: "100%", padding: "10px 12px", border: "1px solid #e0e3eb", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none", color: "#131722" }}
               />
             </div>
@@ -163,7 +165,7 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
             type="submit" disabled={loading}
             style={{ width: "100%", padding: "11px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, fontSize: 13, fontWeight: 500, cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}
           >
-            {loading ? "Laddar..." : mode === "signup" ? "Skapa konto" : mode === "magic" ? "Skicka länk" : "Logga in"}
+            {loading ? t("login.loading") : mode === "signup" ? t("login.signupTab") : mode === "magic" ? t("login.sendLink") : t("login.loginTab")}
           </button>
         </form>
 
@@ -173,7 +175,7 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
               onClick={() => { setMode("magic"); setError(null); setMessage(null); }}
               style={{ fontSize: 12, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
             >
-              Logga in med e-postlänk istället →
+              {t("login.magicLinkInstead")} →
             </button>
           )}
           {mode === "magic" && (
@@ -181,17 +183,17 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
               onClick={() => { setMode("login"); setError(null); setMessage(null); }}
               style={{ fontSize: 12, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
             >
-              ← Logga in med lösenord istället
+              ← {t("login.passwordInstead")}
             </button>
           )}
           {mode === "signup" && (
             <div style={{ fontSize: 12, color: "#787b86" }}>
-              Redan har ett konto?{" "}
+              {t("login.alreadyHaveAccount")}{" "}
               <button
                 onClick={() => { setMode("login"); setError(null); setMessage(null); }}
                 style={{ color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 12 }}
               >
-                Logga in
+                {t("login.loginTab")}
               </button>
             </div>
           )}
@@ -203,7 +205,7 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
           onClick={onShowPrivacy}
           style={{ marginTop: 16, fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
         >
-          Integritetspolicy
+          {t("login.privacyPolicy")}
         </button>
       )}
     </div>

@@ -865,5 +865,24 @@
   },
   "landingPage": {
     "back": "Back"
+  },
+  "login": {
+    "verificationSent": "Verification link sent to {{email}}. Check your inbox!",
+    "magicLinkSent": "Login link sent to {{email}}",
+    "loginTab": "Log in",
+    "signupTab": "Create account",
+    "signupIntro": "Create a free account to get started with Thesion.",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "emailLabel": "EMAIL",
+    "emailPlaceholder": "you@email.com",
+    "passwordLabel": "PASSWORD",
+    "passwordPlaceholder": "Choose a password (at least 6 characters)",
+    "loading": "Loading...",
+    "sendLink": "Send link",
+    "magicLinkInstead": "Log in with an email link instead",
+    "passwordInstead": "Log in with a password instead",
+    "alreadyHaveAccount": "Already have an account?",
+    "privacyPolicy": "Privacy Policy"
   }
 }

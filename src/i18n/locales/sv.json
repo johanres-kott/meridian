@@ -865,5 +865,24 @@
   },
   "landingPage": {
     "back": "Tillbaka"
+  },
+  "login": {
+    "verificationSent": "Verifieringslänk skickad till {{email}}. Kolla din inkorg!",
+    "magicLinkSent": "Inloggningslänk skickad till {{email}}",
+    "loginTab": "Logga in",
+    "signupTab": "Skapa konto",
+    "signupIntro": "Skapa ett gratis konto för att komma igång med Thesion.",
+    "continueWithGoogle": "Fortsätt med Google",
+    "or": "eller",
+    "emailLabel": "E-POST",
+    "emailPlaceholder": "din@email.com",
+    "passwordLabel": "LÖSENORD",
+    "passwordPlaceholder": "Välj ett lösenord (minst 6 tecken)",
+    "loading": "Laddar...",
+    "sendLink": "Skicka länk",
+    "magicLinkInstead": "Logga in med e-postlänk istället",
+    "passwordInstead": "Logga in med lösenord istället",
+    "alreadyHaveAccount": "Redan har ett konto?",
+    "privacyPolicy": "Integritetspolicy"
   }
 }

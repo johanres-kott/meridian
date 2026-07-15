@@ -1199,5 +1199,10 @@
   },
   "suggestionDropdown": {
     "loading": "Loading..."
+  },
+  "picker": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "reset": "Reset"
   }
 }

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Picker({ items, selected, onSave, onCancel, isMobile }) {
+  const { t } = useTranslation();
   const [checked, setChecked] = useState(new Set(selected));
 
   function toggle(symbol) {
@@ -31,20 +33,20 @@ export default function Picker({ items, selected, onSave, onCancel, isMobile }) 
           onClick={() => onSave([...checked])}
           style={{ fontSize: 11, color: "#fff", background: "var(--accent)", border: "none", borderRadius: 3, padding: "4px 12px", cursor: "pointer", fontFamily: "inherit" }}
         >
-          Spara
+          {t("picker.save")}
         </button>
         <button
           onClick={onCancel}
           style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
         >
-          Avbryt
+          {t("picker.cancel")}
         </button>
         {checked.size > 0 && (
           <button
             onClick={() => onSave([])}
             style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginLeft: "auto" }}
           >
-            Aterstall
+            {t("picker.reset")}
           </button>
         )}
       </div>

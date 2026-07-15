@@ -965,5 +965,12 @@
   "leadershipPanel": {
     "boardChair": "Chair of the board",
     "ceo": "CEO"
+  },
+  "insiderSection": {
+    "title": "Insider trading",
+    "buy": "Buy",
+    "sell": "Sell",
+    "shares": "shares",
+    "source": "Source: Finansinspektionen's insider register"
   }
 }

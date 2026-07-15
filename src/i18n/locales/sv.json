@@ -965,5 +965,12 @@
   "leadershipPanel": {
     "boardChair": "Styrelseordförande",
     "ceo": "Verkst. direktör"
+  },
+  "insiderSection": {
+    "title": "Insiderhandel",
+    "buy": "Köp",
+    "sell": "Sälj",
+    "shares": "aktier",
+    "source": "Källa: Finansinspektionens insynsregister"
   }
 }

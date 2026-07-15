@@ -1003,5 +1003,81 @@
     "retail": "Retail",
     "sourceIR": "Source: Company IR page · Updated {{date}}",
     "sourceYahoo": "Source: Yahoo Finance"
+  },
+  "profileInsight": {
+    "scoreDetails": {
+      "piotroski": {
+        "title": "Piotroski F-Score (0–9)",
+        "description": "Measures financial strength based on 9 criteria covering profitability, leverage and efficiency. Higher score = stronger financial health.",
+        "items": [
+          "Positive net income",
+          "Positive operating cash flow",
+          "Rising return on assets (ROA)",
+          "Cash flow exceeds net income",
+          "Decreasing leverage",
+          "Rising current ratio",
+          "No new shares issued",
+          "Rising gross margin",
+          "Rising asset turnover"
+        ]
+      },
+      "magicFormula": {
+        "title": "Magic Formula",
+        "description": "Combines Earnings Yield and ROIC (return on invested capital) to find cheap quality companies.",
+        "items": [
+          "Earnings Yield — high earnings relative to price",
+          "ROIC — efficient use of capital"
+        ]
+      },
+      "growth": {
+        "title": "Growth",
+        "description": "Assesses the company's growth rate based on revenue development and growth trend.",
+        "items": [
+          "Revenue growth",
+          "Stability and trend of growth"
+        ]
+      },
+      "dividend": {
+        "title": "Dividend",
+        "description": "Evaluates the level and stability of the dividend over time.",
+        "items": [
+          "Dividend yield",
+          "Dividend stability and growth"
+        ]
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "Overall picture of the company's quality based on margins, capital efficiency and leverage.",
+        "items": [
+          "Margins (gross, operating, EBITDA)",
+          "ROIC — return on invested capital",
+          "Debt-to-equity ratio"
+        ]
+      }
+    },
+    "scorePrefix": "Score: ",
+    "riskDiversified": "{{risk}} — diversified investment company",
+    "riskMarketCap": "{{risk}} (based on market cap)",
+    "dividendYield": "Dividend yield {{value}}%",
+    "noDividend": "No dividend",
+    "investmentCompany": "Investment company — diversified portfolio",
+    "title": "Your profile & this company",
+    "ourAnalysis": "Our analysis",
+    "growthLabel": "Growth",
+    "dividendLabel": "Dividend",
+    "qualityLabel": "Quality",
+    "totalScoreFor": "/ 100 — total score for {{profile}}",
+    "strongMatch": "Strong match",
+    "partialMatch": "Partial match",
+    "weakMatch": "Weak match",
+    "betaSummary": "How we assess risk (Beta)",
+    "betaIntro": "measures a stock's volatility compared with the market (index). Beta 1.0 = same as the market.",
+    "lowRisk": "Low risk",
+    "lowRiskDesc": " — Beta < 0.8. The stock moves less than the market. More stable price development.",
+    "mediumRisk": "Medium risk",
+    "mediumRiskDesc": " — Beta 0.8–1.2. Tracks the market relatively closely.",
+    "highRisk": "High risk",
+    "highRiskDesc": " — Beta > 1.2. Larger price swings than the market.",
+    "betaDisclaimer": "Beta is calculated from 5 years of price history against the S&P 500 (source: Yahoo Finance). Does not constitute financial advice."
   }
 }

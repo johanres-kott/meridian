@@ -1,61 +1,27 @@
 import { useState, useEffect } from "react";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../../lib/profileMatcher.js";
 import { PROFILE_LABELS } from "../../constants.js";
+import { useTranslation } from "react-i18next";
 
-export const SCORE_DETAILS = {
-  piotroski: {
-    title: "Piotroski F-Score (0–9)",
-    description: "Mäter finansiell styrka baserat på 9 kriterier inom lönsamhet, skuldsättning och effektivitet. Högre poäng = starkare finansiell hälsa.",
-    items: [
-      "Positivt nettoresultat",
-      "Positivt operativt kassaflöde",
-      "Stigande avkastning på tillgångar (ROA)",
-      "Kassaflöde överstiger nettoresultat",
-      "Minskande skuldsättning",
-      "Stigande likviditetskvot",
-      "Inga nya aktier emitterade",
-      "Stigande bruttomarginal",
-      "Stigande tillgångsomsättning",
-    ],
-    formatRaw: (raw) => raw != null ? `${raw}/9` : null,
-  },
-  magicFormula: {
-    title: "Magic Formula",
-    description: "Kombinerar Earnings Yield (vinstavkastning) och ROIC (avkastning på investerat kapital) för att hitta billiga kvalitetsbolag.",
-    items: [
-      "Earnings Yield — hög vinst relativt priset",
-      "ROIC — effektiv kapitalanvändning",
-    ],
-  },
-  growth: {
-    title: "Tillväxt",
-    description: "Bedömer bolagets tillväxttakt baserat på omsättningsutveckling och tillväxttrend.",
-    items: [
-      "Omsättningstillväxt",
-      "Tillväxtens stabilitet och trend",
-    ],
-  },
-  dividend: {
-    title: "Utdelning",
-    description: "Utvärderar utdelningens nivå och stabilitet över tid.",
-    items: [
-      "Direktavkastning",
-      "Utdelningens stabilitet och tillväxt",
-    ],
-  },
-  quality: {
-    title: "Kvalitet",
-    description: "Helhetsbild av bolagets kvalitet baserat på marginaler, kapitaleffektivitet och skuldsättning.",
-    items: [
-      "Marginaler (brutto, rörelse, EBITDA)",
-      "ROIC — avkastning på investerat kapital",
-      "Skuldsättningsgrad",
-    ],
-  },
+const SCORE_DETAIL_KEYS = ["piotroski", "magicFormula", "growth", "dividend", "quality"];
+const SCORE_DETAIL_ITEM_COUNTS = { piotroski: 9, magicFormula: 2, growth: 2, dividend: 2, quality: 3 };
+
+export const getScoreDetails = (t) => {
+  const details = {};
+  for (const key of SCORE_DETAIL_KEYS) {
+    details[key] = {
+      title: t(`profileInsight.scoreDetails.${key}.title`),
+      description: t(`profileInsight.scoreDetails.${key}.description`),
+      items: Array.from({ length: SCORE_DETAIL_ITEM_COUNTS[key] }, (_, i) => t(`profileInsight.scoreDetails.${key}.items.${i}`)),
+    };
+  }
+  details.piotroski.formatRaw = (raw) => raw != null ? `${raw}/9` : null;
+  return details;
 };
 
 export function ScoreDetail({ scoreKey, scoreData }) {
-  const detail = SCORE_DETAILS[scoreKey];
+  const { t } = useTranslation();
+  const detail = getScoreDetails(t)[scoreKey];
   if (!detail) return null;
 
   const rawScore = scoreKey === "piotroski" && detail.formatRaw
@@ -71,7 +37,7 @@ export function ScoreDetail({ scoreKey, scoreData }) {
       <div style={{ fontWeight: 500, color: "var(--text)", marginBottom: 4, fontSize: 12 }}>{detail.title}</div>
       {rawScore && (
         <div style={{ marginBottom: 6, fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, color: "var(--text)" }}>
-          {"Poäng: "}{rawScore}
+          {t("profileInsight.scorePrefix")}{rawScore}
         </div>
       )}
       <div style={{ marginBottom: 8 }}>{detail.description}</div>
@@ -90,7 +56,7 @@ export function ScoreDetail({ scoreKey, scoreData }) {
 export function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle }) {
   if (value == null) return null;
   const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
-  const hasDetail = !!SCORE_DETAILS[scoreKey];
+  const hasDetail = SCORE_DETAIL_KEYS.includes(scoreKey);
   return (
     <div>
       <div
@@ -115,6 +81,7 @@ export function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle
 }
 
 export default function ProfileInsight({ ticker, company, investorProfile }) {
+  const { t } = useTranslation();
   const [scoreData, setScoreData] = useState(null);
   const [expandedScore, setExpandedScore] = useState(null);
 
@@ -144,31 +111,31 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
   if (risk) {
     const riskColor = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
     if (isInvestmentCompany(ticker)) {
-      allItems.push({ icon: "\u25C9", color: riskColor, text: `${riskText} \u2014 diversifierat investmentbolag` });
+      allItems.push({ icon: "\u25C9", color: riskColor, text: t("profileInsight.riskDiversified", { risk: riskText }) });
     } else if (company?.beta != null) {
       allItems.push({ icon: "\u25C9", color: riskColor, text: betaDescription(company.beta) });
     } else {
-      allItems.push({ icon: "\u25C9", color: riskColor, text: `${riskText} (baserat p\u00e5 b\u00f6rsv\u00e4rde)` });
+      allItems.push({ icon: "\u25C9", color: riskColor, text: t("profileInsight.riskMarketCap", { risk: riskText }) });
     }
   }
 
   // Dividend
   if (hasDiv) {
-    allItems.push({ icon: "\uD83D\uDCB0", color: "#089981", text: `Direktavkastning ${company.dividendYield.toFixed(1)}%` });
+    allItems.push({ icon: "\uD83D\uDCB0", color: "#089981", text: t("profileInsight.dividendYield", { value: company.dividendYield.toFixed(1) }) });
   } else {
-    allItems.push({ icon: "\u2013", color: "var(--text-secondary)", text: "Ingen utdelning" });
+    allItems.push({ icon: "\u2013", color: "var(--text-secondary)", text: t("profileInsight.noDividend") });
   }
 
   // Sector
   if (isInvestmentCompany(ticker)) {
-    allItems.push({ icon: "\uD83C\uDFE2", color: "var(--accent)", text: "Investmentbolag \u2014 diversifierad portf\u00f6lj" });
+    allItems.push({ icon: "\uD83C\uDFE2", color: "var(--accent)", text: t("profileInsight.investmentCompany") });
   } else if (company?.sector && company.sector !== "\u2014") {
     allItems.push({ icon: "\uD83C\uDFE2", color: "var(--text-secondary)", text: company.sector });
   }
 
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
-      <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
+      <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>{t("profileInsight.title")}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {allItems.map((item, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
@@ -179,13 +146,13 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
       </div>
       {scoreData?.scores && (
         <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
-          <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>V\u00e5r analys</div>
+          <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>{t("profileInsight.ourAnalysis")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} scoreKey="piotroski" scoreData={scoreData.scores} expanded={expandedScore === "piotroski"} onToggle={() => setExpandedScore(expandedScore === "piotroski" ? null : "piotroski")} />
             <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} scoreKey="magicFormula" scoreData={scoreData.scores} expanded={expandedScore === "magicFormula"} onToggle={() => setExpandedScore(expandedScore === "magicFormula" ? null : "magicFormula")} />
-            <ScoreBar label="Tillv\u00e4xt" value={scoreData.scores.growth} scoreKey="growth" scoreData={scoreData.scores} expanded={expandedScore === "growth"} onToggle={() => setExpandedScore(expandedScore === "growth" ? null : "growth")} />
-            <ScoreBar label="Utdelning" value={scoreData.scores.dividend} scoreKey="dividend" scoreData={scoreData.scores} expanded={expandedScore === "dividend"} onToggle={() => setExpandedScore(expandedScore === "dividend" ? null : "dividend")} />
-            <ScoreBar label="Kvalitet" value={scoreData.scores.quality} scoreKey="quality" scoreData={scoreData.scores} expanded={expandedScore === "quality"} onToggle={() => setExpandedScore(expandedScore === "quality" ? null : "quality")} />
+            <ScoreBar label={t("profileInsight.growthLabel")} value={scoreData.scores.growth} scoreKey="growth" scoreData={scoreData.scores} expanded={expandedScore === "growth"} onToggle={() => setExpandedScore(expandedScore === "growth" ? null : "growth")} />
+            <ScoreBar label={t("profileInsight.dividendLabel")} value={scoreData.scores.dividend} scoreKey="dividend" scoreData={scoreData.scores} expanded={expandedScore === "dividend"} onToggle={() => setExpandedScore(expandedScore === "dividend" ? null : "dividend")} />
+            <ScoreBar label={t("profileInsight.qualityLabel")} value={scoreData.scores.quality} scoreKey="quality" scoreData={scoreData.scores} expanded={expandedScore === "quality"} onToggle={() => setExpandedScore(expandedScore === "quality" ? null : "quality")} />
           </div>
           {scoreData.composite && (() => {
             const profileType = investorProfile?.investorType || "mixed";
@@ -195,7 +162,7 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
             return (
               <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
-                <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>/ 100 \u2014 totalpo\u00e4ng f\u00f6r {PROFILE_LABELS[profileType] || profileType}</span>
+                <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{t("profileInsight.totalScoreFor", { profile: PROFILE_LABELS[profileType] || profileType })}</span>
               </div>
             );
           })()}
@@ -206,7 +173,7 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
         const cs = scoreData?.composite?.[profileType] ?? scoreData?.composite?.mixed ?? score;
         const matchColor = cs >= 70 ? "#089981" : cs >= 40 ? "#e65100" : "#c62828";
         const matchBg = cs >= 70 ? "rgba(8,153,129,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
-        const matchText = cs >= 70 ? "Stark matchning" : cs >= 40 ? "Delvis matchning" : "Svag matchning";
+        const matchText = cs >= 70 ? t("profileInsight.strongMatch") : cs >= 40 ? t("profileInsight.partialMatch") : t("profileInsight.weakMatch");
         return (
           <div style={{ marginTop: 10, padding: "8px 10px", background: matchBg, borderRadius: 4 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: matchColor }}>
@@ -216,27 +183,27 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
         );
       })()}
       <details style={{ marginTop: 10 }}>
-        <summary style={{ fontSize: 10, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>{"Hur vi bedömer risk (Beta)"}</summary>
+        <summary style={{ fontSize: 10, color: "var(--text-muted)", cursor: "pointer", userSelect: "none" }}>{t("profileInsight.betaSummary")}</summary>
         <div style={{ marginTop: 6, fontSize: 10, color: "var(--text-secondary)", lineHeight: 1.6 }}>
           <div style={{ marginBottom: 4 }}>
-            <strong>Beta</strong> {"mäter en akties volatilitet jämfört med marknaden (index). Beta 1.0 = samma som marknaden."}
+            <strong>Beta</strong> {t("profileInsight.betaIntro")}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#089981", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
-              <strong>{"Låg risk"}</strong> {" — Beta < 0.8. Aktien rör sig mindre än marknaden. Stabilare kursutveckling."}
+              <strong>{t("profileInsight.lowRisk")}</strong> {t("profileInsight.lowRiskDesc")}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#ff9800", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
-              <strong>{"Medel risk"}</strong> {" — Beta 0.8–1.2. Följer marknaden relativt nära."}
+              <strong>{t("profileInsight.mediumRisk")}</strong> {t("profileInsight.mediumRiskDesc")}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#f23645", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
-              <strong>{"Hög risk"}</strong> {" — Beta > 1.2. Större kurssvängningar än marknaden."}
+              <strong>{t("profileInsight.highRisk")}</strong> {t("profileInsight.highRiskDesc")}
             </div>
           </div>
           <div style={{ marginTop: 6, color: "var(--text-muted)" }}>
-            {"Beta beräknas från 5 års kurshistorik mot S&P 500 (källa: Yahoo Finance). Utgör inte finansiell rådgivning."}
+            {t("profileInsight.betaDisclaimer")}
           </div>
         </div>
       </details>

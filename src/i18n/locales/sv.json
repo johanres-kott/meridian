@@ -1003,5 +1003,81 @@
     "retail": "Privata",
     "sourceIR": "Källa: Bolagets IR-sida · Uppdaterad {{date}}",
     "sourceYahoo": "Källa: Yahoo Finance"
+  },
+  "profileInsight": {
+    "scoreDetails": {
+      "piotroski": {
+        "title": "Piotroski F-Score (0–9)",
+        "description": "Mäter finansiell styrka baserat på 9 kriterier inom lönsamhet, skuldsättning och effektivitet. Högre poäng = starkare finansiell hälsa.",
+        "items": [
+          "Positivt nettoresultat",
+          "Positivt operativt kassaflöde",
+          "Stigande avkastning på tillgångar (ROA)",
+          "Kassaflöde överstiger nettoresultat",
+          "Minskande skuldsättning",
+          "Stigande likviditetskvot",
+          "Inga nya aktier emitterade",
+          "Stigande bruttomarginal",
+          "Stigande tillgångsomsättning"
+        ]
+      },
+      "magicFormula": {
+        "title": "Magic Formula",
+        "description": "Kombinerar Earnings Yield (vinstavkastning) och ROIC (avkastning på investerat kapital) för att hitta billiga kvalitetsbolag.",
+        "items": [
+          "Earnings Yield — hög vinst relativt priset",
+          "ROIC — effektiv kapitalanvändning"
+        ]
+      },
+      "growth": {
+        "title": "Tillväxt",
+        "description": "Bedömer bolagets tillväxttakt baserat på omsättningsutveckling och tillväxttrend.",
+        "items": [
+          "Omsättningstillväxt",
+          "Tillväxtens stabilitet och trend"
+        ]
+      },
+      "dividend": {
+        "title": "Utdelning",
+        "description": "Utvärderar utdelningens nivå och stabilitet över tid.",
+        "items": [
+          "Direktavkastning",
+          "Utdelningens stabilitet och tillväxt"
+        ]
+      },
+      "quality": {
+        "title": "Kvalitet",
+        "description": "Helhetsbild av bolagets kvalitet baserat på marginaler, kapitaleffektivitet och skuldsättning.",
+        "items": [
+          "Marginaler (brutto, rörelse, EBITDA)",
+          "ROIC — avkastning på investerat kapital",
+          "Skuldsättningsgrad"
+        ]
+      }
+    },
+    "scorePrefix": "Poäng: ",
+    "riskDiversified": "{{risk}} — diversifierat investmentbolag",
+    "riskMarketCap": "{{risk}} (baserat på börsvärde)",
+    "dividendYield": "Direktavkastning {{value}}%",
+    "noDividend": "Ingen utdelning",
+    "investmentCompany": "Investmentbolag — diversifierad portfölj",
+    "title": "Din profil & detta bolag",
+    "ourAnalysis": "Vår analys",
+    "growthLabel": "Tillväxt",
+    "dividendLabel": "Utdelning",
+    "qualityLabel": "Kvalitet",
+    "totalScoreFor": "/ 100 — totalpoäng för {{profile}}",
+    "strongMatch": "Stark matchning",
+    "partialMatch": "Delvis matchning",
+    "weakMatch": "Svag matchning",
+    "betaSummary": "Hur vi bedömer risk (Beta)",
+    "betaIntro": "mäter en akties volatilitet jämfört med marknaden (index). Beta 1.0 = samma som marknaden.",
+    "lowRisk": "Låg risk",
+    "lowRiskDesc": " — Beta < 0.8. Aktien rör sig mindre än marknaden. Stabilare kursutveckling.",
+    "mediumRisk": "Medel risk",
+    "mediumRiskDesc": " — Beta 0.8–1.2. Följer marknaden relativt nära.",
+    "highRisk": "Hög risk",
+    "highRiskDesc": " — Beta > 1.2. Större kurssvängningar än marknaden.",
+    "betaDisclaimer": "Beta beräknas från 5 års kurshistorik mot S&P 500 (källa: Yahoo Finance). Utgör inte finansiell rådgivning."
   }
 }

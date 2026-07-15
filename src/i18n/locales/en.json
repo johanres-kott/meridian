@@ -747,5 +747,43 @@
     "importButton_one": "Import {{count}} company",
     "importButton_other": "Import {{count}} companies",
     "importing": "Importing..."
+  },
+  "importGuide": {
+    "title": "Import from Avanza",
+    "subtitle": "Step-by-step guide",
+    "steps": {
+      "step1": {
+        "title": "Log in to Avanza",
+        "description": "Go to avanza.se and log in with BankID."
+      },
+      "step2": {
+        "title": "Go to Profile",
+        "description": "Click \"Profil\" in the left-hand menu (or at the bottom on mobile)."
+      },
+      "step3": {
+        "title": "Open account statements",
+        "description": "Click the \"Deklaration & Kontobesked\" tab → then \"Kontobesked\"."
+      },
+      "step4": {
+        "title": "Choose monthly statement",
+        "description": "Click the \"Månadsbesked\" tab. Choose account and period — then click the PDF link to open the report.",
+        "tip": "The report opens in a new tab. Save it locally: right-click → \"Save as\" or Cmd+S (Mac) / Ctrl+S (Windows)."
+      },
+      "step5": {
+        "title": "Import into Thesion",
+        "description": "Click \"Import portfolio\" here in Thesion and drag in the saved PDF file, or click to choose it."
+      },
+      "step6": {
+        "title": "Review and confirm",
+        "description": "Thesion reads all holdings with number of shares and GAV (average acquisition cost). Review the list, adjust any ticker matches and click \"Import\".",
+        "tip": "Stocks already in your portfolio are marked as \"Already exists\" and are skipped."
+      }
+    },
+    "close": "Close",
+    "startImport": "Start import",
+    "troubleTitle": "Not working?",
+    "troubleBody": "Make sure you download the report as a PDF (rather than opening it in the browser). The file is usually named something like \"Månadsrapport_2026-03.pdf\".",
+    "contactPre": "Contact us at",
+    "contactPost": "if you need help."
   }
 }

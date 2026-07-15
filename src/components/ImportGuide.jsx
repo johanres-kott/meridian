@@ -1,40 +1,42 @@
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 export default function ImportGuide({ onClose, onStartImport }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const steps = [
     {
       number: "1",
-      title: "Logga in på Avanza",
-      description: "Gå till avanza.se och logga in med BankID.",
+      title: t("importGuide.steps.step1.title"),
+      description: t("importGuide.steps.step1.description"),
     },
     {
       number: "2",
-      title: "Gå till Profil",
-      description: "Klicka på \"Profil\" i vänstermenyn (eller längst ner på mobilen).",
+      title: t("importGuide.steps.step2.title"),
+      description: t("importGuide.steps.step2.description"),
     },
     {
       number: "3",
-      title: "Öppna Kontobesked",
-      description: "Klicka på fliken \"Deklaration & Kontobesked\" → sedan \"Kontobesked\".",
+      title: t("importGuide.steps.step3.title"),
+      description: t("importGuide.steps.step3.description"),
     },
     {
       number: "4",
-      title: "Välj Månadsbesked",
-      description: "Klicka på \"Månadsbesked\"-fliken. Välj konto och period — klicka sedan på PDF-länken för att öppna rapporten.",
-      tip: "Rapporten öppnas i en ny flik. Spara den lokalt: högerklicka → \"Spara som\" eller Cmd+S (Mac) / Ctrl+S (Windows).",
+      title: t("importGuide.steps.step4.title"),
+      description: t("importGuide.steps.step4.description"),
+      tip: t("importGuide.steps.step4.tip"),
     },
     {
       number: "5",
-      title: "Importera i Thesion",
-      description: "Klicka på \"Importera portfölj\" här i Thesion och dra in den sparade PDF-filen, eller klicka för att välja den.",
+      title: t("importGuide.steps.step5.title"),
+      description: t("importGuide.steps.step5.description"),
     },
     {
       number: "6",
-      title: "Granska och bekräfta",
-      description: "Thesion läser av alla innehav med antal aktier och GAV (genomsnittligt anskaffningsvärde). Granska listan, justera eventuella ticker-matchningar och klicka \"Importera\".",
-      tip: "Aktier som redan finns i din portfölj markeras som \"Finns redan\" och hoppas över.",
+      title: t("importGuide.steps.step6.title"),
+      description: t("importGuide.steps.step6.description"),
+      tip: t("importGuide.steps.step6.tip"),
     },
   ];
 
@@ -48,10 +50,10 @@ export default function ImportGuide({ onClose, onStartImport }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Importera från Avanza
+              {t("importGuide.title")}
             </div>
             <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
-              Steg-för-steg guide
+              {t("importGuide.subtitle")}
             </div>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "var(--text-secondary)", lineHeight: 1 }}>✕</button>
@@ -98,18 +100,17 @@ export default function ImportGuide({ onClose, onStartImport }) {
         <div style={{ marginTop: 28, display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button onClick={onClose}
             style={{ padding: "9px 18px", fontSize: 13, background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}>
-            Stäng
+            {t("importGuide.close")}
           </button>
           <button onClick={() => { onClose(); onStartImport(); }}
             style={{ padding: "9px 22px", fontSize: 13, background: "var(--accent)", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
-            Starta import →
+            {t("importGuide.startImport")} →
           </button>
         </div>
 
         <div style={{ marginTop: 20, padding: "12px 14px", borderRadius: 8, background: "var(--bg-secondary)", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6 }}>
-          <strong style={{ color: "var(--text-secondary)" }}>Fungerar det inte?</strong> Se till att du laddar ner rapporten som PDF (inte öppnar den i webbläsaren).
-          Filen heter vanligtvis något i stil med "Månadsrapport_2026-03.pdf".
-          Kontakta oss på <a href="mailto:info@thesion.tech" style={{ color: "var(--accent)", textDecoration: "none" }}>info@thesion.tech</a> om du behöver hjälp.
+          <strong style={{ color: "var(--text-secondary)" }}>{t("importGuide.troubleTitle")}</strong> {t("importGuide.troubleBody")}{" "}
+          {t("importGuide.contactPre")} <a href="mailto:info@thesion.tech" style={{ color: "var(--accent)", textDecoration: "none" }}>info@thesion.tech</a> {t("importGuide.contactPost")}
         </div>
       </div>
     </div>

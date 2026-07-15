@@ -747,5 +747,43 @@
     "importButton_one": "Importera {{count}} bolag",
     "importButton_other": "Importera {{count}} bolag",
     "importing": "Importerar..."
+  },
+  "importGuide": {
+    "title": "Importera från Avanza",
+    "subtitle": "Steg-för-steg guide",
+    "steps": {
+      "step1": {
+        "title": "Logga in på Avanza",
+        "description": "Gå till avanza.se och logga in med BankID."
+      },
+      "step2": {
+        "title": "Gå till Profil",
+        "description": "Klicka på \"Profil\" i vänstermenyn (eller längst ner på mobilen)."
+      },
+      "step3": {
+        "title": "Öppna Kontobesked",
+        "description": "Klicka på fliken \"Deklaration & Kontobesked\" → sedan \"Kontobesked\"."
+      },
+      "step4": {
+        "title": "Välj Månadsbesked",
+        "description": "Klicka på \"Månadsbesked\"-fliken. Välj konto och period — klicka sedan på PDF-länken för att öppna rapporten.",
+        "tip": "Rapporten öppnas i en ny flik. Spara den lokalt: högerklicka → \"Spara som\" eller Cmd+S (Mac) / Ctrl+S (Windows)."
+      },
+      "step5": {
+        "title": "Importera i Thesion",
+        "description": "Klicka på \"Importera portfölj\" här i Thesion och dra in den sparade PDF-filen, eller klicka för att välja den."
+      },
+      "step6": {
+        "title": "Granska och bekräfta",
+        "description": "Thesion läser av alla innehav med antal aktier och GAV (genomsnittligt anskaffningsvärde). Granska listan, justera eventuella ticker-matchningar och klicka \"Importera\".",
+        "tip": "Aktier som redan finns i din portfölj markeras som \"Finns redan\" och hoppas över."
+      }
+    },
+    "close": "Stäng",
+    "startImport": "Starta import",
+    "troubleTitle": "Fungerar det inte?",
+    "troubleBody": "Se till att du laddar ner rapporten som PDF (inte öppnar den i webbläsaren). Filen heter vanligtvis något i stil med \"Månadsrapport_2026-03.pdf\".",
+    "contactPre": "Kontakta oss på",
+    "contactPost": "om du behöver hjälp."
   }
 }

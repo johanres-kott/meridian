@@ -1,11 +1,16 @@
 import { Treemap, ResponsiveContainer } from "recharts";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n/index.js";
 
+// Kept as a plain function (imported by CompanyRow.jsx), so it reads the
+// active language from the shared i18n instance instead of a hook.
 function formatHoldingValue(msek) {
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   if (msek >= 1000) {
     const mdkr = msek / 1000;
-    return `${mdkr % 1 === 0 ? mdkr.toFixed(0) : mdkr.toFixed(1)} Mdkr`;
+    return i18n.t("portfolioTreemap.valueMdkr", { value: mdkr % 1 === 0 ? mdkr.toFixed(0) : mdkr.toFixed(1) });
   }
-  return `${msek.toLocaleString("sv-SE")} Mkr`;
+  return i18n.t("portfolioTreemap.valueMkr", { value: msek.toLocaleString(numberLocale) });
 }
 
 // TradingView-stil heatmap-färger: intensitet kodar dagsförändring.
@@ -34,6 +39,8 @@ function fmtPct(p) {
 }
 
 function TreemapCell({ x, y, width, height, name, ticker, valueSek, changePercent }) {
+  const { t, i18n: i18nHook } = useTranslation();
+  const numberLocale = i18nHook.language === "en" ? "en-GB" : "sv-SE";
   if (width < 4 || height < 4) return null;
   const { bg, fg } = colorFor(changePercent || 0);
   const showTicker = width > 50 && height > 30;
@@ -59,8 +66,8 @@ function TreemapCell({ x, y, width, height, name, ticker, valueSek, changePercen
       {showValue && (
         <text x={x + 6} y={y + 8 + fontSize * 3.2} fontSize={Math.max(9, fontSize - 2)} fill={subColor} fontFamily="inherit">
           {valueSek >= 1000000
-            ? `${(valueSek / 1000000).toFixed(1)} Mkr`
-            : `${Math.round(valueSek).toLocaleString("sv-SE")} kr`}
+            ? t("portfolioTreemap.valueMkr", { value: (valueSek / 1000000).toFixed(1) })
+            : t("portfolioTreemap.valueKr", { value: Math.round(valueSek).toLocaleString(numberLocale) })}
         </text>
       )}
     </g>
@@ -81,6 +88,8 @@ const LEGEND_STEPS = [
 ];
 
 export default function PortfolioTreemap({ items, prices, fxRates, onSelect, isMobile }) {
+  const { t, i18n: i18nHook } = useTranslation();
+  const numberLocale = i18nHook.language === "en" ? "en-GB" : "sv-SE";
   const treemapData = items
     .filter(item => item.shares && prices[item.ticker]?.price)
     .map(item => {
@@ -100,11 +109,13 @@ export default function PortfolioTreemap({ items, prices, fxRates, onSelect, isM
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary, #131722)" }}>Portföljkarta</div>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary, #131722)" }}>{t("portfolioTreemap.title")}</div>
         <div style={{ fontSize: 12, color: "var(--text-secondary, #787b86)" }}>
-          Totalt: {total >= 1000000
-            ? `${(total / 1000000).toFixed(1)} Mkr`
-            : `${Math.round(total).toLocaleString("sv-SE")} kr`}
+          {t("portfolioTreemap.total", {
+            value: total >= 1000000
+              ? t("portfolioTreemap.valueMkr", { value: (total / 1000000).toFixed(1) })
+              : t("portfolioTreemap.valueKr", { value: Math.round(total).toLocaleString(numberLocale) }),
+          })}
         </div>
       </div>
       <div style={{ border: "1px solid var(--border, #e0e3eb)", borderRadius: 6, overflow: "hidden" }}>
@@ -130,13 +141,13 @@ export default function PortfolioTreemap({ items, prices, fxRates, onSelect, isM
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--text-secondary, #787b86)", fontFamily: "'IBM Plex Mono', monospace" }}>
           <span>≤ −3%</span>
-          <span>−1,5%</span>
+          <span>{t("portfolioTreemap.legendNeg15")}</span>
           <span>0%</span>
-          <span>+1,5%</span>
+          <span>{t("portfolioTreemap.legendPos15")}</span>
           <span>≥ +3%</span>
         </div>
         <div style={{ fontSize: 10, color: "var(--text-secondary, #787b86)", marginTop: 2 }}>
-          Färg = dagsförändring · Ruta-storlek = innehavets värde
+          {t("portfolioTreemap.legendCaption")}
         </div>
       </div>
     </div>

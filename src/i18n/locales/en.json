@@ -221,5 +221,15 @@
     "how": "How",
     "rationale": "Rationale",
     "removeStrategy": "Remove strategy"
+  },
+  "portfolioTreemap": {
+    "valueMdkr": "SEK {{value}}bn",
+    "valueMkr": "SEK {{value}}m",
+    "valueKr": "SEK {{value}}",
+    "title": "Portfolio map",
+    "total": "Total: {{value}}",
+    "legendNeg15": "−1.5%",
+    "legendPos15": "+1.5%",
+    "legendCaption": "Colour = daily change · Tile size = holding value"
   }
 }

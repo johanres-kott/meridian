@@ -221,5 +221,15 @@
     "how": "Hur",
     "rationale": "Motivering",
     "removeStrategy": "Ta bort strategi"
+  },
+  "portfolioTreemap": {
+    "valueMdkr": "{{value}} Mdkr",
+    "valueMkr": "{{value}} Mkr",
+    "valueKr": "{{value}} kr",
+    "title": "Portföljkarta",
+    "total": "Totalt: {{value}}",
+    "legendNeg15": "−1,5%",
+    "legendPos15": "+1,5%",
+    "legendCaption": "Färg = dagsförändring · Ruta-storlek = innehavets värde"
   }
 }

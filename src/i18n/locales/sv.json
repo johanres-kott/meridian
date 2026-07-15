@@ -1079,5 +1079,14 @@
     "highRisk": "Hög risk",
     "highRiskDesc": " — Beta > 1.2. Större kurssvängningar än marknaden.",
     "betaDisclaimer": "Beta beräknas från 5 års kurshistorik mot S&P 500 (källa: Yahoo Finance). Utgör inte finansiell rådgivning."
+  },
+  "investmentWizard": {
+    "typeQuestion": "Vill du sätta in nya pengar eller omfördela det du redan har?",
+    "newMoney": "Nya pengar",
+    "rebalance": "Omfördela",
+    "amountQuestion": "Hur mycket vill du investera?",
+    "customAmountPlaceholder": "Ange belopp i kr...",
+    "stepOf": "Steg {{current}} av {{total}}",
+    "cancel": "Avbryt"
   }
 }

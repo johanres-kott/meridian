@@ -1079,5 +1079,14 @@
     "highRisk": "High risk",
     "highRiskDesc": " — Beta > 1.2. Larger price swings than the market.",
     "betaDisclaimer": "Beta is calculated from 5 years of price history against the S&P 500 (source: Yahoo Finance). Does not constitute financial advice."
+  },
+  "investmentWizard": {
+    "typeQuestion": "Do you want to add new money or rebalance what you already have?",
+    "newMoney": "New money",
+    "rebalance": "Rebalance",
+    "amountQuestion": "How much do you want to invest?",
+    "customAmountPlaceholder": "Enter amount in kr...",
+    "stepOf": "Step {{current}} of {{total}}",
+    "cancel": "Cancel"
   }
 }

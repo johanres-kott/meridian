@@ -1,17 +1,20 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const PLAN_QUESTIONS = [
+// NOTE: option `value` strings are data values consumed elsewhere (e.g. ChatPanel
+// checks answers.type === "investera färska pengar") — do not translate them.
+const getPlanQuestions = (t) => [
   {
     key: "type",
-    question: "Vill du sätta in nya pengar eller omfördela det du redan har?",
+    question: t("investmentWizard.typeQuestion"),
     options: [
-      { label: "Nya pengar", value: "investera färska pengar" },
-      { label: "Omfördela", value: "omfördela min befintliga portfölj" },
+      { label: t("investmentWizard.newMoney"), value: "investera färska pengar" },
+      { label: t("investmentWizard.rebalance"), value: "omfördela min befintliga portfölj" },
     ],
   },
   {
     key: "amount",
-    question: "Hur mycket vill du investera?",
+    question: t("investmentWizard.amountQuestion"),
     options: [
       { label: "5 000 kr", value: "5000" },
       { label: "10 000 kr", value: "10000" },
@@ -20,12 +23,15 @@ const PLAN_QUESTIONS = [
       { label: "100 000 kr", value: "100000" },
     ],
     allowCustom: true,
-    customPlaceholder: "Ange belopp i kr...",
+    customPlaceholder: t("investmentWizard.customAmountPlaceholder"),
     onlyIf: (answers) => answers.type === "investera färska pengar",
   },
 ];
 
 export default function InvestmentWizard({ onComplete, onCancel }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
+  const PLAN_QUESTIONS = getPlanQuestions(t);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [customValue, setCustomValue] = useState("");
@@ -76,7 +82,7 @@ export default function InvestmentWizard({ onComplete, onCancel }) {
         {q.question}
         {applicableQuestions.length > 1 && (
           <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-            Steg {visibleStepIndex} av {applicableQuestions.length}
+            {t("investmentWizard.stepOf", { current: visibleStepIndex, total: applicableQuestions.length })}
           </div>
         )}
       </div>
@@ -101,13 +107,13 @@ export default function InvestmentWizard({ onComplete, onCancel }) {
           />
           {customValue && (
             <button onClick={submitCustom} style={{ ...chipStyle, background: "var(--accent)", color: "#fff", border: "none" }}>
-              {Number(customValue).toLocaleString("sv-SE")} kr
+              {Number(customValue).toLocaleString(numberLocale)} kr
             </button>
           )}
         </div>
       )}
       <button onClick={onCancel} style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>
-        Avbryt
+        {t("investmentWizard.cancel")}
       </button>
     </div>
   );

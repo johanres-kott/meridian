@@ -947,5 +947,12 @@
     "getStartedFree": "Get started for free",
     "learnMore": "Learn more",
     "screenshotAlt": "Thesion — Overview"
+  },
+  "holdingsTable": {
+    "noHoldings": "No holdings found",
+    "colCompany": "Company",
+    "colTicker": "Ticker",
+    "colWeight": "Weight (%)",
+    "colValue": "Value (SEK m)"
   }
 }

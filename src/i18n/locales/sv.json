@@ -947,5 +947,12 @@
     "getStartedFree": "Kom igång gratis",
     "learnMore": "Läs mer",
     "screenshotAlt": "Thesion — Översikt"
+  },
+  "holdingsTable": {
+    "noHoldings": "Inga innehav hittade",
+    "colCompany": "Bolag",
+    "colTicker": "Ticker",
+    "colWeight": "Vikt (%)",
+    "colValue": "Värde (Mkr)"
   }
 }

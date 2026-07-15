@@ -1,6 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { useFetch, Skeleton } from "./primitives.jsx";
 
 export default function HoldingsTable({ companyId }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { data, loading } = useFetch("/api/holdings");
 
   const companyHoldings = data?.find(c => c.id === companyId);
@@ -22,7 +25,7 @@ export default function HoldingsTable({ companyId }) {
   }
 
   if (holdings.length === 0) {
-    return <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "16px 0" }}>Inga innehav hittade</div>;
+    return <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "16px 0" }}>{t("holdingsTable.noHoldings")}</div>;
   }
 
   return (
@@ -30,14 +33,19 @@ export default function HoldingsTable({ companyId }) {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
         <thead>
           <tr style={{ borderBottom: "1px solid var(--border)" }}>
-            {["Bolag", "Ticker", "Vikt (%)", "Värde (Mkr)"].map(h => (
-              <th key={h} style={{
-                textAlign: h === "Bolag" || h === "Ticker" ? "left" : "right",
+            {[
+              { label: t("holdingsTable.colCompany"), align: "left" },
+              { label: t("holdingsTable.colTicker"), align: "left" },
+              { label: t("holdingsTable.colWeight"), align: "right" },
+              { label: t("holdingsTable.colValue"), align: "right" },
+            ].map(h => (
+              <th key={h.label} style={{
+                textAlign: h.align,
                 padding: "8px 6px", fontSize: 10, fontWeight: 600,
                 letterSpacing: "0.07em", textTransform: "uppercase",
                 color: "var(--text-secondary)", whiteSpace: "nowrap",
               }}>
-                {h}
+                {h.label}
               </th>
             ))}
           </tr>
@@ -51,7 +59,7 @@ export default function HoldingsTable({ companyId }) {
                 {h.weight != null ? h.weight.toFixed(1) : "—"}
               </td>
               <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
-                {h.valueMSEK != null ? h.valueMSEK.toLocaleString("sv-SE") : "—"}
+                {h.valueMSEK != null ? h.valueMSEK.toLocaleString(numberLocale) : "—"}
               </td>
             </tr>
           ))}

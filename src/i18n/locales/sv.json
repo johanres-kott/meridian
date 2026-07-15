@@ -884,5 +884,20 @@
     "passwordInstead": "Logga in med lösenord istället",
     "alreadyHaveAccount": "Redan har ett konto?",
     "privacyPolicy": "Integritetspolicy"
+  },
+  "ctaAndFooter": {
+    "ctaTitle": "Redo att investera smartare?",
+    "ctaSubtitle": "Skapa ett konto gratis. Inga kreditkort. Inga bindningstider.",
+    "ctaButton": "Kom igång gratis",
+    "aboutTitle": "Om Thesion",
+    "aboutP1Pre": "Thesion är ett hobbyprojekt skapat av",
+    "aboutP1Post": "med ett enkelt mål: att utforska hur långt man kan komma med att bygga en riktig produktionsapp tillsammans med AI.",
+    "aboutP2Pre": "Hela appen — från frontend till backend, scoring-modeller till scraper-tjänst — är byggd med",
+    "aboutP2Post": "(Anthropic). Ingen rad kod är manuellt skriven. Projektet startade som ett experiment och växte till en fullständig investeringsplattform med autentisering, realtidsdata, dark mode och mobilstöd.",
+    "aboutP3": "Thesion är inte finansiell rådgivning. Det är ett verktyg för att lära sig — både om investeringar och om vad som är möjligt när människa och AI bygger tillsammans.",
+    "builtWith": "Byggd med",
+    "createdBy": "Skapad av",
+    "contact": "Kontakt",
+    "privacyPolicy": "Integritetspolicy"
   }
 }

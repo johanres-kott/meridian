@@ -884,5 +884,20 @@
     "passwordInstead": "Log in with a password instead",
     "alreadyHaveAccount": "Already have an account?",
     "privacyPolicy": "Privacy Policy"
+  },
+  "ctaAndFooter": {
+    "ctaTitle": "Ready to invest smarter?",
+    "ctaSubtitle": "Create a free account. No credit card. No lock-in.",
+    "ctaButton": "Get started for free",
+    "aboutTitle": "About Thesion",
+    "aboutP1Pre": "Thesion is a hobby project created by",
+    "aboutP1Post": "with a simple goal: to explore how far you can get building a real production app together with AI.",
+    "aboutP2Pre": "The entire app — from frontend to backend, scoring models to the scraper service — is built with",
+    "aboutP2Post": "(Anthropic). Not a single line of code was written by hand. The project started as an experiment and grew into a complete investment platform with authentication, real-time data, dark mode and mobile support.",
+    "aboutP3": "Thesion is not financial advice. It is a tool for learning — both about investing and about what is possible when human and AI build together.",
+    "builtWith": "Built with",
+    "createdBy": "Created by",
+    "contact": "Contact",
+    "privacyPolicy": "Privacy Policy"
   }
 }

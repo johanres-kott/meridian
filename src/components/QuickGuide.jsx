@@ -1,45 +1,48 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
 const jakarta = "'Plus Jakarta Sans', sans-serif";
 
-const SLIDES = [
+const getSlides = (t) => [
   {
     emoji: "👋",
-    title: "Välkommen till Thesion!",
-    body: "Här får du en snabb genomgång av vad du kan göra. Vi har lagt till 5 aktier baserat på din profil — du kan ändra dem när som helst.",
+    title: t("quickGuide.slides.welcome.title"),
+    body: t("quickGuide.slides.welcome.body"),
   },
   {
     emoji: "📊",
-    title: "Översikt",
-    body: "Din startsida. Här ser du portföljens utveckling, marknadsrörelser och nyheter sedan du senast var inloggad.",
+    title: t("quickGuide.slides.overview.title"),
+    body: t("quickGuide.slides.overview.body"),
   },
   {
     emoji: "💼",
-    title: "Portfölj",
-    body: "Alla dina aktier. Importera från Avanza (PDF), lägg till manuellt, eller gruppera i egna fonder. Här ser du också din investeringsstrategi.",
+    title: t("quickGuide.slides.portfolio.title"),
+    body: t("quickGuide.slides.portfolio.body"),
   },
   {
     emoji: "🎯",
-    title: "Investera",
-    body: "Personliga aktieförslag rankade med 5 etablerade modeller (Piotroski, Magic Formula m.fl.). Följ också 7 svenska investmentbolag med innehav och ledning.",
+    title: t("quickGuide.slides.invest.title"),
+    body: t("quickGuide.slides.invest.body"),
   },
   {
     emoji: "🔍",
-    title: "Analys & Sök",
-    body: "Jämför aktier sida vid sida, se nyckeltal, och sök på vilket bolag som helst. Varje aktie får en riskbedömning och profilmatchning.",
+    title: t("quickGuide.slides.analysis.title"),
+    body: t("quickGuide.slides.analysis.body"),
   },
   {
     emoji: "🤖",
-    title: "Mats — din finansassistent",
-    body: "Klicka på AI-knappen för att prata med Mats. Fråga om din portfölj, be om strategiråd, eller spara insikter direkt till dina aktier.",
+    title: t("quickGuide.slides.mats.title"),
+    body: t("quickGuide.slides.mats.body"),
   },
 ];
 
 export default function QuickGuide({ onComplete }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [step, setStep] = useState(0);
 
+  const SLIDES = getSlides(t);
   const slide = SLIDES[step];
   const isLast = step === SLIDES.length - 1;
 
@@ -79,7 +82,7 @@ export default function QuickGuide({ onComplete }) {
           {step > 0 && (
             <button onClick={() => setStep(step - 1)}
               style={{ padding: "10px 20px", fontSize: 13, background: "none", border: "1px solid var(--border)", borderRadius: 8, cursor: "pointer", fontFamily: "inherit", color: "var(--text-secondary)" }}>
-              ← Tillbaka
+              ← {t("quickGuide.back")}
             </button>
           )}
           <button onClick={() => isLast ? onComplete() : setStep(step + 1)}
@@ -87,7 +90,7 @@ export default function QuickGuide({ onComplete }) {
               padding: "10px 28px", fontSize: 13, background: "var(--accent)", color: "#fff",
               border: "none", borderRadius: 8, cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}>
-            {isLast ? "Starta Thesion →" : "Nästa"}
+            {isLast ? t("quickGuide.start") : t("quickGuide.next")}
           </button>
         </div>
 
@@ -95,7 +98,7 @@ export default function QuickGuide({ onComplete }) {
         {!isLast && (
           <button onClick={onComplete}
             style={{ marginTop: 16, fontSize: 11, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-            Hoppa över guiden
+            {t("quickGuide.skip")}
           </button>
         )}
       </div>

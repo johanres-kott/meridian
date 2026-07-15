@@ -689,5 +689,37 @@
         "advanced": { "label": "Experienced", "explanation": "Mats provides in-depth analysis with key metrics, trends and comparisons without holding back." }
       }
     }
+  },
+  "quickGuide": {
+    "slides": {
+      "welcome": {
+        "title": "Welcome to Thesion!",
+        "body": "Here is a quick tour of what you can do. We have added 5 stocks based on your profile — you can change them at any time."
+      },
+      "overview": {
+        "title": "Overview",
+        "body": "Your home page. Here you can see your portfolio's performance, market moves and news since you last logged in."
+      },
+      "portfolio": {
+        "title": "Portfolio",
+        "body": "All your stocks. Import from Avanza (PDF), add manually, or group into your own funds. This is also where you see your investment strategy."
+      },
+      "invest": {
+        "title": "Invest",
+        "body": "Personal stock suggestions ranked with 5 established models (Piotroski, Magic Formula and more). Also follow 7 Swedish investment companies with holdings and leadership."
+      },
+      "analysis": {
+        "title": "Analysis & Search",
+        "body": "Compare stocks side by side, view key metrics, and search for any company. Every stock gets a risk assessment and profile match."
+      },
+      "mats": {
+        "title": "Mats — your financial assistant",
+        "body": "Click the AI button to talk to Mats. Ask about your portfolio, get strategy advice, or save insights directly to your stocks."
+      }
+    },
+    "back": "Back",
+    "next": "Next",
+    "start": "Start Thesion →",
+    "skip": "Skip the guide"
   }
 }

@@ -689,5 +689,37 @@
         "advanced": { "label": "Erfaren", "explanation": "Mats ger djupgående analys med nyckeltal, trender och jämförelser utan att hålla tillbaka." }
       }
     }
+  },
+  "quickGuide": {
+    "slides": {
+      "welcome": {
+        "title": "Välkommen till Thesion!",
+        "body": "Här får du en snabb genomgång av vad du kan göra. Vi har lagt till 5 aktier baserat på din profil — du kan ändra dem när som helst."
+      },
+      "overview": {
+        "title": "Översikt",
+        "body": "Din startsida. Här ser du portföljens utveckling, marknadsrörelser och nyheter sedan du senast var inloggad."
+      },
+      "portfolio": {
+        "title": "Portfölj",
+        "body": "Alla dina aktier. Importera från Avanza (PDF), lägg till manuellt, eller gruppera i egna fonder. Här ser du också din investeringsstrategi."
+      },
+      "invest": {
+        "title": "Investera",
+        "body": "Personliga aktieförslag rankade med 5 etablerade modeller (Piotroski, Magic Formula m.fl.). Följ också 7 svenska investmentbolag med innehav och ledning."
+      },
+      "analysis": {
+        "title": "Analys & Sök",
+        "body": "Jämför aktier sida vid sida, se nyckeltal, och sök på vilket bolag som helst. Varje aktie får en riskbedömning och profilmatchning."
+      },
+      "mats": {
+        "title": "Mats — din finansassistent",
+        "body": "Klicka på AI-knappen för att prata med Mats. Fråga om din portfölj, be om strategiråd, eller spara insikter direkt till dina aktier."
+      }
+    },
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "start": "Starta Thesion →",
+    "skip": "Hoppa över guiden"
   }
 }

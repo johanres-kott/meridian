@@ -10,8 +10,7 @@
     "src/components/WeeklySummary.jsx",
     "src/components/PortfolioSummary.jsx"
   ],
-  "inReview": [],
-  "pending": [
+  "inReview": [
     "src/components/InvestmentPlanTracker.jsx",
     "src/components/AnalysisTab.jsx",
     "src/components/OwnershipOverlay.jsx",
@@ -27,7 +26,9 @@
     "src/components/MarketsView.jsx",
     "src/components/MarketDetailView.jsx",
     "src/components/CompanySearch.jsx",
-    "src/components/CompanyView.jsx",
+    "src/components/CompanyView.jsx"
+  ],
+  "pending": [
     "src/components/FundView.jsx",
     "src/components/CompareView.jsx",
     "src/components/AllocationCard.jsx",

@@ -120,5 +120,42 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "companyView": {
+    "backButton": "← Tillbaka till bevakningslistan",
+    "loading": "Laddar bolagsdata...",
+    "loadError": "Kunde inte ladda data för {{ticker}}",
+    "keyMetrics": "Nyckeltal",
+    "showAll": "Visa alla →",
+    "showFewer": "Visa färre",
+    "targetPrice": "Kursmål (snitt)",
+    "targetRange": "Spann: {{low}} – {{high}} {{currency}}",
+    "upside": "Uppsida:",
+    "analystSource": "Baserat på {{n}} analytiker · Källa: Yahoo Finance",
+    "recommendation": "Rekommendation",
+    "analystConsensus": "{{n}} analytiker · Yahoo Finance consensus",
+    "latestNews": "Senaste nyheter",
+    "metricLabels": {
+      "peForward": "P/E Forward",
+      "peTrailing": "P/E Trailing",
+      "ebitdaMargin": "EBITDA-marginal",
+      "operatingMargin": "Rör.marginal",
+      "grossMargin": "Bruttomarginal",
+      "roic": "ROIC / ROE",
+      "debtEbitda": "Nettoskuld/EBITDA",
+      "revenueGrowth": "Tillväxt",
+      "dividendYield": "Direktavkastning"
+    },
+    "metricTips": {
+      "peForward": "Aktiekursen delat med förväntad vinst per aktie. Lägre = billigare.",
+      "peTrailing": "Aktiekursen delat med senaste årets vinst per aktie.",
+      "ebitdaMargin": "Vinst före räntor, skatt och avskrivningar som andel av omsättningen.",
+      "operatingMargin": "Rörelseresultat delat med omsättning. Visar hur mycket som blir vinst.",
+      "grossMargin": "Omsättning minus varukostnad, delat med omsättning. Högre = bättre.",
+      "roic": "Avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar.",
+      "debtEbitda": "Nettoskuld delat med EBITDA. Över 3x anses högt belånat.",
+      "revenueGrowth": "Omsättningstillväxt jämfört med föregående år.",
+      "dividendYield": "Årlig utdelning delat med aktiekursen. Högre = mer tillbaka varje år."
+    }
   }
 }

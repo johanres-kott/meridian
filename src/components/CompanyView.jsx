@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { fmt } from "./shared.js";
 import { StatCard, PriceChart } from "./SharedComponents.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -27,29 +28,6 @@ function getMetricOrder(investorType, experience) {
   return full;
 }
 
-const METRIC_TIPS = {
-  peForward: "Aktiekursen delat med förväntad vinst per aktie. Lägre = billigare.",
-  peTrailing: "Aktiekursen delat med senaste årets vinst per aktie.",
-  ebitdaMargin: "Vinst före räntor, skatt och avskrivningar som andel av omsättningen.",
-  operatingMargin: "Rörelseresultat delat med omsättning. Visar hur mycket som blir vinst.",
-  grossMargin: "Omsättning minus varukostnad, delat med omsättning. Högre = bättre.",
-  roic: "Avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar.",
-  debtEbitda: "Nettoskuld delat med EBITDA. Över 3x anses högt belånat.",
-  revenueGrowth: "Omsättningstillväxt jämfört med föregående år.",
-  dividendYield: "Årlig utdelning delat med aktiekursen. Högre = mer tillbaka varje år.",
-};
-
-const METRIC_LABELS = {
-  peForward: "P/E Forward",
-  peTrailing: "P/E Trailing",
-  ebitdaMargin: "EBITDA-marginal",
-  operatingMargin: "Rör.marginal",
-  grossMargin: "Bruttomarginal",
-  roic: "ROIC / ROE",
-  debtEbitda: "Nettoskuld/EBITDA",
-  revenueGrowth: "Tillväxt",
-  dividendYield: "Direktavkastning",
-};
 
 const METRIC_FMT = {
   peForward: "x", peTrailing: "x", ebitdaMargin: "%", operatingMargin: "%",
@@ -63,6 +41,8 @@ function isNeg(key, value) {
 }
 
 export default function CompanyView({ item, onBack, onUpdate }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { preferences } = useUser();
   const investorProfile = preferences.investorProfile || null;
   const investorType = investorProfile?.investorType;
@@ -87,7 +67,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
       <div style={{ marginBottom: 20 }}>
         <button onClick={onBack}
           style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 12 }}>
-          &larr; Tillbaka till bevakningslistan
+          {t("companyView.backButton")}
         </button>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -120,13 +100,13 @@ export default function CompanyView({ item, onBack, onUpdate }) {
         {company && (
           <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 8 }}>
             <span style={{ fontSize: 28, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
-              {company.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {company.price?.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>{company.currency}</span>
             {company.marketCap > 0 && <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>Mkt Cap: {company.marketCap}B {company.currency}</span>}
             {pl !== null && (
               <span style={{ fontSize: 13, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645", marginLeft: 8 }}>
-                P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {company.currency} ({plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%)
+                P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} {company.currency} ({plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%)
               </span>
             )}
           </div>
@@ -134,9 +114,9 @@ export default function CompanyView({ item, onBack, onUpdate }) {
       </div>
 
       {loading ? (
-        <div style={{ color: "var(--text-secondary)", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Laddar bolagsdata...</div>
+        <div style={{ color: "var(--text-secondary)", fontSize: 13, padding: "40px 0", textAlign: "center" }}>{t("companyView.loading")}</div>
       ) : !company ? (
-        <div style={{ color: "#f23645", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Kunde inte ladda data for {item.ticker}</div>
+        <div style={{ color: "#f23645", fontSize: 13, padding: "40px 0", textAlign: "center" }}>{t("companyView.loadError", { ticker: item.ticker })}</div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: isMobile ? 16 : 20, alignItems: "start" }}>
           {/* Left column */}
@@ -152,23 +132,23 @@ export default function CompanyView({ item, onBack, onUpdate }) {
               return (
                 <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>{t("companyView.keyMetrics")}</div>
                     {isFiltered && (
                       <button onClick={() => setShowAllMetrics(true)}
                         style={{ fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-                        Visa alla →
+                        {t("companyView.showAll")}
                       </button>
                     )}
                     {showAllMetrics && investorProfile?.experience !== "advanced" && (
                       <button onClick={() => setShowAllMetrics(false)}
                         style={{ fontSize: 10, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-                        Visa färre
+                        {t("companyView.showFewer")}
                       </button>
                     )}
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
                     {metrics.map(key => (
-                      <StatCard key={key} label={METRIC_LABELS[key]} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} tooltip={METRIC_TIPS[key]} />
+                      <StatCard key={key} label={t(`companyView.metricLabels.${key}`)} value={fmt(company[key], METRIC_FMT[key])} neg={isNeg(key, company[key])} tooltip={t(`companyView.metricTips.${key}`)} />
                     ))}
                   </div>
                 </div>
@@ -183,32 +163,32 @@ export default function CompanyView({ item, onBack, onUpdate }) {
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {company.targetPrice > 0 && (
                   <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: "16px 20px" }}>
-                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>Kursmål (snitt)</div>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>{t("companyView.targetPrice")}</div>
                     <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
                       {company.targetPrice.toFixed(2)} {company.currency}
                     </div>
                     {company.targetLow > 0 && company.targetHigh > 0 && (
                       <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 4 }}>
-                        Spann: {company.targetLow.toFixed(0)} – {company.targetHigh.toFixed(0)} {company.currency}
+                        {t("companyView.targetRange", { low: company.targetLow.toFixed(0), high: company.targetHigh.toFixed(0), currency: company.currency })}
                       </div>
                     )}
                     {company.price > 0 && (
                       <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                        Uppsida: <span style={{ color: company.targetPrice > company.price ? "#089981" : "#f23645" }}>
+                        {t("companyView.upside")} <span style={{ color: company.targetPrice > company.price ? "#089981" : "#f23645" }}>
                           {(((company.targetPrice / company.price) - 1) * 100).toFixed(1)}%
                         </span>
                       </div>
                     )}
                     {company.numberOfAnalysts > 0 && (
                       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
-                        Baserat på {company.numberOfAnalysts} analytiker · Källa: Yahoo Finance
+                        {t("companyView.analystSource", { n: company.numberOfAnalysts })}
                       </div>
                     )}
                   </div>
                 )}
                 {company.recommendation !== "—" && (
                   <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: "16px 20px" }}>
-                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>Rekommendation</div>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>{t("companyView.recommendation")}</div>
                     <div style={{
                       fontSize: 16, fontWeight: 500, textTransform: "uppercase",
                       color: company.recommendation?.includes("buy") ? "#089981" : company.recommendation?.includes("sell") ? "#f23645" : "var(--text)",
@@ -217,7 +197,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
                     </div>
                     {company.numberOfAnalysts > 0 && (
                       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
-                        {company.numberOfAnalysts} analytiker · Yahoo Finance consensus
+                        {t("companyView.analystConsensus", { n: company.numberOfAnalysts })}
                       </div>
                     )}
                   </div>
@@ -228,7 +208,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
             {/* News */}
             {company.news?.length > 0 && (
               <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 20 }}>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>Senaste nyheter</div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>{t("companyView.latestNews")}</div>
                 {company.news.map((n, i) => (
                   <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
                     style={{

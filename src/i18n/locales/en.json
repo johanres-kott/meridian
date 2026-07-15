@@ -120,5 +120,42 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "companyView": {
+    "backButton": "← Back to watchlist",
+    "loading": "Loading company data...",
+    "loadError": "Could not load data for {{ticker}}",
+    "keyMetrics": "Key metrics",
+    "showAll": "Show all →",
+    "showFewer": "Show fewer",
+    "targetPrice": "Price target (avg)",
+    "targetRange": "Range: {{low}} – {{high}} {{currency}}",
+    "upside": "Upside:",
+    "analystSource": "Based on {{n}} analysts · Source: Yahoo Finance",
+    "recommendation": "Recommendation",
+    "analystConsensus": "{{n}} analysts · Yahoo Finance consensus",
+    "latestNews": "Latest news",
+    "metricLabels": {
+      "peForward": "P/E Forward",
+      "peTrailing": "P/E Trailing",
+      "ebitdaMargin": "EBITDA margin",
+      "operatingMargin": "Op. margin",
+      "grossMargin": "Gross margin",
+      "roic": "ROIC / ROE",
+      "debtEbitda": "Net debt/EBITDA",
+      "revenueGrowth": "Growth",
+      "dividendYield": "Dividend yield"
+    },
+    "metricTips": {
+      "peForward": "Share price divided by expected earnings per share. Lower = cheaper.",
+      "peTrailing": "Share price divided by last year's earnings per share.",
+      "ebitdaMargin": "Earnings before interest, tax, and depreciation as a share of revenue.",
+      "operatingMargin": "Operating profit divided by revenue. Shows how much becomes profit.",
+      "grossMargin": "Revenue minus cost of goods, divided by revenue. Higher = better.",
+      "roic": "Return on invested capital. Shows how efficiently the company uses its money.",
+      "debtEbitda": "Net debt divided by EBITDA. Above 3x is considered highly leveraged.",
+      "revenueGrowth": "Revenue growth compared to the previous year.",
+      "dividendYield": "Annual dividend divided by the share price. Higher = more returned each year."
+    }
   }
 }

@@ -1196,5 +1196,8 @@
     "dataSources": "Datakällor",
     "newsSource": "Nyheter: {{source}}",
     "latestNews": "Senaste nyheter"
+  },
+  "suggestionDropdown": {
+    "loading": "Laddar..."
   }
 }

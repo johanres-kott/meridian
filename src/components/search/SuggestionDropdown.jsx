@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export default function SuggestionDropdown({ suggestions, enriched, enrichRef, onSelect }) {
+  const { t } = useTranslation();
   return (
     <div style={{
       position: "absolute", top: "100%", left: 0, right: 48,
@@ -46,7 +49,7 @@ export default function SuggestionDropdown({ suggestions, enriched, enrichRef, o
               </div>
             ) : (
               enrichRef.current > 0 && (
-                <div style={{ marginTop: 4, fontSize: 10, color: "var(--text-muted)" }}>Laddar...</div>
+                <div style={{ marginTop: 4, fontSize: 10, color: "var(--text-muted)" }}>{t("suggestionDropdown.loading")}</div>
               )
             )}
           </div>

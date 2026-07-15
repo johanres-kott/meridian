@@ -1196,5 +1196,8 @@
     "dataSources": "Data sources",
     "newsSource": "News: {{source}}",
     "latestNews": "Latest news"
+  },
+  "suggestionDropdown": {
+    "loading": "Loading..."
   }
 }

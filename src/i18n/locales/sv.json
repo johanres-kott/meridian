@@ -972,5 +972,17 @@
     "sell": "Sälj",
     "shares": "aktier",
     "source": "Källa: Finansinspektionens insynsregister"
+  },
+  "notesSection": {
+    "ownPurchases": "Egna köp",
+    "cancel": "Avbryt",
+    "edit": "Redigera",
+    "sharesLabel": "ANTAL AKTIER",
+    "gavLabel": "GAV (SNITTPRIS)",
+    "save": "Spara",
+    "quantity": "Antal",
+    "gav": "GAV",
+    "notesTitle": "Anteckningar",
+    "noNotes": "Inga anteckningar ännu. Klicka Redigera för att lägga till investeringstes, analys, etc."
   }
 }

@@ -972,5 +972,17 @@
     "sell": "Sell",
     "shares": "shares",
     "source": "Source: Finansinspektionen's insider register"
+  },
+  "notesSection": {
+    "ownPurchases": "Your purchases",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "sharesLabel": "NUMBER OF SHARES",
+    "gavLabel": "AVG. COST (GAV)",
+    "save": "Save",
+    "quantity": "Quantity",
+    "gav": "Avg. cost",
+    "notesTitle": "Notes",
+    "noNotes": "No notes yet. Click Edit to add your investment thesis, analysis, etc."
   }
 }

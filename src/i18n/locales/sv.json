@@ -798,5 +798,69 @@
     },
     "subscribe": "Prenumerera",
     "securePayment": "Säker betalning via Stripe · Avsluta när som helst"
+  },
+  "privacy": {
+    "back": "Tillbaka",
+    "title": "Integritetspolicy",
+    "lastUpdated": "Senast uppdaterad: mars 2026",
+    "section1": {
+      "title": "1. Vilka vi är",
+      "body": "Thesion är en portföljhanteringstjänst för aktieintresserade. Tjänsten drivs som ett hobbyprojekt och tillhandahålls i befintligt skick."
+    },
+    "section2": {
+      "title": "2. Vilken data vi samlar in",
+      "item1Label": "Kontoinformation",
+      "item1Text": "E-postadress och valfritt visningsnamn vid registrering.",
+      "item2Label": "Portföljdata",
+      "item2Text": "Aktier, grupper och inställningar du skapar i tjänsten.",
+      "item3Label": "Teknisk data",
+      "item3Text": "IP-adress och tidsstämplar vid inloggning (hanteras av Supabase Auth).",
+      "footer": "Vi samlar inte in data via tredjepartscookies, spårningspixlar eller analytics-verktyg."
+    },
+    "section3": {
+      "title": "3. Hur vi lagrar din data",
+      "body": "All data lagras i Supabase (PostgreSQL) med servrar inom EU. Varje användare kan bara se och ändra sin egen data tack vare Row Level Security (RLS) på databasnivå. Kommunikation sker alltid över HTTPS."
+    },
+    "section4": {
+      "title": "4. Hur vi använder din data",
+      "body": "Din data används enbart för att tillhandahålla tjänstens funktioner — visa din portfölj, hämta kurser och generera nyckeltal. Vi säljer aldrig din data till tredje part."
+    },
+    "section5": {
+      "title": "5. AI-assistenten och din portföljdata",
+      "body": "Thesion har en inbyggd AI-assistent (driven av Anthropic Claude). När du använder chatten kan din portföljdata — inklusive aktieinnehav, antal aktier, GAV och P&L — skickas till Anthropic för att ge personliga svar.",
+      "item1Label": "Opt-in/Opt-out",
+      "item1Text": "Du kan stänga av delning av portföljdata med AI:n under Profil → Integritet & AI.",
+      "item2Label": "Ingen träning",
+      "item2Text": "Anthropic använder inte din data för att träna sina modeller (Anthropics användningsvillkor).",
+      "item3Label": "Ingen lagring",
+      "item3Text": "Portföljdatan sparas inte av Anthropic efter samtalet.",
+      "item4Label": "Marknadsdata",
+      "item4Text": "Index, råvaror och offentliga aktiekurser delas alltid (ej personlig data)."
+    },
+    "section6": {
+      "title": "6. Vem har tillgång till din data",
+      "item1Label": "Du",
+      "item1Text": "Bara du kan se din portfölj, dina innehav och dina inställningar (skyddat av Row Level Security).",
+      "item2Label": "Administratörer",
+      "item2Text": "Projektägaren har teknisk tillgång till Supabase-databasen för felsökning och support. Denna åtkomst loggas.",
+      "item3Label": "Tredje parter",
+      "item3Text": "Supabase (datalagring, EU), Anthropic (AI-chat, vid aktiverad delning), Vercel (hosting). Ingen av dessa får tillgång utan ditt medgivande."
+    },
+    "section7": {
+      "title": "7. Cookies",
+      "body": "Vi använder enbart nödvändiga cookies för autentisering (Supabase Auth). Inga reklam- eller analyticscookies används."
+    },
+    "section8": {
+      "title": "8. Dina rättigheter (GDPR)",
+      "intro": "Du har rätt att:",
+      "item1": "Begära ut all data vi har om dig.",
+      "item2": "Rätta felaktig information.",
+      "item3": "Radera ditt konto och all tillhörande data.",
+      "item4": "Invända mot behandling av din data."
+    },
+    "section9": {
+      "title": "9. Kontakt",
+      "body": "Har du frågor om din data eller vill utöva dina rättigheter? Kontakta oss på"
+    }
   }
 }

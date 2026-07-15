@@ -798,5 +798,69 @@
     },
     "subscribe": "Subscribe",
     "securePayment": "Secure payment via Stripe · Cancel at any time"
+  },
+  "privacy": {
+    "back": "Back",
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: March 2026",
+    "section1": {
+      "title": "1. Who we are",
+      "body": "Thesion is a portfolio management service for stock market enthusiasts. The service is run as a hobby project and is provided as is."
+    },
+    "section2": {
+      "title": "2. What data we collect",
+      "item1Label": "Account information",
+      "item1Text": "Email address and an optional display name when you register.",
+      "item2Label": "Portfolio data",
+      "item2Text": "Stocks, groups and settings you create in the service.",
+      "item3Label": "Technical data",
+      "item3Text": "IP address and timestamps at login (handled by Supabase Auth).",
+      "footer": "We do not collect data via third-party cookies, tracking pixels or analytics tools."
+    },
+    "section3": {
+      "title": "3. How we store your data",
+      "body": "All data is stored in Supabase (PostgreSQL) on servers within the EU. Each user can only view and change their own data thanks to Row Level Security (RLS) at the database level. Communication always takes place over HTTPS."
+    },
+    "section4": {
+      "title": "4. How we use your data",
+      "body": "Your data is used solely to provide the service's features — showing your portfolio, fetching prices and generating key metrics. We never sell your data to third parties."
+    },
+    "section5": {
+      "title": "5. The AI assistant and your portfolio data",
+      "body": "Thesion has a built-in AI assistant (powered by Anthropic Claude). When you use the chat, your portfolio data — including stock holdings, number of shares, average cost and P&L — may be sent to Anthropic to provide personalised answers.",
+      "item1Label": "Opt-in/Opt-out",
+      "item1Text": "You can turn off sharing of portfolio data with the AI under Profile → Privacy & AI.",
+      "item2Label": "No training",
+      "item2Text": "Anthropic does not use your data to train its models (Anthropic's terms of use).",
+      "item3Label": "No storage",
+      "item3Text": "Your portfolio data is not stored by Anthropic after the conversation.",
+      "item4Label": "Market data",
+      "item4Text": "Indices, commodities and public stock prices are always shared (not personal data)."
+    },
+    "section6": {
+      "title": "6. Who has access to your data",
+      "item1Label": "You",
+      "item1Text": "Only you can see your portfolio, your holdings and your settings (protected by Row Level Security).",
+      "item2Label": "Administrators",
+      "item2Text": "The project owner has technical access to the Supabase database for troubleshooting and support. This access is logged.",
+      "item3Label": "Third parties",
+      "item3Text": "Supabase (data storage, EU), Anthropic (AI chat, when sharing is enabled), Vercel (hosting). None of these are given access without your consent."
+    },
+    "section7": {
+      "title": "7. Cookies",
+      "body": "We only use essential cookies for authentication (Supabase Auth). No advertising or analytics cookies are used."
+    },
+    "section8": {
+      "title": "8. Your rights (GDPR)",
+      "intro": "You have the right to:",
+      "item1": "Request a copy of all data we hold about you.",
+      "item2": "Correct inaccurate information.",
+      "item3": "Delete your account and all associated data.",
+      "item4": "Object to the processing of your data."
+    },
+    "section9": {
+      "title": "9. Contact",
+      "body": "Do you have questions about your data, or want to exercise your rights? Contact us at"
+    }
   }
 }

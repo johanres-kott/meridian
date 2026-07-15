@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { supabase } from "../supabase.js";
 import Markdown from "./Markdown.jsx";
@@ -7,6 +8,8 @@ import InvestmentWizard from "./chat/InvestmentWizard.jsx";
 import PurchaseWizard from "./chat/PurchaseWizard.jsx";
 
 export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = true, onSaveStrategy, onSaveTodo }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const isMobile = useIsMobile();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -88,7 +91,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
     } catch (err) {
       setMessages(prev => {
         const copy = [...prev];
-        copy[copy.length - 1] = { role: "assistant", content: "Fel: Kunde inte nå AI-tjänsten." };
+        copy[copy.length - 1] = { role: "assistant", content: t("chatPanel.errorAiService") };
         return copy;
       });
     } finally {
@@ -99,18 +102,18 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
   if (!open) return null;
 
   const quickActions = [
-    { emoji: "📊", text: "Analysera min portfölj", q: "Analysera min portfölj — vad är bra och vad kan förbättras?" },
-    { emoji: "💡", text: "Ge mig en investeringsplan", wizard: true },
-    { emoji: "📈", text: "Vad driver min portfölj?", q: "Analysera vilka aktier som påverkat min portfölj mest — både uppåt och nedåt. Vad har gått bra och vad har gått dåligt?" },
-    { emoji: "🔄", text: "Vad borde jag sälja/köpa?", q: "Vilka aktier borde jag sälja och vilka borde jag köpa istället? Ge konkreta förslag." },
-    { emoji: "🛒", text: "Registrera köp", purchase: true },
+    { emoji: "📊", text: t("chatPanel.actionAnalyzePortfolio"), q: t("chatPanel.promptAnalyzePortfolio") },
+    { emoji: "💡", text: t("chatPanel.actionInvestmentPlan"), wizard: true },
+    { emoji: "📈", text: t("chatPanel.actionWhatDrives"), q: t("chatPanel.promptWhatDrives") },
+    { emoji: "🔄", text: t("chatPanel.actionBuySell"), q: t("chatPanel.promptBuySell") },
+    { emoji: "🛒", text: t("chatPanel.actionRegisterPurchase"), purchase: true },
   ];
 
   const compactActions = [
-    { emoji: "📊", text: "Analysera portföljen", q: "Analysera min portfölj — vad är bra och vad kan förbättras?" },
-    { emoji: "💡", text: "Investeringsplan", wizard: true },
-    { emoji: "🔄", text: "Köpa/sälja?", q: "Vilka aktier borde jag sälja och vilka borde jag köpa istället? Ge konkreta förslag." },
-    { emoji: "🛒", text: "Registrera köp", purchase: true },
+    { emoji: "📊", text: t("chatPanel.compactAnalyzePortfolio"), q: t("chatPanel.promptAnalyzePortfolio") },
+    { emoji: "💡", text: t("chatPanel.compactInvestmentPlan"), wizard: true },
+    { emoji: "🔄", text: t("chatPanel.compactBuySell"), q: t("chatPanel.promptBuySell") },
+    { emoji: "🛒", text: t("chatPanel.actionRegisterPurchase"), purchase: true },
   ];
 
   function handleAction(item) {
@@ -128,7 +131,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
     }}>
       {/* Header */}
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(135deg, var(--accent), #1e88e5)", color: "#fff" }}>
-        <span style={{ fontSize: 13, fontWeight: 600 }}>Mats <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.7 }}>Finansassistent (AI)</span></span>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>Mats <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.7 }}>{t("chatPanel.assistantSubtitle")}</span></span>
         <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1 }}>✕</button>
       </div>
 
@@ -137,7 +140,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
         {messages.length === 0 && (
           <div style={{ marginTop: 20 }}>
             <div style={{ color: "var(--text-secondary)", fontSize: 12, marginBottom: 16, textAlign: "center" }}>
-              Hej! Jag är Mats. Vad kan jag hjälpa dig med?
+              {t("chatPanel.greeting")}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {quickActions.map((item, i) => (
@@ -158,8 +161,8 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
             </div>
             <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "8px 0", textAlign: "center", marginTop: 8 }}>
               {sharePortfolio
-                ? "🔓 Mats har tillgång till din portfölj"
-                : "🔒 Portföljdata delas inte"}
+                ? t("chatPanel.portfolioShared")
+                : t("chatPanel.portfolioNotShared")}
             </div>
           </div>
         )}
@@ -168,15 +171,15 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
             onComplete={(answers) => {
               setWizardActive(false);
               const isNew = answers.type === "investera färska pengar";
-              const parts = [`Jag vill ${answers.type}.`];
+              const parts = [t("chatPanel.wizardIWant", { type: answers.type })];
               if (isNew && answers.amount) {
-                parts.push(`Belopp: ${answers.amount}.`);
+                parts.push(t("chatPanel.wizardAmount", { amount: answers.amount }));
               }
-              parts.push("Analysera min profil och nuvarande portfölj, föreslå konkreta bolag med ticker, belopp per bolag och motivering.");
+              parts.push(t("chatPanel.wizardAnalyzeProfile"));
               if (!isNew) {
-                parts.push("Föreslå vilka aktier jag borde sälja och vad jag borde köpa istället.");
+                parts.push(t("chatPanel.wizardSuggestSell"));
               }
-              sendWithMessage(`Ge mig en konkret investeringsplan. ${parts.join(" ")}`);
+              sendWithMessage(t("chatPanel.wizardPlanRequest", { parts: parts.join(" ") }));
             }}
             onCancel={() => setWizardActive(false)}
           />
@@ -187,11 +190,11 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
             onComplete={(result) => {
               setPurchaseWizardActive(false);
               const confirmMsg = result.wasExisting
-                ? `Köp registrerat! ${result.shares} st ${result.name} (${result.ticker}) à ${result.price.toLocaleString("sv-SE")} kr. Du äger nu totalt ${result.newTotalShares} st.`
-                : `Köp registrerat! ${result.shares} st ${result.name} (${result.ticker}) à ${result.price.toLocaleString("sv-SE")} kr har lagts till i din portfölj.`;
+                ? t("chatPanel.purchaseConfirmExisting", { shares: result.shares, name: result.name, ticker: result.ticker, price: result.price.toLocaleString(numberLocale), newTotalShares: result.newTotalShares })
+                : t("chatPanel.purchaseConfirmNew", { shares: result.shares, name: result.name, ticker: result.ticker, price: result.price.toLocaleString(numberLocale) });
               setMessages(prev => [
                 ...prev,
-                { role: "assistant", content: `✅ **${confirmMsg}**\n\nLadda om portföljsidan för att se uppdateringen.` },
+                { role: "assistant", content: t("chatPanel.purchaseReload", { message: confirmMsg }) },
               ]);
             }}
             onCancel={() => setPurchaseWizardActive(false)}
@@ -244,7 +247,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendWithMessage(); } }}
-          placeholder="Skriv en fråga..."
+          placeholder={t("chatPanel.inputPlaceholder")}
           disabled={streaming}
           style={{
             flex: 1, padding: "8px 12px", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12, background: "var(--bg-card)", color: "var(--text)",
@@ -260,7 +263,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
             fontSize: 12, cursor: streaming || !input.trim() ? "default" : "pointer", fontFamily: "inherit",
           }}
         >
-          Skicka
+          {t("chatPanel.send")}
         </button>
       </div>
     </div>

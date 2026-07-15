@@ -322,5 +322,33 @@
     "addEntry": "+ Lägg till pensionspost",
     "save": "Spara",
     "cancel": "Avbryt"
+  },
+  "chatPanel": {
+    "errorAiService": "Fel: Kunde inte nå AI-tjänsten.",
+    "actionAnalyzePortfolio": "Analysera min portfölj",
+    "promptAnalyzePortfolio": "Analysera min portfölj — vad är bra och vad kan förbättras?",
+    "actionInvestmentPlan": "Ge mig en investeringsplan",
+    "actionWhatDrives": "Vad driver min portfölj?",
+    "promptWhatDrives": "Analysera vilka aktier som påverkat min portfölj mest — både uppåt och nedåt. Vad har gått bra och vad har gått dåligt?",
+    "actionBuySell": "Vad borde jag sälja/köpa?",
+    "promptBuySell": "Vilka aktier borde jag sälja och vilka borde jag köpa istället? Ge konkreta förslag.",
+    "actionRegisterPurchase": "Registrera köp",
+    "compactAnalyzePortfolio": "Analysera portföljen",
+    "compactInvestmentPlan": "Investeringsplan",
+    "compactBuySell": "Köpa/sälja?",
+    "assistantSubtitle": "Finansassistent (AI)",
+    "greeting": "Hej! Jag är Mats. Vad kan jag hjälpa dig med?",
+    "portfolioShared": "🔓 Mats har tillgång till din portfölj",
+    "portfolioNotShared": "🔒 Portföljdata delas inte",
+    "wizardIWant": "Jag vill {{type}}.",
+    "wizardAmount": "Belopp: {{amount}}.",
+    "wizardAnalyzeProfile": "Analysera min profil och nuvarande portfölj, föreslå konkreta bolag med ticker, belopp per bolag och motivering.",
+    "wizardSuggestSell": "Föreslå vilka aktier jag borde sälja och vad jag borde köpa istället.",
+    "wizardPlanRequest": "Ge mig en konkret investeringsplan. {{parts}}",
+    "purchaseConfirmExisting": "Köp registrerat! {{shares}} st {{name}} ({{ticker}}) à {{price}} kr. Du äger nu totalt {{newTotalShares}} st.",
+    "purchaseConfirmNew": "Köp registrerat! {{shares}} st {{name}} ({{ticker}}) à {{price}} kr har lagts till i din portfölj.",
+    "purchaseReload": "✅ **{{message}}**\n\nLadda om portföljsidan för att se uppdateringen.",
+    "inputPlaceholder": "Skriv en fråga...",
+    "send": "Skicka"
   }
 }

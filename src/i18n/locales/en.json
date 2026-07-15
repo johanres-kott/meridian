@@ -322,5 +322,33 @@
     "addEntry": "+ Add pension entry",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "chatPanel": {
+    "errorAiService": "Error: Could not reach the AI service.",
+    "actionAnalyzePortfolio": "Analyse my portfolio",
+    "promptAnalyzePortfolio": "Analyse my portfolio — what is good and what could be improved?",
+    "actionInvestmentPlan": "Give me an investment plan",
+    "actionWhatDrives": "What is driving my portfolio?",
+    "promptWhatDrives": "Analyse which stocks have affected my portfolio the most — both up and down. What has done well and what has done badly?",
+    "actionBuySell": "What should I sell/buy?",
+    "promptBuySell": "Which stocks should I sell and which should I buy instead? Give me concrete suggestions.",
+    "actionRegisterPurchase": "Register a purchase",
+    "compactAnalyzePortfolio": "Analyse the portfolio",
+    "compactInvestmentPlan": "Investment plan",
+    "compactBuySell": "Buy/sell?",
+    "assistantSubtitle": "Financial assistant (AI)",
+    "greeting": "Hi! I'm Mats. What can I help you with?",
+    "portfolioShared": "🔓 Mats has access to your portfolio",
+    "portfolioNotShared": "🔒 Portfolio data is not shared",
+    "wizardIWant": "I want to {{type}}.",
+    "wizardAmount": "Amount: {{amount}}.",
+    "wizardAnalyzeProfile": "Analyse my profile and current portfolio, and suggest specific companies with ticker, amount per company and rationale.",
+    "wizardSuggestSell": "Suggest which stocks I should sell and what I should buy instead.",
+    "wizardPlanRequest": "Give me a concrete investment plan. {{parts}}",
+    "purchaseConfirmExisting": "Purchase registered! {{shares}} shares of {{name}} ({{ticker}}) at {{price}} SEK. You now own {{newTotalShares}} shares in total.",
+    "purchaseConfirmNew": "Purchase registered! {{shares}} shares of {{name}} ({{ticker}}) at {{price}} SEK have been added to your portfolio.",
+    "purchaseReload": "✅ **{{message}}**\n\nReload the portfolio page to see the update.",
+    "inputPlaceholder": "Type a question...",
+    "send": "Send"
   }
 }

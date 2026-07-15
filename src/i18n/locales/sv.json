@@ -899,5 +899,42 @@
     "createdBy": "Skapad av",
     "contact": "Kontakt",
     "privacyPolicy": "Integritetspolicy"
+  },
+  "features": {
+    "stats": {
+      "analyzedStocks": "Analyserade aktier",
+      "scoringModels": "Scoringmodeller",
+      "investmentCompanies": "Investmentbolag",
+      "realtime": "Realtid",
+      "marketData": "Marknadsdata"
+    },
+    "bentoTitle": "Allt du behöver för att investera smartare",
+    "bentoSubtitle": "Från portföljöversikt till djupanalys — byggt för svenska investerare.",
+    "smartAnalysisLabel": "Smart analys",
+    "scoringTitleLine1": "Scoring baserad på",
+    "scoringTitleLine2": "5 etablerade modeller",
+    "scoringDesc": "Piotroski F-Score, Magic Formula, PEG Ratio, kvalitets- och utdelningsanalys — kombinerat till en composite score.",
+    "personalLabel": "Personligt",
+    "personalTitle": "Anpassat efter dig",
+    "personalDesc": "Värdeinvesterare? Tillväxt? Utdelning? Dina förslag viktas efter din profil.",
+    "riskLow": "Låg risk",
+    "riskMedium": "Medel",
+    "riskHigh": "Hög",
+    "portfolioLabel": "Portfölj",
+    "importTitle": "Importera från Avanza",
+    "importDesc": "Ladda upp din Avanza-PDF och få hela portföljen importerad på sekunder. Spåra P&L i realtid.",
+    "investmentLabel": "Investmentbolag",
+    "investmentTitle": "7 bolag, en vy",
+    "investmentDesc": "Investor, Industrivärden, Öresund, Latour, Lundbergs, Svolder och Creades — innehav, ledning och nyheter.",
+    "insidersTitle": "Se vad insiders gör",
+    "insidersDesc": "Insidertransaktioner från Finansinspektionen — se vad ledningen köper och säljer.",
+    "stepsTitle": "Tre steg till bättre investeringar",
+    "stepsSubtitle": "Kom igång på under en minut",
+    "step1Title": "Berätta vem du är",
+    "step1Desc": "Fyra snabba frågor om din investeringsstil, riskprofil och intressen.",
+    "step2Title": "Utforska förslag",
+    "step2Desc": "En personlig topplista med aktier rankade med etablerade analysmodeller.",
+    "step3Title": "Analysera på djupet",
+    "step3Desc": "Nyckeltal, insiderhandel, risk, kursmål och AI-assistent — allt på ett ställe."
   }
 }

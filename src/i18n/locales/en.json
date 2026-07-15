@@ -899,5 +899,42 @@
     "createdBy": "Created by",
     "contact": "Contact",
     "privacyPolicy": "Privacy Policy"
+  },
+  "features": {
+    "stats": {
+      "analyzedStocks": "Analysed stocks",
+      "scoringModels": "Scoring models",
+      "investmentCompanies": "Investment companies",
+      "realtime": "Real-time",
+      "marketData": "Market data"
+    },
+    "bentoTitle": "Everything you need to invest smarter",
+    "bentoSubtitle": "From portfolio overview to in-depth analysis — built for Swedish investors.",
+    "smartAnalysisLabel": "Smart analysis",
+    "scoringTitleLine1": "Scoring based on",
+    "scoringTitleLine2": "5 established models",
+    "scoringDesc": "Piotroski F-Score, Magic Formula, PEG Ratio, quality and dividend analysis — combined into one composite score.",
+    "personalLabel": "Personal",
+    "personalTitle": "Tailored to you",
+    "personalDesc": "Value investor? Growth? Dividends? Your suggestions are weighted to your profile.",
+    "riskLow": "Low risk",
+    "riskMedium": "Medium",
+    "riskHigh": "High",
+    "portfolioLabel": "Portfolio",
+    "importTitle": "Import from Avanza",
+    "importDesc": "Upload your Avanza PDF and have your entire portfolio imported in seconds. Track P&L in real time.",
+    "investmentLabel": "Investment companies",
+    "investmentTitle": "7 companies, one view",
+    "investmentDesc": "Investor, Industrivärden, Öresund, Latour, Lundbergs, Svolder and Creades — holdings, management and news.",
+    "insidersTitle": "See what insiders are doing",
+    "insidersDesc": "Insider transactions from Finansinspektionen — see what management is buying and selling.",
+    "stepsTitle": "Three steps to better investing",
+    "stepsSubtitle": "Get started in under a minute",
+    "step1Title": "Tell us who you are",
+    "step1Desc": "Four quick questions about your investment style, risk profile and interests.",
+    "step2Title": "Explore suggestions",
+    "step2Desc": "A personal top list of stocks ranked with established analysis models.",
+    "step3Title": "Analyse in depth",
+    "step3Desc": "Key metrics, insider trading, risk, price targets and an AI assistant — all in one place."
   }
 }

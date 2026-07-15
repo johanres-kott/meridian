@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { supabase } from "../../supabase.js";
+import { useTranslation } from "react-i18next";
 
 export default function SaveMenu({ content, onSaveStrategy, onSaveTodo }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [open, setOpen] = useState(false);
   const [saved, setSaved] = useState(null);
   const [stocks, setStocks] = useState([]);
@@ -20,14 +23,14 @@ export default function SaveMenu({ content, onSaveStrategy, onSaveTodo }) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const { data: existing } = await supabase.from("watchlist").select("notes").eq("id", stock.id).single();
-    const date = new Date().toLocaleDateString("sv-SE");
-    const newNotes = (existing?.notes || "") + `\n\n--- AI-insikt ${date} ---\n` + content;
+    const date = new Date().toLocaleDateString(numberLocale);
+    const newNotes = (existing?.notes || "") + `\n\n${t("saveMenu.insightHeader", { date })}\n` + content;
     await supabase.from("watchlist").update({ notes: newNotes }).eq("id", stock.id).eq("user_id", user.id);
     setSaved("insight");
     setShowStocks(false);
   }
 
-  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>{saved === "todo" ? "✓ Tillagd som att-göra" : saved === "strategy" ? "✓ Strategi sparad" : "✓ Insikt sparad"}</span>;
+  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>{saved === "todo" ? t("saveMenu.todoSaved") : saved === "strategy" ? t("saveMenu.strategySaved") : t("saveMenu.insightSaved")}</span>;
 
   const menuBtn = { display: "block", width: "100%", textAlign: "left", padding: "6px 10px", fontSize: 11, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", color: "var(--text)", borderRadius: 4 };
 
@@ -38,13 +41,13 @@ export default function SaveMenu({ content, onSaveStrategy, onSaveTodo }) {
         onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
         onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
       >
-        Spara ▾
+        {t("saveMenu.save")}
       </button>
       {open && (
         <div style={{ position: "absolute", bottom: "100%", left: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 12px rgba(0,0,0,0.12)", padding: "4px 0", zIndex: 100, minWidth: 180, marginBottom: 4 }}>
-          {onSaveTodo && <button style={menuBtn} onClick={() => { onSaveTodo(content); setSaved("todo"); setOpen(false); }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>📋 Spara som att-göra</button>}
-          {onSaveStrategy && <button style={menuBtn} onClick={() => { onSaveStrategy(content); setSaved("strategy"); setOpen(false); }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>🎯 Spara som strategi</button>}
-          <button style={menuBtn} onClick={loadStocks} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>💡 Spara insikt till bolag</button>
+          {onSaveTodo && <button style={menuBtn} onClick={() => { onSaveTodo(content); setSaved("todo"); setOpen(false); }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>{t("saveMenu.saveAsTodo")}</button>}
+          {onSaveStrategy && <button style={menuBtn} onClick={() => { onSaveStrategy(content); setSaved("strategy"); setOpen(false); }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>{t("saveMenu.saveAsStrategy")}</button>}
+          <button style={menuBtn} onClick={loadStocks} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>{t("saveMenu.saveInsightToCompany")}</button>
         </div>
       )}
       {showStocks && (

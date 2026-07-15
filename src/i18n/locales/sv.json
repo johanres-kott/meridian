@@ -1118,5 +1118,15 @@
     "saved": "Sparat!",
     "saveToCompany": "Spara insikt till bolag →",
     "noCompanies": "Inga bolag i portföljen"
+  },
+  "saveMenu": {
+    "insightHeader": "--- AI-insikt {{date}} ---",
+    "todoSaved": "✓ Tillagd som att-göra",
+    "strategySaved": "✓ Strategi sparad",
+    "insightSaved": "✓ Insikt sparad",
+    "save": "Spara ▾",
+    "saveAsTodo": "📋 Spara som att-göra",
+    "saveAsStrategy": "🎯 Spara som strategi",
+    "saveInsightToCompany": "💡 Spara insikt till bolag"
   }
 }

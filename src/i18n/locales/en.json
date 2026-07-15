@@ -1118,5 +1118,15 @@
     "saved": "Saved!",
     "saveToCompany": "Save insight to company →",
     "noCompanies": "No companies in your portfolio"
+  },
+  "saveMenu": {
+    "insightHeader": "--- AI insight {{date}} ---",
+    "todoSaved": "✓ Added as to-do",
+    "strategySaved": "✓ Strategy saved",
+    "insightSaved": "✓ Insight saved",
+    "save": "Save ▾",
+    "saveAsTodo": "📋 Save as to-do",
+    "saveAsStrategy": "🎯 Save as strategy",
+    "saveInsightToCompany": "💡 Save insight to company"
   }
 }

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../supabase.js";
 import { searchStocks } from "../../lib/apiClient.js";
+import { useTranslation } from "react-i18next";
 
 export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [step, setStep] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -39,7 +42,7 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
     setError(null);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Ej inloggad");
+      if (!user) throw new Error(t("purchaseWizard.notLoggedIn"));
 
       const numShares = parseFloat(shares);
       const numPrice = parseFloat(price);
@@ -102,12 +105,12 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
   return (
     <div style={{ padding: "8px 0" }}>
       <div style={{ padding: "8px 12px", borderRadius: 8, background: "var(--border-light)", fontSize: 12, lineHeight: 1.5, color: "var(--text)", marginBottom: 8 }}>
-        {step === 0 && "Vilken aktie har du köpt?"}
-        {step === 1 && `Hur många aktier köpte du av ${selected?.name}?`}
-        {step === 2 && "Till vilken kurs per aktie?"}
-        {step === 3 && "Stämmer detta?"}
+        {step === 0 && t("purchaseWizard.whichStock")}
+        {step === 1 && t("purchaseWizard.howManyShares", { name: selected?.name })}
+        {step === 2 && t("purchaseWizard.atWhatPrice")}
+        {step === 3 && t("purchaseWizard.isThisCorrect")}
         <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-          Registrera köp — Steg {step + 1} av 4
+          {t("purchaseWizard.stepOf", { current: step + 1 })}
         </div>
       </div>
 
@@ -115,7 +118,7 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
         <div>
           {portfolio.length > 0 && !searchQuery && (
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 4 }}>Dina aktier:</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 4 }}>{t("purchaseWizard.yourStocks")}</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                 {portfolio.slice(0, 8).map((s, i) => (
                   <button key={i} onClick={() => selectStock({ ticker: s.ticker, name: s.name })} style={{ ...chipStyle, fontSize: 11, padding: "6px 10px" }}
@@ -131,11 +134,11 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
           <input
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); searchStock(e.target.value); }}
-            placeholder="Sök aktie..."
+            placeholder={t("purchaseWizard.searchStock")}
             autoFocus
             style={inputStyle}
           />
-          {searching && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Söker...</div>}
+          {searching && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{t("purchaseWizard.searching")}</div>}
           {searchResults.length > 0 && (
             <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 2 }}>
               {searchResults.map((r, i) => (
@@ -164,7 +167,7 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
             value={shares}
             onChange={e => setShares(e.target.value.replace(/[^0-9.,]/g, ""))}
             onKeyDown={e => { if (e.key === "Enter" && shares) { setStep(2); } }}
-            placeholder="Antal aktier..."
+            placeholder={t("purchaseWizard.sharesPlaceholder")}
             autoFocus
             type="text"
             inputMode="decimal"
@@ -172,7 +175,7 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
           />
           {shares && (
             <button onClick={() => setStep(2)} style={{ ...chipStyle, marginTop: 6, background: "var(--accent)", color: "#fff", border: "none" }}>
-              {shares} st →
+              {t("purchaseWizard.sharesChip", { shares })}
             </button>
           )}
         </div>
@@ -184,7 +187,7 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
             value={price}
             onChange={e => setPrice(e.target.value.replace(/[^0-9.,]/g, ""))}
             onKeyDown={e => { if (e.key === "Enter" && price) { setStep(3); } }}
-            placeholder="Kurs per aktie (SEK)..."
+            placeholder={t("purchaseWizard.pricePlaceholder")}
             autoFocus
             type="text"
             inputMode="decimal"
@@ -192,7 +195,7 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
           />
           {price && (
             <button onClick={() => setStep(3)} style={{ ...chipStyle, marginTop: 6, background: "var(--accent)", color: "#fff", border: "none" }}>
-              {Number(price).toLocaleString("sv-SE")} kr/st →
+              {t("purchaseWizard.priceChip", { price: Number(price).toLocaleString(numberLocale) })}
             </button>
           )}
         </div>
@@ -205,27 +208,27 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
             fontSize: 12, lineHeight: 1.8,
           }}>
             <div><strong>{selected?.name}</strong> <span style={{ color: "var(--text-muted)" }}>({selected?.ticker})</span></div>
-            <div>Antal: <strong>{shares} st</strong></div>
-            <div>Kurs: <strong>{Number(price).toLocaleString("sv-SE")} kr</strong></div>
+            <div>{t("purchaseWizard.quantityLabel")} <strong>{t("purchaseWizard.sharesValue", { shares })}</strong></div>
+            <div>{t("purchaseWizard.priceLabel")} <strong>{t("purchaseWizard.priceValue", { price: Number(price).toLocaleString(numberLocale) })}</strong></div>
             <div style={{ borderTop: "1px solid var(--border)", marginTop: 6, paddingTop: 6, fontWeight: 500 }}>
-              Totalt: {(parseFloat(shares) * parseFloat(price)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} kr
+              {t("purchaseWizard.total", { amount: (parseFloat(shares) * parseFloat(price)).toLocaleString(numberLocale, { maximumFractionDigits: 0 }) })}
             </div>
           </div>
           {error && <div style={{ fontSize: 11, color: "#f23645", marginTop: 6 }}>{error}</div>}
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <button onClick={submitPurchase} disabled={saving}
               style={{ ...chipStyle, flex: 1, background: "#089981", color: "#fff", border: "none", textAlign: "center", opacity: saving ? 0.6 : 1 }}>
-              {saving ? "Sparar..." : "✓ Registrera köp"}
+              {saving ? t("purchaseWizard.saving") : t("purchaseWizard.recordPurchase")}
             </button>
             <button onClick={() => setStep(0)} style={{ ...chipStyle, fontSize: 11, color: "var(--text-secondary)" }}>
-              Ändra
+              {t("purchaseWizard.change")}
             </button>
           </div>
         </div>
       )}
 
       <button onClick={onCancel} style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}>
-        Avbryt
+        {t("purchaseWizard.cancel")}
       </button>
     </div>
   );

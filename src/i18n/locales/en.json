@@ -1088,5 +1088,29 @@
     "customAmountPlaceholder": "Enter amount in kr...",
     "stepOf": "Step {{current}} of {{total}}",
     "cancel": "Cancel"
+  },
+  "purchaseWizard": {
+    "notLoggedIn": "Not logged in",
+    "whichStock": "Which stock did you buy?",
+    "howManyShares": "How many shares of {{name}} did you buy?",
+    "atWhatPrice": "At what price per share?",
+    "isThisCorrect": "Is this correct?",
+    "stepOf": "Record purchase — Step {{current}} of 4",
+    "yourStocks": "Your stocks:",
+    "searchStock": "Search stock...",
+    "searching": "Searching...",
+    "sharesPlaceholder": "Number of shares...",
+    "sharesChip": "{{shares}} shares →",
+    "pricePlaceholder": "Price per share (SEK)...",
+    "priceChip": "{{price}} kr/share →",
+    "quantityLabel": "Quantity:",
+    "sharesValue": "{{shares}} shares",
+    "priceLabel": "Price:",
+    "priceValue": "{{price}} kr",
+    "total": "Total: {{amount}} kr",
+    "saving": "Saving...",
+    "recordPurchase": "✓ Record purchase",
+    "change": "Change",
+    "cancel": "Cancel"
   }
 }

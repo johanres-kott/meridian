@@ -1088,5 +1088,29 @@
     "customAmountPlaceholder": "Ange belopp i kr...",
     "stepOf": "Steg {{current}} av {{total}}",
     "cancel": "Avbryt"
+  },
+  "purchaseWizard": {
+    "notLoggedIn": "Ej inloggad",
+    "whichStock": "Vilken aktie har du köpt?",
+    "howManyShares": "Hur många aktier köpte du av {{name}}?",
+    "atWhatPrice": "Till vilken kurs per aktie?",
+    "isThisCorrect": "Stämmer detta?",
+    "stepOf": "Registrera köp — Steg {{current}} av 4",
+    "yourStocks": "Dina aktier:",
+    "searchStock": "Sök aktie...",
+    "searching": "Söker...",
+    "sharesPlaceholder": "Antal aktier...",
+    "sharesChip": "{{shares}} st →",
+    "pricePlaceholder": "Kurs per aktie (SEK)...",
+    "priceChip": "{{price}} kr/st →",
+    "quantityLabel": "Antal:",
+    "sharesValue": "{{shares}} st",
+    "priceLabel": "Kurs:",
+    "priceValue": "{{price}} kr",
+    "total": "Totalt: {{amount}} kr",
+    "saving": "Sparar...",
+    "recordPurchase": "✓ Registrera köp",
+    "change": "Ändra",
+    "cancel": "Avbryt"
   }
 }

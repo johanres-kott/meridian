@@ -954,5 +954,12 @@
     "colTicker": "Ticker",
     "colWeight": "Vikt (%)",
     "colValue": "Värde (Mkr)"
+  },
+  "infoCard": {
+    "title": "Bolagsinfo",
+    "ticker": "Ticker",
+    "founded": "Grundat",
+    "website": "Hemsida",
+    "leadershipData": "Ledarskapsdata"
   }
 }

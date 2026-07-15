@@ -1,17 +1,20 @@
+import { useTranslation } from "react-i18next";
 import { Badge } from "./primitives.jsx";
 
 export default function InfoCard({ company, leadershipData }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const rows = [
-    { label: "Ticker",    value: `${company.ticker}.${company.exchange}` },
-    { label: "Grundat",   value: company.founded },
-    { label: "Hemsida",   value: company.url, href: `https://www.${company.url}` },
+    { label: t("infoCard.ticker"),  value: `${company.ticker}.${company.exchange}` },
+    { label: t("infoCard.founded"), value: company.founded },
+    { label: t("infoCard.website"), value: company.url, href: `https://www.${company.url}` },
   ];
 
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
       <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-light)" }}>
         <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>
-          Bolagsinfo
+          {t("infoCard.title")}
         </div>
         {rows.map(r => (
           <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
@@ -32,7 +35,7 @@ export default function InfoCard({ company, leadershipData }) {
       {leadershipData && (
         <div style={{ padding: "10px 16px", background: "var(--bg-secondary)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Ledarskapsdata</span>
+            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{t("infoCard.leadershipData")}</span>
             <Badge
               text={leadershipData.source === "live" ? "● Live" : "Cached"}
               color={leadershipData.source === "live" ? "#089981" : "#b2b5be"}
@@ -41,7 +44,7 @@ export default function InfoCard({ company, leadershipData }) {
           </div>
           {leadershipData.fetchedAt && (
             <div style={{ fontSize: 10, color: "#c0c3cb", marginTop: 4 }}>
-              {new Date(leadershipData.fetchedAt).toLocaleString("sv-SE", { dateStyle: "short", timeStyle: "short" })}
+              {new Date(leadershipData.fetchedAt).toLocaleString(numberLocale, { dateStyle: "short", timeStyle: "short" })}
             </div>
           )}
         </div>

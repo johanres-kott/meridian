@@ -954,5 +954,12 @@
     "colTicker": "Ticker",
     "colWeight": "Weight (%)",
     "colValue": "Value (SEK m)"
+  },
+  "infoCard": {
+    "title": "Company info",
+    "ticker": "Ticker",
+    "founded": "Founded",
+    "website": "Website",
+    "leadershipData": "Leadership data"
   }
 }

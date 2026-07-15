@@ -1128,5 +1128,73 @@
     "saveAsTodo": "📋 Spara som att-göra",
     "saveAsStrategy": "🎯 Spara som strategi",
     "saveInsightToCompany": "💡 Spara insikt till bolag"
+  },
+  "searchResultDetail": {
+    "inPortfolio": "✓ I din portfölj",
+    "addToPortfolio": "+ Lägg till i portfölj",
+    "week52": "52v:",
+    "metricsHeader": "Nyckeltal",
+    "showAll": "Visa alla →",
+    "showFewer": "Visa färre",
+    "metrics": {
+      "peForward": {
+        "label": "P/E Forward",
+        "tip": "Aktiekurs delat med förväntad vinst per aktie kommande 12 mån. Lägre = billigare."
+      },
+      "peTrailing": {
+        "label": "P/E Trailing",
+        "tip": "Aktiekurs delat med vinst per aktie senaste 12 mån. Lägre = billigare."
+      },
+      "ebitdaMargin": {
+        "label": "EBITDA-marginal",
+        "tip": "Vinst före räntor, skatt och avskrivningar som andel av omsättningen."
+      },
+      "operatingMargin": {
+        "label": "Rör.marginal",
+        "tip": "Rörelseresultat delat med omsättning. Visar hur mycket som blir vinst."
+      },
+      "grossMargin": {
+        "label": "Bruttomarginal",
+        "tip": "Omsättning minus varukostnad, delat med omsättning. Högre = bättre."
+      },
+      "roic": {
+        "label": "ROIC / ROE",
+        "tip": "Avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar."
+      },
+      "debtEbitda": {
+        "label": "Nettoskuld/EBITDA",
+        "tip": "Nettoskuld delat med EBITDA. Över 3x anses högt belånat."
+      },
+      "revenueGrowth": {
+        "label": "Tillväxt",
+        "tip": "Omsättningstillväxt jämfört med föregående år (YoY)."
+      },
+      "dividendYield": {
+        "label": "Direktavkastning",
+        "tip": "Årlig utdelning delat med aktiekursen. Högre = mer tillbaka varje år."
+      }
+    },
+    "riskDiversified": "{{risk}} — diversifierat investmentbolag",
+    "riskMarketCap": "{{risk}} (baserat på börsvärde)",
+    "dividendYieldItem": "Direktavkastning {{value}}%",
+    "noDividend": "Ingen utdelning",
+    "profileHeader": "Din profil & detta bolag",
+    "ourAnalysis": "Vår analys",
+    "growthLabel": "Tillväxt",
+    "dividendLabel": "Utdelning",
+    "qualityLabel": "Kvalitet",
+    "totalScoreFor": "/ 100 — totalpoäng för {{profile}}",
+    "strongMatch": "Stark matchning",
+    "partialMatch": "Delvis matchning",
+    "weakMatch": "Svag matchning",
+    "targetPriceHeader": "Kursmål (snitt)",
+    "targetRange": "Spann: {{low}} – {{high}} {{currency}}",
+    "upside": "Uppsida:",
+    "analystsCount": "{{num}} analytiker · Yahoo Finance",
+    "analystsConsensus": "{{num}} analytiker · Yahoo Finance consensus",
+    "recommendation": "Rekommendation",
+    "dataSources": "Datakällor",
+    "newsSource": "Nyheter: {{source}}",
+    "latestNews": "Senaste nyheter"
   }
 }

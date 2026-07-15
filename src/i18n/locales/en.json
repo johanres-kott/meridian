@@ -1128,5 +1128,73 @@
     "saveAsTodo": "📋 Save as to-do",
     "saveAsStrategy": "🎯 Save as strategy",
     "saveInsightToCompany": "💡 Save insight to company"
+  },
+  "searchResultDetail": {
+    "inPortfolio": "✓ In your portfolio",
+    "addToPortfolio": "+ Add to portfolio",
+    "week52": "52w:",
+    "metricsHeader": "Key metrics",
+    "showAll": "Show all →",
+    "showFewer": "Show fewer",
+    "metrics": {
+      "peForward": {
+        "label": "P/E Forward",
+        "tip": "Share price divided by expected earnings per share over the next 12 months. Lower = cheaper."
+      },
+      "peTrailing": {
+        "label": "P/E Trailing",
+        "tip": "Share price divided by earnings per share over the past 12 months. Lower = cheaper."
+      },
+      "ebitdaMargin": {
+        "label": "EBITDA margin",
+        "tip": "Earnings before interest, taxes, depreciation and amortisation as a share of revenue."
+      },
+      "operatingMargin": {
+        "label": "Op. margin",
+        "tip": "Operating profit divided by revenue. Shows how much ends up as profit."
+      },
+      "grossMargin": {
+        "label": "Gross margin",
+        "tip": "Revenue minus cost of goods sold, divided by revenue. Higher = better."
+      },
+      "roic": {
+        "label": "ROIC / ROE",
+        "tip": "Return on invested capital. Shows how efficiently the company uses its money."
+      },
+      "debtEbitda": {
+        "label": "Net debt/EBITDA",
+        "tip": "Net debt divided by EBITDA. Above 3x is considered highly leveraged."
+      },
+      "revenueGrowth": {
+        "label": "Growth",
+        "tip": "Revenue growth compared with the previous year (YoY)."
+      },
+      "dividendYield": {
+        "label": "Dividend yield",
+        "tip": "Annual dividend divided by the share price. Higher = more back each year."
+      }
+    },
+    "riskDiversified": "{{risk}} — diversified investment company",
+    "riskMarketCap": "{{risk}} (based on market cap)",
+    "dividendYieldItem": "Dividend yield {{value}}%",
+    "noDividend": "No dividend",
+    "profileHeader": "Your profile & this company",
+    "ourAnalysis": "Our analysis",
+    "growthLabel": "Growth",
+    "dividendLabel": "Dividend",
+    "qualityLabel": "Quality",
+    "totalScoreFor": "/ 100 — total score for {{profile}}",
+    "strongMatch": "Strong match",
+    "partialMatch": "Partial match",
+    "weakMatch": "Weak match",
+    "targetPriceHeader": "Target price (avg)",
+    "targetRange": "Range: {{low}} – {{high}} {{currency}}",
+    "upside": "Upside:",
+    "analystsCount": "{{num}} analysts · Yahoo Finance",
+    "analystsConsensus": "{{num}} analysts · Yahoo Finance consensus",
+    "recommendation": "Recommendation",
+    "dataSources": "Data sources",
+    "newsSource": "News: {{source}}",
+    "latestNews": "Latest news"
   }
 }

@@ -6,8 +6,10 @@ import { useUser } from "../../contexts/UserContext.jsx";
 import { matchStock, getRisk, riskLabel, betaDescription, isInvestmentCompany } from "../../lib/profileMatcher.js";
 import { PROFILE_LABELS } from "../../constants.js";
 import { ScoreBar } from "../company/ProfileInsight.jsx";
+import { useTranslation } from "react-i18next";
 
 export default function SearchResultDetail({ result, scoreData, added, onAddToPortfolio }) {
+  const { t } = useTranslation();
   const { preferences } = useUser();
   const isMobile = useIsMobile();
   const [showAllMetrics, setShowAllMetrics] = useState(false);
@@ -33,16 +35,16 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
           {added ? (
-            <span style={{ fontSize: 12, color: "#089981", fontWeight: 500 }}>✓ I din portfölj</span>
+            <span style={{ fontSize: 12, color: "#089981", fontWeight: 500 }}>{t("searchResultDetail.inPortfolio")}</span>
           ) : (
             <button onClick={onAddToPortfolio}
               style={{ padding: "7px 16px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 500 }}>
-              + Lägg till i portfölj
+              {t("searchResultDetail.addToPortfolio")}
             </button>
           )}
           {result.week52High > 0 && (
             <div style={{ textAlign: "right", fontSize: 12, color: "var(--text-secondary)" }}>
-              <span>52v: <span style={{ color: "#f23645" }}>{result.week52Low?.toFixed(0)}</span> – <span style={{ color: "#089981" }}>{result.week52High.toFixed(0)}</span> {result.currency}</span>
+              <span>{t("searchResultDetail.week52")} <span style={{ color: "#f23645" }}>{result.week52Low?.toFixed(0)}</span> – <span style={{ color: "#089981" }}>{result.week52High.toFixed(0)}</span> {result.currency}</span>
             </div>
           )}
         </div>
@@ -52,15 +54,15 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
       {(() => {
         const exp = showAllMetrics ? "advanced" : preferences.investorProfile?.experience;
         const allMetrics = [
-          { key: "peForward", label: "P/E Forward", value: fmt(result.peForward, "x"), neg: false, tip: "Aktiekurs delat med förväntad vinst per aktie kommande 12 mån. Lägre = billigare.", level: "beginner" },
-          { key: "peTrailing", label: "P/E Trailing", value: fmt(result.peTrailing, "x"), neg: false, tip: "Aktiekurs delat med vinst per aktie senaste 12 mån. Lägre = billigare.", level: "intermediate" },
-          { key: "ebitdaMargin", label: "EBITDA-marginal", value: fmt(result.ebitdaMargin, "%"), neg: result.ebitdaMargin < 0, tip: "Vinst före räntor, skatt och avskrivningar som andel av omsättningen.", level: "advanced" },
-          { key: "operatingMargin", label: "Rör.marginal", value: fmt(result.operatingMargin, "%"), neg: result.operatingMargin < 0, tip: "Rörelseresultat delat med omsättning. Visar hur mycket som blir vinst.", level: "advanced" },
-          { key: "grossMargin", label: "Bruttomarginal", value: fmt(result.grossMargin, "%"), neg: false, tip: "Omsättning minus varukostnad, delat med omsättning. Högre = bättre.", level: "advanced" },
-          { key: "roic", label: "ROIC / ROE", value: fmt(result.roic, "%"), neg: result.roic < 0, tip: "Avkastning på investerat kapital. Visar hur effektivt bolaget använder sina pengar.", level: "beginner" },
-          { key: "debtEbitda", label: "Nettoskuld/EBITDA", value: fmt(result.debtEbitda, "x"), neg: result.debtEbitda > 3, tip: "Nettoskuld delat med EBITDA. Över 3x anses högt belånat.", level: "intermediate" },
-          { key: "revenueGrowth", label: "Tillväxt", value: fmt(result.revenueGrowth, "%"), neg: result.revenueGrowth < 0, tip: "Omsättningstillväxt jämfört med föregående år (YoY).", level: "beginner" },
-          { key: "dividendYield", label: "Direktavkastning", value: fmt(result.dividendYield, "%"), neg: false, tip: "Årlig utdelning delat med aktiekursen. Högre = mer tillbaka varje år.", level: "beginner" },
+          { key: "peForward", label: t("searchResultDetail.metrics.peForward.label"), value: fmt(result.peForward, "x"), neg: false, tip: t("searchResultDetail.metrics.peForward.tip"), level: "beginner" },
+          { key: "peTrailing", label: t("searchResultDetail.metrics.peTrailing.label"), value: fmt(result.peTrailing, "x"), neg: false, tip: t("searchResultDetail.metrics.peTrailing.tip"), level: "intermediate" },
+          { key: "ebitdaMargin", label: t("searchResultDetail.metrics.ebitdaMargin.label"), value: fmt(result.ebitdaMargin, "%"), neg: result.ebitdaMargin < 0, tip: t("searchResultDetail.metrics.ebitdaMargin.tip"), level: "advanced" },
+          { key: "operatingMargin", label: t("searchResultDetail.metrics.operatingMargin.label"), value: fmt(result.operatingMargin, "%"), neg: result.operatingMargin < 0, tip: t("searchResultDetail.metrics.operatingMargin.tip"), level: "advanced" },
+          { key: "grossMargin", label: t("searchResultDetail.metrics.grossMargin.label"), value: fmt(result.grossMargin, "%"), neg: false, tip: t("searchResultDetail.metrics.grossMargin.tip"), level: "advanced" },
+          { key: "roic", label: t("searchResultDetail.metrics.roic.label"), value: fmt(result.roic, "%"), neg: result.roic < 0, tip: t("searchResultDetail.metrics.roic.tip"), level: "beginner" },
+          { key: "debtEbitda", label: t("searchResultDetail.metrics.debtEbitda.label"), value: fmt(result.debtEbitda, "x"), neg: result.debtEbitda > 3, tip: t("searchResultDetail.metrics.debtEbitda.tip"), level: "intermediate" },
+          { key: "revenueGrowth", label: t("searchResultDetail.metrics.revenueGrowth.label"), value: fmt(result.revenueGrowth, "%"), neg: result.revenueGrowth < 0, tip: t("searchResultDetail.metrics.revenueGrowth.tip"), level: "beginner" },
+          { key: "dividendYield", label: t("searchResultDetail.metrics.dividendYield.label"), value: fmt(result.dividendYield, "%"), neg: false, tip: t("searchResultDetail.metrics.dividendYield.tip"), level: "beginner" },
         ];
         const levels = { beginner: 1, intermediate: 2, advanced: 3 };
         const userLevel = levels[exp] || 3;
@@ -69,17 +71,17 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
         return (
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>{t("searchResultDetail.metricsHeader")}</div>
               {isFiltered && (
                 <button onClick={() => setShowAllMetrics(true)}
                   style={{ fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-                  Visa alla →
+                  {t("searchResultDetail.showAll")}
                 </button>
               )}
               {showAllMetrics && preferences.investorProfile?.experience !== "advanced" && (
                 <button onClick={() => setShowAllMetrics(false)}
                   style={{ fontSize: 10, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-                  Visa färre
+                  {t("searchResultDetail.showFewer")}
                 </button>
               )}
             </div>
@@ -102,13 +104,13 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
           const items = [];
           if (risk) {
             const rc = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
-            items.push({ icon: "◉", color: rc, text: isInvestmentCompany(result.ticker) ? `${riskLabel(risk)} — diversifierat investmentbolag` : result.beta != null ? betaDescription(result.beta) : `${riskLabel(risk)} (baserat på börsvärde)` });
+            items.push({ icon: "◉", color: rc, text: isInvestmentCompany(result.ticker) ? t("searchResultDetail.riskDiversified", { risk: riskLabel(risk) }) : result.beta != null ? betaDescription(result.beta) : t("searchResultDetail.riskMarketCap", { risk: riskLabel(risk) }) });
           }
-          if (result.dividendYield > 0) items.push({ icon: "💰", color: "#089981", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
-          else items.push({ icon: "–", color: "var(--text-secondary)", text: "Ingen utdelning" });
+          if (result.dividendYield > 0) items.push({ icon: "💰", color: "#089981", text: t("searchResultDetail.dividendYieldItem", { value: result.dividendYield.toFixed(1) }) });
+          else items.push({ icon: "–", color: "var(--text-secondary)", text: t("searchResultDetail.noDividend") });
           return (
             <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>{t("searchResultDetail.profileHeader")}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {items.map((it, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
@@ -119,13 +121,13 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
               </div>
               {scoreData?.scores && (
                 <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
-                  <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>Vår analys</div>
+                  <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500, marginBottom: 8 }}>{t("searchResultDetail.ourAnalysis")}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     <ScoreBar label="Piotroski" value={scoreData.scores.piotroski?.normalized} scoreKey="piotroski" scoreData={scoreData.scores} expanded={expandedScore === "piotroski"} onToggle={() => setExpandedScore(expandedScore === "piotroski" ? null : "piotroski")} />
                     <ScoreBar label="Magic Formula" value={scoreData.scores.magicFormula} scoreKey="magicFormula" scoreData={scoreData.scores} expanded={expandedScore === "magicFormula"} onToggle={() => setExpandedScore(expandedScore === "magicFormula" ? null : "magicFormula")} />
-                    <ScoreBar label="Tillväxt" value={scoreData.scores.growth} scoreKey="growth" scoreData={scoreData.scores} expanded={expandedScore === "growth"} onToggle={() => setExpandedScore(expandedScore === "growth" ? null : "growth")} />
-                    <ScoreBar label="Utdelning" value={scoreData.scores.dividend} scoreKey="dividend" scoreData={scoreData.scores} expanded={expandedScore === "dividend"} onToggle={() => setExpandedScore(expandedScore === "dividend" ? null : "dividend")} />
-                    <ScoreBar label="Kvalitet" value={scoreData.scores.quality} scoreKey="quality" scoreData={scoreData.scores} expanded={expandedScore === "quality"} onToggle={() => setExpandedScore(expandedScore === "quality" ? null : "quality")} />
+                    <ScoreBar label={t("searchResultDetail.growthLabel")} value={scoreData.scores.growth} scoreKey="growth" scoreData={scoreData.scores} expanded={expandedScore === "growth"} onToggle={() => setExpandedScore(expandedScore === "growth" ? null : "growth")} />
+                    <ScoreBar label={t("searchResultDetail.dividendLabel")} value={scoreData.scores.dividend} scoreKey="dividend" scoreData={scoreData.scores} expanded={expandedScore === "dividend"} onToggle={() => setExpandedScore(expandedScore === "dividend" ? null : "dividend")} />
+                    <ScoreBar label={t("searchResultDetail.qualityLabel")} value={scoreData.scores.quality} scoreKey="quality" scoreData={scoreData.scores} expanded={expandedScore === "quality"} onToggle={() => setExpandedScore(expandedScore === "quality" ? null : "quality")} />
                   </div>
                   {scoreData.composite && (() => {
                     const profileType = profile?.investorType || "mixed";
@@ -135,7 +137,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
                     return (
                       <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
-                        <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>/ 100 — totalpoäng för {PROFILE_LABELS[profileType] || profileType}</span>
+                        <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{t("searchResultDetail.totalScoreFor", { profile: PROFILE_LABELS[profileType] || profileType })}</span>
                       </div>
                     );
                   })()}
@@ -146,7 +148,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
                 const cs = scoreData?.composite?.[profileType] ?? scoreData?.composite?.mixed ?? score;
                 const matchColor = cs >= 70 ? "#089981" : cs >= 40 ? "#e65100" : "#c62828";
                 const matchBg = cs >= 70 ? "rgba(8,153,129,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
-                const matchText = cs >= 70 ? "Stark matchning" : cs >= 40 ? "Delvis matchning" : "Svag matchning";
+                const matchText = cs >= 70 ? t("searchResultDetail.strongMatch") : cs >= 40 ? t("searchResultDetail.partialMatch") : t("searchResultDetail.weakMatch");
                 return (
                   <div style={{ marginTop: 10, padding: "8px 10px", background: matchBg, borderRadius: 4 }}>
                     <div style={{ fontSize: 11, fontWeight: 500, color: matchColor }}>{matchText}</div>
@@ -164,46 +166,46 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
         <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
           {result.targetPrice > 0 && (
             <div style={{ flex: 1, minWidth: 160, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Kursmål (snitt)</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>{t("searchResultDetail.targetPriceHeader")}</div>
               <div style={{ fontSize: 18, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
                 {result.targetPrice.toFixed(2)} {result.currency}
               </div>
               {result.targetLow > 0 && result.targetHigh > 0 && (
                 <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 4 }}>
-                  Spann: {result.targetLow.toFixed(0)} – {result.targetHigh.toFixed(0)} {result.currency}
+                  {t("searchResultDetail.targetRange", { low: result.targetLow.toFixed(0), high: result.targetHigh.toFixed(0), currency: result.currency })}
                 </div>
               )}
               {result.price > 0 && (
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                  Uppsida: <span style={{ color: result.targetPrice > result.price ? "#089981" : "#f23645" }}>
+                  {t("searchResultDetail.upside")} <span style={{ color: result.targetPrice > result.price ? "#089981" : "#f23645" }}>
                     {(((result.targetPrice / result.price) - 1) * 100).toFixed(1)}%
                   </span>
                 </div>
               )}
               {result.numberOfAnalysts > 0 && (
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
-                  {result.numberOfAnalysts} analytiker · Yahoo Finance
+                  {t("searchResultDetail.analystsCount", { num: result.numberOfAnalysts })}
                 </div>
               )}
             </div>
           )}
           {result.recommendation !== "—" && (
             <div style={{ flex: 1, minWidth: 160, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Rekommendation</div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>{t("searchResultDetail.recommendation")}</div>
               <div style={{ fontSize: 16, fontWeight: 500, color: result.recommendation?.includes("buy") ? "#089981" : result.recommendation?.includes("sell") ? "#f23645" : "var(--text)", textTransform: "uppercase" }}>
                 {result.recommendation}
               </div>
               {result.numberOfAnalysts > 0 && (
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
-                  {result.numberOfAnalysts} analytiker · Yahoo Finance consensus
+                  {t("searchResultDetail.analystsConsensus", { num: result.numberOfAnalysts })}
                 </div>
               )}
             </div>
           )}
           <div style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Datakällor</div>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>{t("searchResultDetail.dataSources")}</div>
             <div style={{ fontSize: 12, color: "var(--text)" }}>{result.sources?.fundamentals}</div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Nyheter: {result.sources?.news}</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{t("searchResultDetail.newsSource", { source: result.sources?.news })}</div>
           </div>
         </div>
       )}
@@ -211,7 +213,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
       {/* News */}
       {result.news?.length > 0 && (
         <div>
-          <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Senaste nyheter</div>
+          <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("searchResultDetail.latestNews")}</div>
           {result.news.map((n, i) => (
             <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
               style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border-light)", textDecoration: "none", color: "var(--text)" }}>

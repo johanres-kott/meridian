@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { supabase } from "../../supabase.js";
+import { useTranslation } from "react-i18next";
 
 export default function SaveInsightButton({ content }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
@@ -21,8 +24,8 @@ export default function SaveInsightButton({ content }) {
     if (!user) return;
 
     const { data: existing } = await supabase.from("watchlist").select("notes").eq("id", stock.id).single();
-    const date = new Date().toLocaleDateString("sv-SE");
-    const insightHeader = `\n\n--- AI-insikt ${date} ---\n`;
+    const date = new Date().toLocaleDateString(numberLocale);
+    const insightHeader = `\n\n${t("saveInsightButton.insightHeader", { date })}\n`;
     const newNotes = (existing?.notes || "") + insightHeader + content;
 
     await supabase.from("watchlist").update({ notes: newNotes }).eq("id", stock.id).eq("user_id", user.id);
@@ -31,7 +34,7 @@ export default function SaveInsightButton({ content }) {
     setShowPicker(false);
   }
 
-  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>Sparat!</span>;
+  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>{t("saveInsightButton.saved")}</span>;
 
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
@@ -42,7 +45,7 @@ export default function SaveInsightButton({ content }) {
         onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
         onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
       >
-        Spara insikt till bolag →
+        {t("saveInsightButton.saveToCompany")}
       </button>
       {showPicker && (
         <div style={{
@@ -51,7 +54,7 @@ export default function SaveInsightButton({ content }) {
           padding: "4px 0", zIndex: 100, minWidth: 200, maxHeight: 200, overflow: "auto", marginBottom: 4,
         }}>
           {stocks.length === 0 ? (
-            <div style={{ padding: "8px 12px", fontSize: 11, color: "var(--text-muted)" }}>Inga bolag i portföljen</div>
+            <div style={{ padding: "8px 12px", fontSize: 11, color: "var(--text-muted)" }}>{t("saveInsightButton.noCompanies")}</div>
           ) : stocks.map(s => (
             <button key={s.id} onClick={() => saveToStock(s)}
               style={{ display: "block", width: "100%", textAlign: "left", padding: "6px 12px", fontSize: 11, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", color: "var(--text)" }}

@@ -1112,5 +1112,11 @@
     "recordPurchase": "✓ Record purchase",
     "change": "Change",
     "cancel": "Cancel"
+  },
+  "saveInsightButton": {
+    "insightHeader": "--- AI insight {{date}} ---",
+    "saved": "Saved!",
+    "saveToCompany": "Save insight to company →",
+    "noCompanies": "No companies in your portfolio"
   }
 }

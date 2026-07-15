@@ -1112,5 +1112,11 @@
     "recordPurchase": "✓ Registrera köp",
     "change": "Ändra",
     "cancel": "Avbryt"
+  },
+  "saveInsightButton": {
+    "insightHeader": "--- AI-insikt {{date}} ---",
+    "saved": "Sparat!",
+    "saveToCompany": "Spara insikt till bolag →",
+    "noCompanies": "Inga bolag i portföljen"
   }
 }

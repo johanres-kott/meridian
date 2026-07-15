@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { STEPS, PROFILE_EXPLANATIONS } from "./onboarding/steps.js";
+import { getSteps, getProfileExplanations } from "./onboarding/steps.js";
 
 export default function OnboardingModal({ onComplete }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const STEPS = useMemo(() => getSteps(t), [t]);
+  const PROFILE_EXPLANATIONS = useMemo(() => getProfileExplanations(t), [t]);
   const [step, setStep] = useState(-1); // -1 = welcome, STEPS.length = summary
   const [answers, setAnswers] = useState({});
 
   const isSummary = step === STEPS.length;
   const current = step >= 0 && step < STEPS.length ? STEPS[step] : null;
-  const isLast = step === STEPS.length - 1;
   const canProceed = current
     ? (current.multi ? (answers[current.id] || []).length > 0 : !!answers[current.id])
     : false;
@@ -43,12 +46,12 @@ export default function OnboardingModal({ onComplete }) {
         {step === -1 ? (
           <>
             <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
-              <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Välkommen till Thesion</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>{t("onboardingModal.welcome.title")}</div>
               <div style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
-                För att kunna ge dig relevanta insikter och förslag behöver vi förstå dig lite bättre som investerare.
+                {t("onboardingModal.welcome.body")}
               </div>
               <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 12, lineHeight: 1.6 }}>
-                Det tar bara en minut — fyra snabba frågor om din investeringsstil, riskprofil och intressen.
+                {t("onboardingModal.welcome.duration")}
               </div>
             </div>
             <div style={{ display: "flex", justifyContent: "center", marginTop: 24 }}>
@@ -60,7 +63,7 @@ export default function OnboardingModal({ onComplete }) {
                   fontFamily: "inherit", fontWeight: 500,
                 }}
               >
-                Kom igång
+                {t("onboardingModal.welcome.start")}
               </button>
             </div>
           </>
@@ -138,7 +141,7 @@ export default function OnboardingModal({ onComplete }) {
             disabled={step === 0}
             style={{ fontSize: 13, color: step === 0 ? "var(--text-muted)" : "var(--text-secondary)", background: "none", border: "none", cursor: step === 0 ? "default" : "pointer", fontFamily: "inherit" }}
           >
-            ← Tillbaka
+            ← {t("onboardingModal.back")}
           </button>
           <button
             onClick={next}
@@ -152,7 +155,7 @@ export default function OnboardingModal({ onComplete }) {
               transition: "all 0.15s",
             }}
           >
-            {isLast ? "Nästa →" : "Nästa →"}
+            {t("onboardingModal.next")} →
           </button>
         </div>
         </>
@@ -162,17 +165,17 @@ export default function OnboardingModal({ onComplete }) {
         {isSummary && (
           <>
             <div style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>Din investerarprofil</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>{t("onboardingModal.summary.title")}</div>
               <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
-                Baserat på dina svar har vi skapat en profil som anpassar hela appen åt dig.
+                {t("onboardingModal.summary.body")}
               </div>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { key: "investorType", icon: "🎯", title: "Investeringsstil" },
-                { key: "riskProfile", icon: "📊", title: "Risknivå" },
-                { key: "experience", icon: "🎓", title: "Erfarenhet" },
+                { key: "investorType", icon: "🎯", title: t("onboardingModal.summary.investingStyle") },
+                { key: "riskProfile", icon: "📊", title: t("onboardingModal.summary.riskLevel") },
+                { key: "experience", icon: "🎓", title: t("onboardingModal.summary.experience") },
               ].map(({ key, icon, title }) => {
                 const val = answers[key];
                 const info = PROFILE_EXPLANATIONS[key]?.[val];
@@ -196,7 +199,7 @@ export default function OnboardingModal({ onComplete }) {
             </div>
 
             <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", marginTop: 16, lineHeight: 1.5 }}>
-              Du kan ändra din profil när som helst via profilsidan.
+              {t("onboardingModal.summary.changeNote")}
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
@@ -204,7 +207,7 @@ export default function OnboardingModal({ onComplete }) {
                 onClick={() => setStep(step - 1)}
                 style={{ fontSize: 13, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
               >
-                ← Tillbaka
+                ← {t("onboardingModal.back")}
               </button>
               <button
                 onClick={next}
@@ -214,7 +217,7 @@ export default function OnboardingModal({ onComplete }) {
                   fontFamily: "inherit", fontWeight: 500,
                 }}
               >
-                Starta Thesion
+                {t("onboardingModal.summary.start")}
               </button>
             </div>
           </>

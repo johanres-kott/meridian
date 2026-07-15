@@ -583,5 +583,111 @@
     "title": "Notifications",
     "markAllRead": "Mark all as read",
     "empty": "No notifications yet"
+  },
+  "onboardingModal": {
+    "welcome": {
+      "title": "Welcome to Thesion",
+      "body": "To give you relevant insights and suggestions, we need to understand you a little better as an investor.",
+      "duration": "It only takes a minute — four quick questions about your investing style, risk profile and interests.",
+      "start": "Get started"
+    },
+    "back": "Back",
+    "next": "Next",
+    "summary": {
+      "title": "Your investor profile",
+      "body": "Based on your answers, we have created a profile that tailors the whole app to you.",
+      "investingStyle": "Investing style",
+      "riskLevel": "Risk level",
+      "experience": "Experience",
+      "changeNote": "You can change your profile at any time from the profile page.",
+      "start": "Start Thesion"
+    },
+    "steps": {
+      "investorType": {
+        "title": "What type of investor are you?",
+        "subtitle": "Choose the style that best describes you.",
+        "options": {
+          "value": { "label": "Value investor", "desc": "Buys undervalued companies with strong fundamentals" },
+          "growth": { "label": "Growth investor", "desc": "Focus on fast-growing companies and future potential" },
+          "dividend": { "label": "Dividend investor", "desc": "Steady returns through dividends" },
+          "index": { "label": "Index investor", "desc": "Broad market exposure, low fees" },
+          "mixed": { "label": "Mixed", "desc": "Combines several strategies" }
+        }
+      },
+      "experience": {
+        "title": "How experienced are you as an investor?",
+        "subtitle": "This helps us tailor language and explanations.",
+        "options": {
+          "beginner": { "label": "Beginner", "desc": "New to shares and investing. Wants simple explanations" },
+          "intermediate": { "label": "Some experience", "desc": "Understands the basics but wants to learn more" },
+          "advanced": { "label": "Experienced", "desc": "Good knowledge of the market. Wants in-depth analysis" }
+        }
+      },
+      "riskProfile": {
+        "title": "What does your risk profile look like?",
+        "subtitle": "How much volatility can you handle?",
+        "options": {
+          "low": { "label": "Low risk", "desc": "Stability and capital preservation. Prefers large, established companies" },
+          "medium": { "label": "Medium", "desc": "Balanced portfolio with a mix of stability and growth" },
+          "high": { "label": "High risk", "desc": "Fine with large swings for higher potential. Small caps, growth companies" }
+        }
+      },
+      "focus": {
+        "title": "What do you focus on?",
+        "subtitle": "Choose what suits you best.",
+        "options": {
+          "dividends": { "label": "Dividends", "desc": "Cash flow and passive income" },
+          "appreciation": { "label": "Price appreciation", "desc": "Capital gains and growth" },
+          "both": { "label": "Both", "desc": "Total return — dividends + price appreciation" }
+        },
+        "extra": {
+          "title": "Geographic focus?",
+          "options": {
+            "nordic": "Sweden/Nordics",
+            "global": "Global",
+            "both": "Mixed"
+          }
+        }
+      },
+      "interests": {
+        "title": "What interests you?",
+        "subtitle": "Select everything that applies — we will find companies that match.",
+        "options": {
+          "tech": "Tech & AI",
+          "finance": "Banking & Finance",
+          "industry": "Industry & Manufacturing",
+          "healthcare": "Healthcare & Pharmaceuticals",
+          "realestate": "Real estate",
+          "food": "Food & Groceries",
+          "energy": "Energy & Oil",
+          "gold": "Gold & Precious metals",
+          "sustainability": "Sustainability & Climate",
+          "gaming": "Gaming & Entertainment",
+          "fashion": "Fashion & Retail",
+          "defense": "Defence & Security",
+          "ev": "EVs & Mobility",
+          "crypto": "Crypto & Blockchain"
+        }
+      }
+    },
+    "profile": {
+      "investorType": {
+        "value": { "label": "Value investor", "explanation": "You look for companies trading below their true value. Thesion prioritises companies with strong fundamentals — low P/E, high return on capital and solid cash flows." },
+        "growth": { "label": "Growth investor", "explanation": "You back companies with strong growth. Thesion prioritises fast-growing companies with high revenue growth and a scalable business model — even if they have a high P/E." },
+        "dividend": { "label": "Dividend investor", "explanation": "You want recurring dividends. Thesion prioritises companies with a high and stable dividend yield, a long dividend history and a sustainable payout ratio." },
+        "index": { "label": "Index investor", "explanation": "You prefer broad exposure. Thesion shows how your portfolio performs against the index and helps you find complementary funds with low fees." },
+        "mixed": { "label": "Mixed", "explanation": "You combine several strategies. Thesion gives you a balanced mix of value, growth and dividends in its suggestions." }
+      },
+      "riskProfile": {
+        "low": { "label": "Low risk", "explanation": "We filter out speculative companies and small caps. Focus on large, established companies with low volatility. Investment plans are spread over time (DCA) to reduce timing risk." },
+        "medium": { "label": "Medium risk", "explanation": "A balance between stable large caps and more exciting growth cases. Investment plans are spread over 2-3 months." },
+        "high": { "label": "High risk", "explanation": "You can tolerate large price swings. We include small caps and growth companies with higher potential. Investments are preferably made up front (lump sum) for the best historical return." }
+      },
+      "experience": {
+        "beginner": { "label": "Beginner", "explanation": "Mats (the AI assistant) explains everything in simple terms and avoids jargon. Tooltips and explanations are shown extra clearly." },
+        "intermediate": { "label": "Some experience", "explanation": "Mats uses common financial terms but explains more advanced concepts. You get a good mix of guidance and depth." },
+        "advanced": { "label": "Experienced", "explanation": "Mats provides in-depth analysis with key metrics, trends and comparisons without holding back." }
+      }
+    }
   }
 }

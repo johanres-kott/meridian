@@ -785,5 +785,18 @@
     "troubleBody": "Make sure you download the report as a PDF (rather than opening it in the browser). The file is usually named something like \"Månadsrapport_2026-03.pdf\".",
     "contactPre": "Contact us at",
     "contactPost": "if you need help."
+  },
+  "premiumGate": {
+    "loading": "Loading...",
+    "pitch": "Get access to in-depth analyses, sector reports and premium content. The analyses are produced with AI and verified against real data sources.",
+    "priceSuffix": "kr/month",
+    "features": {
+      "deepAnalyses": "In-depth analyses of companies and sectors",
+      "sectorReports": "Comparative sector reports",
+      "continuousUpdates": "Continuously updated with new data",
+      "cancelAnytime": "Cancel at any time"
+    },
+    "subscribe": "Subscribe",
+    "securePayment": "Secure payment via Stripe · Cancel at any time"
   }
 }

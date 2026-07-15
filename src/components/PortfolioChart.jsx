@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
@@ -6,6 +7,8 @@ import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
 import usePortfolioData from "../hooks/usePortfolioData.js";
 
 export default function PortfolioChart({ compact = false }) {
+  const { t, i18n } = useTranslation();
+  const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const { userId } = useUser();
   const isMobile = useIsMobile();
   const [range, setRange] = useState("3m");
@@ -66,7 +69,7 @@ export default function PortfolioChart({ compact = false }) {
     return (
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
         <div style={{ height: chartHeight, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", fontSize: 12 }}>
-          Laddar portföljutveckling...
+          {t("portfolioChart.loading")}
         </div>
       </div>
     );
@@ -80,16 +83,16 @@ export default function PortfolioChart({ compact = false }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: compact ? "center" : "flex-start", marginBottom: compact ? 10 : 16, flexDirection: compact && isMobile ? "column" : "row", gap: compact && isMobile ? 8 : 0 }}>
         <div>
           <div style={{ fontSize: compact ? 10 : 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: compact ? 2 : 4 }}>
-            Portföljutveckling
+            {t("portfolioChart.title")}
           </div>
           {!compact && (
             <div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                 <span style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {last.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
+                  {last.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK
                 </span>
                 <span style={{ fontSize: 13, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK ({returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%)
+                  {returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK ({returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%)
                 </span>
               </div>
               {/* Index comparison stats */}
@@ -104,7 +107,7 @@ export default function PortfolioChart({ compact = false }) {
                   ))}
                   {bestIdx && (
                     <span style={{ color: returnPct > bestIdx[1] ? "#089981" : "#f23645", fontWeight: 500 }}>
-                      {returnPct > bestIdx[1] ? "▲" : "▼"} {Math.abs(returnPct - bestIdx[1]).toFixed(1)}% vs index
+                      {returnPct > bestIdx[1] ? "▲" : "▼"} {t("portfolioChart.vsIndex", { value: Math.abs(returnPct - bestIdx[1]).toFixed(1) })}
                     </span>
                   )}
                 </div>
@@ -116,7 +119,7 @@ export default function PortfolioChart({ compact = false }) {
               <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%
                 <span style={{ color: "var(--text-secondary)", fontWeight: 400, marginLeft: 6 }}>
-                  ({returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK)
+                  ({returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK)
                 </span>
               </span>
               {/* Compact index comparison */}
@@ -187,7 +190,7 @@ export default function PortfolioChart({ compact = false }) {
               contentStyle={{ fontSize: 12, borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
               formatter={(v, name) => {
                 if (v == null) return [null, null];
-                if (name === "portfolioPct") return [`${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, "Min portfölj"];
+                if (name === "portfolioPct") return [`${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, t("portfolioChart.myPortfolio")];
                 const idx = INDEXES.find(i => `${i.id}Pct` === name);
                 return [`${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, idx?.label || name];
               }}
@@ -212,11 +215,11 @@ export default function PortfolioChart({ compact = false }) {
               minTickGap={compact ? 50 : 40}
             />
             <YAxis domain={["auto", "auto"]} tick={{ fontSize: 10, fill: "var(--text-muted, #b2b5be)" }} tickLine={false} axisLine={false} width={compact ? 50 : 65}
-              tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v.toLocaleString("sv-SE")}
+              tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v.toLocaleString(numberLocale)}
             />
             <Tooltip
               contentStyle={{ fontSize: 12, borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-              formatter={(v, name) => { if (v == null) return [null, null]; return [v.toLocaleString("sv-SE", { maximumFractionDigits: 0 }) + " SEK", name === "est" ? "Estimerat" : "Portföljvärde"]; }}
+              formatter={(v, name) => { if (v == null) return [null, null]; return [v.toLocaleString(numberLocale, { maximumFractionDigits: 0 }) + " SEK", name === "est" ? t("portfolioChart.estimated") : t("portfolioChart.portfolioValue")]; }}
               labelFormatter={d => d}
             />
             {hasEstimated ? (
@@ -234,18 +237,18 @@ export default function PortfolioChart({ compact = false }) {
       {/* Footer */}
       {!compact && points.length > 1 && (
         <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11, color: "var(--text-secondary)", flexWrap: "wrap" }}>
-          <span>{"\u0048\u00f6gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
-          <span>{"\u004c\u00e4gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{t("portfolioChart.high")}{" "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.value)).toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{t("portfolioChart.low")}{" "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.value)).toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK</span></span>
           {hasEstimated && (
             <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
-              {"Estimerat baserat p\u00e5 nuvarande innehav"}
+              {t("portfolioChart.estimatedNote")}
             </span>
           )}
         </div>
       )}
       {compact && hasEstimated && (
         <div style={{ fontSize: 10, color: "var(--text-muted)", fontStyle: "italic", marginTop: 6 }}>
-          {"Estimerat baserat p\u00e5 nuvarande innehav"}
+          {t("portfolioChart.estimatedNote")}
         </div>
       )}
     </div>

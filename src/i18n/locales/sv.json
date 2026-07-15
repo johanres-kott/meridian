@@ -231,5 +231,16 @@
     "legendNeg15": "−1,5%",
     "legendPos15": "+1,5%",
     "legendCaption": "Färg = dagsförändring · Ruta-storlek = innehavets värde"
+  },
+  "portfolioChart": {
+    "loading": "Laddar portföljutveckling...",
+    "title": "Portföljutveckling",
+    "vsIndex": "{{value}}% vs index",
+    "myPortfolio": "Min portfölj",
+    "estimated": "Estimerat",
+    "portfolioValue": "Portföljvärde",
+    "high": "Högst:",
+    "low": "Lägst:",
+    "estimatedNote": "Estimerat baserat på nuvarande innehav"
   }
 }

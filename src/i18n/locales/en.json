@@ -231,5 +231,16 @@
     "legendNeg15": "−1.5%",
     "legendPos15": "+1.5%",
     "legendCaption": "Colour = daily change · Tile size = holding value"
+  },
+  "portfolioChart": {
+    "loading": "Loading portfolio performance...",
+    "title": "Portfolio performance",
+    "vsIndex": "{{value}}% vs index",
+    "myPortfolio": "My portfolio",
+    "estimated": "Estimated",
+    "portfolioValue": "Portfolio value",
+    "high": "High:",
+    "low": "Low:",
+    "estimatedNote": "Estimated based on current holdings"
   }
 }

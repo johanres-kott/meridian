@@ -451,5 +451,36 @@
     "contactText": "Do you have questions, feedback or suggestions? Get in touch!",
     "disclaimer": "Disclaimer",
     "disclaimerText": "Thesion does not provide financial advice. All information is for educational purposes. Always do your own research before investing."
+  },
+  "documentation": {
+    "title": "Documentation",
+    "contents": "Contents",
+    "toc": {
+      "scoring": "How we score companies",
+      "models": "The five sub-models",
+      "weighting": "Profile weighting",
+      "risk": "Risk assessment (Beta)",
+      "riskAdjust": "Risk adjustment of scores",
+      "allocation": "Portfolio allocation",
+      "coreSatellite": "The Core-Satellite model",
+      "classification": "Classification logic",
+      "targetAllocation": "Target allocation per risk profile",
+      "strategies": "Investment strategies",
+      "dcaLump": "DCA vs Lump Sum",
+      "ownership": "Ownership structure and share classes",
+      "shareClass": "Swedish A and B shares",
+      "dualClassConsequences": "Consequences for corporate governance",
+      "shareClassPractical": "Practical points for you as an investor",
+      "shareClassInternational": "Other countries",
+      "glossary": "Key metrics A–Z",
+      "sources": "Data sources",
+      "frequency": "Update frequency",
+      "pension": "Pension savings",
+      "premiepension": "The premiepension",
+      "itp": "Occupational pension — ITP",
+      "pensionFees": "The impact of fees",
+      "pensionAllocation": "Age-adjusted allocation",
+      "disclaimer": "Disclaimer"
+    }
   }
 }

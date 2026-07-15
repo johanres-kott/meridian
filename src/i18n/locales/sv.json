@@ -451,5 +451,36 @@
     "contactText": "Har du frågor, feedback eller förslag? Hör av dig!",
     "disclaimer": "Ansvarsfriskrivning",
     "disclaimerText": "Thesion ger inte finansiell rådgivning. All information är för utbildningssyfte. Gör alltid din egen research innan du investerar."
+  },
+  "documentation": {
+    "title": "Dokumentation",
+    "contents": "Innehåll",
+    "toc": {
+      "scoring": "Hur vi poängsätter bolag",
+      "models": "De fem delmodellerna",
+      "weighting": "Profilviktning",
+      "risk": "Riskbedömning (Beta)",
+      "riskAdjust": "Riskjustering av poäng",
+      "allocation": "Portföljallokering",
+      "coreSatellite": "Core-Satellite-modellen",
+      "classification": "Klassificeringslogik",
+      "targetAllocation": "Målallokering per riskprofil",
+      "strategies": "Investeringsstrategier",
+      "dcaLump": "DCA vs Lump Sum",
+      "ownership": "Ägarstruktur och aktieklasser",
+      "shareClass": "Svenska A- och B-aktier",
+      "dualClassConsequences": "Konsekvens för bolagsstyrning",
+      "shareClassPractical": "Praktiskt för dig som investerare",
+      "shareClassInternational": "Andra länder",
+      "glossary": "Nyckeltal A–Ö",
+      "sources": "Datakällor",
+      "frequency": "Uppdateringsfrekvens",
+      "pension": "Pensionssparande",
+      "premiepension": "Premiepensionen",
+      "itp": "Tjänstepension — ITP",
+      "pensionFees": "Avgiftens påverkan",
+      "pensionAllocation": "Åldersanpassad placering",
+      "disclaimer": "Ansvarsfriskrivning"
+    }
   }
 }

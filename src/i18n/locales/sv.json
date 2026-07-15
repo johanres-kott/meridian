@@ -275,5 +275,13 @@
     "active": "Aktiv",
     "fee": "Avgift: {{value}}%",
     "oneYear": "1 år: {{value}}%"
+  },
+  "groupFilterBar": {
+    "confirmDeleteGroup": "Ta bort gruppen \"{{name}}\"?",
+    "all": "Alla ({{total}})",
+    "deleteGroup": "Ta bort grupp",
+    "groupNamePlaceholder": "Gruppnamn...",
+    "cancel": "Avbryt",
+    "newGroup": "+ Ny grupp"
   }
 }

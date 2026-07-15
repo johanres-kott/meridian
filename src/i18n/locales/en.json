@@ -275,5 +275,13 @@
     "active": "Active",
     "fee": "Fee: {{value}}%",
     "oneYear": "1 yr: {{value}}%"
+  },
+  "groupFilterBar": {
+    "confirmDeleteGroup": "Delete the group \"{{name}}\"?",
+    "all": "All ({{total}})",
+    "deleteGroup": "Delete group",
+    "groupNamePlaceholder": "Group name...",
+    "cancel": "Cancel",
+    "newGroup": "+ New group"
   }
 }

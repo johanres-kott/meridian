@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sanitizeInput } from "../lib/sanitize.js";
 import { useUser } from "../contexts/UserContext.jsx";
 
 export default function GroupFilterBar({ items, activeGroup, setActiveGroup, isMobile }) {
+  const { t } = useTranslation();
   const { preferences, updatePreferences } = useUser();
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
@@ -21,7 +23,7 @@ export default function GroupFilterBar({ items, activeGroup, setActiveGroup, isM
   }
 
   function deleteGroup(name) {
-    if (!window.confirm(`Ta bort gruppen "${name}"?`)) return;
+    if (!window.confirm(t("groupFilterBar.confirmDeleteGroup", { name }))) return;
     const updated = groups.filter(g => g.name !== name);
     updatePreferences({ groups: updated });
     if (activeGroup === name) setActiveGroup(null);
@@ -40,7 +42,7 @@ export default function GroupFilterBar({ items, activeGroup, setActiveGroup, isM
           flexShrink: 0, whiteSpace: "nowrap",
         }}
       >
-        Alla ({items.length})
+        {t("groupFilterBar.all", { total: items.length })}
       </button>
       {groups.map(g => {
         const count = (g.members || []).filter(m => items.some(i => i.id === m)).length;
@@ -63,7 +65,7 @@ export default function GroupFilterBar({ items, activeGroup, setActiveGroup, isM
             {isActive && (
               <button
                 onClick={(e) => { e.stopPropagation(); deleteGroup(g.name); }}
-                title="Ta bort grupp"
+                title={t("groupFilterBar.deleteGroup")}
                 style={{ marginLeft: 2, fontSize: 11, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
                 onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
                 onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
@@ -81,18 +83,18 @@ export default function GroupFilterBar({ items, activeGroup, setActiveGroup, isM
             onChange={e => setNewGroupName(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") createGroup(); if (e.key === "Escape") { setCreatingGroup(false); setNewGroupName(""); } }}
             autoFocus
-            placeholder="Gruppnamn..."
+            placeholder={t("groupFilterBar.groupNamePlaceholder")}
             style={{ fontSize: 12, padding: "4px 10px", border: "1px solid var(--accent)", borderRadius: 14, outline: "none", fontFamily: "inherit", width: 140, background: "var(--bg-card)", color: "var(--text)" }}
           />
           <button onClick={createGroup} style={{ fontSize: 11, padding: "4px 8px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontFamily: "inherit" }}>OK</button>
-          <button onClick={() => { setCreatingGroup(false); setNewGroupName(""); }} style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer" }}>Avbryt</button>
+          <button onClick={() => { setCreatingGroup(false); setNewGroupName(""); }} style={{ fontSize: 11, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer" }}>{t("groupFilterBar.cancel")}</button>
         </div>
       ) : (
         <button
           onClick={() => setCreatingGroup(true)}
           style={{ fontSize: 12, padding: "5px 12px", borderRadius: 14, border: "1px dashed var(--border)", background: "none", cursor: "pointer", color: "var(--text-secondary)", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}
         >
-          + Ny grupp
+          {t("groupFilterBar.newGroup")}
         </button>
       )}
     </div>

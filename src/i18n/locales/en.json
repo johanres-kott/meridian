@@ -1526,5 +1526,171 @@
     "sum3Text": "Same logic — index funds with low fees.",
     "sum4Label": "Private:",
     "sum4Text": "ISK with broad index funds. Save at least 10% of your net salary."
+  },
+  "referenceDocs": {
+    "sourcesTitle": "Data sources",
+    "sources": [
+      {
+        "name": "Yahoo Finance",
+        "desc": "Share prices, key metrics, beta, dividends, analyst targets"
+      },
+      {
+        "name": "Finnhub",
+        "desc": "News, company search"
+      },
+      {
+        "name": "Financial Modeling Prep",
+        "desc": "Supplementary key metrics (ROIC)"
+      },
+      {
+        "name": "Finansinspektionen",
+        "desc": "Insider transactions (the insider register)"
+      },
+      {
+        "name": "Investment companies' websites",
+        "desc": "Portfolio holdings, weights, values"
+      }
+    ],
+    "sourcesNote": "Data is updated daily via automated scrapers. Share prices are fetched in real time on every page load.",
+    "frequencyTitle": "Update frequency",
+    "frequency": [
+      {
+        "what": "Share prices",
+        "freq": "Real time on page load"
+      },
+      {
+        "what": "Score calculation",
+        "freq": "Daily (overnight)"
+      },
+      {
+        "what": "Insider transactions",
+        "freq": "Daily"
+      },
+      {
+        "what": "Investment company holdings",
+        "freq": "Daily"
+      },
+      {
+        "what": "News",
+        "freq": "Real time on page load"
+      }
+    ],
+    "glossaryTitle": "Key metrics A–Z",
+    "glossaryIntro": "Here all key metrics and concepts used in Thesion are explained — in a pedagogical way with examples.",
+    "exampleLabel": "Example:",
+    "glossary": [
+      {
+        "term": "The Core-Satellite model",
+        "def": "A portfolio strategy that splits holdings into a stable Core for security, a Satellite part for growth, and a small Speculation part for high risk/high upside. Thesion analyses your portfolio automatically using this model.",
+        "example": "A medium-risk profile targets 60% Core, 30% Satellite, 10% Speculation."
+      },
+      {
+        "term": "DCA (Dollar Cost Averaging)",
+        "def": "An investment strategy where you spread your purchases over time — for example the same amount every month. Reduces the risk of buying everything at the top.",
+        "example": "You want to invest SEK 60,000. Instead of all at once, you buy for SEK 20,000 per month over three months."
+      },
+      {
+        "term": "Lump Sum",
+        "def": "Investing the entire amount immediately instead of spreading it out. Historically this yields better returns in roughly two out of three cases, since the market tends to rise over time.",
+        "example": "You have SEK 60,000 to invest and buy for the entire amount today instead of splitting it up."
+      },
+      {
+        "term": "Beta",
+        "def": "Measures how much a stock's price swings compared to the market. Beta 1.0 = same as the index. Below 0.8 = more stable, above 1.2 = more volatile.",
+        "example": "AstraZeneca has a beta of 0.29 (very stable), Sinch 1.72 (swings a lot)."
+      },
+      {
+        "term": "Gross margin",
+        "def": "How much of every krona earned remains after the cost of goods is deducted. Gross margin = (Revenue − Cost of goods) / Revenue.",
+        "example": "A company with a 40% gross margin keeps 40 öre of every krona earned after cost of goods."
+      },
+      {
+        "term": "Dividend yield",
+        "def": "Annual dividend divided by the share price. Shows how much money you get back each year just for owning the share.",
+        "example": "If the share costs SEK 100 and the dividend is SEK 4 per year → 4% dividend yield."
+      },
+      {
+        "term": "EBITDA",
+        "def": "Earnings Before Interest, Taxes, Depreciation and Amortization. Shows the company's operating profitability without the effects of financing and accounting depreciation.",
+        "example": "Used to compare profitability between companies regardless of leverage."
+      },
+      {
+        "term": "EBITDA margin",
+        "def": "EBITDA divided by revenue. Shows what share of every krona earned becomes operating profit.",
+        "example": "25% EBITDA margin = 25 öre of every krona becomes profit before interest and tax."
+      },
+      {
+        "term": "EPS",
+        "def": "Earnings Per Share — net profit divided by the number of outstanding shares.",
+        "example": "If the company earns 1 billion and has 100 million shares → EPS = SEK 10."
+      },
+      {
+        "term": "F-Score (Piotroski)",
+        "def": "A score between 0 and 9 measuring a company's financial health. Developed by professor Joseph Piotroski at Stanford. Based on 9 criteria around profitability, leverage and efficiency. Higher = healthier company.",
+        "example": "F-Score 8 or 9 = strong company. Below 3 = potential problems."
+      },
+      {
+        "term": "GAV (average cost)",
+        "def": "The Swedish term for average acquisition cost — the average price you paid for your shares. Used to calculate P&L (profit/loss).",
+        "example": "If you bought 100 shares at SEK 50 and 100 shares at SEK 60 → average cost = SEK 55."
+      },
+      {
+        "term": "Magic Formula",
+        "def": "Joel Greenblatt's investment strategy that ranks companies by the combination of high earnings yield (cheap share) and high ROIC (efficient business).",
+        "example": "A company with a low P/E AND a high ROIC ranks high on the list."
+      },
+      {
+        "term": "Net debt/EBITDA",
+        "def": "Net debt (interest-bearing debt minus cash) divided by EBITDA. Shows how many years of profit it takes to pay off the debt. Above 3x is considered highly leveraged.",
+        "example": "Net debt 6 billion / EBITDA 2 billion = 3x. The company needs 3 years of profit to pay off the debt."
+      },
+      {
+        "term": "P&L",
+        "def": "Profit & Loss. In Thesion: the difference between the current value and your acquisition cost (GAV).",
+        "example": "Bought for SEK 10,000, worth SEK 12,000 today → P&L = +SEK 2,000 (+20%)."
+      },
+      {
+        "term": "P/E Forward",
+        "def": "Price/Earnings Forward — the share price divided by expected earnings per share next year. Lower P/E = cheaper share relative to its earnings.",
+        "example": "Share price SEK 100, expected EPS SEK 10 → P/E Forward = 10x. You pay 10 times earnings."
+      },
+      {
+        "term": "P/E Trailing",
+        "def": "Price/Earnings Trailing — the share price divided by the last 12 months' actual earnings per share.",
+        "example": "The difference vs Forward: trailing looks backwards (what the company earned), forward looks ahead (what analysts expect)."
+      },
+      {
+        "term": "PEG Ratio",
+        "def": "P/E divided by expected growth. Below 1 = the share may be undervalued given its growth. Above 2 = may be expensive.",
+        "example": "P/E 20 and 20% growth → PEG = 1.0. P/E 30 and 10% growth → PEG = 3.0 (expensive)."
+      },
+      {
+        "term": "ROIC",
+        "def": "Return on Invested Capital. Shows how efficiently the company uses money invested in the business.",
+        "example": "ROIC 15% = every invested krona generates 15 öre of profit per year. Above 10% is considered good."
+      },
+      {
+        "term": "ROE",
+        "def": "Return on Equity — net profit divided by equity.",
+        "example": "ROE 20% = shareholders get a 20% return on their invested capital."
+      },
+      {
+        "term": "Operating margin",
+        "def": "Operating profit divided by revenue. Shows what share of revenue becomes profit after all operating costs (but before interest and tax).",
+        "example": "15% operating margin = 15 öre of every krona earned becomes operating profit."
+      },
+      {
+        "term": "Net asset value (NAV)",
+        "def": "The true value of an investment company's assets. The share price is often compared to NAV — does it trade at a discount or a premium?",
+        "example": "Investor's NAV = SEK 350/share, share price SEK 300 → 14% NAV discount."
+      },
+      {
+        "term": "Growth (Revenue Growth)",
+        "def": "Revenue growth compared to the previous year. Shows whether the company is growing or shrinking.",
+        "example": "+15% growth = revenue increased 15% versus last year. Negative = the company is shrinking."
+      }
+    ],
+    "disclaimerTitle": "Disclaimer",
+    "disclaimerBody": "Thesion provides tools for stock analysis and portfolio management. The information and recommendations do not constitute financial advice. All investment decisions are made by you alone. Historical returns are no guarantee of future results. Consult an authorised financial adviser if needed."
   }
 }

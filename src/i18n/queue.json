@@ -26,9 +26,7 @@
     "src/components/MarketsView.jsx",
     "src/components/MarketDetailView.jsx",
     "src/components/CompanySearch.jsx",
-    "src/components/CompanyView.jsx"
-  ],
-  "pending": [
+    "src/components/CompanyView.jsx",
     "src/components/FundView.jsx",
     "src/components/CompareView.jsx",
     "src/components/AllocationCard.jsx",
@@ -82,6 +80,7 @@
     "src/components/docs/ReferenceDocs.jsx",
     "src/components/docs/ScoringDocs.jsx"
   ],
+  "pending": [],
   "skip": [
     "src/main.jsx",
     "src/contexts/UserContext.jsx",

@@ -607,38 +607,80 @@
         "title": "Vilken typ av investerare är du?",
         "subtitle": "Välj den stil som bäst beskriver dig.",
         "options": {
-          "value": { "label": "Värdeinvesterare", "desc": "Köper undervärderade bolag med stark fundamental" },
-          "growth": { "label": "Tillväxtinvesterare", "desc": "Fokus på snabbväxande bolag och framtida potential" },
-          "dividend": { "label": "Utdelningsinvesterare", "desc": "Stabil avkastning genom utdelningar" },
-          "index": { "label": "Indexinvesterare", "desc": "Bred marknadsexponering, låga avgifter" },
-          "mixed": { "label": "Blandat", "desc": "Kombinerar flera strategier" }
+          "value": {
+            "label": "Värdeinvesterare",
+            "desc": "Köper undervärderade bolag med stark fundamental"
+          },
+          "growth": {
+            "label": "Tillväxtinvesterare",
+            "desc": "Fokus på snabbväxande bolag och framtida potential"
+          },
+          "dividend": {
+            "label": "Utdelningsinvesterare",
+            "desc": "Stabil avkastning genom utdelningar"
+          },
+          "index": {
+            "label": "Indexinvesterare",
+            "desc": "Bred marknadsexponering, låga avgifter"
+          },
+          "mixed": {
+            "label": "Blandat",
+            "desc": "Kombinerar flera strategier"
+          }
         }
       },
       "experience": {
         "title": "Hur erfaren är du som investerare?",
         "subtitle": "Detta hjälper oss anpassa språk och förklaringar.",
         "options": {
-          "beginner": { "label": "Nybörjare", "desc": "Ny till aktier och investeringar. Vill ha enkla förklaringar" },
-          "intermediate": { "label": "Har lite erfarenhet", "desc": "Förstår grunderna men vill lära mig mer" },
-          "advanced": { "label": "Erfaren", "desc": "God kunskap om marknaden. Vill ha djupgående analys" }
+          "beginner": {
+            "label": "Nybörjare",
+            "desc": "Ny till aktier och investeringar. Vill ha enkla förklaringar"
+          },
+          "intermediate": {
+            "label": "Har lite erfarenhet",
+            "desc": "Förstår grunderna men vill lära mig mer"
+          },
+          "advanced": {
+            "label": "Erfaren",
+            "desc": "God kunskap om marknaden. Vill ha djupgående analys"
+          }
         }
       },
       "riskProfile": {
         "title": "Hur ser din riskprofil ut?",
         "subtitle": "Hur mycket svängningar klarar du av?",
         "options": {
-          "low": { "label": "Låg risk", "desc": "Stabilitet och kapitalbevarande. Föredrar stora, etablerade bolag" },
-          "medium": { "label": "Medel", "desc": "Balanserad portfölj med mix av stabilt och tillväxt" },
-          "high": { "label": "Hög risk", "desc": "Okej med stora svängningar för högre potential. Small caps, tillväxtbolag" }
+          "low": {
+            "label": "Låg risk",
+            "desc": "Stabilitet och kapitalbevarande. Föredrar stora, etablerade bolag"
+          },
+          "medium": {
+            "label": "Medel",
+            "desc": "Balanserad portfölj med mix av stabilt och tillväxt"
+          },
+          "high": {
+            "label": "Hög risk",
+            "desc": "Okej med stora svängningar för högre potential. Small caps, tillväxtbolag"
+          }
         }
       },
       "focus": {
         "title": "Vad fokuserar du på?",
         "subtitle": "Välj det som passar dig bäst.",
         "options": {
-          "dividends": { "label": "Utdelning", "desc": "Kassaflöde och passiv inkomst" },
-          "appreciation": { "label": "Kursökning", "desc": "Kapitalvinst och tillväxt" },
-          "both": { "label": "Båda", "desc": "Totalavkastning — utdelning + kursökning" }
+          "dividends": {
+            "label": "Utdelning",
+            "desc": "Kassaflöde och passiv inkomst"
+          },
+          "appreciation": {
+            "label": "Kursökning",
+            "desc": "Kapitalvinst och tillväxt"
+          },
+          "both": {
+            "label": "Båda",
+            "desc": "Totalavkastning — utdelning + kursökning"
+          }
         },
         "extra": {
           "title": "Geografiskt fokus?",
@@ -672,21 +714,54 @@
     },
     "profile": {
       "investorType": {
-        "value": { "label": "Värdeinvesterare", "explanation": "Du letar efter bolag som handlas under sitt verkliga värde. Thesion prioriterar bolag med stark fundamental — lågt P/E, hög avkastning på kapital och bra kassaflöden." },
-        "growth": { "label": "Tillväxtinvesterare", "explanation": "Du satsar på bolag med stark tillväxt. Thesion prioriterar snabbväxande bolag med hög omsättningstillväxt och skalbar affärsmodell — även om de har högt P/E." },
-        "dividend": { "label": "Utdelningsinvesterare", "explanation": "Du vill ha löpande utdelningar. Thesion prioriterar bolag med hög och stabil direktavkastning, lång utdelningshistorik och hållbar utdelningsandel." },
-        "index": { "label": "Indexinvesterare", "explanation": "Du föredrar bred exponering. Thesion visar hur din portfölj presterar mot index och hjälper dig hitta kompletterande fonder med låga avgifter." },
-        "mixed": { "label": "Blandat", "explanation": "Du kombinerar flera strategier. Thesion ger en balanserad mix av värde, tillväxt och utdelning i sina förslag." }
+        "value": {
+          "label": "Värdeinvesterare",
+          "explanation": "Du letar efter bolag som handlas under sitt verkliga värde. Thesion prioriterar bolag med stark fundamental — lågt P/E, hög avkastning på kapital och bra kassaflöden."
+        },
+        "growth": {
+          "label": "Tillväxtinvesterare",
+          "explanation": "Du satsar på bolag med stark tillväxt. Thesion prioriterar snabbväxande bolag med hög omsättningstillväxt och skalbar affärsmodell — även om de har högt P/E."
+        },
+        "dividend": {
+          "label": "Utdelningsinvesterare",
+          "explanation": "Du vill ha löpande utdelningar. Thesion prioriterar bolag med hög och stabil direktavkastning, lång utdelningshistorik och hållbar utdelningsandel."
+        },
+        "index": {
+          "label": "Indexinvesterare",
+          "explanation": "Du föredrar bred exponering. Thesion visar hur din portfölj presterar mot index och hjälper dig hitta kompletterande fonder med låga avgifter."
+        },
+        "mixed": {
+          "label": "Blandat",
+          "explanation": "Du kombinerar flera strategier. Thesion ger en balanserad mix av värde, tillväxt och utdelning i sina förslag."
+        }
       },
       "riskProfile": {
-        "low": { "label": "Låg risk", "explanation": "Vi filtrerar bort spekulativa bolag och small caps. Fokus på stora, etablerade bolag med låg volatilitet. Investeringsplaner sprids över tid (DCA) för att minska timingrisken." },
-        "medium": { "label": "Medel risk", "explanation": "En balans mellan stabila storbolag och mer spännande tillväxtcase. Investeringsplaner sprids över 2-3 månader." },
-        "high": { "label": "Hög risk", "explanation": "Du kan tåla stora kurssvängningar. Vi inkluderar small caps och tillväxtbolag med högre potential. Investeringar görs gärna direkt (lump sum) för bäst historisk avkastning." }
+        "low": {
+          "label": "Låg risk",
+          "explanation": "Vi filtrerar bort spekulativa bolag och small caps. Fokus på stora, etablerade bolag med låg volatilitet. Investeringsplaner sprids över tid (DCA) för att minska timingrisken."
+        },
+        "medium": {
+          "label": "Medel risk",
+          "explanation": "En balans mellan stabila storbolag och mer spännande tillväxtcase. Investeringsplaner sprids över 2-3 månader."
+        },
+        "high": {
+          "label": "Hög risk",
+          "explanation": "Du kan tåla stora kurssvängningar. Vi inkluderar small caps och tillväxtbolag med högre potential. Investeringar görs gärna direkt (lump sum) för bäst historisk avkastning."
+        }
       },
       "experience": {
-        "beginner": { "label": "Nybörjare", "explanation": "Mats (AI-assistenten) förklarar allt med enkla ord och undviker facktermer. Tooltips och förklaringar visas extra tydligt." },
-        "intermediate": { "label": "Lite erfarenhet", "explanation": "Mats använder vanliga finanstermer men förklarar mer avancerade begrepp. Du får en bra mix av pedagogik och djup." },
-        "advanced": { "label": "Erfaren", "explanation": "Mats ger djupgående analys med nyckeltal, trender och jämförelser utan att hålla tillbaka." }
+        "beginner": {
+          "label": "Nybörjare",
+          "explanation": "Mats (AI-assistenten) förklarar allt med enkla ord och undviker facktermer. Tooltips och förklaringar visas extra tydligt."
+        },
+        "intermediate": {
+          "label": "Lite erfarenhet",
+          "explanation": "Mats använder vanliga finanstermer men förklarar mer avancerade begrepp. Du får en bra mix av pedagogik och djup."
+        },
+        "advanced": {
+          "label": "Erfaren",
+          "explanation": "Mats ger djupgående analys med nyckeltal, trender och jämförelser utan att hålla tillbaka."
+        }
       }
     }
   },
@@ -1279,5 +1354,46 @@
     "highRiskDesc": "Historiskt bäst avkastning. Passar dig som tål svängningar och tror på marknaden långsiktigt.",
     "tipLabel": "Tips:",
     "tipText": "Oavsett strategi — det viktigaste är att du investerar regelbundet och håller dig till din plan. Att vänta på \"rätt tillfälle\" brukar ge sämre resultat än att bara komma igång."
+  },
+  "ownershipDocs": {
+    "title": "Ägarstruktur och aktieklasser",
+    "intro": "I Analys → Ägarstruktur visas free float, största ägare, röst/kapital-gap och spin-off-flagga för bolagen i din bevakningslista. Datan kommer från en kurerad svensk databas för .ST-tickers och från Yahoo Finance för utländska. Det här avsnittet förklarar de underliggande begreppen.",
+    "shareClassTitle": "Svenska A- och B-aktier",
+    "shareClassP1a": "De flesta större svenska börsnoterade bolag har två (ibland fler) aktieklasser med",
+    "shareClassP1b": "samma rätt till utdelning och kapital",
+    "shareClassP1c": "men olika röststyrka på bolagsstämman. A-aktien har typiskt",
+    "shareClassP1d": "10 röster",
+    "shareClassP1e": "B-aktien",
+    "shareClassP1f": "1 röst",
+    "shareClassP1g": "Vissa bolag har även C- eller D-aktier, oftast utan rösträtt eller med särskild utdelning (preferensaktier).",
+    "shareClassP2": "Strukturen tillåter grundarfamiljer och stiftelser att behålla röstmajoriteten utan att äga majoriteten av kapitalet — en svensk tradition som går tillbaka till sekelskiftet 1900 och som har konsekvent stöd från lagstiftaren.",
+    "governanceTitle": "Konsekvens för bolagsstyrning",
+    "governanceIntro": "Långsiktigt ägande möjliggörs. Sfärerna som äger merparten av Stockholmsbörsens stora bolag bygger i regel sina maktpositioner via A-aktier:",
+    "sphere1Label": "Wallenbergsstiftelserna",
+    "sphere1Text": "via Investor AB: Atlas Copco, SEB, Ericsson, AstraZeneca, ABB, Epiroc, Saab, Husqvarna, Electrolux, EQT, Sobi",
+    "sphere2Label": "Lundbergs",
+    "sphere2Text": "Hufvudstaden, Industrivärden (vidare till Handelsbanken, Sandvik, Volvo, SCA)",
+    "sphere3Label": "Stenbeckssfären",
+    "sphere3Text": "Kinnevik (Tele2, Millicom)",
+    "sphere4Label": "Douglas/Latour-sfären",
+    "sphere4Text": "Securitas, Assa Abloy, Loomis, Sweco",
+    "governanceP2": "Fördelen: strategier kan drivas över decennier utan att tvingas till kortsiktiga vinster av aktivistägare eller fientliga uppköp. Nackdelen: minoritetsägare har mindre att säga till om, och bolagsledningen är mindre disciplinerad av marknaden vid sämre prestation — det går inte att rösta bort en kontrollägare.",
+    "practicalTitle": "Praktiskt för dig som investerare",
+    "practicalIntro": "Eftersom A- och B-aktier är samma bolag är utdelning, vinst per aktie, fundamenta och långsiktig avkastning identiska. Det som skiljer är:",
+    "liquidityLabel": "Likviditet:",
+    "liquidityText": "B-aktien har nästan alltid mer omsättning och tightare spread. Förstahandsval för retail.",
+    "priceLabel": "Pris:",
+    "priceText": "A-aktien handlas ibland med en liten premie för rösträtten, ibland med rabatt på grund av sämre likviditet. Gapet är typiskt 0–5%.",
+    "votingLabel": "Rösträtt:",
+    "votingText": "Spelar i praktiken roll bara för storägare. Som retailinvesterare med någon hundratusenkronors position påverkar du inte stämman oavsett klass.",
+    "internationalTitle": "Andra länder",
+    "usaLabel": "USA:",
+    "usaText": "Förekommer framför allt hos techbolag och familjekontrollerade konglomerat — Meta (Mark Zuckerberg), Alphabet (Sergey Brin / Larry Page), Snap (Evan Spiegel), Berkshire Hathaway (Buffett-arvet). Tickerkonventionen varierar: GOOGL har rösträtt, GOOG inte; META erbjuder bara icke-röstberättigad klass A på börsen. Resten av amerikansk large-cap är mestadels singel-klass.",
+    "ukLabel": "UK och Tyskland:",
+    "ukText": "Mestadels singel-klass enligt principen \"one share, one vote\". Brittiska Premium-segmentet förbjuder dubbel-klass helt sedan flera år.",
+    "finlandLabel": "Finland:",
+    "finlandText": "Liknande system som Sverige men annan teckenkodning på Helsingforsbörsen. Wärtsilä handlas t.ex. som WRT1V.HE där \"1V\" markerar klass — inte som svenskt \"-A\"/\"-B\"-suffix. Vår dedup-logik fångar bara svenska .ST-tickers.",
+    "hkLabel": "Hong Kong och Kina:",
+    "hkText": "Förbjöd länge dubbel-klass helt men lättade på reglerna 2018 för att locka tillbaka kinesiska techbolag som flytt till amerikanska börser. Alibaba, JD.com och Xiaomi har idag dubbel-klass-strukturer i Hong Kong."
   }
 }

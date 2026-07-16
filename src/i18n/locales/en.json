@@ -607,38 +607,80 @@
         "title": "What type of investor are you?",
         "subtitle": "Choose the style that best describes you.",
         "options": {
-          "value": { "label": "Value investor", "desc": "Buys undervalued companies with strong fundamentals" },
-          "growth": { "label": "Growth investor", "desc": "Focus on fast-growing companies and future potential" },
-          "dividend": { "label": "Dividend investor", "desc": "Steady returns through dividends" },
-          "index": { "label": "Index investor", "desc": "Broad market exposure, low fees" },
-          "mixed": { "label": "Mixed", "desc": "Combines several strategies" }
+          "value": {
+            "label": "Value investor",
+            "desc": "Buys undervalued companies with strong fundamentals"
+          },
+          "growth": {
+            "label": "Growth investor",
+            "desc": "Focus on fast-growing companies and future potential"
+          },
+          "dividend": {
+            "label": "Dividend investor",
+            "desc": "Steady returns through dividends"
+          },
+          "index": {
+            "label": "Index investor",
+            "desc": "Broad market exposure, low fees"
+          },
+          "mixed": {
+            "label": "Mixed",
+            "desc": "Combines several strategies"
+          }
         }
       },
       "experience": {
         "title": "How experienced are you as an investor?",
         "subtitle": "This helps us tailor language and explanations.",
         "options": {
-          "beginner": { "label": "Beginner", "desc": "New to shares and investing. Wants simple explanations" },
-          "intermediate": { "label": "Some experience", "desc": "Understands the basics but wants to learn more" },
-          "advanced": { "label": "Experienced", "desc": "Good knowledge of the market. Wants in-depth analysis" }
+          "beginner": {
+            "label": "Beginner",
+            "desc": "New to shares and investing. Wants simple explanations"
+          },
+          "intermediate": {
+            "label": "Some experience",
+            "desc": "Understands the basics but wants to learn more"
+          },
+          "advanced": {
+            "label": "Experienced",
+            "desc": "Good knowledge of the market. Wants in-depth analysis"
+          }
         }
       },
       "riskProfile": {
         "title": "What does your risk profile look like?",
         "subtitle": "How much volatility can you handle?",
         "options": {
-          "low": { "label": "Low risk", "desc": "Stability and capital preservation. Prefers large, established companies" },
-          "medium": { "label": "Medium", "desc": "Balanced portfolio with a mix of stability and growth" },
-          "high": { "label": "High risk", "desc": "Fine with large swings for higher potential. Small caps, growth companies" }
+          "low": {
+            "label": "Low risk",
+            "desc": "Stability and capital preservation. Prefers large, established companies"
+          },
+          "medium": {
+            "label": "Medium",
+            "desc": "Balanced portfolio with a mix of stability and growth"
+          },
+          "high": {
+            "label": "High risk",
+            "desc": "Fine with large swings for higher potential. Small caps, growth companies"
+          }
         }
       },
       "focus": {
         "title": "What do you focus on?",
         "subtitle": "Choose what suits you best.",
         "options": {
-          "dividends": { "label": "Dividends", "desc": "Cash flow and passive income" },
-          "appreciation": { "label": "Price appreciation", "desc": "Capital gains and growth" },
-          "both": { "label": "Both", "desc": "Total return — dividends + price appreciation" }
+          "dividends": {
+            "label": "Dividends",
+            "desc": "Cash flow and passive income"
+          },
+          "appreciation": {
+            "label": "Price appreciation",
+            "desc": "Capital gains and growth"
+          },
+          "both": {
+            "label": "Both",
+            "desc": "Total return — dividends + price appreciation"
+          }
         },
         "extra": {
           "title": "Geographic focus?",
@@ -672,21 +714,54 @@
     },
     "profile": {
       "investorType": {
-        "value": { "label": "Value investor", "explanation": "You look for companies trading below their true value. Thesion prioritises companies with strong fundamentals — low P/E, high return on capital and solid cash flows." },
-        "growth": { "label": "Growth investor", "explanation": "You back companies with strong growth. Thesion prioritises fast-growing companies with high revenue growth and a scalable business model — even if they have a high P/E." },
-        "dividend": { "label": "Dividend investor", "explanation": "You want recurring dividends. Thesion prioritises companies with a high and stable dividend yield, a long dividend history and a sustainable payout ratio." },
-        "index": { "label": "Index investor", "explanation": "You prefer broad exposure. Thesion shows how your portfolio performs against the index and helps you find complementary funds with low fees." },
-        "mixed": { "label": "Mixed", "explanation": "You combine several strategies. Thesion gives you a balanced mix of value, growth and dividends in its suggestions." }
+        "value": {
+          "label": "Value investor",
+          "explanation": "You look for companies trading below their true value. Thesion prioritises companies with strong fundamentals — low P/E, high return on capital and solid cash flows."
+        },
+        "growth": {
+          "label": "Growth investor",
+          "explanation": "You back companies with strong growth. Thesion prioritises fast-growing companies with high revenue growth and a scalable business model — even if they have a high P/E."
+        },
+        "dividend": {
+          "label": "Dividend investor",
+          "explanation": "You want recurring dividends. Thesion prioritises companies with a high and stable dividend yield, a long dividend history and a sustainable payout ratio."
+        },
+        "index": {
+          "label": "Index investor",
+          "explanation": "You prefer broad exposure. Thesion shows how your portfolio performs against the index and helps you find complementary funds with low fees."
+        },
+        "mixed": {
+          "label": "Mixed",
+          "explanation": "You combine several strategies. Thesion gives you a balanced mix of value, growth and dividends in its suggestions."
+        }
       },
       "riskProfile": {
-        "low": { "label": "Low risk", "explanation": "We filter out speculative companies and small caps. Focus on large, established companies with low volatility. Investment plans are spread over time (DCA) to reduce timing risk." },
-        "medium": { "label": "Medium risk", "explanation": "A balance between stable large caps and more exciting growth cases. Investment plans are spread over 2-3 months." },
-        "high": { "label": "High risk", "explanation": "You can tolerate large price swings. We include small caps and growth companies with higher potential. Investments are preferably made up front (lump sum) for the best historical return." }
+        "low": {
+          "label": "Low risk",
+          "explanation": "We filter out speculative companies and small caps. Focus on large, established companies with low volatility. Investment plans are spread over time (DCA) to reduce timing risk."
+        },
+        "medium": {
+          "label": "Medium risk",
+          "explanation": "A balance between stable large caps and more exciting growth cases. Investment plans are spread over 2-3 months."
+        },
+        "high": {
+          "label": "High risk",
+          "explanation": "You can tolerate large price swings. We include small caps and growth companies with higher potential. Investments are preferably made up front (lump sum) for the best historical return."
+        }
       },
       "experience": {
-        "beginner": { "label": "Beginner", "explanation": "Mats (the AI assistant) explains everything in simple terms and avoids jargon. Tooltips and explanations are shown extra clearly." },
-        "intermediate": { "label": "Some experience", "explanation": "Mats uses common financial terms but explains more advanced concepts. You get a good mix of guidance and depth." },
-        "advanced": { "label": "Experienced", "explanation": "Mats provides in-depth analysis with key metrics, trends and comparisons without holding back." }
+        "beginner": {
+          "label": "Beginner",
+          "explanation": "Mats (the AI assistant) explains everything in simple terms and avoids jargon. Tooltips and explanations are shown extra clearly."
+        },
+        "intermediate": {
+          "label": "Some experience",
+          "explanation": "Mats uses common financial terms but explains more advanced concepts. You get a good mix of guidance and depth."
+        },
+        "advanced": {
+          "label": "Experienced",
+          "explanation": "Mats provides in-depth analysis with key metrics, trends and comparisons without holding back."
+        }
       }
     }
   },
@@ -1279,5 +1354,46 @@
     "highRiskDesc": "Historically the best return. Suits you if you can handle swings and believe in the market long term.",
     "tipLabel": "Tip:",
     "tipText": "Whatever the strategy — the most important thing is to invest regularly and stick to your plan. Waiting for the \"right moment\" usually gives worse results than just getting started."
+  },
+  "ownershipDocs": {
+    "title": "Ownership structure and share classes",
+    "intro": "Analysis → Ownership structure shows free float, largest owners, vote/capital gap and spin-off flag for the companies on your watchlist. The data comes from a curated Swedish database for .ST tickers and from Yahoo Finance for foreign ones. This section explains the underlying concepts.",
+    "shareClassTitle": "Swedish A and B shares",
+    "shareClassP1a": "Most larger Swedish listed companies have two (sometimes more) share classes with",
+    "shareClassP1b": "the same right to dividends and capital",
+    "shareClassP1c": "but different voting power at the general meeting. The A share typically carries",
+    "shareClassP1d": "10 votes",
+    "shareClassP1e": "the B share",
+    "shareClassP1f": "1 vote",
+    "shareClassP1g": "Some companies also have C or D shares, usually without voting rights or with a special dividend (preference shares).",
+    "shareClassP2": "The structure lets founding families and foundations retain the voting majority without owning the majority of the capital — a Swedish tradition dating back to the turn of the 20th century, with consistent support from the legislator.",
+    "governanceTitle": "Consequences for corporate governance",
+    "governanceIntro": "It enables long-term ownership. The spheres that own most of the Stockholm exchange's large companies typically build their positions of control through A shares:",
+    "sphere1Label": "Wallenbergsstiftelserna",
+    "sphere1Text": "via Investor AB: Atlas Copco, SEB, Ericsson, AstraZeneca, ABB, Epiroc, Saab, Husqvarna, Electrolux, EQT, Sobi",
+    "sphere2Label": "Lundbergs",
+    "sphere2Text": "Hufvudstaden, Industrivärden (onward to Handelsbanken, Sandvik, Volvo, SCA)",
+    "sphere3Label": "Stenbeckssfären",
+    "sphere3Text": "Kinnevik (Tele2, Millicom)",
+    "sphere4Label": "Douglas/Latour-sfären",
+    "sphere4Text": "Securitas, Assa Abloy, Loomis, Sweco",
+    "governanceP2": "The upside: strategies can be pursued over decades without being forced into short-term profits by activist owners or hostile takeovers. The downside: minority owners have less say, and management is less disciplined by the market when underperforming — a controlling owner cannot be voted out.",
+    "practicalTitle": "In practice, for you as an investor",
+    "practicalIntro": "Since A and B shares are the same company, dividends, earnings per share, fundamentals and long-term returns are identical. What differs is:",
+    "liquidityLabel": "Liquidity:",
+    "liquidityText": "The B share almost always has more turnover and a tighter spread. The first choice for retail.",
+    "priceLabel": "Price:",
+    "priceText": "The A share sometimes trades at a small premium for the voting rights, sometimes at a discount due to poorer liquidity. The gap is typically 0–5%.",
+    "votingLabel": "Voting rights:",
+    "votingText": "In practice only matters for large owners. As a retail investor with a position of a few hundred thousand kronor, you won't influence the general meeting regardless of class.",
+    "internationalTitle": "Other countries",
+    "usaLabel": "USA:",
+    "usaText": "Found mainly among tech companies and family-controlled conglomerates — Meta (Mark Zuckerberg), Alphabet (Sergey Brin / Larry Page), Snap (Evan Spiegel), Berkshire Hathaway (the Buffett legacy). Ticker conventions vary: GOOGL has voting rights, GOOG does not; META only offers the non-voting class A on the exchange. The rest of US large cap is mostly single class.",
+    "ukLabel": "UK and Germany:",
+    "ukText": "Mostly single class following the principle of \"one share, one vote\". The British Premium segment has banned dual class entirely for several years.",
+    "finlandLabel": "Finland:",
+    "finlandText": "A similar system to Sweden but different notation on the Helsinki exchange. Wärtsilä trades e.g. as WRT1V.HE where \"1V\" marks the class — not with the Swedish \"-A\"/\"-B\" suffix. Our dedup logic only catches Swedish .ST tickers.",
+    "hkLabel": "Hong Kong and China:",
+    "hkText": "Long banned dual class entirely but relaxed the rules in 2018 to lure back Chinese tech companies that had fled to US exchanges. Alibaba, JD.com and Xiaomi today have dual-class structures in Hong Kong."
   }
 }

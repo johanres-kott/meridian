@@ -61,7 +61,7 @@ export default function TodoList({ todos = [], onUpdate, isMobile }) {
       {!collapsed && (
         <div style={{ padding: isMobile ? "8px 12px" : "8px 20px" }}>
           {/* Pending */}
-          {pending.map((todo, i) => {
+          {pending.map((todo) => {
             const realIdx = todos.indexOf(todo);
             return (
               <div key={realIdx} style={{
@@ -83,7 +83,7 @@ export default function TodoList({ todos = [], onUpdate, isMobile }) {
           })}
 
           {/* Done */}
-          {done.map((todo, i) => {
+          {done.map((todo) => {
             const realIdx = todos.indexOf(todo);
             return (
               <div key={realIdx} style={{

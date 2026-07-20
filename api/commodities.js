@@ -70,7 +70,7 @@ export default async function handler(req, res) {
           high: parseFloat(((meta.regularMarketDayHigh ?? 0) * f).toPrecision(6)),
           low: parseFloat(((meta.regularMarketDayLow ?? 0) * f).toPrecision(6)),
         };
-      } catch (e) {
+      } catch {
         return { ...item, price: 0, change: 0, changeAbs: 0, high: 0, low: 0 };
       }
     })

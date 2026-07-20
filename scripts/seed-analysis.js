@@ -16,7 +16,7 @@ for (const envFile of [".env", ".env.local"]) {
       const m = line.match(/^([^#=]+)=(.*)$/);
       if (m && !process.env[m[1].trim()]) process.env[m[1].trim()] = m[2].trim();
     }
-  } catch {}
+  } catch { /* .env is optional */ }
 }
 
 const supabase = createClient(

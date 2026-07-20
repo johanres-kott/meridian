@@ -116,7 +116,7 @@ function PdfButton({ slug }) {
       if (data.url) {
         window.open(data.url, "_blank");
       }
-    } catch {}
+    } catch { /* ignore — PDF open is best-effort */ }
     setLoading(false);
   }
 
@@ -177,7 +177,7 @@ function AnalysisDetail({ analysis, onBack }) {
   );
 }
 
-export default function PremiumAnalyses({ isMobile }) {
+export default function PremiumAnalyses() {
   const { premium, loading, checkoutLoading, error, startCheckout } = usePremium();
   const [analyses, setAnalyses] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -201,7 +201,7 @@ export default function PremiumAnalyses({ isMobile }) {
         } else if (data.slug) {
           setAnalyses([data]);
         }
-      } catch (err) {
+      } catch {
         setFetchError("Kunde inte ladda analyser");
       }
       setFetchLoading(false);

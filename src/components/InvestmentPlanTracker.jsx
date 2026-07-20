@@ -6,7 +6,7 @@ import parseDCAPlan from "../lib/parseDCAPlan.js";
  * Compact investment plan tracker card for the Overview page.
  * Shows current month's actions from a DCA plan.
  */
-export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
+export default function InvestmentPlanTracker({ isMobile }) {
   const { preferences, updatePreferences } = useUser();
   const plan = preferences?.investmentPlan;
   const dcaPlan = useMemo(

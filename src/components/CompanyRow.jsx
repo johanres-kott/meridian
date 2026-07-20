@@ -72,7 +72,6 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
 
   const currency = price?.currency || "SEK";
   const fxRate = fxRates[currency] || null;
-  const priceSek = (price?.price && fxRate) ? price.price * fxRate : null;
   // P/L: compare price and GAV in original currency, then convert to SEK
   const plLocal = (item.gav && item.shares && price?.price) ? ((price.price - item.gav) * item.shares) : null;
   const pl = (plLocal !== null && fxRate) ? plLocal * fxRate : plLocal;

@@ -56,7 +56,7 @@ export function usePremium() {
         setError(data.error || "Kunde inte starta betalning");
         setCheckoutLoading(false);
       }
-    } catch (err) {
+    } catch {
       setError("Nätverksfel — försök igen");
       setCheckoutLoading(false);
     }

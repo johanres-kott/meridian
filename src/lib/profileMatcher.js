@@ -137,7 +137,7 @@ export function matchStock(ticker, profile = {}, companyData = {}) {
  * Legacy function for compatibility — when no companyData is available,
  * returns null risk (no tags/warnings for risk).
  */
-export function getStockRisk(ticker) {
+export function getStockRisk(_ticker) {
   // Without beta data, we can't determine risk
   return null;
 }

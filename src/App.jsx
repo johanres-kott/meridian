@@ -70,10 +70,10 @@ export default function App() {
 }
 
 function AppContent() {
-  const { userId, preferences, updatePreferences, lastSeenAt, displayName, session } = useUser();
+  const { userId, preferences, updatePreferences, displayName, session } = useUser();
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   // Sync language from saved preferences once they load from Supabase. localStorage
   // already gave us the right language on first paint; this catches the case where
@@ -123,7 +123,7 @@ function AppContent() {
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-    } catch {}
+    } catch { /* ignore — portal open is best-effort */ }
     setPortalLoading(false);
   }
 

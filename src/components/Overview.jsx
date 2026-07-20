@@ -17,7 +17,7 @@ class SafeCard extends Component {
 }
 
 export default function Overview({ onNavigate }) {
-  const { userId, preferences, updatePreferences, lastSeenAt, displayName } = useUser();
+  const { userId, preferences, updatePreferences, displayName } = useUser();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 

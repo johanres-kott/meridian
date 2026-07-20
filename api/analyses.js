@@ -37,7 +37,7 @@ export default async function handler(req, res) {
               const subs = await stripe.subscriptions.list({ customer: customers.data[0].id, status: "active", limit: 1 });
               if (subs.data.length > 0) isPremium = true;
             }
-          } catch {}
+          } catch { /* premium lookup is best-effort */ }
         }
       }
     }

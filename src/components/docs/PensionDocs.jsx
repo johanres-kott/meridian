@@ -1,4 +1,3 @@
-import { useState } from "react";
 
 const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 24, marginBottom: 16 };
 const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
@@ -114,9 +113,6 @@ function PensionFeeImpact() {
 }
 
 export default function PensionDocs() {
-  const [openSection, setOpenSection] = useState(null);
-  const toggle = (id) => setOpenSection(prev => prev === id ? null : id);
-
   return (
     <>
       {/* Pensionens tre pelare */}

@@ -4,7 +4,6 @@ import PdfImportModal from "./PdfImportModal.jsx";
 import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { sanitizeInput } from "../lib/sanitize.js";
 import { fetchCompany, fetchFund } from "../lib/apiClient.js";
 import FundView from "./FundView.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";

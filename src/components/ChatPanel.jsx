@@ -85,7 +85,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
           } catch { /* partial SSE chunk, expected */ }
         }
       }
-    } catch (err) {
+    } catch {
       setMessages(prev => {
         const copy = [...prev];
         copy[copy.length - 1] = { role: "assistant", content: "Fel: Kunde inte nå AI-tjänsten." };

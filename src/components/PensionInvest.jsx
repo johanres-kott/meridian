@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { searchFunds } from "../lib/apiClient.js";
+import { useState } from "react";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import { useItpProviders } from "../hooks/useItpProviders.js";
@@ -270,7 +269,7 @@ function OverviewTab({ isMobile }) {
 
 // ─── Premiepension ───────────────────────────────────────────────────────────
 
-function PPMTab({ isMobile }) {
+function PPMTab() {
   return (
     <>
       <div style={cardStyle}>

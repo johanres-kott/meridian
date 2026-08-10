@@ -45,11 +45,30 @@ export default function OnboardingModal({ onComplete }) {
             <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
               <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Välkommen till Thesion</div>
               <div style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
-                För att kunna ge dig relevanta insikter och förslag behöver vi förstå dig lite bättre som investerare.
+                Thesion bygger på en enkel idé om sparande:
               </div>
-              <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 12, lineHeight: 1.6 }}>
-                Det tar bara en minut — fyra snabba frågor om din investeringsstil, riskprofil och intressen.
-              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 420, margin: "16px auto 0" }}>
+              {[
+                { n: "1", title: "Basen", text: "En billig global indexfond som grund — bred, enkel och låg avgift." },
+                { n: "2", title: "Kryddan", text: "Aktier i bolag du gillar och förstår — med koll på om bolaget faktiskt går bra." },
+                { n: "3", title: "Helheten", text: "Portfölj och pension samlat, så du ser hela bilden." },
+              ].map(item => (
+                <div key={item.n} style={{ display: "flex", gap: 12, alignItems: "flex-start", textAlign: "left", padding: "10px 14px", background: "var(--bg-secondary)", borderRadius: 8 }}>
+                  <span style={{
+                    width: 22, height: 22, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 700, background: "var(--accent)", color: "#fff",
+                  }}>{item.n}</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{item.title}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5 }}>{item.text}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 16, lineHeight: 1.6, textAlign: "center" }}>
+              Fyra snabba frågor så anpassar vi appen efter dig.
             </div>
             <div style={{ display: "flex", justifyContent: "center", marginTop: 24 }}>
               <button
@@ -193,6 +212,20 @@ export default function OnboardingModal({ onComplete }) {
                   </div>
                 );
               })}
+            </div>
+
+            <div style={{
+              marginTop: 12, padding: "12px 14px", borderRadius: 8,
+              background: "rgba(8,153,129,0.08)", border: "1px solid rgba(8,153,129,0.25)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 16 }}>🧱</span>
+                <span style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500 }}>Första steget: din bas</span>
+              </div>
+              <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, paddingLeft: 28 }}>
+                Oavsett stil är en billig global indexfond en vanlig grund att börja med — aktierna blir kryddan ovanpå.
+                Du hittar globala indexfonder under Investera → Fonder. Generell information, inte personlig rådgivning.
+              </div>
             </div>
 
             <div style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", marginTop: 16, lineHeight: 1.5 }}>

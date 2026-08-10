@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "../supabase.js";
 import { Chg, StatCard } from "./SharedComponents.jsx";
-import { parseFxRates } from "../hooks/useFxRates.js";
 import { STATUS_COLORS } from "../constants.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import { getPensionTotalValue } from "../lib/pension.js";
+import { getPortfolioValuation } from "../lib/portfolioValue.js";
 
 export default function PortfolioSummary({ isMobile, onNavigate }) {
   const { userId, preferences } = useUser();
@@ -19,80 +18,12 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
 
     async function load() {
       try {
-        const { data: watchlist } = await supabase
-          .from("watchlist")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at");
+        const { empty, watchlist, priced, holdings, currencyGroups, totalSek, dailyChangeSek } = await getPortfolioValuation(userId);
 
-        if (!watchlist || watchlist.length === 0) {
+        if (empty) {
           setData({ empty: true });
           setLoading(false);
           return;
-        }
-
-        // Fetch prices + FX rates in parallel
-        const [pricedResults, commoditiesRes] = await Promise.all([
-          Promise.all(
-            watchlist.slice(0, 20).map(async (item) => {
-              try {
-                const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
-                const d = await res.json();
-                return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
-              } catch (err) {
-                console.error(`PortfolioSummary: failed to fetch ${item.ticker}:`, err);
-                return { ...item, price: 0, changePercent: 0 };
-              }
-            })
-          ),
-          fetch("/api/commodities").then(r => r.json()).catch(() => []),
-        ]);
-        const priced = pricedResults;
-
-        // Build FX rates to SEK from commodities API
-        const fxToSek = parseFxRates(commoditiesRes);
-
-        // Portfolio value (only "Äger" with shares), grouped by currency
-        const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);
-
-        // Fetch missing FX rates from Yahoo Finance
-        const holdingCurrencies = [...new Set(holdings.map(h => h.currency || "SEK"))];
-        const missingCurrencies = holdingCurrencies.filter(c => !fxToSek[c]);
-        if (missingCurrencies.length > 0) {
-          await Promise.all(missingCurrencies.map(async (cur) => {
-            try {
-              const res = await fetch(`/api/company?ticker=${encodeURIComponent(cur + "SEK=X")}`);
-              const d = await res.json();
-              if (d.price > 0) fxToSek[cur] = d.price;
-            } catch (err) { console.error(`PortfolioSummary: FX rate fetch failed for ${cur}:`, err); }
-          }));
-        }
-        const byCurrency = {};
-        for (const h of holdings) {
-          const cur = h.currency || "SEK";
-          if (!byCurrency[cur]) byCurrency[cur] = { value: 0, dailyChange: 0 };
-          byCurrency[cur].value += h.price * h.shares;
-          const prevPrice = h.price / (1 + h.changePercent / 100);
-          byCurrency[cur].dailyChange += (h.price - prevPrice) * h.shares;
-        }
-        const currencyGroups = Object.entries(byCurrency).map(([currency, { value, dailyChange }]) => ({
-          currency,
-          value,
-          dailyChange,
-          dailyChangePct: value > 0 ? (dailyChange / (value - dailyChange)) * 100 : 0,
-        }));
-
-        // Calculate total in SEK if multiple currencies
-        let totalSek = null;
-        let dailyChangeSek = null;
-        const hasMultipleCurrencies = currencyGroups.length > 1;
-        const allConvertible = currencyGroups.every(g => fxToSek[g.currency] != null);
-        if (hasMultipleCurrencies && allConvertible) {
-          totalSek = currencyGroups.reduce((sum, g) => sum + g.value * fxToSek[g.currency], 0);
-          dailyChangeSek = currencyGroups.reduce((sum, g) => sum + g.dailyChange * fxToSek[g.currency], 0);
-        } else if (currencyGroups.length === 1 && currencyGroups[0].currency !== "SEK" && fxToSek[currencyGroups[0].currency]) {
-          totalSek = currencyGroups[0].value * fxToSek[currencyGroups[0].currency];
-          dailyChangeSek = currencyGroups[0].dailyChange * fxToSek[currencyGroups[0].currency];
         }
 
         // Status counts

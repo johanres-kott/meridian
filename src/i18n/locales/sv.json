@@ -9,7 +9,9 @@
     "investment": "Investera",
     "analysis": "Analys",
     "commodities": "Marknader",
-    "search": "Sök"
+    "search": "Sök",
+    "addAssets": "Lägg till",
+    "goals": "Mål"
   },
   "profile": {
     "language": "Språk"
@@ -120,5 +122,48 @@
     "noNews": "Inga nyheter",
     "customize": "Anpassa",
     "cancel": "Avbryt"
+  },
+  "baseFund": {
+    "title": "Din bas",
+    "inPlaceTitle": "Din bas är på plats",
+    "inPlaceText": "Du äger en global indexfond — en bred och billig grund att bygga vidare på.",
+    "fee": "Avgift",
+    "index": "Indexfond",
+    "nudgeText": "Ett vanligt sätt att bygga ett sparande är en billig global indexfond som bas — enskilda aktier blir kryddan ovanpå. Du har ingen global indexfond bland dina innehav ännu.",
+    "cta": "Utforska globala indexfonder →",
+    "disclaimer": "Generell information, inte personlig rådgivning."
+  },
+  "feeScan": {
+    "title": "Avgiftskoll",
+    "intro": "Dina aktiva fonder jämfört med billigaste globala indexfonden i vår lista ({{name}}, {{fee}} % avgift):",
+    "perYear": "kr/år i skillnad",
+    "feeLabel": "avgift",
+    "total": "Totalt ≈ {{amount}} kr per år i avgiftsskillnad",
+    "disclaimer": "Räknat på nuvarande innehavsvärde och avgifter (källa: Morningstar). Fonder skiljer sig i inriktning och risk — generell information, inte personlig rådgivning."
+  },
+  "myFinances": {
+    "title": "Min ekonomi",
+    "netWorth": "Nettoförmögenhet",
+    "portfolio": "Portfölj",
+    "pension": "Pension",
+    "assets": "Tillgångar",
+    "debts": "Skulder",
+    "portfolioUnavailable": "Portföljvärdet kunde inte räknas om till SEK och ingår inte i summan.",
+    "add": "+ Lägg till tillgång eller skuld",
+    "labelPlaceholder": "Namn (t.ex. Lägenheten)",
+    "valuePlaceholder": "Värde i kr",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "saveError": "Kunde inte spara. Är migrationen manual_assets körd i Supabase?",
+    "kinds": {
+      "bostad": "Bostad",
+      "fordon": "Fordon",
+      "sparkonto": "Sparkonto",
+      "buffert": "Buffert",
+      "ovrigt": "Övrig tillgång",
+      "bolan": "Bolån",
+      "skuld": "Övrig skuld"
+    },
+    "todayPortfolio": "idag (portföljen)"
   }
 }

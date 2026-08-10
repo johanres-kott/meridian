@@ -9,6 +9,11 @@ import WeeklySummary from "./WeeklySummary.jsx";
 import UpcomingEarnings from "./UpcomingEarnings.jsx";
 import TodoList from "./TodoList.jsx";
 import InvestmentPlanTracker from "./InvestmentPlanTracker.jsx";
+import BaseFundCard from "./BaseFundCard.jsx";
+import FeeScanCard from "./FeeScanCard.jsx";
+import NetWorthCard from "./NetWorthCard.jsx";
+import HomeHero from "./HomeHero.jsx";
+import useNetWorth from "../hooks/useNetWorth.js";
 
 class SafeCard extends Component {
   state = { hasError: false };
@@ -17,9 +22,10 @@ class SafeCard extends Component {
 }
 
 export default function Overview({ onNavigate }) {
-  const { userId, preferences, updatePreferences, lastSeenAt, displayName } = useUser();
+  const { userId, preferences, updatePreferences, displayName } = useUser();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const netWorthData = useNetWorth();
 
   return (
     <div>
@@ -46,16 +52,20 @@ export default function Overview({ onNavigate }) {
           isMobile={isMobile}
         />
       )}
-      <SedanSist isMobile={isMobile} onNavigate={onNavigate} />
-      <SafeCard><InvestmentPlanTracker isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
-      <PortfolioSummary isMobile={isMobile} onNavigate={onNavigate} />
+      <SafeCard><HomeHero data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
       {userId && (
         <SafeCard>
           <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-            <PortfolioChart compact />
+            <PortfolioChart compact offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0} />
           </div>
         </SafeCard>
       )}
+      <SafeCard><BaseFundCard isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
+      <SafeCard><FeeScanCard isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
+      <SafeCard><NetWorthCard isMobile={isMobile} onNavigate={onNavigate} data={netWorthData} showTotal={false} /></SafeCard>
+      <SedanSist isMobile={isMobile} onNavigate={onNavigate} />
+      <SafeCard><InvestmentPlanTracker isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
+      <PortfolioSummary isMobile={isMobile} onNavigate={onNavigate} />
       <WeeklySummary isMobile={isMobile} onNavigate={onNavigate} />
       <UpcomingEarnings isMobile={isMobile} />
     </div>

@@ -5,13 +5,24 @@ import { useUser } from "../contexts/UserContext.jsx";
 import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
 import usePortfolioData from "../hooks/usePortfolioData.js";
 
-export default function PortfolioChart({ compact = false }) {
+// offsetSek: pension + manuella tillgångar − skulder från useNetWorth. När det
+// är satt visar grafen nettoförmögenhet — de posterna har ingen kurshistorik,
+// så de ingår med sitt nuvarande inmatade värde (plattas bakåt, noteras i UI).
+export default function PortfolioChart({ compact = false, offsetSek = 0 }) {
   const { userId } = useUser();
   const isMobile = useIsMobile();
   const [range, setRange] = useState("3m");
-  const [activeIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
+  const [rawActiveIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
 
-  const { points, indexDataMap, loading, error } = usePortfolioData(userId, range);
+  const { points: rawPoints, indexDataMap, loading, error } = usePortfolioData(userId, range);
+  const isNetWorth = offsetSek !== 0;
+  const chartTitle = isNetWorth ? "Nettoförmögenhet" : "Portföljutveckling";
+  // Indexjämförelse i % gäller portföljen — döljs i nettoläge för att inte blanda äpplen och päron.
+  const activeIndexes = isNetWorth ? [] : rawActiveIndexes;
+  const points = useMemo(
+    () => (isNetWorth ? rawPoints.map(p => ({ ...p, value: p.value + offsetSek })) : rawPoints),
+    [rawPoints, isNetWorth, offsetSek]
+  );
 
   const toggleIndex = (id) => {
     setActiveIndexes(prev =>
@@ -80,7 +91,7 @@ export default function PortfolioChart({ compact = false }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: compact ? "center" : "flex-start", marginBottom: compact ? 10 : 16, flexDirection: compact && isMobile ? "column" : "row", gap: compact && isMobile ? 8 : 0 }}>
         <div>
           <div style={{ fontSize: compact ? 10 : 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: compact ? 2 : 4 }}>
-            Portföljutveckling
+            {chartTitle}
           </div>
           {!compact && (
             <div>
@@ -136,7 +147,7 @@ export default function PortfolioChart({ compact = false }) {
         </div>
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {/* Index toggle buttons */}
-          {INDEXES.filter(idx => indexDataMap[idx.id]).map(idx => (
+          {!isNetWorth && INDEXES.filter(idx => indexDataMap[idx.id]).map(idx => (
             <button key={idx.id} onClick={() => toggleIndex(idx.id)}
               style={{
                 fontSize: 10, padding: "3px 8px", borderRadius: 3, cursor: "pointer",
@@ -149,7 +160,7 @@ export default function PortfolioChart({ compact = false }) {
             </button>
           ))}
           {/* Spacer */}
-          {INDEXES.some(idx => indexDataMap[idx.id]) && <div style={{ width: compact ? 4 : 8 }} />}
+          {!isNetWorth && INDEXES.some(idx => indexDataMap[idx.id]) && <div style={{ width: compact ? 4 : 8 }} />}
           {/* Range buttons */}
           {RANGES.map(r => (
             <button key={r.id} onClick={() => setRange(r.id)}
@@ -246,6 +257,11 @@ export default function PortfolioChart({ compact = false }) {
       {compact && hasEstimated && (
         <div style={{ fontSize: 10, color: "var(--text-muted)", fontStyle: "italic", marginTop: 6 }}>
           {"Estimerat baserat p\u00e5 nuvarande innehav"}
+        </div>
+      )}
+      {isNetWorth && (
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
+          Pension och manuellt inmatade tillg\u00e5ngar/skulder ing\u00e5r med sitt nuvarande v\u00e4rde \u2014 deras historik f\u00f6ljer inte grafen.
         </div>
       )}
     </div>

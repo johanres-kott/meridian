@@ -9,6 +9,8 @@ import NotesSection from "./company/NotesSection.jsx";
 import ProfileInsight from "./company/ProfileInsight.jsx";
 import InsiderSection from "./company/InsiderSection.jsx";
 import OwnershipChart from "./company/OwnershipChart.jsx";
+import HealthSignal from "./company/HealthSignal.jsx";
+import AboutCompany from "./company/AboutCompany.jsx";
 
 // Beginner sees 4 key metrics, intermediate 6, advanced all 8-9
 const BEGINNER_METRICS = ["peForward", "dividendYield", "revenueGrowth", "roic"];
@@ -62,6 +64,11 @@ function isNeg(key, value) {
   return value < 0;
 }
 
+const VIEWS = [
+  { id: "overview", label: "Översikt" },
+  { id: "details", label: "Detaljer" },
+];
+
 export default function CompanyView({ item, onBack, onUpdate }) {
   const { preferences } = useUser();
   const investorProfile = preferences.investorProfile || null;
@@ -70,6 +77,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAllMetrics, setShowAllMetrics] = useState(false);
+  const [view, setView] = useState("overview");
 
   useEffect(() => {
     fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`)
@@ -84,7 +92,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
   return (
     <div>
       {/* Back button + header */}
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 16 }}>
         <button onClick={onBack}
           style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 12 }}>
           &larr; Tillbaka till bevakningslistan
@@ -133,13 +141,68 @@ export default function CompanyView({ item, onBack, onUpdate }) {
         )}
       </div>
 
+      {/* Översikt (produktsida) / Detaljer (siffror och grafer) */}
+      <div style={{ display: "inline-flex", border: "1px solid var(--border)", borderRadius: 6, overflow: "hidden", marginBottom: 20 }}>
+        {VIEWS.map(v => (
+          <button key={v.id} onClick={() => setView(v.id)}
+            style={{
+              fontSize: 12, padding: "6px 18px", border: "none", cursor: "pointer", fontFamily: "inherit",
+              fontWeight: view === v.id ? 600 : 400,
+              background: view === v.id ? "var(--accent)" : "var(--bg-card)",
+              color: view === v.id ? "#fff" : "var(--text-secondary)",
+            }}>
+            {v.label}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div style={{ color: "var(--text-secondary)", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Laddar bolagsdata...</div>
       ) : !company ? (
         <div style={{ color: "#f23645", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Kunde inte ladda data for {item.ticker}</div>
+      ) : view === "overview" ? (
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: isMobile ? 16 : 20, alignItems: "start" }}>
+          {/* Left column: vad bolaget är och hur det mår */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <HealthSignal ticker={item.ticker} investorProfile={investorProfile} />
+            <AboutCompany company={company} />
+
+            {/* News */}
+            {company.news?.length > 0 && (
+              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 20 }}>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>Senaste nyheter</div>
+                {company.news.map((n, i) => (
+                  <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: "flex", justifyContent: "space-between", padding: "10px 0",
+                      borderBottom: i < company.news.length - 1 ? "1px solid var(--border-light)" : "none",
+                      textDecoration: "none", color: "var(--text)",
+                    }}>
+                    <span style={{ fontSize: 12, lineHeight: 1.4 }}>{n.headline}</span>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 16, whiteSpace: "nowrap", flexShrink: 0 }}>{n.source}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            <button onClick={() => setView("details")}
+              style={{
+                fontSize: 12, color: "var(--accent)", background: "none", border: "1px dashed var(--border)",
+                borderRadius: 6, padding: "10px 16px", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+              }}>
+              Vill du gräva i siffrorna? Kurschart, nyckeltal, kvartal och insiderhandel finns under Detaljer →
+            </button>
+          </div>
+
+          {/* Right column: Profile insight + Notes */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <ProfileInsight ticker={item.ticker} company={company} investorProfile={investorProfile} />
+            <NotesSection item={item} onUpdate={onUpdate} />
+          </div>
+        </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: isMobile ? 16 : 20, alignItems: "start" }}>
-          {/* Left column */}
+          {/* Left column: siffror och grafer */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {/* Chart */}
             <PriceChart ticker={item.ticker} />
@@ -225,31 +288,12 @@ export default function CompanyView({ item, onBack, onUpdate }) {
               </div>
             )}
 
-            {/* News */}
-            {company.news?.length > 0 && (
-              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 20 }}>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>Senaste nyheter</div>
-                {company.news.map((n, i) => (
-                  <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
-                    style={{
-                      display: "flex", justifyContent: "space-between", padding: "10px 0",
-                      borderBottom: i < company.news.length - 1 ? "1px solid var(--border-light)" : "none",
-                      textDecoration: "none", color: "var(--text)",
-                    }}>
-                    <span style={{ fontSize: 12, lineHeight: 1.4 }}>{n.headline}</span>
-                    <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 16, whiteSpace: "nowrap", flexShrink: 0 }}>{n.source}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-
             {/* Insider transactions */}
             <InsiderSection ticker={item.ticker} />
           </div>
 
-          {/* Right column: Profile insight + Notes + GAV */}
+          {/* Right column: Ownership + Notes */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <ProfileInsight ticker={item.ticker} company={company} investorProfile={investorProfile} />
             <OwnershipChart ticker={item.ticker} />
             <NotesSection item={item} onUpdate={onUpdate} />
           </div>

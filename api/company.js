@@ -84,6 +84,11 @@ async function getYahooFundamentals(ticker, crumbData) {
     return {
       sector: ap.sector ?? "—",
       industry: ap.industry ?? "—",
+      description: ap.longBusinessSummary ?? null,
+      website: ap.website ?? null,
+      employees: ap.fullTimeEmployees ?? null,
+      city: ap.city ?? null,
+      country: ap.country ?? null,
       ebitdaMargin: fd.ebitdaMargins?.raw ? parseFloat((fd.ebitdaMargins.raw * 100).toFixed(1)) : 0,
       operatingMargin: fd.operatingMargins?.raw ? parseFloat((fd.operatingMargins.raw * 100).toFixed(1)) : 0,
       grossMargin: fd.grossMargins?.raw ? parseFloat((fd.grossMargins.raw * 100).toFixed(1)) : 0,
@@ -197,6 +202,10 @@ export default async function handler(req, res) {
       marketCapSek: calculatedBeta?.market_cap_sek ?? null,
       week52High: priceData?.week52High ?? 0,
       week52Low: priceData?.week52Low ?? 0,
+      description: fundamentals?.description ?? null,
+      website: fundamentals?.website ?? null,
+      employees: fundamentals?.employees ?? null,
+      headquarters: [fundamentals?.city, fundamentals?.country].filter(Boolean).join(", ") || null,
       news,
       sources: {
         quote: "Yahoo Finance v8",

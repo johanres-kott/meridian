@@ -11,20 +11,38 @@ import LeadershipPanel from "./investment/LeadershipPanel.jsx";
 import InfoCard from "./investment/InfoCard.jsx";
 import CompanySelector, { COMPANIES } from "./investment/CompanySelector.jsx";
 import HoldingsTable from "./investment/HoldingsTable.jsx";
+import InvestLanding from "./investment/InvestLanding.jsx";
 import FundSuggestions from "./FundSuggestions.jsx";
 import FundEducation from "./FundEducation.jsx";
 import PensionInvest from "./PensionInvest.jsx";
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function InvestmentCompanies({ onNavigate }) {
+export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepLink }) {
   const { userId, preferences } = useUser();
   const isMobile = useIsMobile();
   const [selectedId, setSelectedId] = useState("investor");
   const [tickers, setTickers] = useState([]);
   const [suggestMode, setSuggestMode] = useState("stock"); // "stock" | "fund"
-  const [subTab, setSubTab] = useState("toppforslag");
+  const [subTab, setSubTab] = useState("start");
+  const [fundDefaults, setFundDefaults] = useState(null); // { category, type } from deep link
+  const [handledLink, setHandledLink] = useState(null);
   const company = COMPANIES.find(c => c.id === selectedId);
+
+  // Deep link från t.ex. "Din bas"-kortet: hoppa till rätt underflik och fondfilter.
+  // Lokal state justeras under render (React-mönstret för härledd state);
+  // förälderns deepLink nollställs i en effekt eftersom det är extern state.
+  if (deepLink?.subTab && deepLink !== handledLink) {
+    setHandledLink(deepLink);
+    setSubTab(deepLink.subTab);
+    if (deepLink.suggestMode) setSuggestMode(deepLink.suggestMode);
+    if (deepLink.fundCategory || deepLink.fundType) {
+      setFundDefaults({ category: deepLink.fundCategory, type: deepLink.fundType });
+    }
+  }
+  useEffect(() => {
+    if (deepLink?.subTab) onClearDeepLink?.();
+  }, [deepLink, onClearDeepLink]);
 
   useEffect(() => {
     if (!userId) return;
@@ -49,6 +67,7 @@ export default function InvestmentCompanies({ onNavigate }) {
       {/* ── Sub-navigation ── */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 24 }}>
         {[
+          { id: "start", label: "Start" },
           { id: "toppforslag", label: "Toppförslag" },
           { id: "pension", label: "Pension" },
           { id: "investmentbolag", label: "Investmentbolag" },
@@ -70,6 +89,24 @@ export default function InvestmentCompanies({ onNavigate }) {
           </button>
         ))}
       </div>
+
+      {/* ── Start: produktkort (Finary-inspirerat, se PIVOT.md) ── */}
+      {subTab === "start" && (
+        <InvestLanding
+          isMobile={isMobile}
+          onNavigate={onNavigate}
+          onFunds={() => {
+            setSuggestMode("fund");
+            setFundDefaults({ category: "aktie_global", type: "index" });
+            setSubTab("toppforslag");
+          }}
+          onStocks={() => {
+            setSuggestMode("stock");
+            setSubTab("toppforslag");
+          }}
+          onPension={() => setSubTab("pension")}
+        />
+      )}
 
       {/* ── Smart Suggestions ── */}
       {subTab === "toppforslag" && <div style={{ marginBottom: 32 }}>
@@ -98,7 +135,7 @@ export default function InvestmentCompanies({ onNavigate }) {
         </div>
         {suggestMode === "fund" ? (
           <>
-            <FundSuggestions isMobile={isMobile} onNavigate={onNavigate} />
+            <FundSuggestions key={fundDefaults ? `${fundDefaults.category}-${fundDefaults.type}` : "default"} isMobile={isMobile} onNavigate={onNavigate} initialCategory={fundDefaults?.category} initialType={fundDefaults?.type} />
             <FundEducation />
           </>
         ) : preferences.investorProfile ? (

@@ -9,9 +9,9 @@ const CATEGORIES = [
   { id: "rantefond", label: "Räntefonder" },
 ];
 
-export default function FundSuggestions({ isMobile, onNavigate }) {
-  const [category, setCategory] = useState("aktie_sverige");
-  const [typeFilter, setTypeFilter] = useState("all"); // "all" | "index" | "active"
+export default function FundSuggestions({ isMobile, onNavigate, initialCategory, initialType }) {
+  const [category, setCategory] = useState(initialCategory || "aktie_sverige");
+  const [typeFilter, setTypeFilter] = useState(initialType || "all"); // "all" | "index" | "active"
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(new Set());

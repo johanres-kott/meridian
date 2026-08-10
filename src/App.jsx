@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "./supabase.js";
 import { useIsMobile } from "./hooks/useIsMobile.js";
-import { useTheme } from "./hooks/useTheme.js";
 import { UserProvider, useUser } from "./contexts/UserContext.jsx";
 import Login from "./components/Login.jsx";
 import LandingPage from "./components/LandingPage.jsx";
@@ -10,7 +9,6 @@ import Portfolio from "./components/Portfolio.jsx";
 import AnalysisTab from "./components/AnalysisTab.jsx";
 import CompanySearch from "./components/CompanySearch.jsx";
 import MarketsView from "./components/MarketsView.jsx";
-import ChatPanel from "./components/ChatPanel.jsx";
 import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
@@ -20,20 +18,41 @@ import ScoringMethodology from "./components/ScoringMethodology.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
 import AboutPage from "./components/AboutPage.jsx";
-import { sanitizeInput } from "./lib/sanitize.js";
-import { useChatContext } from "./hooks/useChatContext.js";
-import { usePremium } from "./hooks/usePremium.js";
+import ProfileMenu from "./components/ProfileMenu.jsx";
+import AddAssetsPage from "./components/addassets/AddAssetsPage.jsx";
+import GoalsTab from "./components/GoalsTab.jsx";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES, setLanguage } from "./i18n/index.js";
+
+// Skal enligt DESIGN.md: sidomeny på desktop (Finary-mönstret), flikar på mobil.
+const NAV_ICONS = {
+  markets: <><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></>,
+  portfolio: <><path d="M6 20V10" /><path d="M12 20V4" /><path d="M18 20v-6" /></>,
+  goals: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r="0.5" /></>,
+  investment: <><path d="M3 10l9-6 9 6" /><path d="M5 10v8" /><path d="M9.5 10v8" /><path d="M14.5 10v8" /><path d="M19 10v8" /><path d="M3 20h18" /></>,
+  analysis: <><circle cx="12" cy="12" r="9" /><path d="M12 12V3" /><path d="M12 12l6 6" /></>,
+  commodities: <><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></>,
+  search: <><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></>,
+};
 
 const TABS = [
   { id: "markets", key: "nav.markets" },
   { id: "portfolio", key: "nav.portfolio" },
+  { id: "goals", key: "nav.goals" },
   { id: "investment", key: "nav.investment" },
   { id: "analysis", key: "nav.analysis" },
   { id: "commodities", key: "nav.commodities" },
   { id: "search", key: "nav.search" },
 ];
+
+function Logo({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 56 56" fill="none">
+      <rect width="56" height="56" rx="14" fill="#3B6AE6" />
+      <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white" /><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85" /><circle cx="38" cy="17" r="1.5" fill="#3B6AE6" /><polygon points="32,18 34,24 28,32 26,24" fill="white" /><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white" /><polygon points="12,36 8,28 10,26 14,32" fill="white" /><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round" /><polygon points="22,44 20,48 24,48 26,44" fill="white" /><polygon points="28,42 27,48 31,48 30,42" fill="white" />
+    </svg>
+  );
+}
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -70,10 +89,9 @@ export default function App() {
 }
 
 function AppContent() {
-  const { userId, preferences, updatePreferences, lastSeenAt, displayName, session } = useUser();
+  const { userId, preferences, updatePreferences } = useUser();
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
-  const { theme, toggleTheme, isDark } = useTheme();
 
   // Sync language from saved preferences once they load from Supabase. localStorage
   // already gave us the right language on first paint; this catches the case where
@@ -85,54 +103,14 @@ function AppContent() {
     }
   }, [preferences.language, i18n.language]);
 
-  function changeLanguage(code) {
-    setLanguage(code);
-    updatePreferences({ language: code });
-  }
-  const { premium, loading: premiumLoading } = usePremium();
-  const [portalLoading, setPortalLoading] = useState(false);
   const [tab, setTab] = useState("markets");
   const [deepLink, setDeepLink] = useState(null);
+  const [time, setTime] = useState(new Date());
+  const [showAddAssets, setShowAddAssets] = useState(false);
 
   function navigate(targetTab, detail) {
     setDeepLink(detail || null);
     setTab(targetTab);
-  }
-  const [time, setTime] = useState(new Date());
-  const [chatOpen, setChatOpen] = useState(true);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [editingName, setEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState("");
-  const chatContextRef = useChatContext(chatOpen);
-  const profileRef = useRef(null);
-
-  const displayInitial = (preferences.display_name?.[0] || session?.user?.email?.[0] || "?").toUpperCase();
-
-  function startEditingName() {
-    setNameInput(preferences.display_name || "");
-    setEditingName(true);
-  }
-
-  async function openStripePortal() {
-    setPortalLoading(true);
-    try {
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      const res = await fetch("/api/stripe-portal", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${authSession?.access_token}` },
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch {}
-    setPortalLoading(false);
-  }
-
-  function saveDisplayName() {
-    const sanitized = sanitizeInput(nameInput);
-    if (sanitized) {
-      updatePreferences({ display_name: sanitized });
-    }
-    setEditingName(false);
   }
 
   useEffect(() => {
@@ -140,247 +118,33 @@ function AppContent() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (!profileOpen) return;
-    function handleClick(e) {
-      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [profileOpen]);
+  const addAssetsButton = (
+    <button
+      onClick={() => setShowAddAssets(true)}
+      style={{ fontSize: 12, fontWeight: 600, color: "#fff", background: "var(--accent)", border: "none", borderRadius: 999, padding: isMobile ? "6px 12px" : "7px 16px", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
+    >
+      + {t("nav.addAssets")}
+    </button>
+  );
 
-  return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); --sal: env(safe-area-inset-left); --sar: env(safe-area-inset-right); }
-        .tab-btn { background: none; border: none; cursor: pointer; padding: 10px 14px; font-size: 13px; font-family: inherit; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
-        .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
-        .tab-btn:hover { color: var(--text); }
-      `}</style>
+  const content = (
+    <>
+      {tab === "markets" && <Overview onNavigate={navigate} />}
+      {tab === "goals" && <GoalsTab />}
+      {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+      {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+      {tab === "analysis" && <AnalysisTab onNavigate={navigate} isMobile={isMobile} />}
+      {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+      {tab === "investment" && <InvestmentCompanies onNavigate={navigate} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+      {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
+      {tab === "profile" && <ProfilePage onResetProfile={() => updatePreferences({ investorProfile: null })} />}
+      {tab === "docs" && <Documentation />}
+      {tab === "about" && <AboutPage />}
+    </>
+  );
 
-      {/* Mobile logo banner */}
-      {isMobile && (
-        <div style={{ background: "#3B6AE6", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 0", paddingTop: "calc(10px + env(safe-area-inset-top, 0px))", position: "sticky", top: 0, zIndex: 51 }}>
-          <svg width="20" height="20" viewBox="0 0 56 56" fill="none">
-            <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white"/><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85"/><circle cx="38" cy="17" r="1.5" fill="#3B6AE6"/><polygon points="32,18 34,24 28,32 26,24" fill="white"/><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white"/><polygon points="12,36 8,28 10,26 14,32" fill="white"/><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round"/><polygon points="22,44 20,48 24,48 26,44" fill="white"/><polygon points="28,42 27,48 31,48 30,42" fill="white"/>
-          </svg>
-          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px", color: "#fff" }}>Thesion</span>
-        </div>
-      )}
-
-      {/* Topbar */}
-      <div style={{ borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 8px" : "0 32px", height: 42, position: "sticky", top: isMobile ? 40 : 0, background: "var(--bg-card)", zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 0 : 32, flex: 1, minWidth: 0 }}>
-          {!isMobile && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-              <svg width="22" height="22" viewBox="0 0 56 56" fill="none">
-                <rect width="56" height="56" rx="14" fill="#3B6AE6"/>
-                <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white"/><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85"/><circle cx="38" cy="17" r="1.5" fill="#3B6AE6"/><polygon points="32,18 34,24 28,32 26,24" fill="white"/><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white"/><polygon points="12,36 8,28 10,26 14,32" fill="white"/><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round"/><polygon points="22,44 20,48 24,48 26,44" fill="white"/><polygon points="28,42 27,48 31,48 30,42" fill="white"/>
-              </svg>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px" }}>Thesion</span>
-            </div>
-          )}
-          <div style={{ display: "flex", overflow: "auto", msOverflowStyle: "none", scrollbarWidth: "none" }}>
-            {TABS.map(tabItem => (
-              <button key={tabItem.id} className={`tab-btn${tab === tabItem.id ? " active" : ""}`} onClick={() => setTab(tabItem.id)} style={isMobile ? { padding: "8px 8px", fontSize: 11 } : undefined}>
-                {t(tabItem.key)}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 16, flexShrink: 0 }}>
-          {!isMobile && (
-            <>
-              <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>
-                {time.toLocaleTimeString("sv-SE")} CET
-              </span>
-              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
-                <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>Live</span>
-              </div>
-            </>
-          )}
-          <button
-            onClick={() => setChatOpen(!chatOpen)}
-            style={{ fontSize: 11, color: chatOpen ? "#2962ff" : "var(--text-secondary)", background: chatOpen ? "var(--border-light)" : "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
-          >
-            AI
-          </button>
-          <NotificationBell />
-          <div ref={profileRef} style={{ position: "relative" }}>
-            <button
-              onClick={() => { setProfileOpen(!profileOpen); setEditingName(false); }}
-              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: profileOpen ? "#2962ff" : "var(--text-secondary)", background: profileOpen ? "var(--border-light)" : "none", border: "1px solid var(--border)", borderRadius: 3, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}
-            >
-              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#2962ff", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
-                {displayInitial}
-              </div>
-              {!isMobile && displayName}
-            </button>
-            {profileOpen && (
-              <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 0", minWidth: 240, zIndex: 100 }}>
-                <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid var(--border-light)" }}>
-                  {editingName ? (
-                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                      <input
-                        value={nameInput}
-                        onChange={e => setNameInput(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Enter") saveDisplayName(); if (e.key === "Escape") setEditingName(false); }}
-                        autoFocus
-                        placeholder="Ditt namn"
-                        style={{ flex: 1, padding: "4px 8px", border: "1px solid #2962ff", borderRadius: 3, fontSize: 13, fontFamily: "inherit", outline: "none" }}
-                      />
-                      <button onClick={saveDisplayName} style={{ padding: "4px 10px", fontSize: 11, background: "#2962ff", color: "#fff", border: "none", borderRadius: 3, cursor: "pointer", fontFamily: "inherit" }}>Spara</button>
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{displayName}</div>
-                        <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>{session.user.email}</div>
-                      </div>
-                      <button
-                        onClick={startEditingName}
-                        title="Byt namn"
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--text-secondary)", padding: "2px 6px" }}
-                      >
-                        ✏
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {preferences.investorProfile && (
-                  <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
-                    <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 6 }}>Din investerarprofil</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                      {[
-                        { value: preferences.investorProfile.investorType, map: { value: "Värde", growth: "Tillväxt", dividend: "Utdelning", index: "Index", mixed: "Blandat" } },
-                        { value: preferences.investorProfile.experience, map: { beginner: "Nybörjare", intermediate: "Lite erfarenhet", advanced: "Erfaren" } },
-                        { value: preferences.investorProfile.riskProfile, map: { low: "Låg risk", medium: "Medel risk", high: "Hög risk" } },
-                        { value: preferences.investorProfile.focus, map: { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" } },
-                        { value: preferences.investorProfile.geography, map: { nordic: "Norden", global: "Globalt", both: "Blandat geo" } },
-                      ].filter(t => t.value && t.map[t.value]).map((t, i) => (
-                        <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "var(--border-light)", color: "#2962ff", fontWeight: 500 }}>
-                          {t.map[t.value]}
-                        </span>
-                      ))}
-                    </div>
-                    {preferences.investorProfile.interests?.length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-                        {preferences.investorProfile.interests.map(i => {
-                          const labels = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
-                          return <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "#e8f5e9", color: "#1b5e20", fontWeight: 500 }}>{labels[i] || i}</span>;
-                        })}
-                      </div>
-                    )}
-                    <button
-                      onClick={() => { updatePreferences({ investorProfile: null }); setProfileOpen(false); }}
-                      style={{ fontSize: 10, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginTop: 6 }}
-                    >
-                      Ändra profil →
-                    </button>
-                  </div>
-                )}
-                <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Prenumeration</div>
-                    {premium && (
-                      <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 3, background: "rgba(8,153,129,0.1)", color: "#089981", fontWeight: 600 }}>
-                        ★ Premium
-                      </span>
-                    )}
-                  </div>
-                  {premiumLoading ? (
-                    <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Laddar...</div>
-                  ) : premium ? (
-                    <button
-                      onClick={openStripePortal}
-                      disabled={portalLoading}
-                      style={{ fontSize: 11, color: "#2962ff", background: "none", border: "none", cursor: portalLoading ? "default" : "pointer", fontFamily: "inherit", padding: 0, marginTop: 4 }}
-                    >
-                      {portalLoading ? "Öppnar..." : "Hantera prenumeration →"}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => { setTab("analysis"); setProfileOpen(false); }}
-                      style={{ fontSize: 11, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginTop: 4 }}
-                    >
-                      Uppgradera till Premium →
-                    </button>
-                  )}
-                </div>
-                <button
-                  onClick={() => { setTab("profile"); setProfileOpen(false); }}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                >
-                  Profil & inställningar
-                </button>
-                <button
-                  onClick={() => { setTab("docs"); setProfileOpen(false); }}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                >
-                  Dokumentation
-                </button>
-                <button
-                  onClick={() => { setTab("about"); setProfileOpen(false); }}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                >
-                  Om Thesion
-                </button>
-                <div style={{ padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("profile.language")}</span>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {LANGUAGES.map(l => {
-                      const active = i18n.language === l.code;
-                      return (
-                        <button
-                          key={l.code}
-                          onClick={() => changeLanguage(l.code)}
-                          title={l.label}
-                          style={{
-                            fontSize: 11, padding: "3px 8px", borderRadius: 12, cursor: "pointer", fontFamily: "inherit",
-                            border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
-                            background: active ? "var(--accent-light)" : "var(--bg-card)",
-                            color: active ? "var(--accent)" : "var(--text-secondary)",
-                            fontWeight: active ? 600 : 500,
-                          }}
-                        >
-                          {l.flag} {l.code.toUpperCase()}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <button
-                  onClick={toggleTheme}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                >
-                  {isDark ? "☀️" : "🌙"} {isDark ? "Ljust läge" : "Mörkt läge"}
-                </button>
-                <div style={{ borderTop: "1px solid var(--border-light)" }} />
-                <button
-                  onClick={() => supabase.auth.signOut()}
-                  style={{ width: "100%", textAlign: "left", padding: "10px 16px", fontSize: 12, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.color = "var(--text)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                >
-                  Logga ut
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
+  const modals = (
+    <>
       {/* Onboarding modal for new users */}
       {!preferences.investorProfile && (
         <OnboardingModal onComplete={async (profile) => {
@@ -440,24 +204,116 @@ function AppContent() {
         <QuickGuide onComplete={() => updatePreferences({ guideSeen: true })} />
       )}
 
-      {/* Content + Chat */}
-      <div style={{ display: "flex", height: isMobile ? "calc(100vh - 82px)" : "calc(100vh - 42px)" }}>
-        <div style={{ flex: 1, overflow: "auto", padding: isMobile ? "16px 12px" : "24px 32px", paddingBottom: isMobile ? "calc(16px + env(safe-area-inset-bottom, 0px))" : "24px", paddingLeft: isMobile ? "calc(12px + env(safe-area-inset-left, 0px))" : "32px", paddingRight: isMobile ? "calc(12px + env(safe-area-inset-right, 0px))" : "32px" }}>
-          {tab === "markets" && <Overview onNavigate={navigate} />}
-          {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-          {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-          {tab === "analysis" && <AnalysisTab onNavigate={navigate} isMobile={isMobile} />}
-          {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-          {tab === "investment" && <InvestmentCompanies onNavigate={navigate} />}
-          {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
-          {tab === "profile" && <ProfilePage onResetProfile={() => updatePreferences({ investorProfile: null })} />}
-          {tab === "docs" && <Documentation />}
-          {tab === "about" && <AboutPage />}
+      {/* Add assets-katalog (helsida, Finary-inspirerad) */}
+      {showAddAssets && (
+        <AddAssetsPage onClose={() => setShowAddAssets(false)} onNavigate={navigate} />
+      )}
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); --sal: env(safe-area-inset-left); --sar: env(safe-area-inset-right); }
+          .tab-btn { background: none; border: none; cursor: pointer; padding: 8px 8px; font-size: 11px; font-family: inherit; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+          .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
+        `}</style>
+
+        {/* Mobile logo banner */}
+        <div style={{ background: "#3B6AE6", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 0", paddingTop: "calc(10px + env(safe-area-inset-top, 0px))", position: "sticky", top: 0, zIndex: 51 }}>
+          <svg width="20" height="20" viewBox="0 0 56 56" fill="none">
+            <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white" /><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85" /><circle cx="38" cy="17" r="1.5" fill="#3B6AE6" /><polygon points="32,18 34,24 28,32 26,24" fill="white" /><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white" /><polygon points="12,36 8,28 10,26 14,32" fill="white" /><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round" /><polygon points="22,44 20,48 24,48 26,44" fill="white" /><polygon points="28,42 27,48 31,48 30,42" fill="white" />
+          </svg>
+          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px", color: "#fff" }}>Thesion</span>
         </div>
-        <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} contextFn={() => chatContextRef.current} sharePortfolio={preferences.sharePortfolioWithAI !== false} onSaveStrategy={(text) => updatePreferences({ investmentPlan: { text, savedAt: new Date().toISOString() } })} onSaveTodo={(text) => {
-          const todos = preferences.todos || [];
-          updatePreferences({ todos: [...todos, { text, done: false, createdAt: new Date().toISOString() }] });
-        }} />
+
+        {/* Topbar: flikar + åtgärder */}
+        <div style={{ borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 8px", height: 42, position: "sticky", top: 40, background: "var(--bg-card)", zIndex: 50 }}>
+          <div style={{ display: "flex", overflow: "auto", msOverflowStyle: "none", scrollbarWidth: "none", flex: 1, minWidth: 0 }}>
+            {TABS.map(tabItem => (
+              <button key={tabItem.id} className={`tab-btn${tab === tabItem.id ? " active" : ""}`} onClick={() => setTab(tabItem.id)}>
+                {t(tabItem.key)}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            {addAssetsButton}
+            <NotificationBell />
+            <ProfileMenu onNavigate={navigate} direction="down" showName={false} />
+          </div>
+        </div>
+
+        {modals}
+
+        <div style={{ height: "calc(100vh - 82px)", overflow: "auto", padding: "16px 12px", paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))", paddingLeft: "calc(12px + env(safe-area-inset-left, 0px))", paddingRight: "calc(12px + env(safe-area-inset-right, 0px))" }}>
+          {content}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop: sidomeny + topbar (DESIGN.md) ──
+  return (
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .side-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-family: inherit; font-size: 13px; color: var(--text-secondary); text-align: left; transition: background 0.15s, color 0.15s; }
+        .side-item:hover { color: var(--text); background: rgba(108,113,122,0.06); }
+        .side-item.active { color: var(--text); background: rgba(108,113,122,0.1); font-weight: 500; }
+      `}</style>
+
+      {/* Topbar */}
+      <div style={{ height: 52, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Logo />
+          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px" }}>Thesion</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            {time.toLocaleTimeString("sv-SE")} CET
+          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
+            <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>Live</span>
+          </div>
+          <NotificationBell />
+          {addAssetsButton}
+        </div>
+      </div>
+
+      {modals}
+
+      {/* Sidomeny + innehåll */}
+      <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+        <div style={{ width: 220, flexShrink: 0, display: "flex", flexDirection: "column", padding: "8px 12px 16px", overflowY: "auto" }}>
+          <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {TABS.map(tabItem => (
+              <button
+                key={tabItem.id}
+                className={`side-item${tab === tabItem.id ? " active" : ""}`}
+                onClick={() => setTab(tabItem.id)}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  {NAV_ICONS[tabItem.id]}
+                </svg>
+                {t(tabItem.key)}
+              </button>
+            ))}
+          </nav>
+          <div style={{ marginTop: "auto", paddingTop: 16 }}>
+            <ProfileMenu onNavigate={navigate} direction="up" />
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
+          <div style={{ maxWidth: 1240, margin: "0 auto", padding: "12px 32px 40px" }}>
+            {content}
+          </div>
+        </div>
       </div>
     </div>
   );

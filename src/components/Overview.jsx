@@ -21,7 +21,7 @@ class SafeCard extends Component {
   render() { return this.state.hasError ? null : this.props.children; }
 }
 
-export default function Overview({ onNavigate }) {
+export default function Overview({ onNavigate, onAddAssets }) {
   const { userId, preferences, updatePreferences, displayName } = useUser();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -62,7 +62,7 @@ export default function Overview({ onNavigate }) {
       )}
       <SafeCard><BaseFundCard isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
       <SafeCard><FeeScanCard isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
-      <SafeCard><NetWorthCard isMobile={isMobile} onNavigate={onNavigate} data={netWorthData} showTotal={false} /></SafeCard>
+      <SafeCard><NetWorthCard isMobile={isMobile} onNavigate={onNavigate} onAddAssets={onAddAssets} data={netWorthData} showTotal={false} /></SafeCard>
       <SedanSist isMobile={isMobile} onNavigate={onNavigate} />
       <SafeCard><InvestmentPlanTracker isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
       <PortfolioSummary isMobile={isMobile} onNavigate={onNavigate} />

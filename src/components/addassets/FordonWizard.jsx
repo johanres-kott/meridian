@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../supabase.js";
-import { useUser } from "../../contexts/UserContext.jsx";
+import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import { mono, inputStyle, parseAmount, fmtKr } from "./wizardHelpers.js";
 import { Field, ChipSelect, StepNav, WizardButtons, SaveError } from "./wizardShared.jsx";
@@ -33,7 +32,6 @@ const FINANCING_OPTIONS = [
 ];
 
 export default function FordonWizard({ onSaved, onBack }) {
-  const { userId } = useUser();
   const isMobile = useIsMobile();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -77,46 +75,39 @@ export default function FordonWizard({ onSaved, onBack }) {
       monthlyCost: isLeasing ? monthlyCost : null,
     };
 
-    // Leasat fordon ägs inte — det sparas med värde 0 så det syns i helheten
-    // utan att blåsa upp nettoförmögenheten.
-    const { data: vehicleRow, error: vehicleErr } = await supabase
-      .from("manual_assets")
-      .insert({ user_id: userId, kind: "fordon", label: d.name.trim(), value_sek: isLeasing ? 0 : value, is_debt: false, metadata: vehicleMetadata })
-      .select()
-      .single();
-
-    if (vehicleErr) {
-      console.error("FordonWizard: vehicle insert failed:", vehicleErr);
-      setSaving(false);
-      setSaveError(vehicleErr.message || true);
-      return;
-    }
-
-    if (hasLoan && loan != null && loan > 0) {
-      const { error: loanErr } = await supabase.from("manual_assets").insert({
-        user_id: userId,
-        kind: "skuld",
-        label: `Billån · ${d.name.trim()}`,
-        value_sek: loan,
-        is_debt: true,
-        metadata: {
-          wizard: "fordon",
-          loanType: "billan",
-          linkedAssetId: vehicleRow?.id ?? null,
-          lender: d.lender.trim() || null,
-          interestRate: parseAmount(d.interestRate),
-        },
+    try {
+      // Leasat fordon ägs inte — det sparas med värde 0 så det syns i helheten
+      // utan att blåsa upp nettoförmögenheten.
+      const vehicleRow = await createManualAsset({
+        kind: "fordon",
+        label: d.name.trim(),
+        value_sek: isLeasing ? 0 : value,
+        is_debt: false,
+        metadata: vehicleMetadata,
       });
-      if (loanErr) {
-        console.error("FordonWizard: loan insert failed:", loanErr);
-        setSaving(false);
-        setSaveError(loanErr.message || true);
-        return;
-      }
-    }
 
-    setSaving(false);
-    onSaved();
+      if (hasLoan && loan != null && loan > 0) {
+        await createManualAsset({
+          kind: "skuld",
+          label: `Billån · ${d.name.trim()}`,
+          value_sek: loan,
+          is_debt: true,
+          metadata: {
+            wizard: "fordon",
+            loanType: "billan",
+            linkedAssetId: vehicleRow?.id ?? null,
+            lender: d.lender.trim() || null,
+            interestRate: parseAmount(d.interestRate),
+          },
+        });
+      }
+      onSaved();
+    } catch (err) {
+      console.error("FordonWizard: save failed:", err);
+      setSaveError(err.message || true);
+    } finally {
+      setSaving(false);
+    }
   }
 
   const summaryRows = [

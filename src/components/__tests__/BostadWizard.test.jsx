@@ -3,21 +3,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import BostadWizard from "../addassets/BostadWizard.jsx";
 
 const inserted = [];
-vi.mock("../../supabase.js", () => ({
-  supabase: {
-    from: () => ({
-      insert: (row) => {
-        inserted.push(row);
-        return {
-          select: () => ({ single: () => Promise.resolve({ data: { ...row, id: "home-1" }, error: null }) }),
-          then: (resolve) => resolve({ error: null }),
-        };
-      },
-    }),
+vi.mock("../../lib/manualAssets.js", () => ({
+  createManualAsset: async (payload) => {
+    inserted.push(payload);
+    return { ...payload, id: inserted.length === 1 ? "home-1" : `row-${inserted.length}` };
   },
-}));
-vi.mock("../../contexts/UserContext.jsx", () => ({
-  useUser: () => ({ userId: "test-user" }),
 }));
 
 function fillAndAdvance() {

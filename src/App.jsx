@@ -129,7 +129,7 @@ function AppContent() {
 
   const content = (
     <>
-      {tab === "markets" && <Overview onNavigate={navigate} />}
+      {tab === "markets" && <Overview onNavigate={navigate} onAddAssets={() => setShowAddAssets(true)} />}
       {tab === "goals" && <GoalsTab />}
       {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
       {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}

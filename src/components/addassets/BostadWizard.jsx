@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../supabase.js";
-import { useUser } from "../../contexts/UserContext.jsx";
+import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import BooliValuation from "./BooliValuation.jsx";
 import { mono, inputStyle, parseAmount, fmtKr } from "./wizardHelpers.js";
@@ -26,7 +25,6 @@ const PROPERTY_TYPES = [
 ];
 
 export default function BostadWizard({ onSaved, onBack }) {
-  const { userId } = useUser();
   const isMobile = useIsMobile();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -65,43 +63,36 @@ export default function BostadWizard({ onSaved, onBack }) {
       pantbrev,
     };
 
-    const { data: homeRow, error: homeErr } = await supabase
-      .from("manual_assets")
-      .insert({ user_id: userId, kind: "bostad", label: d.name.trim(), value_sek: value, is_debt: false, metadata: homeMetadata })
-      .select()
-      .single();
-
-    if (homeErr) {
-      console.error("BostadWizard: home insert failed:", homeErr);
-      setSaving(false);
-      setSaveError(homeErr.message || true);
-      return;
-    }
-
-    if (loan != null && loan > 0) {
-      const { error: loanErr } = await supabase.from("manual_assets").insert({
-        user_id: userId,
-        kind: "bolan",
-        label: `Bolån · ${d.name.trim()}`,
-        value_sek: loan,
-        is_debt: true,
-        metadata: {
-          wizard: "bostad",
-          linkedAssetId: homeRow?.id ?? null,
-          lender: d.lender.trim() || null,
-          interestRate: parseAmount(d.interestRate),
-        },
+    try {
+      const homeRow = await createManualAsset({
+        kind: "bostad",
+        label: d.name.trim(),
+        value_sek: value,
+        is_debt: false,
+        metadata: homeMetadata,
       });
-      if (loanErr) {
-        console.error("BostadWizard: loan insert failed:", loanErr);
-        setSaving(false);
-        setSaveError(loanErr.message || true);
-        return;
-      }
-    }
 
-    setSaving(false);
-    onSaved();
+      if (loan != null && loan > 0) {
+        await createManualAsset({
+          kind: "bolan",
+          label: `Bolån · ${d.name.trim()}`,
+          value_sek: loan,
+          is_debt: true,
+          metadata: {
+            wizard: "bostad",
+            linkedAssetId: homeRow?.id ?? null,
+            lender: d.lender.trim() || null,
+            interestRate: parseAmount(d.interestRate),
+          },
+        });
+      }
+      onSaved();
+    } catch (err) {
+      console.error("BostadWizard: save failed:", err);
+      setSaveError(err.message || true);
+    } finally {
+      setSaving(false);
+    }
   }
 
   const summaryRows = [

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../supabase.js";
-import { useUser } from "../../contexts/UserContext.jsx";
+import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import BostadWizard from "./BostadWizard.jsx";
 import FordonWizard from "./FordonWizard.jsx";
@@ -51,34 +50,33 @@ const MANUAL_FORMS = {
 };
 
 function ManualForm({ formId, onSaved, onBack }) {
-  const { userId } = useUser();
   const isMobile = useIsMobile();
   const form = MANUAL_FORMS[formId];
   const [kind, setKind] = useState(form.kinds[0].value);
   const [label, setLabel] = useState("");
   const [value, setValue] = useState("");
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
   async function save() {
     const parsed = parseFloat(String(value).replace(/\s/g, "").replace(",", "."));
     if (!label.trim() || !(parsed >= 0) || saving) return;
     setSaving(true);
-    setError(false);
-    const { error: err } = await supabase.from("manual_assets").insert({
-      user_id: userId,
-      kind,
-      label: label.trim(),
-      value_sek: parsed,
-      is_debt: kind === "bolan" || kind === "skuld",
-    });
-    setSaving(false);
-    if (err) {
+    setError(null);
+    try {
+      await createManualAsset({
+        kind,
+        label: label.trim(),
+        value_sek: parsed,
+        is_debt: kind === "bolan" || kind === "skuld",
+      });
+      onSaved();
+    } catch (err) {
       console.error("AddAssetsPage: insert failed:", err);
-      setError(true);
-      return;
+      setError(err.message || true);
+    } finally {
+      setSaving(false);
     }
-    onSaved();
   }
 
   const inputStyle = {
@@ -148,7 +146,7 @@ function ManualForm({ formId, onSaved, onBack }) {
       </button>
       {error && (
         <div style={{ fontSize: 12, color: "#f23645", marginTop: 10 }}>
-          Kunde inte spara — försök igen.
+          Kunde inte spara{typeof error === "string" ? `: ${error}` : ""} — försök igen.
         </div>
       )}
     </div>

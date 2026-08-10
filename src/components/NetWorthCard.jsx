@@ -1,51 +1,32 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import { deleteManualAsset } from "../lib/manualAssets.js";
 
-// "Min ekonomi" (PIVOT.md fas 3): hantering av manuella tillgångar/skulder
-// (manual_assets, se migrations/2026-08-10_manual_assets.sql). Siffrorna kommer
-// från useNetWorth via Overview — totalen visas i HomeHero, så showTotal är
-// avstängd där heron finns för att slippa dubblering.
+// "Min ekonomi" (PIVOT.md fas 3): listar och raderar manuella tillgångar/
+// skulder. Nya poster läggs till via Add Assets-katalogen (onAddAssets) —
+// wizardarna där är enda vägen in, så det inte finns två halvbra sätt.
+// Siffrorna kommer från useNetWorth via Overview; totalen visas i HomeHero.
 
-const ASSET_KINDS = ["bostad", "fordon", "sparkonto", "buffert", "ovrigt"];
-const DEBT_KINDS = ["bolan", "skuld"];
 const KIND_ICONS = { bostad: "🏠", fordon: "🚗", sparkonto: "🏦", buffert: "🛟", ovrigt: "📦", bolan: "🏠", skuld: "📄" };
 
-export default function NetWorthCard({ isMobile, onNavigate, data, showTotal = true }) {
-  const { userId, preferences } = useUser();
+export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, showTotal = true }) {
+  const { preferences } = useUser();
   const { t, i18n } = useTranslation();
   const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
-  const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ kind: "bostad", label: "", value: "" });
-  const [saveError, setSaveError] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
   const { portfolioSek, portfolioLoaded, assets, debts, netWorth, hasAnything, pensionValue, reloadManual } = data;
 
-  async function saveNew() {
-    const value = parseFloat(String(form.value).replace(/\s/g, "").replace(",", "."));
-    if (!form.label.trim() || !(value >= 0)) return;
-    setSaveError(false);
-    const { error } = await supabase.from("manual_assets").insert({
-      user_id: userId,
-      kind: form.kind,
-      label: form.label.trim(),
-      value_sek: value,
-      is_debt: DEBT_KINDS.includes(form.kind),
-    });
-    if (error) {
-      console.error("NetWorthCard: insert failed:", error);
-      setSaveError(true);
-      return;
-    }
-    setForm({ kind: "bostad", label: "", value: "" });
-    setAdding(false);
-    reloadManual();
-  }
-
   async function removeRow(id) {
-    const { error } = await supabase.from("manual_assets").delete().eq("id", id).eq("user_id", userId);
-    if (!error) reloadManual();
+    setDeleteError(null);
+    try {
+      await deleteManualAsset(id);
+      reloadManual();
+    } catch (err) {
+      console.error("NetWorthCard: delete failed:", err);
+      setDeleteError(err.message || true);
+    }
   }
 
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
@@ -106,39 +87,14 @@ export default function NetWorthCard({ isMobile, onNavigate, data, showTotal = t
           ))}
         </div>
 
-        {adding ? (
-          <div style={{ marginTop: 10, display: "flex", flexDirection: isMobile ? "column" : "row", gap: 6 }}>
-            <select value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })}
-              style={{ fontSize: 12, padding: "6px 8px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
-              {[...ASSET_KINDS, ...DEBT_KINDS].map(k => (
-                <option key={k} value={k}>{t(`myFinances.kinds.${k}`)}</option>
-              ))}
-            </select>
-            <input value={form.label} onChange={e => setForm({ ...form, label: e.target.value })}
-              placeholder={t("myFinances.labelPlaceholder")}
-              style={{ flex: 1, fontSize: 12, padding: "6px 8px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }} />
-            <input value={form.value} onChange={e => setForm({ ...form, value: e.target.value })}
-              placeholder={t("myFinances.valuePlaceholder")} inputMode="numeric"
-              style={{ width: isMobile ? "100%" : 120, fontSize: 12, padding: "6px 8px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }} />
-            <div style={{ display: "flex", gap: 6 }}>
-              <button onClick={saveNew}
-                style={{ fontSize: 12, padding: "6px 14px", borderRadius: 4, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>
-                {t("myFinances.save")}
-              </button>
-              <button onClick={() => { setAdding(false); setSaveError(false); }}
-                style={{ fontSize: 12, padding: "6px 10px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>
-                {t("myFinances.cancel")}
-              </button>
-            </div>
+        <button onClick={() => onAddAssets?.()}
+          style={{ marginTop: 10, fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+          {t("myFinances.add")}
+        </button>
+        {deleteError && (
+          <div style={{ fontSize: 11, color: "#f23645", marginTop: 6 }}>
+            {typeof deleteError === "string" ? deleteError : t("myFinances.saveError")}
           </div>
-        ) : (
-          <button onClick={() => setAdding(true)}
-            style={{ marginTop: 10, fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
-            {t("myFinances.add")}
-          </button>
-        )}
-        {saveError && (
-          <div style={{ fontSize: 11, color: "#f23645", marginTop: 6 }}>{t("myFinances.saveError")}</div>
         )}
       </div>
     </div>

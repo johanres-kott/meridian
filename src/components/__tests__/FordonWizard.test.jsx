@@ -3,21 +3,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import FordonWizard from "../addassets/FordonWizard.jsx";
 
 const inserted = [];
-vi.mock("../../supabase.js", () => ({
-  supabase: {
-    from: () => ({
-      insert: (row) => {
-        inserted.push(row);
-        return {
-          select: () => ({ single: () => Promise.resolve({ data: { ...row, id: "vehicle-1" }, error: null }) }),
-          then: (resolve) => resolve({ error: null }),
-        };
-      },
-    }),
+vi.mock("../../lib/manualAssets.js", () => ({
+  createManualAsset: async (payload) => {
+    inserted.push(payload);
+    return { ...payload, id: inserted.length === 1 ? "vehicle-1" : `row-${inserted.length}` };
   },
-}));
-vi.mock("../../contexts/UserContext.jsx", () => ({
-  useUser: () => ({ userId: "test-user" }),
 }));
 
 describe("FordonWizard", () => {

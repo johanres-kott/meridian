@@ -1,14 +1,14 @@
 import Logo from "./Logo.jsx";
 
-const jakarta = "'Plus Jakarta Sans', sans-serif";
-const mono = "'IBM Plex Mono', monospace";
+const jakarta = "var(--font-display)";
+const mono = "var(--font-mono)";
 
 export default function Hero({ isMobile, onLogin, onSignup }) {
   return (
     <div style={{ background: "linear-gradient(165deg, #0a0f1e 0%, #0f1a2e 40%, #0d1f2d 70%, #0a1628 100%)", position: "relative", overflow: "hidden" }}>
       {/* Ambient glow */}
-      <div style={{ position: "absolute", top: "-20%", right: "-10%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(41,98,255,0.15) 0%, transparent 60%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-30%", left: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(8,153,129,0.10) 0%, transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: "-20%", right: "-10%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(15,122,92,0.15) 0%, transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-30%", left: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(15,154,108,0.10) 0%, transparent 60%)", pointerEvents: "none" }} />
 
       {/* Nav */}
       <nav style={{
@@ -26,9 +26,9 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
             Logga in
           </button>
           <button onClick={onSignup}
-            style={{ padding: "9px 22px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600, transition: "background 0.15s" }}
+            style={{ padding: "9px 22px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600, transition: "background 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.background = "#3d72ff"}
-            onMouseLeave={e => e.currentTarget.style.background = "#2962ff"}
+            onMouseLeave={e => e.currentTarget.style.background = "var(--brand)"}
           >
             Kom igång
           </button>
@@ -43,7 +43,7 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
             background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)",
             fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.6)", letterSpacing: "0.03em",
           }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pos)" }} />
             Investeringsanalys driven av data
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
           marginBottom: 24, letterSpacing: "-0.04em",
         }}>
           Analysera smartare.{isMobile ? " " : <br />}
-          <span style={{ background: "linear-gradient(135deg, #5b9aff 0%, #2962ff 40%, #089981 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <span style={{ background: "linear-gradient(135deg, var(--green-400) 0%, var(--brand) 40%, var(--pos) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             Investera tryggare.
           </span>
         </h1>
@@ -69,13 +69,13 @@ export default function Hero({ isMobile, onLogin, onSignup }) {
         <div className="fu fu3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: isMobile ? 48 : 72 }}>
           <button onClick={onSignup}
             style={{
-              padding: "14px 36px", background: "#2962ff", color: "#fff", border: "none",
+              padding: "14px 36px", background: "var(--brand)", color: "#fff", border: "none",
               borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-              boxShadow: "0 0 40px rgba(41,98,255,0.3)",
+              boxShadow: "0 0 40px rgba(15,122,92,0.3)",
               transition: "transform 0.15s, box-shadow 0.15s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 60px rgba(41,98,255,0.4)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(41,98,255,0.3)"; }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 60px rgba(15,122,92,0.4)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(15,122,92,0.3)"; }}
           >
             Kom igång gratis →
           </button>

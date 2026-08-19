@@ -34,7 +34,7 @@ export default function Overview({ onNavigate, onAddAssets }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: isMobile ? 4 : 8, flexWrap: "wrap" }}>
-        <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontSize: isMobile ? 24 : 30, fontWeight: 500, letterSpacing: "-0.01em", color: "var(--text)", marginBottom: 2 }}>
           {t("overview.greeting", { name: displayName })}
         </h1>
         {userId && <RangeBar value={range} onChange={setRange} isMobile={isMobile} />}

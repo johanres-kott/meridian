@@ -8,14 +8,14 @@ import { useTranslation } from "react-i18next";
 // faktiskt finns; saknas FX-kurs för portföljen utelämnas den med en not.
 
 const COLORS = {
-  stocks: "#2962ff",
-  funds: "#5b9aff",
-  pension: "#089981",
+  stocks: "var(--brand)",
+  funds: "var(--green-400)",
+  pension: "var(--pos)",
   bostad: "#7c4dff",
-  fordon: "#ff9800",
+  fordon: "var(--warn)",
   cash: "#26a69a",
   ovrigt: "#8d6e63",
-  bolan: "#f23645",
+  bolan: "var(--neg)",
   skuld: "#ef6c00",
 };
 
@@ -59,14 +59,14 @@ export default function AssetBreakdown({ data, isMobile, onNavigate }) {
   const list = mode === "assets" ? assetsList : debtsList;
   const total = mode === "assets" ? assetTotal : debtTotal;
   const fmt = v => `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   const catTarget = {
     stocks: ["portfolio"], funds: ["portfolio"], pension: ["investment", { subTab: "pension" }],
   };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 16px" : "18px 22px", marginBottom: isMobile ? 12 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 16px" : "18px 22px", marginBottom: isMobile ? 12 : 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
         <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{t("assetBreakdown.title")}</span>
         <div style={{ display: "flex", gap: 14 }}>

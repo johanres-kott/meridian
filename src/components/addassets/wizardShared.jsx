@@ -80,7 +80,7 @@ export function WizardButtons({ step, lastStep, canNext, saving, onBack, onNext,
 export function SaveError({ error }) {
   if (!error) return null;
   return (
-    <div style={{ fontSize: 12, color: "#f23645", marginTop: 10 }}>
+    <div style={{ fontSize: 12, color: "var(--neg)", marginTop: 10 }}>
       Kunde inte spara{typeof error === "string" ? `: ${error}` : ""} — försök igen.
     </div>
   );

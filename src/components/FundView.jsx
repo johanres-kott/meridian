@@ -8,7 +8,7 @@ function StatCard({ label, value, sub, tip }) {
   return (
     <div title={tip} style={{ background: "var(--bg-secondary)", borderRadius: 6, padding: "12px 14px", minWidth: 110 }}>
       <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</div>
-      <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
+      <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-mono)" }}>{value}</div>
       {sub && <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 2 }}>{sub}</div>}
     </div>
   );
@@ -16,13 +16,13 @@ function StatCard({ label, value, sub, tip }) {
 
 function ReturnBar({ label, value }) {
   if (value == null) return null;
-  const color = value >= 0 ? "#089981" : "#f23645";
+  const color = value >= 0 ? "var(--pos)" : "var(--neg)";
   const width = Math.min(Math.abs(value), 100);
   return (
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
         <span style={{ color: "var(--text-secondary)" }}>{label}</span>
-        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, color }}>{value > 0 ? "+" : ""}{value.toFixed(1)}%</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500, color }}>{value > 0 ? "+" : ""}{value.toFixed(1)}%</span>
       </div>
       <div style={{ height: 6, background: "var(--bg-secondary)", borderRadius: 3, overflow: "hidden" }}>
         <div style={{ height: "100%", width: `${width}%`, background: color, borderRadius: 3 }} />
@@ -82,12 +82,12 @@ export default function FundView({ item, onBack, onUpdate }) {
         {/* NAV + P&L */}
         {fund && (
           <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 12 }}>
-            <span style={{ fontSize: 28, fontWeight: 600, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <span style={{ fontSize: 28, fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
               {fund.nav?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{fund.currency || "SEK"}</span>
             {fund.returnD1 != null && (
-              <span style={{ fontSize: 14, fontWeight: 500, color: fund.returnD1 >= 0 ? "#089981" : "#f23645" }}>
+              <span style={{ fontSize: 14, fontWeight: 500, color: fund.returnD1 >= 0 ? "var(--pos)" : "var(--neg)" }}>
                 {fund.returnD1 > 0 ? "+" : ""}{fund.returnD1.toFixed(2)}% idag
               </span>
             )}
@@ -96,7 +96,7 @@ export default function FundView({ item, onBack, onUpdate }) {
 
         {/* P&L if holdings */}
         {pl !== null && (
-          <div style={{ marginTop: 8, fontSize: 13, color: pl >= 0 ? "#089981" : "#f23645" }}>
+          <div style={{ marginTop: 8, fontSize: 13, color: pl >= 0 ? "var(--pos)" : "var(--neg)" }}>
             {item.shares} andelar · P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {fund?.currency || "SEK"} ({plPct >= 0 ? "+" : ""}{plPct.toFixed(1)}%)
           </div>
         )}
@@ -110,7 +110,7 @@ export default function FundView({ item, onBack, onUpdate }) {
               value={item.shares || ""}
               onChange={e => onUpdate(item.id, { shares: e.target.value ? Number(e.target.value) : null })}
               placeholder="0"
-              style={{ width: 90, padding: "6px 10px", fontSize: 13, border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}
+              style={{ width: 90, padding: "6px 10px", fontSize: 13, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
             />
           </div>
           <div>
@@ -121,7 +121,7 @@ export default function FundView({ item, onBack, onUpdate }) {
               value={item.gav || ""}
               onChange={e => onUpdate(item.id, { gav: e.target.value ? Number(e.target.value) : null })}
               placeholder="0.00"
-              style={{ width: 100, padding: "6px 10px", fontSize: 13, border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}
+              style={{ width: 100, padding: "6px 10px", fontSize: 13, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
             />
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function FundView({ item, onBack, onUpdate }) {
             </div>
 
             {/* Return bars */}
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 16, marginBottom: 24 }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 16, marginBottom: 24 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>Avkastning</div>
               <ReturnBar label="1 vecka" value={fund.returnW1} />
               <ReturnBar label="1 månad" value={fund.returnM1} />

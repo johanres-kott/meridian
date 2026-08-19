@@ -105,8 +105,8 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
         <div style={{
           position: "absolute",
           ...(direction === "up" ? { bottom: "calc(100% + 8px)", left: 0 } : { top: "calc(100% + 6px)", right: 0 }),
-          background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
-          boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: "12px 0", minWidth: 240, zIndex: 100,
+          background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
+          padding: "12px 0", minWidth: 240, zIndex: 100,
         }}>
           <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid var(--border-light)" }}>
             {editingName ? (
@@ -175,7 +175,7 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Prenumeration</div>
               {premium && (
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 3, background: "rgba(8,153,129,0.1)", color: "#089981", fontWeight: 600 }}>
+                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 3, background: "rgba(15,154,108,0.1)", color: "var(--pos)", fontWeight: 600 }}>
                   ★ Premium
                 </span>
               )}
@@ -230,7 +230,7 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
           </div>
 
           <button onClick={toggleTheme} style={{ ...itemStyle, display: "flex", alignItems: "center", gap: 8 }} {...hover}>
-            {isDark ? "☀️" : "🌙"} {isDark ? "Ljust läge" : "Mörkt läge"}
+            {isDark ? "Ljust läge" : "Mörkt läge"}
           </button>
           <div style={{ borderTop: "1px solid var(--border-light)" }} />
           <button onClick={() => supabase.auth.signOut()} style={itemStyle} {...hover}>Logga ut</button>

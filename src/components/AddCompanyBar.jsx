@@ -55,10 +55,10 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
         value={query}
         onChange={e => setQuery(e.target.value)}
         placeholder={mode === "fund" ? "Sök fond — t.ex. SEB, Handelsbanken, Avanza..." : "Lägg till bolag — sök på namn eller ticker..."}
-        style={{ width: "100%", maxWidth: isMobile ? "100%" : undefined, boxSizing: isMobile ? "border-box" : undefined, padding: "10px 14px", border: "1px solid var(--border)", borderRadius: 10, fontSize: 13, fontFamily: "inherit", outline: "none", color: "var(--text)", background: "var(--bg-card)" }}
+        style={{ width: "100%", maxWidth: isMobile ? "100%" : undefined, boxSizing: isMobile ? "border-box" : undefined, padding: "10px 14px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", fontSize: 13, fontFamily: "inherit", outline: "none", color: "var(--text)", background: "var(--bg-card)" }}
       />
       {results.length > 0 && (
-        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", zIndex: 100, marginTop: 4, maxHeight: 320, overflowY: "auto" }}>
+        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", zIndex: 100, marginTop: 4, maxHeight: 320, overflowY: "auto" }}>
           {results.map(r => {
             if (mode === "fund") {
               return (
@@ -73,7 +73,7 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
                       <span style={{
                         fontSize: 9, padding: "1px 5px", borderRadius: 3, fontWeight: 500,
                         background: r.indexFund ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
-                        color: r.indexFund ? "#1976d2" : "#7b1fa2",
+                        color: r.indexFund ? "var(--green-600)" : "#7b1fa2",
                       }}>
                         {r.indexFund ? "Index" : "Aktiv"}
                       </span>

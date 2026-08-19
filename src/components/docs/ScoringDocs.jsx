@@ -1,4 +1,4 @@
-const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 24, marginBottom: 16 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 24, marginBottom: 16 };
 const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
 const h3Style = { fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6, marginTop: 16 };
 const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
@@ -123,17 +123,17 @@ export default function ScoringDocs() {
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
-            <span style={{ color: "#089981", fontSize: 14 }}>◉</span>
+            <span style={{ color: "var(--pos)", fontSize: 14 }}>◉</span>
             <strong style={{ width: 80, color: "var(--text)" }}>Låg risk</strong>
             <span style={{ color: "var(--text-secondary)" }}>Beta &lt; 0.8 — aktien rör sig mindre än marknaden</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
-            <span style={{ color: "#ff9800", fontSize: 14 }}>◉</span>
+            <span style={{ color: "var(--warn)", fontSize: 14 }}>◉</span>
             <strong style={{ width: 80, color: "var(--text)" }}>Medel risk</strong>
             <span style={{ color: "var(--text-secondary)" }}>Beta 0.8–1.2 — följer marknaden relativt nära</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
-            <span style={{ color: "#f23645", fontSize: 14 }}>◉</span>
+            <span style={{ color: "var(--neg)", fontSize: 14 }}>◉</span>
             <strong style={{ width: 80, color: "var(--text)" }}>Hög risk</strong>
             <span style={{ color: "var(--text-secondary)" }}>Beta &gt; 1.2 — större kurssvängningar än marknaden</span>
           </div>

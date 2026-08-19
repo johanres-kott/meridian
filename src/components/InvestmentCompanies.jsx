@@ -153,7 +153,7 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
             onNavigate={onNavigate}
           />
         ) : (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: 20, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: 20, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)" }}>
             Skapa en investerarprofil för att få aktieförslag anpassade efter dig.
           </div>
         )}
@@ -178,7 +178,7 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
 
       {/* ── Company hero ── */}
       <div style={{
-        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
         padding: isMobile ? "14px 12px" : "20px 24px", marginBottom: 16,
         display: "flex", flexDirection: isMobile ? "column" : "row",
         alignItems: isMobile ? "flex-start" : "center",
@@ -209,12 +209,12 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
         <div style={{ display: "flex", gap: 12, alignItems: "center", ...(isMobile ? { width: "100%", justifyContent: "space-between" } : {}) }}>
           {companyData?.price != null && (
             <div style={{ textAlign: isMobile ? "left" : "right" }}>
-              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "var(--text)" }}>
+              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "var(--font-mono)", color: "var(--text)" }}>
                 {companyData.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 4 }}>{companyData.currency}</span>
               </div>
               {companyData.changePercent != null && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: companyData.changePercent >= 0 ? "#089981" : "#f23645" }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: companyData.changePercent >= 0 ? "var(--pos)" : "var(--neg)" }}>
                   {companyData.changePercent >= 0 ? "+" : ""}{companyData.changePercent.toFixed(2)}%
                 </div>
               )}
@@ -223,7 +223,7 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
           {leadershipData && (
             <Badge
               text={leadershipData.source === "live" ? "● Live data" : "Cached data"}
-              color={leadershipData.source === "live" ? "#089981" : "#b2b5be"}
+              color={leadershipData.source === "live" ? "var(--pos)" : "#b2b5be"}
               bg={leadershipData.source === "live" ? "#e8f5f1" : "#f5f5f5"}
             />
           )}
@@ -237,25 +237,25 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
           {/* Leadership */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Ledning</SectionLabel>
             <LeadershipPanel companyId={selectedId} isMobile={isMobile} />
           </div>
 
           {/* Price chart */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Kursutveckling</SectionLabel>
             <PriceChart ticker={fullTicker} />
           </div>
 
           {/* Holdings */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Innehav</SectionLabel>
             <HoldingsTable companyId={selectedId} />
           </div>
 
           {/* Press releases */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
                 <Badge text="Pressreleaser" color="var(--text-secondary)" bg="var(--border-light)" />
@@ -270,7 +270,7 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
           </div>
 
           {/* EFN */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
                 <Badge text="EFN.se" color="var(--accent)" bg="var(--accent-light)" />
@@ -290,7 +290,7 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
           <InfoCard company={company} leadershipData={leadershipData} />
 
           {/* Quick links */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "14px 16px" }}>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 10 }}>
               Snabblänkar
             </div>

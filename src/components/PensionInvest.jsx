@@ -4,8 +4,8 @@ import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import { useItpProviders } from "../hooks/useItpProviders.js";
 
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
-const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20, marginBottom: 16 };
+const mono = { fontFamily: "var(--font-mono)" };
+const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 20, marginBottom: 16 };
 
 // ─── PPM fund suggestions (real funds available on Pensionsmyndighetens fondtorg) ───
 
@@ -26,7 +26,7 @@ const MODEL_PORTFOLIOS = [
   {
     label: "Ung (25–40 år)",
     icon: "🚀",
-    color: "#089981",
+    color: "var(--pos)",
     allocation: "90–100% aktier",
     suggestion: "AP7 Såfa eller 100% global indexfond",
     detail: "Lång horisont — maximera tillväxt. Nedgångar hinner återhämta sig.",
@@ -42,7 +42,7 @@ const MODEL_PORTFOLIOS = [
   {
     label: "Nära pension (55–65)",
     icon: "🛡️",
-    color: "#ff9800",
+    color: "var(--warn)",
     allocation: "40–60% aktier, 40–60% räntor",
     suggestion: "Trad.försäkring eller balanserad mix",
     detail: "Prioritera kapitalskydd. Kortare tid att återhämta sig från nedgångar.",
@@ -94,14 +94,14 @@ function FundTable({ funds }) {
           {funds.map((f, i) => (
             <tr key={i}>
               <td style={{ ...tdStyle, fontWeight: 500, color: "var(--text)" }}>{f.name}</td>
-              <td style={{ ...tdStyle, textAlign: "right", ...mono, color: f.fee <= 0.1 ? "#089981" : f.fee <= 0.3 ? "#5b9bd5" : "var(--text-secondary)" }}>
+              <td style={{ ...tdStyle, textAlign: "right", ...mono, color: f.fee <= 0.1 ? "var(--pos)" : f.fee <= 0.3 ? "#5b9bd5" : "var(--text-secondary)" }}>
                 {f.fee.toFixed(2)}%
               </td>
               <td style={tdStyle}>
                 <span style={{
                   fontSize: 9, padding: "1px 5px", borderRadius: 3, fontWeight: 500,
                   background: f.type === "index" ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
-                  color: f.type === "index" ? "#1976d2" : "#7b1fa2",
+                  color: f.type === "index" ? "var(--green-600)" : "#7b1fa2",
                 }}>
                   {f.type === "index" ? "Index" : "Aktiv"}
                 </span>
@@ -118,7 +118,7 @@ function FundTable({ funds }) {
 function ProviderTable({ providers }) {
   const thStyle = { fontSize: 10, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--border)" };
   const tdStyle = { fontSize: 12, color: "var(--text-secondary)", padding: "8px 10px", borderBottom: "1px solid var(--border)" };
-  const dot = (ok) => <span style={{ color: ok ? "#089981" : "var(--text-muted)" }}>{ok ? "✓" : "—"}</span>;
+  const dot = (ok) => <span style={{ color: ok ? "var(--pos)" : "var(--text-muted)" }}>{ok ? "✓" : "—"}</span>;
 
   return (
     <div style={{ overflowX: "auto" }}>
@@ -252,7 +252,7 @@ function OverviewTab({ isMobile }) {
       {/* Key insight */}
       <div style={{
         ...cardStyle,
-        background: "rgba(8,153,129,0.04)", border: "1px solid rgba(8,153,129,0.15)",
+        background: "rgba(15,154,108,0.04)", border: "1px solid rgba(15,154,108,0.15)",
       }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
           💡 Det viktigaste att komma ihåg
@@ -382,9 +382,9 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
           <div style={{
             padding: 16, borderRadius: 6,
-            border: "1px solid rgba(8,153,129,0.2)", background: "rgba(8,153,129,0.04)",
+            border: "1px solid rgba(15,154,108,0.2)", background: "rgba(15,154,108,0.04)",
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#089981", marginBottom: 8 }}>Fondförsäkring</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--pos)", marginBottom: 8 }}>Fondförsäkring</div>
             <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
               <li>Du väljer fonder själv</li>
               <li>Högre potentiell avkastning</li>
@@ -447,7 +447,7 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
 
       <div style={{
         ...cardStyle,
-        background: "rgba(8,153,129,0.04)", border: "1px solid rgba(8,153,129,0.15)",
+        background: "rgba(15,154,108,0.04)", border: "1px solid rgba(15,154,108,0.15)",
       }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
           📌 Sammanfattning

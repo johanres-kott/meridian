@@ -146,9 +146,9 @@ export function getStockRisk(ticker) {
  * Legend data for the profile matching system
  */
 export const LEGEND = [
-  { color: "#089981", label: "Matchar profil", description: "Aktien passar din investerarstrategi och risknivå" },
-  { color: "#ff9800", label: "Varning", description: "Aktien avviker från din profil (t.ex. för hög risk)" },
-  { color: "#2962ff", label: "Utdelning", description: "Aktien har historiskt hög direktavkastning (>3%)" },
+  { color: "var(--pos)", label: "Matchar profil", description: "Aktien passar din investerarstrategi och risknivå" },
+  { color: "var(--warn)", label: "Varning", description: "Aktien avviker från din profil (t.ex. för hög risk)" },
+  { color: "var(--brand)", label: "Utdelning", description: "Aktien har historiskt hög direktavkastning (>3%)" },
   { color: "#7b1fa2", label: "Tillväxt", description: "Aktien har hög omsättningstillväxt (>15%)" },
 ];
 

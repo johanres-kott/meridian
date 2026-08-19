@@ -4,17 +4,17 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer,
 } from "recharts";
 
-const COMPANY_COLORS = ["#2962ff", "#089981", "#f23645", "#e65100"];
+const COMPANY_COLORS = ["var(--brand)", "var(--pos)", "var(--neg)", "var(--warn)"];
 
 const METRIC_COLUMNS = [
   { key: "peForward", label: "P/E Forward", fmt: v => fmt(v, "x") },
   { key: "peTrailing", label: "P/E Trailing", fmt: v => fmt(v, "x") },
-  { key: "operatingMargin", label: "Rörelsemarginal", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "ebitdaMargin", label: "EBITDA-marginal", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  { key: "operatingMargin", label: "Rörelsemarginal", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : null },
+  { key: "ebitdaMargin", label: "EBITDA-marginal", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : null },
   { key: "grossMargin", label: "Bruttomarginal", fmt: v => fmt(v, "%") },
-  { key: "revenueGrowth", label: "Tillväxt", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
-  { key: "roic", label: "ROIC", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  { key: "debtEbitda", label: "Skuld/EBITDA", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
+  { key: "revenueGrowth", label: "Tillväxt", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : v > 0 ? "var(--pos)" : null },
+  { key: "roic", label: "ROIC", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : null },
+  { key: "debtEbitda", label: "Skuld/EBITDA", fmt: v => fmt(v, "x"), color: v => v > 3 ? "var(--neg)" : null },
 ];
 
 const RADAR_METRICS = [
@@ -85,7 +85,7 @@ export default function CompareView({ companies, onBack }) {
             borderTop: `3px solid ${COMPANY_COLORS[i]}`,
           }}>
             <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text)" }}>{c.name || c.ticker}</div>
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "var(--font-mono)", marginTop: 2 }}>
               {c.ticker}
             </div>
             {c.price != null && (
@@ -97,7 +97,7 @@ export default function CompareView({ companies, onBack }) {
             {c.changePercent != null && (
               <div style={{
                 fontSize: 12, marginTop: 4,
-                color: c.changePercent > 0 ? "#089981" : c.changePercent < 0 ? "#f23645" : "var(--text-secondary)",
+                color: c.changePercent > 0 ? "var(--pos)" : c.changePercent < 0 ? "var(--neg)" : "var(--text-secondary)",
               }}>
                 {c.changePercent >= 0 ? "+" : ""}{c.changePercent.toFixed(2)}%
               </div>
@@ -168,7 +168,7 @@ export default function CompareView({ companies, onBack }) {
                   return (
                     <td key={c.ticker} style={{
                       padding: "8px 10px", textAlign: "right",
-                      fontFamily: "'IBM Plex Mono', monospace", fontSize: 12,
+                      fontFamily: "var(--font-mono)", fontSize: 12,
                       borderBottom: "1px solid var(--border-light)",
                       color: cellColor || "var(--text)",
                     }}>

@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { IconBadge } from "./icons.jsx";
 
 // Finarys tillgångstabell (DESIGN.md): EN rad per tillgång oavsett slag —
 // aktier, fonder, pension, bostad, fordon, sparkonton, övrigt — med typ-chips,
@@ -7,19 +8,19 @@ import { useTranslation } from "react-i18next";
 // portfolioValue.holdings, så siffrorna är samma som hero/donut.
 
 const TYPE_META = {
-  stock:    { label: "Aktie",     color: "#2962ff", icon: "📈" },
-  fund:     { label: "Fond",      color: "#5b9aff", icon: "💠" },
-  pension:  { label: "Pension",   color: "#089981", icon: "🪺" },
-  bostad:   { label: "Bostad",    color: "#7c4dff", icon: "🏠" },
-  fordon:   { label: "Fordon",    color: "#ff9800", icon: "🚗" },
-  sparkonto:{ label: "Sparkonto", color: "#26a69a", icon: "🏦" },
-  buffert:  { label: "Buffert",   color: "#26a69a", icon: "🛟" },
-  ovrigt:   { label: "Övrigt",    color: "#8d6e63", icon: "📦" },
-  bolan:    { label: "Bolån",     color: "#f23645", icon: "🏠" },
-  skuld:    { label: "Skuld",     color: "#ef6c00", icon: "📄" },
+  stock:    { label: "Aktie",     color: "var(--brand)" },
+  fund:     { label: "Fond",      color: "var(--green-400)" },
+  pension:  { label: "Pension",   color: "var(--pos)" },
+  bostad:   { label: "Bostad",    color: "#7c4dff" },
+  fordon:   { label: "Fordon",    color: "var(--warn)" },
+  sparkonto:{ label: "Sparkonto", color: "#26a69a" },
+  buffert:  { label: "Buffert",   color: "#26a69a" },
+  ovrigt:   { label: "Övrigt",    color: "#8d6e63" },
+  bolan:    { label: "Bolån",     color: "var(--neg)" },
+  skuld:    { label: "Skuld",     color: "#ef6c00" },
 };
 
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+const mono = { fontFamily: "var(--font-mono)" };
 
 export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile, onSelectHolding, onNavigate }) {
   const { t, i18n } = useTranslation();
@@ -65,7 +66,7 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
   const fmt = v => `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden", marginBottom: isMobile ? 12 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden", marginBottom: isMobile ? 12 : 20 }}>
       {/* Tabs */}
       <div style={{ display: "flex", gap: 18, padding: isMobile ? "10px 14px 0" : "12px 22px 0", borderBottom: "1px solid var(--border-light)" }}>
         {["assets", "debts"].map(m => (
@@ -123,7 +124,7 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
                 </td>
                 {!isMobile && <td />}
                 <td />
-                <td style={{ ...mono, padding: isMobile ? "10px 14px" : "10px 22px", fontSize: 13, fontWeight: 600, color: mode === "debts" ? "#f23645" : "var(--text)", textAlign: "right" }}>{mode === "debts" ? "−" : ""}{fmt(total)}</td>
+                <td style={{ ...mono, padding: isMobile ? "10px 14px" : "10px 22px", fontSize: 13, fontWeight: 600, color: mode === "debts" ? "var(--neg)" : "var(--text)", textAlign: "right" }}>{mode === "debts" ? "−" : ""}{fmt(total)}</td>
               </tr>
             </thead>
             <tbody>
@@ -145,7 +146,7 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
                     <td style={{ padding: isMobile ? "10px 14px" : "11px 22px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ width: 30, height: 30, borderRadius: "50%", background: `${meta.color}1f`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{meta.icon}</span>
+                        <IconBadge kind={r.type} color={meta.color} />
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</div>
                           {r.sub && <div style={{ fontSize: 11, color: "var(--text-secondary)", ...(r.holding ? mono : {}) }}>{r.sub}</div>}
@@ -168,11 +169,11 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
                       )}
                     </td>
                     <td style={{ padding: isMobile ? "10px 14px" : "11px 22px", textAlign: "right" }}>
-                      <div style={{ ...mono, fontSize: 13, color: mode === "debts" ? "#f23645" : "var(--text)" }}>
+                      <div style={{ ...mono, fontSize: 13, color: mode === "debts" ? "var(--neg)" : "var(--text)" }}>
                         {r.valueSek != null ? `${mode === "debts" ? "−" : ""}${fmt(r.valueSek)}` : "—"}
                       </div>
                       {r.changePct != null && r.changePct !== 0 && (
-                        <div style={{ ...mono, fontSize: 10, color: r.changePct >= 0 ? "#089981" : "#f23645" }}>{r.changePct >= 0 ? "+" : ""}{r.changePct.toFixed(2)}%</div>
+                        <div style={{ ...mono, fontSize: 10, color: r.changePct >= 0 ? "var(--pos)" : "var(--neg)" }}>{r.changePct >= 0 ? "+" : ""}{r.changePct.toFixed(2)}%</div>
                       )}
                     </td>
                   </tr>

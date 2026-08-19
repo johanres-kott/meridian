@@ -3,7 +3,7 @@ export default function Privacy({ onBack }) {
     <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 20px" }}>
       <button
         onClick={onBack}
-        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#2962ff", padding: 0, marginBottom: 24, fontFamily: "inherit" }}
+        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--brand)", padding: 0, marginBottom: 24, fontFamily: "inherit" }}
       >
         ← Tillbaka
       </button>

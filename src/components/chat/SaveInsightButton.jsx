@@ -31,7 +31,7 @@ export default function SaveInsightButton({ content }) {
     setShowPicker(false);
   }
 
-  if (saved) return <span style={{ fontSize: 10, color: "#089981" }}>Sparat!</span>;
+  if (saved) return <span style={{ fontSize: 10, color: "var(--pos)" }}>Sparat!</span>;
 
   return (
     <div style={{ position: "relative", display: "inline-block" }}>

@@ -165,7 +165,7 @@ export default function FordonWizard({ onSaved, onBack }) {
 
         {step === 1 && isLeasing && (
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)" }}>
               ⓘ Vid leasing äger du inte fordonet — det räknas varken som tillgång eller skuld i din nettoförmögenhet.
               Vi sparar det ändå (med värde 0 kr) så att hela din ekonomi finns samlad på ett ställe.
             </div>
@@ -183,7 +183,7 @@ export default function FordonWizard({ onSaved, onBack }) {
             <Field label="Vad är fordonet värt idag?">
               <input value={d.value} onChange={set("value")} placeholder="Uppskattat andrahandsvärde, kr" inputMode="numeric" autoFocus style={inputStyle} />
             </Field>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)" }}>
               ⓘ Osäker på värdet? <a href="https://www.blocket.se/bilvardering" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", textDecoration: "none" }}>Värdera bilen på Blocket ↗</a> eller
               jämför liknande annonser — fyll sedan i själv.
             </div>
@@ -199,7 +199,7 @@ export default function FordonWizard({ onSaved, onBack }) {
         )}
 
         {step === 2 && isLeasing && (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)" }}>
             ⓘ Leasing — inget lån läggs in eftersom fordonet inte är din tillgång.
             {monthlyCost != null && <> Månadskostnaden ({fmtKr(monthlyCost)}/mån) sparas som info på fordonet.</>}
           </div>
@@ -211,7 +211,7 @@ export default function FordonWizard({ onSaved, onBack }) {
               Kontantköp — inget lån läggs in. Hela värdet räknas som ditt eget kapital.
             </div>
             {value != null && (
-              <div style={{ maxWidth: 260, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" }}>
+              <div style={{ maxWidth: 260, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "12px 16px" }}>
                 <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Eget kapital</div>
                 <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>{fmtKr(value)}</div>
               </div>
@@ -239,9 +239,9 @@ export default function FordonWizard({ onSaved, onBack }) {
             {(loanShare != null || equity != null) && (
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                 {loanShare != null && (
-                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" }}>
+                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "12px 16px" }}>
                     <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Lån / värde</div>
-                    <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: loanShare > 100 ? "#f23645" : loanShare > 70 ? "#ff9800" : "#089981" }}>{loanShare.toFixed(0)}%</div>
+                    <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: loanShare > 100 ? "var(--neg)" : loanShare > 70 ? "var(--warn)" : "var(--pos)" }}>{loanShare.toFixed(0)}%</div>
                     {loanShare > 100 && (
                       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>
                         Lånet är större än fordonets värde.
@@ -250,9 +250,9 @@ export default function FordonWizard({ onSaved, onBack }) {
                   </div>
                 )}
                 {equity != null && (
-                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" }}>
+                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "12px 16px" }}>
                     <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Eget kapital</div>
-                    <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: equity < 0 ? "#f23645" : "var(--text)" }}>{fmtKr(equity)}</div>
+                    <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: equity < 0 ? "var(--neg)" : "var(--text)" }}>{fmtKr(equity)}</div>
                   </div>
                 )}
               </div>
@@ -262,11 +262,11 @@ export default function FordonWizard({ onSaved, onBack }) {
 
         {step === 3 && (
           <div>
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "18px 20px" }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "18px 20px" }}>
               {summaryRows.map((r, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "6px 0", borderBottom: i < summaryRows.length - 1 ? "1px solid var(--border-light)" : "none", fontSize: 13 }}>
                   <span style={{ color: "var(--text-secondary)" }}>{r.label}</span>
-                  <span style={{ ...mono, color: r.negative ? "#f23645" : "var(--text)", fontWeight: r.strong ? 600 : 400 }}>{r.value}</span>
+                  <span style={{ ...mono, color: r.negative ? "var(--neg)" : "var(--text)", fontWeight: r.strong ? 600 : 400 }}>{r.value}</span>
                 </div>
               ))}
             </div>

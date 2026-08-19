@@ -86,7 +86,7 @@ export default function NotificationBell() {
         onClick={() => setOpen(!open)}
         style={{
           fontSize: 11,
-          color: open ? "#2962ff" : "var(--text-secondary)",
+          color: open ? "var(--brand)" : "var(--text-secondary)",
           background: open ? "var(--border-light)" : "none",
           border: "1px solid var(--border)",
           borderRadius: 3,
@@ -181,7 +181,7 @@ export default function NotificationBell() {
                 disabled={loading}
                 style={{
                   fontSize: 11,
-                  color: "#2962ff",
+                  color: "var(--brand)",
                   background: "none",
                   border: "none",
                   cursor: loading ? "default" : "pointer",

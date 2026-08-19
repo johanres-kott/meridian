@@ -33,11 +33,11 @@ export function PriceChart({ ticker, yahooSymbol, conv = 1, label = "Kurs" }) {
   const first = points[0]?.close;
   const last = points[points.length - 1]?.close;
   const isUp = last >= first;
-  const color = isUp ? "#089981" : "#f23645";
+  const color = isUp ? "var(--pos)" : "var(--neg)";
   const gradientId = `chartGrad-${(chartSymbol || "default").replace(/[^a-zA-Z0-9]/g, "")}`;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "20px 20px 12px" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "20px 20px 12px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Kursutveckling</div>
         <div style={{ display: "flex", gap: 4 }}>
@@ -104,8 +104,8 @@ export function PriceChart({ ticker, yahooSymbol, conv = 1, label = "Kurs" }) {
       {points.length > 1 && (
         <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11, color: "var(--text-secondary)" }}>
           <span>Period: <span style={{ color, fontWeight: 500 }}>{isUp ? "+" : ""}{((last - first) / first * 100).toFixed(1)}%</span></span>
-          <span>Hog: <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.close)).toLocaleString("sv-SE", { minimumFractionDigits: 2 })}</span></span>
-          <span>Lag: <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.close)).toLocaleString("sv-SE", { minimumFractionDigits: 2 })}</span></span>
+          <span>Hog: <span style={{ fontFamily: "var(--font-mono)" }}>{Math.max(...points.map(p => p.close)).toLocaleString("sv-SE", { minimumFractionDigits: 2 })}</span></span>
+          <span>Lag: <span style={{ fontFamily: "var(--font-mono)" }}>{Math.min(...points.map(p => p.close)).toLocaleString("sv-SE", { minimumFractionDigits: 2 })}</span></span>
         </div>
       )}
     </div>
@@ -113,7 +113,7 @@ export function PriceChart({ ticker, yahooSymbol, conv = 1, label = "Kurs" }) {
 }
 
 export const Chg = ({ value }) => (
-  <span style={{ color: value >= 0 ? "#089981" : "#f23645" }}>
+  <span style={{ color: value >= 0 ? "var(--pos)" : "var(--neg)" }}>
     {value >= 0 ? "+" : ""}{value.toFixed(2)}%
   </span>
 );
@@ -125,10 +125,10 @@ export const MiniBar = ({ value, peer, max }) => {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <div style={{ width: 72, height: 3, background: "var(--border-light)", borderRadius: 2, position: "relative" }}>
-        <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${vPct}%`, background: value < peer ? "#f23645" : "#089981", borderRadius: 2 }} />
+        <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${vPct}%`, background: value < peer ? "var(--neg)" : "var(--pos)", borderRadius: 2 }} />
         <div style={{ position: "absolute", top: -2, left: `${pPct}%`, width: 1, height: 7, background: "var(--text-muted)" }} />
       </div>
-      <span style={{ fontSize: 11, color: value < peer ? "#f23645" : "#089981" }}>
+      <span style={{ fontSize: 11, color: value < peer ? "var(--neg)" : "var(--pos)" }}>
         {value.toFixed(1)}%
       </span>
     </div>
@@ -139,7 +139,7 @@ export const Pill = ({ text, green }) => (
   <span style={{
     fontSize: 11, padding: "2px 8px", borderRadius: 3,
     background: green ? "#e8f5e9" : "var(--bg-secondary)",
-    color: green ? "#089981" : "var(--text-secondary)", fontWeight: 500
+    color: green ? "var(--pos)" : "var(--text-secondary)", fontWeight: 500
   }}>{text}</span>
 );
 
@@ -185,7 +185,7 @@ export const StatCard = ({ label, value, sub, neg, tooltip }) => {
         {label}
         {tooltip && <span style={{ marginLeft: 4, fontSize: 9, opacity: 0.5 }}>?</span>}
       </div>
-      <div style={{ fontSize: 15, fontWeight: 500, color: neg ? "#f23645" : neg === false ? "#089981" : "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>{value}</div>
+      <div style={{ fontSize: 15, fontWeight: 500, color: neg ? "var(--neg)" : neg === false ? "var(--pos)" : "var(--text)", fontFamily: "var(--font-mono)" }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{sub}</div>}
       {show && tooltip && (
         <div style={{

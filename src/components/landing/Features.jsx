@@ -1,5 +1,5 @@
-const jakarta = "'Plus Jakarta Sans', sans-serif";
-const mono = "'IBM Plex Mono', monospace";
+const jakarta = "var(--font-display)";
+const mono = "var(--font-mono)";
 
 export default function Features({ isMobile }) {
   return (
@@ -61,7 +61,7 @@ export default function Features({ isMobile }) {
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
               {["Piotroski", "Magic Formula", "Quality", "Dividend", "Growth"].map(m => (
-                <span key={m} style={{ fontSize: 9, padding: "4px 8px", borderRadius: 4, background: "rgba(41,98,255,0.2)", color: "#5b9aff", fontWeight: 600, fontFamily: mono }}>{m}</span>
+                <span key={m} style={{ fontSize: 9, padding: "4px 8px", borderRadius: 4, background: "rgba(15,122,92,0.2)", color: "var(--green-400)", fontWeight: 600, fontFamily: mono }}>{m}</span>
               ))}
             </div>
           </div>
@@ -82,8 +82,8 @@ export default function Features({ isMobile }) {
             </div>
             <div style={{ marginTop: 20, display: "flex", gap: 6 }}>
               <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 12, background: "#e8f5e9", color: "#1b5e20", fontWeight: 600 }}>Låg risk</span>
-              <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 12, background: "#fff8e1", color: "#e65100", fontWeight: 600 }}>Medel</span>
-              <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 12, background: "#fce4ec", color: "#c62828", fontWeight: 600 }}>Hög</span>
+              <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 12, background: "#fff8e1", color: "var(--warn)", fontWeight: 600 }}>Medel</span>
+              <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 12, background: "#fce4ec", color: "var(--neg)", fontWeight: 600 }}>Hög</span>
             </div>
           </div>
 
@@ -142,9 +142,9 @@ export default function Features({ isMobile }) {
           </div>
           <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 36 : 56, justifyContent: "center" }}>
             {[
-              { step: "01", title: "Berätta vem du är", desc: "Fyra snabba frågor om din investeringsstil, riskprofil och intressen.", color: "#2962ff" },
-              { step: "02", title: "Utforska förslag", desc: "En personlig topplista med aktier rankade med etablerade analysmodeller.", color: "#089981" },
-              { step: "03", title: "Analysera på djupet", desc: "Nyckeltal, insiderhandel, risk, kursmål och AI-assistent — allt på ett ställe.", color: "#e65100" },
+              { step: "01", title: "Berätta vem du är", desc: "Fyra snabba frågor om din investeringsstil, riskprofil och intressen.", color: "var(--brand)" },
+              { step: "02", title: "Utforska förslag", desc: "En personlig topplista med aktier rankade med etablerade analysmodeller.", color: "var(--pos)" },
+              { step: "03", title: "Analysera på djupet", desc: "Nyckeltal, insiderhandel, risk, kursmål och AI-assistent — allt på ett ställe.", color: "var(--warn)" },
             ].map((s, i) => (
               <div key={i} style={{ flex: 1, textAlign: isMobile ? "center" : "left", maxWidth: 300 }}>
                 <div style={{ fontSize: 32, fontWeight: 800, color: s.color, fontFamily: jakarta, marginBottom: 12, opacity: 0.2 }}>{s.step}</div>

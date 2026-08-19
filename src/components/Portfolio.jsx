@@ -277,17 +277,17 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
             URL.revokeObjectURL(url);
           }}
             title={t("portfolio.exportCsv")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.exportCsvShort") : t("portfolio.exportCsv")}
           </button>
           <button onClick={() => setShowImport(true)}
             title={t("portfolio.importPortfolio")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.importPortfolioShort") : t("portfolio.importPortfolio")}
           </button>
           <button onClick={() => setShowGuide(true)}
             title={t("portfolio.importHelp")}
-            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
+            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
             ?
           </button>
         </div>
@@ -304,7 +304,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
               : t("portfolio.emptyNoCompanies")}
           </div>
         ) : (
-          <div style={{ border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
               <thead>
                 <tr>
@@ -345,19 +345,19 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
             <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--bg-secondary)", borderRadius: 6, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(15,154,108,0.15)", color: "var(--pos)", fontWeight: 600, fontFamily: "var(--font-mono)", flexShrink: 0 }}>82</span>
                   {t("portfolio.scoring.strong")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "var(--warn)", fontWeight: 600, fontFamily: "var(--font-mono)", flexShrink: 0 }}>55</span>
                   {t("portfolio.scoring.ok")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(242,54,69,0.15)", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(205,74,64,0.15)", color: "var(--neg)", fontWeight: 600, fontFamily: "var(--font-mono)", flexShrink: 0 }}>25</span>
                   {t("portfolio.scoring.weak")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
+                  <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "var(--pos)", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
                   {t("portfolio.scoring.fscore")}
                 </div>
               </div>

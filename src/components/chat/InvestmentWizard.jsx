@@ -97,7 +97,7 @@ export default function InvestmentWizard({ onComplete, onCancel }) {
             onChange={e => setCustomValue(e.target.value.replace(/[^0-9]/g, ""))}
             onKeyDown={e => { if (e.key === "Enter") submitCustom(); }}
             placeholder={q.customPlaceholder}
-            style={{ flex: 1, padding: "6px 10px", border: "1px solid var(--border)", borderRadius: 10, fontSize: 12, background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit", outline: "none" }}
+            style={{ flex: 1, padding: "6px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", fontSize: 12, background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit", outline: "none" }}
           />
           {customValue && (
             <button onClick={submitCustom} style={{ ...chipStyle, background: "var(--accent)", color: "#fff", border: "none" }}>

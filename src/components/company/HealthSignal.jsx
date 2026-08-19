@@ -4,16 +4,16 @@ import { useState, useEffect } from "react";
 // Visar ingenting alls om score saknas — vi hittar aldrig på data.
 
 function verdictFor(score) {
-  if (score >= 70) return { label: "Ja", text: "Bolaget ser välmående ut", color: "#089981", bg: "rgba(8,153,129,0.10)" };
-  if (score >= 40) return { label: "Sådär", text: "Blandad bild — både styrkor och svagheter", color: "#e65100", bg: "rgba(255,152,0,0.10)" };
-  return { label: "Nej", text: "Siffrorna är svaga just nu", color: "#c62828", bg: "rgba(200,40,40,0.10)" };
+  if (score >= 70) return { label: "Ja", text: "Bolaget ser välmående ut", color: "var(--pos)", bg: "rgba(15,154,108,0.10)" };
+  if (score >= 40) return { label: "Sådär", text: "Blandad bild — både styrkor och svagheter", color: "var(--warn)", bg: "rgba(255,152,0,0.10)" };
+  return { label: "Nej", text: "Siffrorna är svaga just nu", color: "var(--neg)", bg: "rgba(200,40,40,0.10)" };
 }
 
 function levelFor(value) {
   if (value == null) return null;
-  if (value >= 70) return { text: "stark", color: "#089981" };
-  if (value >= 40) return { text: "okej", color: "#ff9800" };
-  return { text: "svag", color: "#f23645" };
+  if (value >= 70) return { text: "stark", color: "var(--pos)" };
+  if (value >= 40) return { text: "okej", color: "var(--warn)" };
+  return { text: "svag", color: "var(--neg)" };
 }
 
 const DRIVERS = [
@@ -50,7 +50,7 @@ export default function HealthSignal({ ticker, investorProfile }) {
   }).filter(d => d.level);
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: verdict.bg }}>
         <div style={{
           width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
@@ -65,7 +65,7 @@ export default function HealthSignal({ ticker, investorProfile }) {
           <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginTop: 2 }}>{verdict.text}</div>
         </div>
         <div style={{ marginLeft: "auto", textAlign: "right", flexShrink: 0 }}>
-          <span style={{ fontSize: 22, fontWeight: 600, color: verdict.color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(composite)}</span>
+          <span style={{ fontSize: 22, fontWeight: 600, color: verdict.color, fontFamily: "var(--font-mono)" }}>{Math.round(composite)}</span>
           <span style={{ fontSize: 11, color: "var(--text-secondary)" }}> / 100</span>
         </div>
       </div>

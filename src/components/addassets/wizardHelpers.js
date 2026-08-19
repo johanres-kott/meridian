@@ -1,7 +1,7 @@
 // Icke-komponent-hjälpare för add asset-wizards (separerade från
 // wizardShared.jsx för att hålla react-refresh nöjd).
 
-export const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+export const mono = { fontFamily: "var(--font-mono)" };
 
 export const inputStyle = {
   width: "100%", fontSize: 14, padding: "8px 0", border: "none",

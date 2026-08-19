@@ -102,7 +102,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
           <div>
             <div style={{ fontSize: 22, fontWeight: 500, color: "var(--text)" }}>
               {item.name || item.ticker}
-              <span style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", marginLeft: 10 }}>{item.ticker}</span>
+              <span style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "var(--font-mono)", marginLeft: 10 }}>{item.ticker}</span>
             </div>
             {company && (
               <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>
@@ -127,13 +127,13 @@ export default function CompanyView({ item, onBack, onUpdate }) {
         {/* Price + P&L row */}
         {company && (
           <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 8 }}>
-            <span style={{ fontSize: 28, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <span style={{ fontSize: 28, fontWeight: 300, fontFamily: "var(--font-mono)" }}>
               {company.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>{company.currency}</span>
             {company.marketCap > 0 && <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>Mkt Cap: {company.marketCap}B {company.currency}</span>}
             {pl !== null && (
-              <span style={{ fontSize: 13, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645", marginLeft: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: pl >= 0 ? "var(--pos)" : "var(--neg)", marginLeft: 8 }}>
                 P&L: {pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} {company.currency} ({plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%)
               </span>
             )}
@@ -159,7 +159,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
       {loading ? (
         <div style={{ color: "var(--text-secondary)", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Laddar bolagsdata...</div>
       ) : !company ? (
-        <div style={{ color: "#f23645", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Kunde inte ladda data for {item.ticker}</div>
+        <div style={{ color: "var(--neg)", fontSize: 13, padding: "40px 0", textAlign: "center" }}>Kunde inte ladda data for {item.ticker}</div>
       ) : view === "overview" ? (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: isMobile ? 16 : 20, alignItems: "start" }}>
           {/* Left column: vad bolaget är och hur det mår */}
@@ -169,7 +169,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
 
             {/* News */}
             {company.news?.length > 0 && (
-              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
+              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 20 }}>
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>Senaste nyheter</div>
                 {company.news.map((n, i) => (
                   <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
@@ -213,7 +213,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
               const metrics = getMetricOrder(investorType, exp);
               const isFiltered = !showAllMetrics && (investorProfile?.experience === "beginner" || investorProfile?.experience === "intermediate");
               return (
-                <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? 12 : 20 }}>
+                <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? 12 : 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
                     {isFiltered && (
@@ -245,9 +245,9 @@ export default function CompanyView({ item, onBack, onUpdate }) {
             {(company.targetPrice > 0 || company.recommendation !== "—") && (
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {company.targetPrice > 0 && (
-                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "16px 20px" }}>
+                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "16px 20px" }}>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>Kursmål (snitt)</div>
-                    <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
+                    <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "var(--font-mono)", color: "var(--pos)" }}>
                       {company.targetPrice.toFixed(2)} {company.currency}
                     </div>
                     {company.targetLow > 0 && company.targetHigh > 0 && (
@@ -257,7 +257,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
                     )}
                     {company.price > 0 && (
                       <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                        Uppsida: <span style={{ color: company.targetPrice > company.price ? "#089981" : "#f23645" }}>
+                        Uppsida: <span style={{ color: company.targetPrice > company.price ? "var(--pos)" : "var(--neg)" }}>
                           {(((company.targetPrice / company.price) - 1) * 100).toFixed(1)}%
                         </span>
                       </div>
@@ -270,11 +270,11 @@ export default function CompanyView({ item, onBack, onUpdate }) {
                   </div>
                 )}
                 {company.recommendation !== "—" && (
-                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "16px 20px" }}>
+                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "16px 20px" }}>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>Rekommendation</div>
                     <div style={{
                       fontSize: 16, fontWeight: 500, textTransform: "uppercase",
-                      color: company.recommendation?.includes("buy") ? "#089981" : company.recommendation?.includes("sell") ? "#f23645" : "var(--text)",
+                      color: company.recommendation?.includes("buy") ? "var(--pos)" : company.recommendation?.includes("sell") ? "var(--neg)" : "var(--text)",
                     }}>
                       {company.recommendation}
                     </div>

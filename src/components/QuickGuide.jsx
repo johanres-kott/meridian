@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-const jakarta = "'Plus Jakarta Sans', sans-serif";
+const jakarta = "var(--font-display)";
 
 const SLIDES = [
   {

@@ -1,4 +1,4 @@
-const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 24, marginBottom: 16 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 24, marginBottom: 16 };
 const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
 const h3Style = { fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6, marginTop: 16 };
 const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
@@ -26,7 +26,7 @@ export default function AllocationDocs() {
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
             <span style={{ fontSize: 16 }}>🛡️</span>
             <div>
-              <strong style={{ color: "#089981" }}>Kärna (Core)</strong>
+              <strong style={{ color: "var(--pos)" }}>Kärna (Core)</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
                 Stabila blue chips, defensiva bolag, låg beta (&lt;0.8), hög kvalitet.
                 Dessa ger trygghet och stabilitet till portföljen. Exempel: stora banker, telekombolag,
@@ -48,7 +48,7 @@ export default function AllocationDocs() {
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
             <span style={{ fontSize: 16 }}>🎲</span>
             <div>
-              <strong style={{ color: "#f23645" }}>Spekulation (Speculation)</strong>
+              <strong style={{ color: "var(--neg)" }}>Spekulation (Speculation)</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
                 Hög risk, hög uppsida, turnarounds. Små positioner i bolag
                 med asymmetrisk potential. Exempel: micro-caps, pre-revenue-bolag, kryptorelaterade.
@@ -84,8 +84,8 @@ export default function AllocationDocs() {
               ].map(([signal, core, spec], i) => (
                 <tr key={i} style={{ borderBottom: "1px solid #f0f3fa" }}>
                   <td style={{ ...tdStyle, color: "var(--text)" }}>{signal}</td>
-                  <td style={{ ...tdStyle, textAlign: "center", color: "#089981" }}>{core}</td>
-                  <td style={{ ...tdStyle, textAlign: "center", color: "#f23645" }}>{spec}</td>
+                  <td style={{ ...tdStyle, textAlign: "center", color: "var(--pos)" }}>{core}</td>
+                  <td style={{ ...tdStyle, textAlign: "center", color: "var(--neg)" }}>{spec}</td>
                 </tr>
               ))}
             </tbody>
@@ -109,9 +109,9 @@ export default function AllocationDocs() {
             <thead>
               <tr style={{ borderBottom: "2px solid var(--border)" }}>
                 <th style={thStyle}>Riskprofil</th>
-                <th style={{ ...thStyle, textAlign: "center", color: "#089981" }}>Kärna</th>
+                <th style={{ ...thStyle, textAlign: "center", color: "var(--pos)" }}>Kärna</th>
                 <th style={{ ...thStyle, textAlign: "center", color: "#5b9bd5" }}>Satellit</th>
-                <th style={{ ...thStyle, textAlign: "center", color: "#f23645" }}>Spekulation</th>
+                <th style={{ ...thStyle, textAlign: "center", color: "var(--neg)" }}>Spekulation</th>
               </tr>
             </thead>
             <tbody>
@@ -171,21 +171,21 @@ export default function AllocationDocs() {
         <p style={pStyle}>Baserat på din riskprofil rekommenderar Mats olika strategier:</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
-            <span style={{ color: "#089981", fontSize: 14 }}>◉</span>
+            <span style={{ color: "var(--pos)", fontSize: 14 }}>◉</span>
             <div>
               <strong style={{ color: "var(--text)" }}>Låg risk-profil → DCA 3–4 månader</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>Sprider risken maximalt. Du slipper oroa dig för tajming och marknadens svängningar.</div>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
-            <span style={{ color: "#ff9800", fontSize: 14 }}>◉</span>
+            <span style={{ color: "var(--warn)", fontSize: 14 }}>◉</span>
             <div>
               <strong style={{ color: "var(--text)" }}>Medel risk-profil → DCA 2–3 månader</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>Balans mellan riskspridning och att komma in i marknaden snabbt.</div>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
-            <span style={{ color: "#f23645", fontSize: 14 }}>◉</span>
+            <span style={{ color: "var(--neg)", fontSize: 14 }}>◉</span>
             <div>
               <strong style={{ color: "var(--text)" }}>Hög risk-profil → Lump Sum (engångsinsats)</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>Historiskt bäst avkastning. Passar dig som tål svängningar och tror på marknaden långsiktigt.</div>

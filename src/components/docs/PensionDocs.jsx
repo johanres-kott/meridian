@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 24, marginBottom: 16 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 24, marginBottom: 16 };
 const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
 const h3Style = { fontSize: 13, fontWeight: 600, color: "var(--text)", marginTop: 16, marginBottom: 6 };
 const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
 const listStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.8, paddingLeft: 20, marginBottom: 8 };
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+const mono = { fontFamily: "var(--font-mono)" };
 const calloutStyle = (color) => ({
   background: `rgba(${color},0.06)`, border: `1px solid rgba(${color},0.15)`,
   borderRadius: 6, padding: 16, marginTop: 12, marginBottom: 12,
@@ -49,7 +49,7 @@ function AgeAllocationTable() {
           {rows.map(r => (
             <tr key={r.age}>
               <td style={{ ...tdStyle, fontWeight: 500, color: "var(--text)", ...mono }}>{r.age}</td>
-              <td style={{ ...tdStyle, color: "#089981", ...mono }}>{r.stocks}</td>
+              <td style={{ ...tdStyle, color: "var(--pos)", ...mono }}>{r.stocks}</td>
               <td style={{ ...tdStyle, color: "#5b9bd5", ...mono }}>{r.bonds}</td>
               <td style={tdStyle}>{r.note}</td>
             </tr>
@@ -86,7 +86,7 @@ function PensionFeeImpact() {
         const val = calc(fee);
         const lost = calc(0) - val;
         const pct = (val / maxVal) * 100;
-        const color = fee <= 0.2 ? "#089981" : fee <= 0.5 ? "#2196f3" : fee <= 1.0 ? "#ff9800" : "#f23645";
+        const color = fee <= 0.2 ? "var(--pos)" : fee <= 0.5 ? "#2196f3" : fee <= 1.0 ? "var(--warn)" : "var(--neg)";
         return (
           <div key={fee} style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
@@ -95,7 +95,7 @@ function PensionFeeImpact() {
               </span>
               <span style={{ ...mono, fontWeight: 500, color: "var(--text)" }}>
                 {Math.round(val).toLocaleString("sv-SE")} kr
-                {lost > 0 && <span style={{ color: "#f23645", fontSize: 10, marginLeft: 6 }}>
+                {lost > 0 && <span style={{ color: "var(--neg)", fontSize: 10, marginLeft: 6 }}>
                   −{Math.round(lost).toLocaleString("sv-SE")} kr
                 </span>}
               </span>
@@ -245,9 +245,9 @@ export default function PensionDocs() {
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8, marginBottom: 16 }}>
           <div style={{
             flex: 1, minWidth: 200, padding: 16, borderRadius: 6,
-            border: "1px solid rgba(8,153,129,0.2)", background: "rgba(8,153,129,0.04)",
+            border: "1px solid rgba(15,154,108,0.2)", background: "rgba(15,154,108,0.04)",
           }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#089981", marginBottom: 6 }}>Fondförsäkring</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--pos)", marginBottom: 6 }}>Fondförsäkring</div>
             <ul style={{ ...listStyle, fontSize: 11, marginBottom: 0 }}>
               <li>Du väljer fonder själv</li>
               <li>Högre potentiell avkastning</li>

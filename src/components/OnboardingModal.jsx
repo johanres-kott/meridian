@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { STEPS, PROFILE_EXPLANATIONS } from "./onboarding/steps.js";
+import { Target, Shield, Compass, Layers } from "./icons.jsx";
 
 export default function OnboardingModal({ onComplete }) {
   const isMobile = useIsMobile();
@@ -189,10 +190,12 @@ export default function OnboardingModal({ onComplete }) {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { key: "investorType", icon: "🎯", title: "Investeringsstil" },
-                { key: "riskProfile", icon: "📊", title: "Risknivå" },
-                { key: "experience", icon: "🎓", title: "Erfarenhet" },
-              ].map(({ key, icon, title }) => {
+                { key: "investorType", Icon: Target, title: "Investeringsstil" },
+                { key: "riskProfile", Icon: Shield, title: "Risknivå" },
+                { key: "experience", Icon: Compass, title: "Erfarenhet" },
+              ].map((row) => {
+                const { key, title } = row;
+                const RowIcon = row.Icon;
                 const val = answers[key];
                 const info = PROFILE_EXPLANATIONS[key]?.[val];
                 if (!info) return null;
@@ -202,7 +205,7 @@ export default function OnboardingModal({ onComplete }) {
                     background: "var(--bg-secondary)", border: "1px solid var(--border)",
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: 16 }}>{icon}</span>
+                      <span style={{ color: "var(--brand)", display: "inline-flex" }}><RowIcon size={16} strokeWidth={1.5} aria-hidden /></span>
                       <span style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500 }}>{title}</span>
                       <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", marginLeft: "auto" }}>{info.label}</span>
                     </div>
@@ -216,10 +219,10 @@ export default function OnboardingModal({ onComplete }) {
 
             <div style={{
               marginTop: 12, padding: "12px 14px", borderRadius: 8,
-              background: "rgba(8,153,129,0.08)", border: "1px solid rgba(8,153,129,0.25)",
+              background: "rgba(15,154,108,0.08)", border: "1px solid rgba(15,154,108,0.25)",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 16 }}>🧱</span>
+                <span style={{ color: "var(--brand)", display: "inline-flex" }}><Layers size={16} strokeWidth={1.5} aria-hidden /></span>
                 <span style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 500 }}>Första steget: din bas</span>
               </div>
               <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, paddingLeft: 28 }}>

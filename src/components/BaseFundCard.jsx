@@ -47,7 +47,7 @@ export default function BaseFundCard({ isMobile, onNavigate }) {
   return (
     <div style={{
       marginBottom: isMobile ? 12 : 20, borderRadius: 8, overflow: "hidden",
-      border: `1px solid ${baseFund ? "rgba(8,153,129,0.35)" : "var(--border)"}`,
+      border: `1px solid ${baseFund ? "rgba(15,154,108,0.35)" : "var(--border)"}`,
       background: "var(--bg-card)",
     }}>
       <div style={{ padding: isMobile ? "12px 14px" : "16px 20px" }}>
@@ -56,7 +56,7 @@ export default function BaseFundCard({ isMobile, onNavigate }) {
             width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, fontWeight: 700, color: "#fff",
-            background: baseFund ? "#089981" : "var(--accent)",
+            background: baseFund ? "var(--pos)" : "var(--accent)",
           }}>
             {baseFund ? "✓" : "1"}
           </span>
@@ -80,12 +80,12 @@ export default function BaseFundCard({ isMobile, onNavigate }) {
               </span>
               <span style={{
                 fontSize: 9, padding: "1px 5px", borderRadius: 3, fontWeight: 500,
-                background: "rgba(33,150,243,0.12)", color: "#1976d2", flexShrink: 0,
+                background: "rgba(33,150,243,0.12)", color: "var(--green-600)", flexShrink: 0,
               }}>
                 {t("baseFund.index")}
               </span>
               {baseFund.ongoingCharge != null && (
-                <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
+                <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "var(--font-mono)", flexShrink: 0 }}>
                   {t("baseFund.fee")} {baseFund.ongoingCharge.toFixed(2)}%
                 </span>
               )}

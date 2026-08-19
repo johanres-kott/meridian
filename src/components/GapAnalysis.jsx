@@ -11,16 +11,16 @@ const MOBILE_COLUMNS = new Set(["name", "price", "changePercent", "peForward"]);
 const ALL_COLUMNS = {
   name: { key: "name", label: "Bolag", align: "left" },
   price: { key: "price", label: "Kurs", align: "right", tip: "Aktiens senaste pris", fmt: (v, d) => v ? `${v.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${d.currency || ""}` : "\u2014" },
-  changePercent: { key: "changePercent", label: "\u0394 Idag", align: "right", tip: "Kursf\u00f6r\u00e4ndring idag i procent", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "#089981" : v < 0 ? "#f23645" : "var(--text-secondary)" },
+  changePercent: { key: "changePercent", label: "\u0394 Idag", align: "right", tip: "Kursf\u00f6r\u00e4ndring idag i procent", fmt: v => v != null ? `${v >= 0 ? "+" : ""}${v.toFixed(2)}%` : "\u2014", color: v => v > 0 ? "var(--pos)" : v < 0 ? "var(--neg)" : "var(--text-secondary)" },
   peForward: { key: "peForward", label: "P/E Fwd", align: "right", tip: "Price/Earnings Forward \u2014 aktiekursen delat med f\u00f6rv\u00e4ntad vinst per aktie. L\u00e4gre = billigare.", fmt: v => fmt(v, "x") },
   peTrailing: { key: "peTrailing", label: "P/E Trail", align: "right", tip: "Price/Earnings Trailing \u2014 aktiekursen delat med senaste \u00e5rets vinst per aktie.", fmt: v => fmt(v, "x") },
-  ebitdaMargin: { key: "ebitdaMargin", label: "EBITDA %", align: "right", tip: "Vinst f\u00f6re r\u00e4ntor, skatt och avskrivningar som andel av oms\u00e4ttningen. M\u00e4ter operativ l\u00f6nsamhet.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  operatingMargin: { key: "operatingMargin", label: "R\u00f6r.marg", align: "right", tip: "R\u00f6relsemarginal \u2014 r\u00f6relseresultat delat med oms\u00e4ttning. Visar hur mycket av varje krona som blir vinst.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
+  ebitdaMargin: { key: "ebitdaMargin", label: "EBITDA %", align: "right", tip: "Vinst f\u00f6re r\u00e4ntor, skatt och avskrivningar som andel av oms\u00e4ttningen. M\u00e4ter operativ l\u00f6nsamhet.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : null },
+  operatingMargin: { key: "operatingMargin", label: "R\u00f6r.marg", align: "right", tip: "R\u00f6relsemarginal \u2014 r\u00f6relseresultat delat med oms\u00e4ttning. Visar hur mycket av varje krona som blir vinst.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : null },
   grossMargin: { key: "grossMargin", label: "Brutto %", align: "right", tip: "Bruttomarginal \u2014 oms\u00e4ttning minus varukostnad, delat med oms\u00e4ttning. H\u00f6gre = b\u00e4ttre prisf\u00f6rm\u00e5ga.", fmt: v => fmt(v, "%") },
-  revenueGrowth: { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", tip: "Oms\u00e4ttningstillv\u00e4xt j\u00e4mf\u00f6rt med f\u00f6reg\u00e5ende \u00e5r.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : v > 0 ? "#089981" : null },
-  roic: { key: "roic", label: "ROIC", align: "right", tip: "Return on Invested Capital \u2014 avkastning p\u00e5 investerat kapital. Visar hur effektivt bolaget anv\u00e4nder sina pengar.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "#f23645" : null },
-  debtEbitda: { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", tip: "Nettoskuld delat med EBITDA. \u00d6ver 3x anses h\u00f6gt bel\u00e5nat.", fmt: v => fmt(v, "x"), color: v => v > 3 ? "#f23645" : null },
-  dividendYield: { key: "dividendYield", label: "Utdelning", align: "right", tip: "Direktavkastning \u2014 \u00e5rlig utdelning delat med aktiekursen. H\u00f6gre = mer pengar tillbaka varje \u00e5r.", fmt: v => fmt(v, "%"), color: v => v > 3 ? "#089981" : null },
+  revenueGrowth: { key: "revenueGrowth", label: "Tillv\u00e4xt", align: "right", tip: "Oms\u00e4ttningstillv\u00e4xt j\u00e4mf\u00f6rt med f\u00f6reg\u00e5ende \u00e5r.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : v > 0 ? "var(--pos)" : null },
+  roic: { key: "roic", label: "ROIC", align: "right", tip: "Return on Invested Capital \u2014 avkastning p\u00e5 investerat kapital. Visar hur effektivt bolaget anv\u00e4nder sina pengar.", fmt: v => fmt(v, "%"), color: v => v < 0 ? "var(--neg)" : null },
+  debtEbitda: { key: "debtEbitda", label: "Skuld/EBITDA", align: "right", tip: "Nettoskuld delat med EBITDA. \u00d6ver 3x anses h\u00f6gt bel\u00e5nat.", fmt: v => fmt(v, "x"), color: v => v > 3 ? "var(--neg)" : null },
+  dividendYield: { key: "dividendYield", label: "Utdelning", align: "right", tip: "Direktavkastning \u2014 \u00e5rlig utdelning delat med aktiekursen. H\u00f6gre = mer pengar tillbaka varje \u00e5r.", fmt: v => fmt(v, "%"), color: v => v > 3 ? "var(--pos)" : null },
 };
 
 const COLUMN_ORDERS = {
@@ -153,7 +153,7 @@ export default function GapAnalysis({ onNavigate }) {
   const tdStyle = (col) => ({
     padding: isMobile ? "6px 6px" : "8px 10px",
     textAlign: col.align,
-    fontFamily: col.align === "right" ? "'IBM Plex Mono', monospace" : "inherit",
+    fontFamily: col.align === "right" ? "var(--font-mono)" : "inherit",
     fontSize: isMobile ? 11 : 12,
     borderBottom: "1px solid var(--border-light)",
   });
@@ -170,7 +170,7 @@ export default function GapAnalysis({ onNavigate }) {
             onClick={() => setCompareMode(true)}
             style={{
               marginTop: 8, fontSize: 12, padding: "6px 16px", borderRadius: 4,
-              border: "none", background: "#2962ff", color: "#fff",
+              border: "none", background: "var(--brand)", color: "#fff",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
               width: isMobile ? "100%" : "auto",
             }}
@@ -272,7 +272,7 @@ export default function GapAnalysis({ onNavigate }) {
                         return (
                           <td key={col.key} style={{ ...tdStyle(col), fontWeight: 500 }}>
                             <div style={{ color: "var(--text)" }}>{item.name || item.ticker}</div>
-                            <div style={{ fontSize: 10, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</div>
+                            <div style={{ fontSize: 10, color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{item.ticker}</div>
                           </td>
                         );
                       }

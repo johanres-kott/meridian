@@ -23,9 +23,9 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
           </div>
           <div style={{ fontSize: 22, fontWeight: 500 }}>
             {result.name}
-            <span style={{ fontSize: 14, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", marginLeft: 10 }}>{result.ticker}</span>
+            <span style={{ fontSize: 14, color: "var(--text-secondary)", fontFamily: "var(--font-mono)", marginLeft: 10 }}>{result.ticker}</span>
           </div>
-          <div style={{ fontSize: 24, fontWeight: 300, marginTop: 4, fontFamily: "'IBM Plex Mono', monospace" }}>
+          <div style={{ fontSize: 24, fontWeight: 300, marginTop: 4, fontFamily: "var(--font-mono)" }}>
             {result.price?.toFixed(2)}
             <span style={{ fontSize: 13, color: "var(--text-secondary)", marginLeft: 8 }}>{result.currency}</span>
             {result.marketCap > 0 && <span style={{ fontSize: 13, color: "var(--text-secondary)", marginLeft: 16 }}>Mkt Cap: {result.marketCap}B {result.currency}</span>}
@@ -33,16 +33,16 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
           {added ? (
-            <span style={{ fontSize: 12, color: "#089981", fontWeight: 500 }}>✓ I din portfölj</span>
+            <span style={{ fontSize: 12, color: "var(--pos)", fontWeight: 500 }}>✓ I din portfölj</span>
           ) : (
             <button onClick={onAddToPortfolio}
-              style={{ padding: "7px 16px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 500 }}>
+              style={{ padding: "7px 16px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 500 }}>
               + Lägg till i portfölj
             </button>
           )}
           {result.week52High > 0 && (
             <div style={{ textAlign: "right", fontSize: 12, color: "var(--text-secondary)" }}>
-              <span>52v: <span style={{ color: "#f23645" }}>{result.week52Low?.toFixed(0)}</span> – <span style={{ color: "#089981" }}>{result.week52High.toFixed(0)}</span> {result.currency}</span>
+              <span>52v: <span style={{ color: "var(--neg)" }}>{result.week52Low?.toFixed(0)}</span> – <span style={{ color: "var(--pos)" }}>{result.week52High.toFixed(0)}</span> {result.currency}</span>
             </div>
           )}
         </div>
@@ -101,10 +101,10 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
           const risk = getRisk(result.beta, result.marketCap, result.ticker);
           const items = [];
           if (risk) {
-            const rc = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
+            const rc = risk === "low" ? "var(--pos)" : risk === "medium" ? "var(--warn)" : "var(--neg)";
             items.push({ icon: "◉", color: rc, text: isInvestmentCompany(result.ticker) ? `${riskLabel(risk)} — diversifierat investmentbolag` : result.beta != null ? betaDescription(result.beta) : `${riskLabel(risk)} (baserat på börsvärde)` });
           }
-          if (result.dividendYield > 0) items.push({ icon: "💰", color: "#089981", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
+          if (result.dividendYield > 0) items.push({ icon: "💰", color: "var(--pos)", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
           else items.push({ icon: "–", color: "var(--text-secondary)", text: "Ingen utdelning" });
           return (
             <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
@@ -131,10 +131,10 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
                     const profileType = profile?.investorType || "mixed";
                     const compositeScore = scoreData.composite[profileType] ?? scoreData.composite.mixed;
                     if (compositeScore == null) return null;
-                    const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
+                    const color = compositeScore >= 70 ? "var(--pos)" : compositeScore >= 40 ? "var(--warn)" : "var(--neg)";
                     return (
                       <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
+                        <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "var(--font-mono)" }}>{Math.round(compositeScore)}</span>
                         <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>/ 100 — totalpoäng för {PROFILE_LABELS[profileType] || profileType}</span>
                       </div>
                     );
@@ -144,8 +144,8 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
               {(() => {
                 const profileType = profile?.investorType || "mixed";
                 const cs = scoreData?.composite?.[profileType] ?? scoreData?.composite?.mixed ?? score;
-                const matchColor = cs >= 70 ? "#089981" : cs >= 40 ? "#e65100" : "#c62828";
-                const matchBg = cs >= 70 ? "rgba(8,153,129,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
+                const matchColor = cs >= 70 ? "var(--pos)" : cs >= 40 ? "var(--warn)" : "var(--neg)";
+                const matchBg = cs >= 70 ? "rgba(15,154,108,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
                 const matchText = cs >= 70 ? "Stark matchning" : cs >= 40 ? "Delvis matchning" : "Svag matchning";
                 return (
                   <div style={{ marginTop: 10, padding: "8px 10px", background: matchBg, borderRadius: 4 }}>
@@ -165,7 +165,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
           {result.targetPrice > 0 && (
             <div style={{ flex: 1, minWidth: 160, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
               <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Kursmål (snitt)</div>
-              <div style={{ fontSize: 18, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
+              <div style={{ fontSize: 18, fontWeight: 300, fontFamily: "var(--font-mono)", color: "var(--pos)" }}>
                 {result.targetPrice.toFixed(2)} {result.currency}
               </div>
               {result.targetLow > 0 && result.targetHigh > 0 && (
@@ -175,7 +175,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
               )}
               {result.price > 0 && (
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                  Uppsida: <span style={{ color: result.targetPrice > result.price ? "#089981" : "#f23645" }}>
+                  Uppsida: <span style={{ color: result.targetPrice > result.price ? "var(--pos)" : "var(--neg)" }}>
                     {(((result.targetPrice / result.price) - 1) * 100).toFixed(1)}%
                   </span>
                 </div>
@@ -190,7 +190,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
           {result.recommendation !== "—" && (
             <div style={{ flex: 1, minWidth: 160, border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px" }}>
               <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 }}>Rekommendation</div>
-              <div style={{ fontSize: 16, fontWeight: 500, color: result.recommendation?.includes("buy") ? "#089981" : result.recommendation?.includes("sell") ? "#f23645" : "var(--text)", textTransform: "uppercase" }}>
+              <div style={{ fontSize: 16, fontWeight: 500, color: result.recommendation?.includes("buy") ? "var(--pos)" : result.recommendation?.includes("sell") ? "var(--neg)" : "var(--text)", textTransform: "uppercase" }}>
                 {result.recommendation}
               </div>
               {result.numberOfAnalysts > 0 && (

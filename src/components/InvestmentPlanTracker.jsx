@@ -54,9 +54,9 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
       padding: isMobile ? 14 : 18,
       borderRadius: 8,
       background: allDone
-        ? "linear-gradient(135deg, rgba(8,153,129,0.08), rgba(8,153,129,0.04))"
+        ? "linear-gradient(135deg, rgba(15,154,108,0.08), rgba(15,154,108,0.04))"
         : "linear-gradient(135deg, var(--accent-light), var(--bg-card))",
-      border: allDone ? "1px solid rgba(8,153,129,0.3)" : "1px solid var(--border)",
+      border: allDone ? "1px solid rgba(15,154,108,0.3)" : "1px solid var(--border)",
     }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
@@ -82,7 +82,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
         <div style={{
           height: "100%",
           width: `${progressPct}%`,
-          background: allDone ? "#089981" : "var(--accent)",
+          background: allDone ? "var(--pos)" : "var(--accent)",
           borderRadius: 2,
           transition: "width 0.3s ease",
         }} />
@@ -103,7 +103,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
               textAlign: "center",
               padding: "6px 4px",
               borderRadius: 6,
-              background: isCurrent ? "var(--accent-light)" : monthAllDone ? "rgba(8,153,129,0.08)" : "transparent",
+              background: isCurrent ? "var(--accent-light)" : monthAllDone ? "rgba(15,154,108,0.08)" : "transparent",
               border: isCurrent ? "1px solid var(--accent)" : "1px solid transparent",
             }}>
               <div style={{ fontSize: 10, color: isCurrent ? "var(--accent)" : "var(--text-secondary)", fontWeight: isCurrent ? 600 : 400 }}>
@@ -146,7 +146,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
                 <div style={{
                   width: 20, height: 20, borderRadius: 4,
                   border: done ? "none" : "2px solid var(--border)",
-                  background: done ? "#089981" : "transparent",
+                  background: done ? "var(--pos)" : "transparent",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0,
                   transition: "all 0.15s ease",
@@ -166,7 +166,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
                 <div style={{
                   fontSize: 12,
                   fontWeight: 500,
-                  color: done ? "#089981" : "var(--text)",
+                  color: done ? "var(--pos)" : "var(--text)",
                   textDecoration: done ? "line-through" : "none",
                 }}>
                   {p.amount.toLocaleString("sv-SE")} kr
@@ -221,7 +221,7 @@ function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, month
                 border: "1px solid var(--border)", padding: "8px 12px",
                 opacity: monthAllDone ? 0.7 : 1,
               }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: isPast && !monthAllDone ? "#f23645" : "var(--text-secondary)", marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: isPast && !monthAllDone ? "var(--neg)" : "var(--text-secondary)", marginBottom: 6 }}>
                   {monthAllDone ? "✅" : isPast ? "⚠️" : "⏳"} Månad {m.month} — {monthLabels[monthDate.getMonth()]} {monthDate.getFullYear()}
                 </div>
                 {m.purchases.map((p, pi) => {
@@ -238,7 +238,7 @@ function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, month
                       <div style={{
                         width: 16, height: 16, borderRadius: 3,
                         border: done ? "none" : "1.5px solid var(--border)",
-                        background: done ? "#089981" : "transparent",
+                        background: done ? "var(--pos)" : "transparent",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         flexShrink: 0,
                       }}>

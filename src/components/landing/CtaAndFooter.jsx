@@ -1,6 +1,6 @@
 import Logo from "./Logo.jsx";
 
-const jakarta = "'Plus Jakarta Sans', sans-serif";
+const jakarta = "var(--font-display)";
 
 export default function CtaAndFooter({ isMobile, onSignup, onShowPrivacy }) {
   return (
@@ -11,7 +11,7 @@ export default function CtaAndFooter({ isMobile, onSignup, onShowPrivacy }) {
         background: "linear-gradient(165deg, #0a0f1e 0%, #0f1a2e 50%, #0d1f2d 100%)",
         textAlign: "center", position: "relative", overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(41,98,255,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(15,122,92,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, maxWidth: 600, margin: "0 auto" }}>
           <h2 style={{ fontSize: isMobile ? 30 : 44, fontWeight: 800, color: "#fff", fontFamily: jakarta, letterSpacing: "-0.03em", marginBottom: 16 }}>
             Redo att investera smartare?
@@ -21,9 +21,9 @@ export default function CtaAndFooter({ isMobile, onSignup, onShowPrivacy }) {
           </p>
           <button onClick={onSignup}
             style={{
-              padding: "15px 44px", background: "#2962ff", color: "#fff", border: "none",
+              padding: "15px 44px", background: "var(--brand)", color: "#fff", border: "none",
               borderRadius: 10, fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-              boxShadow: "0 0 50px rgba(41,98,255,0.35)",
+              boxShadow: "0 0 50px rgba(15,122,92,0.35)",
               transition: "transform 0.15s",
             }}
             onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}

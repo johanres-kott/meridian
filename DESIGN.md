@@ -1,4 +1,25 @@
-# Thesion designsystem — Finary-inspirerat, i våra färger
+# Thesion designsystem
+
+> **Aug 2026: nytt brand applicerat.** Källan är paketet "Thesion design-system"
+> (readme + tokens + komponenter, levererat 2026-08-19). Det ersätter avsnittet
+> "Uppmätta Finary-tokens" nedan — Finary-analysen gäller fortfarande för
+> *layout och mönster*, men färg/typ/radier kommer nu från det egna systemet.
+>
+> **Kärnan:** grönt brand (`--brand #0F7A5C`) med guldaccent (`--gold-500`,
+> sparsamt: premium/Äger/CTA på mörkgrönt), nära-vit bakgrund `#FCFCFC`
+> (aldrig beige), **Newsreader** (serif) för rubriker och stora tal,
+> **Schibsted Grotesk** för UI, **Spline Sans Mono** (tabular) för siffror.
+> Kort radie 14 + `--shadow-card` (gröntonad), knappar/badges pill (999),
+> inga gradienter, **inga emoji** — Lucide-ikoner (stroke 1.5) via
+> `src/components/icons.jsx` + `iconMaps.js`. Svensk du-form, meningsversal.
+> Logotyp: `public/brand/logo-green.svg` (förslag, godkänt tills vidare —
+> ny logotyp + namn utreds senare). Tokens: `src/index.css`.
+>
+> **Gjort:** tokens in, 559 typ/färg-ersättningar i 89 filer, 100 kort →
+> radie 14 + skugga, appskal (logo, Newsreader på hälsning/hero), emoji →
+> Lucide i alla nya vyer. **Kvar:** emoji i arv-komponenter (PensionInvest,
+> InvestmentPlanTracker, QuickGuide, docs/, chat/ — chat är avmonterad),
+> LandingPage i nya brandet (ui_kits/marketing som förebild), dark mode-QA.
 
 Underlag: designstudie av app.finary.com (aug 2026) med uppmätta värden ur
 deras DOM, se PIVOT.md för produktanalysen. Principen är **copy with pride**:

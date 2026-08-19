@@ -46,11 +46,11 @@ export default function HoldingsTable({ companyId }) {
           {holdings.map((h, i) => (
             <tr key={i} style={{ borderBottom: i < holdings.length - 1 ? "1px solid var(--border-light)" : "none" }}>
               <td style={{ padding: "8px 6px", color: "var(--text)", fontWeight: 500 }}>{h.name}</td>
-              <td style={{ padding: "8px 6px", color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", fontSize: 11 }}>{h.ticker || "—"}</td>
-              <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <td style={{ padding: "8px 6px", color: "var(--text-secondary)", fontFamily: "var(--font-mono)", fontSize: 11 }}>{h.ticker || "—"}</td>
+              <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                 {h.weight != null ? h.weight.toFixed(1) : "—"}
               </td>
-              <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <td style={{ padding: "8px 6px", textAlign: "right", color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                 {h.valueMSEK != null ? h.valueMSEK.toLocaleString("sv-SE") : "—"}
               </td>
             </tr>

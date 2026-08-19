@@ -269,7 +269,7 @@ export function allocationSummary(analysis) {
 }
 
 export const BUCKET_META = {
-  core: { label: "Kärna", color: "#089981", icon: "🛡️", desc: "Stabila blue chips, defensiva bolag, låg risk" },
+  core: { label: "Kärna", color: "var(--pos)", icon: "🛡️", desc: "Stabila blue chips, defensiva bolag, låg risk" },
   satellite: { label: "Satellit", color: "#5b9bd5", icon: "🚀", desc: "Tillväxt, tematiska satsningar, medel risk" },
-  speculation: { label: "Spekulation", color: "#f23645", icon: "🎲", desc: "Hög risk, hög uppsida, turnarounds" },
+  speculation: { label: "Spekulation", color: "var(--neg)", icon: "🎲", desc: "Hög risk, hög uppsida, turnarounds" },
 };

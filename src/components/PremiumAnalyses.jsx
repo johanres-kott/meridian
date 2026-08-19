@@ -3,14 +3,14 @@ import { usePremium } from "../hooks/usePremium.js";
 import { supabase } from "../supabase.js";
 import PremiumGate from "./PremiumGate.jsx";
 
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+const mono = { fontFamily: "var(--font-mono)" };
 
 function AnalysisCard({ analysis, onSelect }) {
   return (
     <div
       onClick={() => onSelect(analysis)}
       style={{
-        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
         padding: 20, cursor: "pointer", transition: "border-color 0.15s",
       }}
       onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent)"}
@@ -41,7 +41,7 @@ function CompanyAnalysis({ company }) {
   if (!company) return null;
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
       overflow: "hidden", marginBottom: 16,
     }}>
       <div style={{
@@ -82,7 +82,7 @@ function CompanyAnalysis({ company }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {company.strengths?.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#089981", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Styrkor</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--pos)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Styrkor</div>
               <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
                 {company.strengths.map((s, i) => <li key={i}>{s}</li>)}
               </ul>
@@ -90,7 +90,7 @@ function CompanyAnalysis({ company }) {
           )}
           {company.risks?.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#f23645", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Risker</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--neg)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>Risker</div>
               <ul style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.7, paddingLeft: 16, margin: 0 }}>
                 {company.risks.map((r, i) => <li key={i}>{r}</li>)}
               </ul>
@@ -157,7 +157,7 @@ function AnalysisDetail({ analysis, onBack }) {
 
       {analysis.conclusion && (
         <div style={{
-          background: "rgba(8,153,129,0.04)", border: "1px solid rgba(8,153,129,0.15)",
+          background: "rgba(15,154,108,0.04)", border: "1px solid rgba(15,154,108,0.15)",
           borderRadius: 8, padding: 20, marginTop: 8,
         }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Slutsats</div>
@@ -241,7 +241,7 @@ export default function PremiumAnalyses({ isMobile }) {
         {premium && (
           <span style={{
             fontSize: 10, padding: "3px 10px", borderRadius: 4,
-            background: "rgba(8,153,129,0.1)", color: "#089981", fontWeight: 600,
+            background: "rgba(15,154,108,0.1)", color: "var(--pos)", fontWeight: 600,
           }}>
             ★ Premium
           </span>
@@ -254,7 +254,7 @@ export default function PremiumAnalyses({ isMobile }) {
             Laddar analyser...
           </div>
         ) : fetchError ? (
-          <div style={{ textAlign: "center", padding: 40, color: "#f23645", fontSize: 13 }}>
+          <div style={{ textAlign: "center", padding: 40, color: "var(--neg)", fontSize: 13 }}>
             {fetchError}
           </div>
         ) : analyses.length === 0 ? (

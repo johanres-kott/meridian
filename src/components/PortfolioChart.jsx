@@ -55,7 +55,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   const last = points.length >= 2 ? points[points.length - 1]?.value : null;
   const canRender = !error && first != null && last != null;
   const isUp = canRender ? last >= first : true;
-  const color = isUp ? "#089981" : "#f23645";
+  const color = isUp ? "var(--pos)" : "var(--neg)";
   const returnSek = canRender ? last - first : 0;
   const returnPct = canRender && first > 0 ? ((last - first) / first) * 100 : 0;
 
@@ -98,7 +98,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   // ALL hooks above this line — no early returns before here!
   if (loading) {
     return (
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
         <div style={{ height: chartHeight, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", fontSize: 12 }}>
           Laddar portföljutveckling...
         </div>
@@ -109,7 +109,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   if (!canRender) return null;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
       {/* Header with return info and range selector */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: compact ? "center" : "flex-start", marginBottom: compact ? 10 : 16, flexDirection: compact && isMobile ? "column" : "row", gap: compact && isMobile ? 8 : 0 }}>
         <div>
@@ -119,10 +119,10 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
           {!compact && (
             <div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-                <span style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                <span style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                   {last.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
                 </span>
-                <span style={{ fontSize: 13, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color, fontFamily: "var(--font-mono)" }}>
                   {returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK ({returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%)
                 </span>
               </div>
@@ -131,13 +131,13 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   {INDEXES.filter(idx => indexReturns[idx.id] != null && activeIndexes.includes(idx.id)).map(idx => (
                     <span key={idx.id}>
-                      {idx.label}: <span style={{ color: indexReturns[idx.id] >= 0 ? "#089981" : "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>
+                      {idx.label}: <span style={{ color: indexReturns[idx.id] >= 0 ? "var(--pos)" : "var(--neg)", fontFamily: "var(--font-mono)" }}>
                         {indexReturns[idx.id] >= 0 ? "+" : ""}{indexReturns[idx.id].toFixed(1)}%
                       </span>
                     </span>
                   ))}
                   {bestIdx && (
-                    <span style={{ color: returnPct > bestIdx[1] ? "#089981" : "#f23645", fontWeight: 500 }}>
+                    <span style={{ color: returnPct > bestIdx[1] ? "var(--pos)" : "var(--neg)", fontWeight: 500 }}>
                       {returnPct > bestIdx[1] ? "▲" : "▼"} {Math.abs(returnPct - bestIdx[1]).toFixed(1)}% vs index
                     </span>
                   )}
@@ -147,7 +147,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
           )}
           {compact && (
             <div>
-              <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "var(--font-mono)" }}>
                 {returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%
                 <span style={{ color: "var(--text-secondary)", fontWeight: 400, marginLeft: 6 }}>
                   ({returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK)
@@ -158,7 +158,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
                 <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 3, display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {INDEXES.filter(idx => indexReturns[idx.id] != null && activeIndexes.includes(idx.id)).map(idx => (
                     <span key={idx.id}>
-                      <span style={{ color: idx.color, fontSize: 8 }}>●</span> {idx.label}: <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: indexReturns[idx.id] >= 0 ? "#089981" : "#f23645" }}>
+                      <span style={{ color: idx.color, fontSize: 8 }}>●</span> {idx.label}: <span style={{ fontFamily: "var(--font-mono)", color: indexReturns[idx.id] >= 0 ? "var(--pos)" : "var(--neg)" }}>
                         {indexReturns[idx.id] >= 0 ? "+" : ""}{indexReturns[idx.id].toFixed(1)}%
                       </span>
                     </span>
@@ -268,8 +268,8 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
       {/* Footer */}
       {!compact && points.length > 1 && (
         <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11, color: "var(--text-secondary)", flexWrap: "wrap" }}>
-          <span>{"\u0048\u00f6gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
-          <span>{"\u004c\u00e4gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{"\u0048\u00f6gst: "}<span style={{ fontFamily: "var(--font-mono)" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{"\u004c\u00e4gst: "}<span style={{ fontFamily: "var(--font-mono)" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
           {hasEstimated && (
             <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
               {"Estimerat baserat p\u00e5 nuvarande innehav"}

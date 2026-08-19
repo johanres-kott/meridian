@@ -108,11 +108,11 @@ export default function SedanSist({ isMobile, onNavigate }) {
   const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid var(--border-light)" };
   const tickerStyle = { fontSize: isMobile ? 11 : 12, fontWeight: 500, color: "var(--text)" };
   const subtext = { fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)" };
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
   const editBtn = { fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textTransform: "none", letterSpacing: "normal", fontWeight: 400 };
 
   return (
-    <div style={{ marginBottom: 28, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ marginBottom: 28, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

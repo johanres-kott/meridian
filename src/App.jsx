@@ -48,8 +48,8 @@ const TABS = [
 function Logo({ size = 22 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 56 56" fill="none">
-      <rect width="56" height="56" rx="14" fill="#3B6AE6" />
-      <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white" /><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85" /><circle cx="38" cy="17" r="1.5" fill="#3B6AE6" /><polygon points="32,18 34,24 28,32 26,24" fill="white" /><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white" /><polygon points="12,36 8,28 10,26 14,32" fill="white" /><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round" /><polygon points="22,44 20,48 24,48 26,44" fill="white" /><polygon points="28,42 27,48 31,48 30,42" fill="white" />
+      <rect width="56" height="56" rx="14" fill="var(--green-700)" />
+      <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white" /><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85" /><circle cx="38" cy="17" r="1.5" fill="var(--green-700)" /><polygon points="32,18 34,24 28,32 26,24" fill="white" /><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white" /><polygon points="12,36 8,28 10,26 14,32" fill="white" /><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round" /><polygon points="22,44 20,48 24,48 26,44" fill="white" /><polygon points="28,42 27,48 31,48 30,42" fill="white" />
     </svg>
   );
 }
@@ -72,7 +72,7 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', sans-serif", color: "var(--text-secondary)" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-sans)", color: "var(--text-secondary)" }}>
         Laddar...
       </div>
     );
@@ -213,9 +213,8 @@ function AppContent() {
 
   if (isMobile) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", fontSize: 13 }}>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
           * { box-sizing: border-box; margin: 0; padding: 0; }
           :root { --sat: env(safe-area-inset-top); --sab: env(safe-area-inset-bottom); --sal: env(safe-area-inset-left); --sar: env(safe-area-inset-right); }
           .tab-btn { background: none; border: none; cursor: pointer; padding: 8px 8px; font-size: 11px; font-family: inherit; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
@@ -223,11 +222,11 @@ function AppContent() {
         `}</style>
 
         {/* Mobile logo banner */}
-        <div style={{ background: "#3B6AE6", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 0", paddingTop: "calc(10px + env(safe-area-inset-top, 0px))", position: "sticky", top: 0, zIndex: 51 }}>
+        <div style={{ background: "var(--surface-dark)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 0", paddingTop: "calc(10px + env(safe-area-inset-top, 0px))", position: "sticky", top: 0, zIndex: 51 }}>
           <svg width="20" height="20" viewBox="0 0 56 56" fill="none">
-            <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white" /><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85" /><circle cx="38" cy="17" r="1.5" fill="#3B6AE6" /><polygon points="32,18 34,24 28,32 26,24" fill="white" /><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white" /><polygon points="12,36 8,28 10,26 14,32" fill="white" /><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round" /><polygon points="22,44 20,48 24,48 26,44" fill="white" /><polygon points="28,42 27,48 31,48 30,42" fill="white" />
+            <polygon points="32,12 44,16 44,22 38,24 32,22" fill="white" /><polygon points="34,22 44,22 42,26 34,25" fill="white" opacity="0.85" /><circle cx="38" cy="17" r="1.5" fill="var(--green-700)" /><polygon points="32,18 34,24 28,32 26,24" fill="white" /><polygon points="18,28 32,26 34,38 28,44 16,44 12,36" fill="white" /><polygon points="12,36 8,28 10,26 14,32" fill="white" /><line x1="32" y1="30" x2="35" y2="32" stroke="white" strokeWidth="2" strokeLinecap="round" /><polygon points="22,44 20,48 24,48 26,44" fill="white" /><polygon points="28,42 27,48 31,48 30,42" fill="white" />
           </svg>
-          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px", color: "#fff" }}>Thesion</span>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#fff" }}>Thesion</span>
         </div>
 
         {/* Topbar: flikar + åtgärder */}
@@ -257,27 +256,26 @@ function AppContent() {
 
   // ── Desktop: sidomeny + topbar (DESIGN.md) ──
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", fontSize: 13 }}>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-sans)", fontSize: 13 }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .side-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-family: inherit; font-size: 13px; color: var(--text-secondary); text-align: left; transition: background 0.15s, color 0.15s; }
-        .side-item:hover { color: var(--text); background: rgba(108,113,122,0.06); }
-        .side-item.active { color: var(--text); background: rgba(108,113,122,0.1); font-weight: 500; }
+        .side-item:hover { color: var(--text); background: var(--bg-raised); }
+        .side-item.active { color: var(--brand); background: var(--brand-tint); font-weight: 600; }
       `}</style>
 
       {/* Topbar */}
       <div style={{ height: 52, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Logo />
-          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "-0.5px" }}>Thesion</span>
+          <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>Thesion</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>
+          <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>
             {time.toLocaleTimeString("sv-SE")} CET
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#089981" }} />
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pos)" }} />
             <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>Live</span>
           </div>
           <NotificationBell />

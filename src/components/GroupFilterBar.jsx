@@ -65,7 +65,7 @@ export default function GroupFilterBar({ items, activeGroup, setActiveGroup, isM
                 onClick={(e) => { e.stopPropagation(); deleteGroup(g.name); }}
                 title="Ta bort grupp"
                 style={{ marginLeft: 2, fontSize: 11, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: "0 4px" }}
-                onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
+                onMouseEnter={e => e.currentTarget.style.color = "var(--neg)"}
                 onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
               >
                 ×

@@ -17,13 +17,13 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
   }, [onClose]);
 
   if (!groups.length) return (
-    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "12px 16px", zIndex: 200, minWidth: 180, marginTop: 4 }}>
+    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "12px 16px", zIndex: 200, minWidth: 180, marginTop: 4 }}>
       <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>Inga grupper skapade</div>
     </div>
   );
 
   return (
-    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", padding: "6px 0", zIndex: 200, minWidth: 180, marginTop: 4 }}>
+    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "6px 0", zIndex: 200, minWidth: 180, marginTop: 4 }}>
       {groups.map(g => {
         const isMember = (g.members || []).includes(item.id);
         return (
@@ -67,7 +67,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
   }, [item.ticker, item.type, priceData]);
 
   const chg = price?.changePercent;
-  const chgColor = chg > 0 ? "#089981" : chg < 0 ? "#f23645" : "var(--text-secondary)";
+  const chgColor = chg > 0 ? "var(--pos)" : chg < 0 ? "var(--neg)" : "var(--text-secondary)";
   const totalValue = (item.shares && price?.price) ? (price.price * item.shares) : null;
 
   const currency = price?.currency || "SEK";
@@ -99,21 +99,21 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
           {item.type !== "fund" && <ShareClassBadge ticker={item.ticker} />}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          {item.type !== "fund" && <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace" }}>{item.ticker}</span>}
+          {item.type !== "fund" && <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{item.ticker}</span>}
           {scoreData && (() => {
             const profileType = investorProfile?.investorType || "mixed";
             const compositeScore = scoreData.composite?.[profileType] ?? scoreData.composite?.mixed;
             if (compositeScore == null) return null;
-            const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
-            const bg = compositeScore >= 70 ? "rgba(8,153,129,0.15)" : compositeScore >= 40 ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)";
+            const color = compositeScore >= 70 ? "var(--pos)" : compositeScore >= 40 ? "var(--warn)" : "var(--neg)";
+            const bg = compositeScore >= 70 ? "rgba(15,154,108,0.15)" : compositeScore >= 40 ? "rgba(255,152,0,0.15)" : "rgba(205,74,64,0.15)";
             return (
-              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: bg, color, fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace" }}>
+              <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: bg, color, fontWeight: 600, fontFamily: "var(--font-mono)" }}>
                 {Math.round(compositeScore)}
               </span>
             );
           })()}
           {scoreData?.scores?.piotroski?.raw >= 7 && (
-            <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500 }}>
+            <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "var(--pos)", fontWeight: 500 }}>
               F-Score {scoreData.scores.piotroski.raw}/9
             </span>
           )}
@@ -162,7 +162,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
           {investmentHolding?.valueMSEK != null ? formatHoldingValue(investmentHolding.valueMSEK) : "–"}
         </td>
       )}
-      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+      <td style={{ ...tdBase, textAlign: "right", fontFamily: "var(--font-mono)" }}>
         {price ? (
           <>
             <div style={{ fontWeight: 500, fontSize: 13, color: "var(--text)" }}>{price.price?.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {price.currency || ""}</div>
@@ -170,7 +170,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
           </>
         ) : <span style={{ color: "var(--text-muted)", fontSize: 11 }}>Hämtar...</span>}
       </td>
-      <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+      <td style={{ ...tdBase, textAlign: "right", fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
         {totalValue !== null ? (
           <>
             {currency !== "SEK" && fxRate ? (
@@ -188,11 +188,11 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
         ) : null}
       </td>
       {!isMobile && (
-        <td style={{ ...tdBase, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+        <td style={{ ...tdBase, textAlign: "right", fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
           {pl !== null ? (
             <>
-              <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "#089981" : "#f23645" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
-              <div style={{ fontSize: 11, color: pl >= 0 ? "#089981" : "#f23645" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: pl >= 0 ? "var(--pos)" : "var(--neg)" }}>{pl >= 0 ? "+" : ""}{pl.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</div>
+              <div style={{ fontSize: 11, color: pl >= 0 ? "var(--pos)" : "var(--neg)" }}>{plPct >= 0 ? "+" : ""}{plPct?.toFixed(1)}%</div>
             </>
           ) : null}
         </td>
@@ -202,7 +202,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
           onClick={() => { if (window.confirm(`Ta bort ${item.name || item.ticker} från portföljen?`)) onDelete(item.id); }}
           title="Ta bort"
           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 14, padding: "2px 6px", lineHeight: 1 }}
-          onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
+          onMouseEnter={e => e.currentTarget.style.color = "var(--neg)"}
           onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
         >
           ×

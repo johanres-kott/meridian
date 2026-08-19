@@ -1,3 +1,5 @@
+import { Layers, Sparkles, Egg } from "../icons.jsx";
+
 // Startvyn på Investera-fliken — produktkort i Finary-stil (se PIVOT.md),
 // men med Thesions berättelse: basen (indexfonder), kryddan (aktier), pension.
 // Korten säljer inga produkter, de är pedagogiska ingångar till undervyerna.
@@ -5,18 +7,19 @@
 const CHECK = "✓";
 
 function Card({ icon, title, headline, text, points, ctaLabel, onCta, secondary, gradient, isMobile }) {
+  const IconCmp = icon.Cmp;
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
       overflow: "hidden", display: "flex", flexDirection: "column",
     }}>
       <div style={{ padding: isMobile ? "14px 16px" : "18px 20px", background: gradient }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
           <span style={{
-            width: 34, height: 34, borderRadius: 8, flexShrink: 0, fontSize: 17,
+            width: 34, height: 34, borderRadius: 10, flexShrink: 0, color: "var(--brand)",
             display: "flex", alignItems: "center", justifyContent: "center",
             background: "var(--bg-card)", border: "1px solid var(--border-light)",
-          }}>{icon}</span>
+          }}><IconCmp size={17} strokeWidth={1.5} aria-hidden /></span>
           <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{title}</span>
         </div>
         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>{headline}</div>
@@ -25,7 +28,7 @@ function Card({ icon, title, headline, text, points, ctaLabel, onCta, secondary,
       <div style={{ padding: isMobile ? "12px 16px 14px" : "14px 20px 18px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
         {points.map((p, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "var(--text)" }}>
-            <span style={{ color: "#089981", fontWeight: 700, flexShrink: 0 }}>{CHECK}</span>
+            <span style={{ color: "var(--pos)", fontWeight: 700, flexShrink: 0 }}>{CHECK}</span>
             <span style={{ lineHeight: 1.5 }}>{p}</span>
           </div>
         ))}
@@ -64,7 +67,7 @@ export default function InvestLanding({ isMobile, onFunds, onStocks, onPension, 
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 12 : 16, alignItems: "stretch" }}>
         <Card
           isMobile={isMobile}
-          icon="🧱"
+          icon={{ Cmp: Layers }}
           title="Basen"
           headline="Globala indexfonder"
           text="En billig, bred grund för sparandet — hela världen i en fond."
@@ -76,11 +79,11 @@ export default function InvestLanding({ isMobile, onFunds, onStocks, onPension, 
           ctaLabel="Utforska fonder"
           onCta={onFunds}
           secondary={null}
-          gradient="linear-gradient(135deg, rgba(59,106,230,0.10), rgba(59,106,230,0.02))"
+          gradient="linear-gradient(135deg, rgba(15,122,92,0.10), rgba(15,122,92,0.02))"
         />
         <Card
           isMobile={isMobile}
-          icon="✨"
+          icon={{ Cmp: Sparkles }}
           title="Kryddan"
           headline="Aktier i bolag du tror på"
           text="Älskar du produkterna? Kolla om bolaget faktiskt går bra."
@@ -96,7 +99,7 @@ export default function InvestLanding({ isMobile, onFunds, onStocks, onPension, 
         />
         <Card
           isMobile={isMobile}
-          icon="🪺"
+          icon={{ Cmp: Egg }}
           title="Helheten"
           headline="Pension & nettoförmögenhet"
           text="Tjänstepensionen är ofta din största tillgång — ha den med i bilden."
@@ -108,7 +111,7 @@ export default function InvestLanding({ isMobile, onFunds, onStocks, onPension, 
           ctaLabel="Till pensionen"
           onCta={onPension}
           secondary={{ label: "Min ekonomi", onClick: () => onNavigate?.("markets") }}
-          gradient="linear-gradient(135deg, rgba(8,153,129,0.10), rgba(8,153,129,0.02))"
+          gradient="linear-gradient(135deg, rgba(15,154,108,0.10), rgba(15,154,108,0.02))"
         />
       </div>
     </div>

@@ -192,9 +192,9 @@ export default function BostadWizard({ onSaved, onBack }) {
             {(ltv != null || equity != null) && (
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                 {ltv != null && (
-                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" }}>
+                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "12px 16px" }}>
                     <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Belåningsgrad</div>
-                    <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: ltv > 85 ? "#f23645" : ltv > 70 ? "#ff9800" : "#089981" }}>{ltv.toFixed(0)}%</div>
+                    <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: ltv > 85 ? "var(--neg)" : ltv > 70 ? "var(--warn)" : "var(--pos)" }}>{ltv.toFixed(0)}%</div>
                     {ltv > 70 && (
                       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>
                         Över 70 % gäller 2 % amorteringskrav, över 50 % gäller 1 % (generell regel).
@@ -203,7 +203,7 @@ export default function BostadWizard({ onSaved, onBack }) {
                   </div>
                 )}
                 {equity != null && (
-                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px" }}>
+                  <div style={{ flex: 1, minWidth: 150, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "12px 16px" }}>
                     <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Eget kapital</div>
                     <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>{fmtKr(equity)}</div>
                   </div>
@@ -212,7 +212,7 @@ export default function BostadWizard({ onSaved, onBack }) {
             )}
 
             {pantbrevGap != null && (
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6, padding: "10px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6, padding: "10px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)" }}>
                 ⓘ Lånet överstiger uttagna pantbrev med {fmtKr(pantbrevGap)}. Nya pantbrev kostar 2 % i stämpelskatt
                 på det nya beloppet plus 375 kr i expeditionsavgift (gäller fastigheter, inte bostadsrätter). Generell information.
               </div>
@@ -222,11 +222,11 @@ export default function BostadWizard({ onSaved, onBack }) {
 
         {step === 3 && (
           <div>
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "18px 20px" }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "18px 20px" }}>
               {summaryRows.map((r, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "6px 0", borderBottom: i < summaryRows.length - 1 ? "1px solid var(--border-light)" : "none", fontSize: 13 }}>
                   <span style={{ color: "var(--text-secondary)" }}>{r.label}</span>
-                  <span style={{ ...mono, color: r.negative ? "#f23645" : "var(--text)", fontWeight: r.strong ? 600 : 400 }}>{r.value}</span>
+                  <span style={{ ...mono, color: r.negative ? "var(--neg)" : "var(--text)", fontWeight: r.strong ? 600 : 400 }}>{r.value}</span>
                 </div>
               ))}
             </div>

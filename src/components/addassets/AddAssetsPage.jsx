@@ -3,6 +3,7 @@ import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import BostadWizard from "./BostadWizard.jsx";
 import FordonWizard from "./FordonWizard.jsx";
+import { KindIcon } from "../icons.jsx";
 
 // Helsides "Komplettera din portfölj" — Finary-inspirerad Add Assets-katalog
 // (se PIVOT.md) i Thesions färger. Sök + kategorikort; manuella tillgångar
@@ -11,14 +12,14 @@ import FordonWizard from "./FordonWizard.jsx";
 // För bostad länkar vi till Booli/hitta.se så användaren kan slå upp värdet själv.
 
 const CATEGORIES = [
-  { id: "stocks", icon: "📈", title: "Aktier", desc: "Bolag du tror på — med produktsida och hälsosignalen ”Går bolaget bra?”" },
-  { id: "funds", icon: "💠", title: "Fonder", desc: "Globala indexfonder och toppfonder med avgifter och betyg från Morningstar" },
-  { id: "bostad", icon: "🏠", title: "Bostad", desc: "Lägenhet, hus eller fritidshus — slå upp värdet på Booli eller hitta.se" },
-  { id: "fordon", icon: "🚗", title: "Fordon", desc: "Bil, MC, husbil eller båt" },
-  { id: "sparkonto", icon: "🏦", title: "Sparkonto & buffert", desc: "Kontanter, sparkonton och din buffert" },
-  { id: "lan", icon: "📄", title: "Bolån & skulder", desc: "Lån dras av från din nettoförmögenhet" },
-  { id: "pension", icon: "🪺", title: "Pension (ITP)", desc: "Din tjänstepension — följ värdet och jämför fondval" },
-  { id: "ovrigt", icon: "📦", title: "Övrigt", desc: "Konst, klockor eller andra tillgångar värda att räkna med" },
+  { id: "stocks", kind: "stocks", title: "Aktier", desc: "Bolag du tror på — med produktsida och hälsosignalen ”Går bolaget bra?”" },
+  { id: "funds", kind: "funds", title: "Fonder", desc: "Globala indexfonder och toppfonder med avgifter och betyg från Morningstar" },
+  { id: "bostad", kind: "bostad", title: "Bostad", desc: "Lägenhet, hus eller fritidshus — slå upp värdet på Booli eller hitta.se" },
+  { id: "fordon", kind: "fordon", title: "Fordon", desc: "Bil, MC, husbil eller båt" },
+  { id: "sparkonto", kind: "sparkonto", title: "Sparkonto & buffert", desc: "Kontanter, sparkonton och din buffert" },
+  { id: "lan", kind: "skuld", title: "Bolån & skulder", desc: "Lån dras av från din nettoförmögenhet" },
+  { id: "pension", kind: "pension", title: "Pension (ITP)", desc: "Din tjänstepension — följ värdet och jämför fondval" },
+  { id: "ovrigt", kind: "ovrigt", title: "Övrigt", desc: "Konst, klockor eller andra tillgångar värda att räkna med" },
 ];
 
 // Manuella formulär per kategori. kinds = valbara typer (måste matcha manual_assets-constrainten).
@@ -116,7 +117,7 @@ function ManualForm({ formId, onSaved, onBack }) {
       </div>
 
       {(form.hint || form.lookups) && (
-        <div style={{ marginTop: 20, padding: "14px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)" }}>
+        <div style={{ marginTop: 20, padding: "14px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)" }}>
           {form.hint && (
             <div style={{ display: "flex", gap: 8, fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.55 }}>
               <span style={{ flexShrink: 0 }}>ⓘ</span>
@@ -145,7 +146,7 @@ function ManualForm({ formId, onSaved, onBack }) {
         {saving ? "Sparar..." : "Spara"}
       </button>
       {error && (
-        <div style={{ fontSize: 12, color: "#f23645", marginTop: 10 }}>
+        <div style={{ fontSize: 12, color: "var(--neg)", marginTop: 10 }}>
           Kunde inte spara{typeof error === "string" ? `: ${error}` : ""} — försök igen.
         </div>
       )}
@@ -185,7 +186,7 @@ export default function AddAssetsPage({ onClose, onNavigate }) {
     <div style={{
       position: "fixed", inset: 0, zIndex: 300, overflow: "auto",
       background: "var(--bg)", color: "var(--text)",
-      fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+      fontFamily: "var(--font-sans)",
     }}>
       {/* Stängknapp */}
       <button onClick={onClose} title="Stäng"
@@ -227,7 +228,7 @@ export default function AddAssetsPage({ onClose, onNavigate }) {
                 <button key={cat.id} onClick={() => openCategory(cat.id)}
                   style={{
                     position: "relative", overflow: "hidden", textAlign: "left",
-                    background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+                    background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
                     padding: "18px 110px 18px 20px", cursor: "pointer", fontFamily: "inherit", minHeight: 96,
                   }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent)"}
@@ -236,10 +237,10 @@ export default function AddAssetsPage({ onClose, onNavigate }) {
                   <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 5 }}>{cat.title}</div>
                   <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5 }}>{cat.desc}</div>
                   <span aria-hidden style={{
-                    position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
-                    fontSize: 52, opacity: 0.22, pointerEvents: "none",
+                    position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)",
+                    color: "var(--brand)", opacity: 0.16, pointerEvents: "none", display: "inline-flex",
                   }}>
-                    {cat.icon}
+                    <KindIcon kind={cat.kind} size={56} />
                   </span>
                 </button>
               ))}

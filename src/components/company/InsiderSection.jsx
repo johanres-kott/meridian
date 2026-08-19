@@ -18,10 +18,10 @@ export default function InsiderSection({ ticker }) {
   if (loading) return null;
   if (transactions.length === 0) return null;
 
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 20 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>
         Insiderhandel
       </div>
@@ -40,7 +40,7 @@ export default function InsiderSection({ ticker }) {
               </div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>
                 <span style={{
-                  color: isBuy ? "#089981" : "#f23645",
+                  color: isBuy ? "var(--pos)" : "var(--neg)",
                   fontWeight: 500,
                 }}>
                   {isBuy ? "Köp" : "Sälj"}

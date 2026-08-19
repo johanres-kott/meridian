@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { useUser } from "../contexts/UserContext.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { GOAL_ICONS, Target } from "./icons.jsx";
 
 // Mål & kassaflöde (DESIGN.md): Finarys Budget-mönster (Pengar in / ut /
 // Sparutrymme) fast med manuellt inmatad lön och utgifter — ingen bankkoppling.
 // Sparmål med progress; "klart om X mån" är ett räkneexempel på användarens
 // egna siffror, aldrig en prognos vi hittar på.
 
-const GOAL_ICONS = ["🛟", "🏠", "🏝️", "🚗", "🎓", "💍", "🛥️", "🎁"];
+// Legacy: mål sparade med emoji mappas till Lucide-ikon-id
+const LEGACY_EMOJI = { "🛟": "buffert", "🏠": "bostad", "🏝️": "resa", "🚗": "bil", "🎓": "studier", "💍": "brollop", "🛥️": "bat", "🎁": "present" };
+function GoalIcon({ icon, size = 20 }) {
+  const id = LEGACY_EMOJI[icon] || icon;
+  const def = GOAL_ICONS.find(g => g.id === id);
+  const Icon = def?.Icon || Target;
+  return <Icon size={size} strokeWidth={1.5} aria-hidden />;
+}
 
 function parseAmount(v) {
   const n = parseFloat(String(v).replace(/\s/g, "").replace(",", "."));
@@ -18,7 +26,7 @@ function newId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+const mono = { fontFamily: "var(--font-mono)" };
 
 function fmtKr(v) {
   return `${v.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} kr`;
@@ -29,11 +37,11 @@ function fmtKr(v) {
 // Utgiftskategorier (Finary-mönstret: fördelning av "Money out")
 const EXPENSE_CATEGORIES = [
   { id: "boende",    label: "Boende",         color: "#7c4dff", hint: "Hyra, avgift, bolåneränta, el" },
-  { id: "mat",       label: "Mat",            color: "#ff9800", hint: "Mat, restaurang" },
+  { id: "mat",       label: "Mat",            color: "var(--warn)", hint: "Mat, restaurang" },
   { id: "transport", label: "Transport",      color: "#26a69a", hint: "Bil, bensin, kollektivtrafik" },
   { id: "barn",      label: "Barn & familj",  color: "#ec407a", hint: "Förskola, aktiviteter" },
-  { id: "lan",       label: "Lån & amortering", color: "#f23645", hint: "Amortering, billån, CSN" },
-  { id: "abonnemang",label: "Abonnemang",     color: "#5b9aff", hint: "Mobil, streaming, gym" },
+  { id: "lan",       label: "Lån & amortering", color: "var(--neg)", hint: "Amortering, billån, CSN" },
+  { id: "abonnemang",label: "Abonnemang",     color: "var(--green-400)", hint: "Mobil, streaming, gym" },
   { id: "forsakring",label: "Försäkringar",   color: "#8d6e63", hint: "Hem, bil, liv" },
   { id: "ovrigt",    label: "Övrigt",         color: "#78909c", hint: "Allt annat" },
 ];
@@ -104,7 +112,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
 
   return (
-    <div style={{ flex: 1, minWidth: 280, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ flex: 1, minWidth: 280, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--border-light)" }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{title}</span>
         <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: accent || "var(--text)" }}>{rows.length ? `${fmtKr(total)}/mån` : "—"}</span>
@@ -190,15 +198,15 @@ function CashflowDistribution({ incomes, expenses, available, isMobile }) {
   const overspendPct = base > 0 && available < 0 ? (-available / base) * 100 : 0;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 16px" : "16px 20px", marginBottom: isMobile ? 10 : 14 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 16px" : "16px 20px", marginBottom: isMobile ? 10 : 14 }}>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Vart tar lönen vägen?</div>
       {/* Flödesstapel */}
       <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden", background: "var(--border-light)" }}>
         {cats.map(c => (
           <div key={c.id} title={`${c.label}: ${fmtKr(c.amount)}`} style={{ width: `${base > 0 ? (c.amount / base) * 100 : 0}%`, background: c.color }} />
         ))}
-        {savingsPct > 0 && <div title={`Sparutrymme: ${fmtKr(available)}`} style={{ width: `${savingsPct}%`, background: "#089981" }} />}
-        {overspendPct > 0 && <div title={`Underskott: ${fmtKr(-available)}`} style={{ width: `${overspendPct}%`, background: "repeating-linear-gradient(45deg,#f23645,#f23645 4px,transparent 4px,transparent 8px)" }} />}
+        {savingsPct > 0 && <div title={`Sparutrymme: ${fmtKr(available)}`} style={{ width: `${savingsPct}%`, background: "var(--pos)" }} />}
+        {overspendPct > 0 && <div title={`Underskott: ${fmtKr(-available)}`} style={{ width: `${overspendPct}%`, background: "repeating-linear-gradient(45deg,var(--neg),var(--neg) 4px,transparent 4px,transparent 8px)" }} />}
       </div>
       {/* Legend */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginTop: 10 }}>
@@ -210,12 +218,12 @@ function CashflowDistribution({ incomes, expenses, available, isMobile }) {
         ))}
         {available > 0 && (
           <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-secondary)" }}>
-            <span style={{ width: 8, height: 8, borderRadius: 2, background: "#089981" }} />
-            Sparutrymme <span style={{ ...mono, color: "#089981", fontWeight: 600 }}>{Math.round(savingsPct)}%</span>
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: "var(--pos)" }} />
+            Sparutrymme <span style={{ ...mono, color: "var(--pos)", fontWeight: 600 }}>{Math.round(savingsPct)}%</span>
           </span>
         )}
         {available < 0 && (
-          <span style={{ fontSize: 11, color: "#f23645", fontWeight: 600 }}>Utgifterna överstiger inkomsterna med {fmtKr(-available)}/mån</span>
+          <span style={{ fontSize: 11, color: "var(--neg)", fontWeight: 600 }}>Utgifterna överstiger inkomsterna med {fmtKr(-available)}/mån</span>
         )}
       </div>
     </div>
@@ -239,24 +247,24 @@ function GoalCard({ goal, monthlySavings, onUpdateSaved, onRemove }) {
   }
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "16px 18px" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "16px 18px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <span style={{ fontSize: 22 }}>{goal.icon}</span>
+        <span style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--brand-tint)", color: "var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><GoalIcon icon={goal.icon} size={18} /></span>
         <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", flex: 1 }}>{goal.name}</span>
         <button onClick={onRemove} title="Ta bort mål"
           style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 13, fontFamily: "inherit" }}>×</button>
       </div>
       <div style={{ height: 8, borderRadius: 4, background: "var(--border-light)", overflow: "hidden", marginBottom: 8 }}>
-        <div style={{ width: `${pct}%`, height: "100%", borderRadius: 4, background: pct >= 100 ? "#089981" : "var(--accent)", transition: "width 0.3s" }} />
+        <div style={{ width: `${pct}%`, height: "100%", borderRadius: 4, background: pct >= 100 ? "var(--pos)" : "var(--accent)", transition: "width 0.3s" }} />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", fontSize: 12 }}>
         <span style={{ ...mono, color: "var(--text)" }}>
           {fmtKr(goal.saved)} <span style={{ color: "var(--text-secondary)" }}>/ {fmtKr(goal.target)}</span>
         </span>
-        <span style={{ ...mono, color: pct >= 100 ? "#089981" : "var(--text-secondary)" }}>{Math.round(pct)}%</span>
+        <span style={{ ...mono, color: pct >= 100 ? "var(--pos)" : "var(--text-secondary)" }}>{Math.round(pct)}%</span>
       </div>
       {pct >= 100 ? (
-        <div style={{ fontSize: 11, color: "#089981", fontWeight: 600, marginTop: 6 }}>Mål uppnått 🎉</div>
+        <div style={{ fontSize: 11, color: "var(--pos)", fontWeight: 600, marginTop: 6 }}>Mål uppnått</div>
       ) : monthsLeft != null && (
         <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 6 }}>
           ≈ {monthsLeft} {monthsLeft === 1 ? "månad" : "månader"} kvar med {fmtKr(monthlySavings)}/mån i sparutrymme
@@ -282,7 +290,7 @@ function GoalCard({ goal, monthlySavings, onUpdateSaved, onRemove }) {
 
 function NewGoalCard({ onAdd }) {
   const [open, setOpen] = useState(false);
-  const [icon, setIcon] = useState(GOAL_ICONS[0]);
+  const [icon, setIcon] = useState(GOAL_ICONS[0].id);
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
   const [saved, setSaved] = useState("");
@@ -312,14 +320,16 @@ function NewGoalCard({ onAdd }) {
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--accent)", borderRadius: 10, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {GOAL_ICONS.map(i => (
-          <button key={i} onClick={() => setIcon(i)}
+        {GOAL_ICONS.map(g => (
+          <button key={g.id} onClick={() => setIcon(g.id)} title={g.label}
             style={{
-              fontSize: 16, padding: "4px 8px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
-              border: `1px solid ${icon === i ? "var(--accent)" : "var(--border)"}`,
-              background: icon === i ? "var(--accent-light)" : "var(--bg-card)",
+              width: 36, height: 36, padding: 0, borderRadius: "50%", cursor: "pointer", fontFamily: "inherit",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              border: `1px solid ${icon === g.id ? "var(--brand)" : "var(--border)"}`,
+              background: icon === g.id ? "var(--brand-tint)" : "var(--bg-card)",
+              color: icon === g.id ? "var(--brand)" : "var(--text-secondary)",
             }}>
-            {i}
+            <g.Icon size={16} strokeWidth={1.5} aria-hidden />
           </button>
         ))}
       </div>
@@ -359,7 +369,7 @@ export default function GoalsTab() {
   }
 
   const statCard = (label, value, color, sub) => (
-    <div style={{ flex: 1, minWidth: 140, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 18px" }}>
+    <div style={{ flex: 1, minWidth: 140, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: "14px 18px" }}>
       <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>{label}</div>
       <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: color || "var(--text)" }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: color || "var(--text-secondary)", marginTop: 2 }}>{sub}</div>}
@@ -377,7 +387,7 @@ export default function GoalsTab() {
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 14 }}>
         {statCard("Pengar in", hasFlow ? fmtKr(totalIn) : "—")}
         {statCard("Pengar ut", hasFlow ? fmtKr(totalOut) : "—")}
-        {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "#089981" : "#f23645", savingsRate != null ? `${savingsRate.toFixed(0)} % sparkvot` : null)}
+        {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "var(--pos)" : "var(--neg)", savingsRate != null ? `${savingsRate.toFixed(0)} % sparkvot` : null)}
       </div>
 
       <CashflowDistribution incomes={cashflow.incomes} expenses={cashflow.expenses} available={available} isMobile={isMobile} />
@@ -385,7 +395,7 @@ export default function GoalsTab() {
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 32 }}>
         <FlowColumn
           title="Pengar in"
-          accent="#089981"
+          accent="var(--pos)"
           withIncomeType
           rows={cashflow.incomes}
           placeholder="T.ex. Lön efter skatt"
@@ -394,7 +404,7 @@ export default function GoalsTab() {
         />
         <FlowColumn
           title="Pengar ut"
-          accent="#f23645"
+          accent="var(--neg)"
           withCategory
           presets={EXPENSE_PRESETS}
           rows={cashflow.expenses}

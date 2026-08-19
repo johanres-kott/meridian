@@ -32,7 +32,7 @@ function EventRow({ item, isLast }) {
       {/* Date chip */}
       <div style={{
         fontSize: 10, fontWeight: 500, color: "var(--text-muted)",
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "var(--font-mono)",
         letterSpacing: "0.02em", lineHeight: 1.3,
       }}>
         {dateStr ?? "—"}

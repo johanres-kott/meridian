@@ -33,7 +33,7 @@ export default function ProfilePage({ onResetProfile }) {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? 16 : 24, marginBottom: 16 };
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? 16 : 24, marginBottom: 16 };
   const labelStyle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
   const fieldLabel = { fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 };
   const fieldValue = { fontSize: 14, color: "var(--text)", fontWeight: 500 };
@@ -78,7 +78,7 @@ export default function ProfilePage({ onResetProfile }) {
                     style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                     Ändra
                   </button>
-                  {saved && <span style={{ fontSize: 11, color: "#089981" }}>Sparat!</span>}
+                  {saved && <span style={{ fontSize: 11, color: "var(--pos)" }}>Sparat!</span>}
                 </div>
               )}
             </div>
@@ -152,7 +152,7 @@ export default function ProfilePage({ onResetProfile }) {
               </div>
               <div>
                 <div style={fieldLabel}>Månadsinbetalning</div>
-                <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                <div style={{ ...fieldValue, fontFamily: "var(--font-mono)" }}>
                   {preferences.pension?.monthlyContribution != null
                     ? `${Number(preferences.pension.monthlyContribution).toLocaleString("sv-SE")} kr`
                     : "–"}
@@ -160,7 +160,7 @@ export default function ProfilePage({ onResetProfile }) {
               </div>
               <div>
                 <div style={fieldLabel}>Totalt kapital</div>
-                <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                <div style={{ ...fieldValue, fontFamily: "var(--font-mono)" }}>
                   {getPensionTotalValue(preferences.pension) != null
                     ? `${getPensionTotalValue(preferences.pension).toLocaleString("sv-SE")} kr`
                     : "–"}
@@ -178,7 +178,7 @@ export default function ProfilePage({ onResetProfile }) {
                       </span>
                     </div>
                     {e.currentValue != null && (
-                      <span style={{ fontSize: 12, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                      <span style={{ fontSize: 12, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                         {Number(e.currentValue).toLocaleString("sv-SE")} kr
                       </span>
                     )}
@@ -186,14 +186,14 @@ export default function ProfilePage({ onResetProfile }) {
                   {e.funds?.length > 0 && e.funds.map((f, fi) => (
                     <div key={fi} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-secondary)", padding: "2px 0" }}>
                       <span>{f.name}</span>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
+                      <span style={{ fontFamily: "var(--font-mono)" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
                     </div>
                   ))}
                 </div>
               ))}
             </div>
             <button onClick={() => updatePreferences({ pension: {} })}
-              style={{ fontSize: 11, color: "#c62828", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
+              style={{ fontSize: 11, color: "var(--neg)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
               Rensa pensionsdata
             </button>
           </>
@@ -251,7 +251,7 @@ export default function ProfilePage({ onResetProfile }) {
               onClick={() => updatePreferences({ sharePortfolioWithAI: !(preferences.sharePortfolioWithAI !== false) })}
               style={{
                 width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
-                background: (preferences.sharePortfolioWithAI !== false) ? "#089981" : "var(--border)",
+                background: (preferences.sharePortfolioWithAI !== false) ? "var(--pos)" : "var(--border)",
                 position: "relative", transition: "background 0.2s",
               }}
             >
@@ -285,11 +285,11 @@ export default function ProfilePage({ onResetProfile }) {
           </div>
           <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <div style={{ fontSize: 13, color: "#c62828" }}>Radera konto</div>
+              <div style={{ fontSize: 13, color: "var(--neg)" }}>Radera konto</div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>All data raderas permanent</div>
             </div>
             <button disabled
-              style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "#c62828", border: "1px solid #fce4ec", borderRadius: 4, cursor: "not-allowed", fontFamily: "inherit", opacity: 0.5 }}
+              style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "var(--neg)", border: "1px solid #fce4ec", borderRadius: 4, cursor: "not-allowed", fontFamily: "inherit", opacity: 0.5 }}
               title="Kontakta support för att radera konto">
               Radera
             </button>

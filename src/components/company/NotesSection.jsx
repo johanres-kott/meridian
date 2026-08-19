@@ -21,7 +21,7 @@ export default function NotesSection({ item, onUpdate }) {
   return (
     <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
       {/* GAV */}
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Egna kop</div>
           <button onClick={() => setShowGAV(!showGAV)}
@@ -45,7 +45,7 @@ export default function NotesSection({ item, onUpdate }) {
               </div>
             </div>
             <button onClick={saveGAV}
-              style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "#2962ff", color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+              style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "var(--brand)", color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
               Spara
             </button>
           </div>
@@ -53,18 +53,18 @@ export default function NotesSection({ item, onUpdate }) {
           <div style={{ display: "flex", gap: 24 }}>
             <div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>Antal</div>
-              <div style={{ fontSize: 15, fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace" }}>{item.shares || "\u2014"}</div>
+              <div style={{ fontSize: 15, fontWeight: 500, fontFamily: "var(--font-mono)" }}>{item.shares || "\u2014"}</div>
             </div>
             <div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>GAV</div>
-              <div style={{ fontSize: 15, fontWeight: 500, fontFamily: "'IBM Plex Mono', monospace" }}>{item.gav ? item.gav.toLocaleString("sv-SE", { minimumFractionDigits: 2 }) : "\u2014"}</div>
+              <div style={{ fontSize: 15, fontWeight: 500, fontFamily: "var(--font-mono)" }}>{item.gav ? item.gav.toLocaleString("sv-SE", { minimumFractionDigits: 2 }) : "\u2014"}</div>
             </div>
           </div>
         )}
       </div>
 
       {/* Notes */}
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Anteckningar</div>
           {!editing && (
@@ -81,11 +81,11 @@ export default function NotesSection({ item, onUpdate }) {
               style={{ width: "100%", minHeight: 120, padding: "10px 12px", border: "1px solid var(--accent)", borderRadius: 4, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none" }} />
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
               <button onClick={saveNotes}
-                style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "#2962ff", color: "#fff", cursor: "pointer" }}>
+                style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "var(--brand)", color: "#fff", cursor: "pointer" }}>
                 Spara
               </button>
               <button onClick={() => { setNotes(item.notes || ""); setEditing(false); }}
-                style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer" }}>
+                style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", cursor: "pointer" }}>
                 Avbryt
               </button>
             </div>

@@ -3,8 +3,8 @@ import FundAutocomplete from "./FundAutocomplete.jsx";
 import { useItpProviders } from "../hooks/useItpProviders.js";
 import { getPensionEntries, getPensionTotalValue, newPensionEntry } from "../lib/pension.js";
 
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
-const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20, marginBottom: 16 };
+const mono = { fontFamily: "var(--font-mono)" };
+const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 20, marginBottom: 16 };
 
 function formatKr(n) {
   return Number(n).toLocaleString("sv-SE");
@@ -84,7 +84,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
   }
 
   const inputStyle = {
-    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 10,
+    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
     fontSize: 13, fontFamily: "inherit", background: "var(--bg-card)", color: "var(--text)",
     outline: "none", width: "100%", boxSizing: "border-box",
   };
@@ -161,7 +161,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
                           <span style={{ fontSize: 12, color: "var(--text)" }}>{f.name}</span>
                           <div style={{ display: "flex", gap: 12 }}>
                             <span style={{ fontSize: 11, color: "var(--text-secondary)", ...mono }}>{f.allocation}%</span>
-                            {f.fee != null && <span style={{ fontSize: 11, color: f.fee <= 0.3 ? "#089981" : "var(--text-secondary)", ...mono }}>avg. {f.fee}%</span>}
+                            {f.fee != null && <span style={{ fontSize: 11, color: f.fee <= 0.3 ? "var(--pos)" : "var(--text-secondary)", ...mono }}>avg. {f.fee}%</span>}
                           </div>
                         </div>
                       ))}
@@ -227,7 +227,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
               <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text-secondary)" }}>Post {ei + 1}</div>
               {entries.length > 1 && (
                 <button onClick={() => removeEntry(ei)}
-                  style={{ fontSize: 11, color: "#c62828", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ fontSize: 11, color: "var(--neg)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                   Ta bort post
                 </button>
               )}

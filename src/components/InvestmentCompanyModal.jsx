@@ -95,7 +95,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
       <div style={{ background: "var(--bg-card)", borderRadius: 8, padding: isMobile ? 16 : 28, width: isMobile ? "95vw" : 620, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}>
 
         {error && (
-          <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
+          <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "var(--neg)", marginBottom: 16 }}>
             {error}
           </div>
         )}
@@ -115,7 +115,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                   onClick={() => selectCompany(company)}
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "14px 16px", border: "1px solid var(--border)", borderRadius: 10,
+                    padding: "14px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
                     background: "var(--bg-card)", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
                     transition: "border-color 0.15s",
                   }}
@@ -207,7 +207,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
               <input
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
-                style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 10, fontSize: 13, fontFamily: "inherit", color: "var(--text)", background: "var(--bg-card)", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", fontSize: 13, fontFamily: "inherit", color: "var(--text)", background: "var(--bg-card)", boxSizing: "border-box" }}
               />
             </div>
 
@@ -231,5 +231,5 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
 
 const thStyle = { padding: "8px 6px", fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 };
 const tdStyle = { padding: "8px 6px" };
-const btnSecondary = { padding: "7px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
+const btnSecondary = { padding: "7px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
 const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "var(--accent)", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };

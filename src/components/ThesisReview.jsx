@@ -17,9 +17,9 @@ const STATUS_LABELS = {
 };
 
 const STATUS_COLORS = {
-  active: { bg: "rgba(8,153,129,0.12)", fg: "#089981" },
-  weakening: { bg: "rgba(255,152,0,0.15)", fg: "#ff9800" },
-  broken: { bg: "rgba(242,54,69,0.15)", fg: "#f23645" },
+  active: { bg: "rgba(15,154,108,0.12)", fg: "var(--pos)" },
+  weakening: { bg: "rgba(255,152,0,0.15)", fg: "var(--warn)" },
+  broken: { bg: "rgba(205,74,64,0.15)", fg: "var(--neg)" },
 };
 
 const REVIEW_QUESTIONS = [
@@ -160,7 +160,7 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
                 style={{ width: 56, padding: "3px 6px", border: "1px solid var(--accent)", borderRadius: 3, fontSize: 11, fontFamily: "inherit" }}
               />
               <button onClick={saveThreshold}
-                style={{ fontSize: 10, padding: "3px 8px", border: "none", borderRadius: 3, background: "#2962ff", color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                style={{ fontSize: 10, padding: "3px 8px", border: "none", borderRadius: 3, background: "var(--brand)", color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
                 OK
               </button>
             </>
@@ -204,7 +204,7 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
           {avgWinnerReturnPct != null && (
             <div>
               <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vägt snitt, vinnare</div>
-              <div style={{ fontSize: 15, fontWeight: 500, color: "#089981", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <div style={{ fontSize: 15, fontWeight: 500, color: "var(--pos)", fontFamily: "var(--font-mono)" }}>
                 +{avgWinnerReturnPct.toFixed(1)}%
               </div>
             </div>
@@ -212,14 +212,14 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
           {avgLoserReturnPct != null && (
             <div>
               <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Vägt snitt, förlorare</div>
-              <div style={{ fontSize: 15, fontWeight: 500, color: "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <div style={{ fontSize: 15, fontWeight: 500, color: "var(--neg)", fontFamily: "var(--font-mono)" }}>
                 {avgLoserReturnPct.toFixed(1)}%
               </div>
             </div>
           )}
           <div>
             <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Bolag att granska</div>
-            <div style={{ fontSize: 15, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ fontSize: 15, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
               {counts.winner_stale + counts.loser_stale}
             </div>
           </div>
@@ -231,9 +231,9 @@ function DispositionNudge({ summary, thresholdPct, reviewMonths, onThresholdChan
 
 function NudgeRow({ tone, title, body }) {
   const palette = {
-    warning: { bg: "rgba(255,152,0,0.10)", border: "rgba(255,152,0,0.4)", fg: "#ff9800" },
-    danger: { bg: "rgba(242,54,69,0.08)", border: "rgba(242,54,69,0.35)", fg: "#f23645" },
-    ok: { bg: "rgba(8,153,129,0.08)", border: "rgba(8,153,129,0.3)", fg: "#089981" },
+    warning: { bg: "rgba(255,152,0,0.10)", border: "rgba(255,152,0,0.4)", fg: "var(--warn)" },
+    danger: { bg: "rgba(205,74,64,0.08)", border: "rgba(205,74,64,0.35)", fg: "var(--neg)" },
+    ok: { bg: "rgba(15,154,108,0.08)", border: "rgba(15,154,108,0.3)", fg: "var(--pos)" },
   }[tone];
 
   return (
@@ -289,7 +289,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
 
   const needsReview = category === "winner_stale" || category === "loser_stale";
   const cardBorder = needsReview
-    ? (category === "loser_stale" ? "rgba(242,54,69,0.35)" : "rgba(255,152,0,0.4)")
+    ? (category === "loser_stale" ? "rgba(205,74,64,0.35)" : "rgba(255,152,0,0.4)")
     : "var(--border)";
 
   const monthsLabel = monthsSinceReview == null
@@ -299,7 +299,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
       : `Granskad för ${Math.round(monthsSinceReview)} mån sedan`;
 
   const monthsColor = monthsSinceReview == null || monthsSinceReview >= reviewMonths
-    ? "#ff9800"
+    ? "var(--warn)"
     : "var(--text-muted)";
 
   return (
@@ -329,8 +329,8 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Sedan köp</div>
               <div style={{
-                fontSize: 15, fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace",
-                color: returnPct >= 0 ? "#089981" : "#f23645",
+                fontSize: 15, fontWeight: 600, fontFamily: "var(--font-mono)",
+                color: returnPct >= 0 ? "var(--pos)" : "var(--neg)",
               }}>
                 {returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%
               </div>
@@ -407,14 +407,14 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
             <button
               onClick={saveThesis}
               disabled={saving}
-              style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "#2962ff", color: "#fff", cursor: saving ? "default" : "pointer", fontFamily: "inherit", opacity: saving ? 0.6 : 1 }}
+              style={{ fontSize: 11, padding: "6px 14px", border: "none", borderRadius: 4, background: "var(--brand)", color: "#fff", cursor: saving ? "default" : "pointer", fontFamily: "inherit", opacity: saving ? 0.6 : 1 }}
             >
               {saving ? "Sparar..." : "Spara & markera granskad"}
             </button>
             <button
               onClick={() => { setThesisText(item.thesis_text || ""); setEditing(false); }}
               disabled={saving}
-              style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}
+              style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}
             >
               Avbryt
             </button>

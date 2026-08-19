@@ -36,7 +36,7 @@ export default function BooliValuation({ onUseEstimate, initialAddress = "", ini
   };
 
   return (
-    <div style={{ padding: "16px 18px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)" }}>
+    <div style={{ padding: "16px 18px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)" }}>
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Värdeindikation från området</div>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: 10 }}>
         Ange adress eller område så hämtar vi faktiska slutpriser i närheten (källa: Booli).
@@ -65,7 +65,7 @@ export default function BooliValuation({ onUseEstimate, initialAddress = "", ini
         </div>
       )}
       {status === "error" && (
-        <div style={{ fontSize: 11, color: "#f23645", marginTop: 10 }}>Kunde inte hämta slutpriser — försök igen.</div>
+        <div style={{ fontSize: 11, color: "var(--neg)", marginTop: 10 }}>Kunde inte hämta slutpriser — försök igen.</div>
       )}
 
       {result && result.count === 0 && (
@@ -76,7 +76,7 @@ export default function BooliValuation({ onUseEstimate, initialAddress = "", ini
           <div style={{ display: "flex", gap: 18, flexWrap: "wrap", alignItems: "baseline" }}>
             <div>
               <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Median i området</div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                 {result.medianPricePerSqm.toLocaleString("sv-SE")} kr/m²
               </div>
               <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{result.count} slutpriser · {result.source}</div>
@@ -84,7 +84,7 @@ export default function BooliValuation({ onUseEstimate, initialAddress = "", ini
             {result.estimate != null && (
               <div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Indikation för {sqm} m²</div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: "var(--accent)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                <div style={{ fontSize: 16, fontWeight: 600, color: "var(--accent)", fontFamily: "var(--font-mono)" }}>
                   ≈ {result.estimate.toLocaleString("sv-SE")} kr
                 </div>
                 <button onClick={() => onUseEstimate(result.estimate)}
@@ -100,7 +100,7 @@ export default function BooliValuation({ onUseEstimate, initialAddress = "", ini
                 <div key={i} style={{ display: "flex", gap: 10, fontSize: 11, color: "var(--text-secondary)", padding: "3px 0" }}>
                   <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.address || s.area || "—"}</span>
                   {s.livingArea > 0 && <span style={{ flexShrink: 0 }}>{s.livingArea} m²</span>}
-                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0, color: "var(--text)" }}>{s.soldPrice.toLocaleString("sv-SE")} kr</span>
+                  <span style={{ fontFamily: "var(--font-mono)", flexShrink: 0, color: "var(--text)" }}>{s.soldPrice.toLocaleString("sv-SE")} kr</span>
                 </div>
               ))}
             </div>

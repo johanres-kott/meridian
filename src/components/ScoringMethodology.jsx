@@ -101,7 +101,7 @@ export default function ScoringMethodology({ onBack }) {
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <button onClick={onBack}
-        style={{ fontSize: 12, color: "#2962ff", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 16 }}>
+        style={{ fontSize: 12, color: "var(--brand)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 16 }}>
         ← Tillbaka
       </button>
 
@@ -122,7 +122,7 @@ export default function ScoringMethodology({ onBack }) {
           )}
 
           {s.note && (
-            <div style={{ fontSize: 11, color: "#2962ff", marginTop: 8, fontStyle: "italic" }}>{s.note}</div>
+            <div style={{ fontSize: 11, color: "var(--brand)", marginTop: 8, fontStyle: "italic" }}>{s.note}</div>
           )}
 
           {s.table && (

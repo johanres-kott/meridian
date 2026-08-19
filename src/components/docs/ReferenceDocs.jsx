@@ -23,7 +23,7 @@ const GLOSSARY = [
   { term: "Tillväxt (Revenue Growth)", def: "Omsättningstillväxt jämfört med föregående år. Visar om bolaget växer eller krymper.", example: "+15% tillväxt = omsättningen ökade med 15% jämfört med förra året. Negativt = bolaget krymper." },
 ];
 
-const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 24, marginBottom: 16 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 24, marginBottom: 16 };
 const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
 const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
 
@@ -92,7 +92,7 @@ export default function ReferenceDocs({ isMobile }) {
 
       {/* Disclaimer */}
       <div id="disclaimer" style={{ ...sectionStyle, background: "rgba(255,152,0,0.08)", border: "1px solid rgba(255,152,0,0.2)" }}>
-        <div style={{ ...h2Style, color: "#e65100" }}>Ansvarsfriskrivning</div>
+        <div style={{ ...h2Style, color: "var(--warn)" }}>Ansvarsfriskrivning</div>
         <p style={{ ...pStyle, color: "var(--text-secondary)" }}>
           Thesion tillhandahåller verktyg för aktieanalys och portföljhantering. Informationen och
           rekommendationerna utgör inte finansiell rådgivning. Alla investeringsbeslut fattas av

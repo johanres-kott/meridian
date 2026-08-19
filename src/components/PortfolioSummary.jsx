@@ -74,10 +74,10 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
 
   const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10 };
   const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid var(--border-light)" };
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("portfolioSummary.title")}</span>
         <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>{t("portfolioSummary.companiesCount", { count: data.totalCount })}</span>
@@ -93,7 +93,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
                 <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>
                   {data.totalSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK
                 </div>
-                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: data.dailyChangeSek >= 0 ? "#089981" : "#f23645" }}>
+                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: data.dailyChangeSek >= 0 ? "var(--pos)" : "var(--neg)" }}>
                   {data.dailyChangeSek >= 0 ? "+" : ""}{data.dailyChangeSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK {t("portfolioSummary.today")} ({data.dailyChangeSekPct >= 0 ? "+" : ""}{data.dailyChangeSekPct.toFixed(2)}%)
                 </div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>{t("portfolioSummary.convertedToSek")}</div>
@@ -104,7 +104,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
                 <div style={{ ...mono, fontSize: 14, fontWeight: 500, color: "var(--text)" }}>
                   {g.value.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} {g.currency}
                 </div>
-                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "#089981" : "#f23645" }}>
+                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "var(--pos)" : "var(--neg)" }}>
                   {g.dailyChange >= 0 ? "+" : ""}{g.dailyChange.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} {g.currency} {t("portfolioSummary.today")} ({g.dailyChangePct >= 0 ? "+" : ""}{g.dailyChangePct.toFixed(2)}%)
                 </div>
               </div>

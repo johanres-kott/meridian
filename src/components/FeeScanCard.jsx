@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
+import { Search } from "./icons.jsx";
 
 // Avgiftskoll (PIVOT.md fas 2c, Finary-inspirerad "optimize"-funktion):
 // jämför avgiften på ägda AKTIVA fonder mot billigaste globala indexfonden i
@@ -72,7 +73,7 @@ export default function FeeScanCard({ isMobile, onNavigate }) {
     <div style={{ marginBottom: isMobile ? 12 : 20, borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-card)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "12px 14px" : "16px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ fontSize: 15 }}>🔍</span>
+          <span style={{ color: "var(--brand)", display: "inline-flex" }}><Search size={16} strokeWidth={1.5} aria-hidden /></span>
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{t("feeScan.title")}</span>
         </div>
         <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: 10 }}>
@@ -89,11 +90,11 @@ export default function FeeScanCard({ isMobile, onNavigate }) {
                 padding: "8px 12px", cursor: "pointer", fontFamily: "inherit",
               }}>
               <span style={{ fontSize: 12, fontWeight: 500, color: "var(--text)", flex: 1, minWidth: 0 }}>{r.name}</span>
-              <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
+              <span style={{ fontSize: 11, color: "var(--text-secondary)", fontFamily: "var(--font-mono)", flexShrink: 0 }}>
                 {r.charge.toFixed(2)} % {t("feeScan.feeLabel")}
               </span>
               {r.diffKr != null && (
-                <span style={{ fontSize: 11, fontWeight: 600, color: "#e65100", fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--warn)", fontFamily: "var(--font-mono)", flexShrink: 0 }}>
                   ≈ {Math.round(r.diffKr).toLocaleString("sv-SE")} {t("feeScan.perYear")}
                 </span>
               )}
@@ -101,7 +102,7 @@ export default function FeeScanCard({ isMobile, onNavigate }) {
           ))}
         </div>
         {totalKr != null && rows.length > 1 && (
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#e65100", marginTop: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--warn)", marginTop: 10 }}>
             {t("feeScan.total", { amount: Math.round(totalKr).toLocaleString("sv-SE") })}
           </div>
         )}

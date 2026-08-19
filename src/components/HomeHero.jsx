@@ -11,7 +11,7 @@ export default function HomeHero({ data, isMobile, onNavigate, period }) {
   if (!data.portfolioLoaded || !data.hasAnything) return null;
 
   const { netWorth, dailyChangeSek, portfolioSek, pensionValue, assetSum, debtSum } = data;
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
   const fmt = v => `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
 
   const chips = [
@@ -25,25 +25,25 @@ export default function HomeHero({ data, isMobile, onNavigate, period }) {
 
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
       padding: isMobile ? "16px 16px" : "22px 24px", marginBottom: isMobile ? 12 : 20,
     }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>{dateLabel}</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
-        <span style={{ ...mono, fontSize: isMobile ? 28 : 36, fontWeight: 600, color: "var(--text)", letterSpacing: "-0.02em" }}>
+        <span style={{ fontFamily: "var(--font-display)", fontVariantNumeric: "tabular-nums", fontSize: isMobile ? 34 : 44, fontWeight: 500, color: "var(--text)", letterSpacing: "-0.015em", lineHeight: 1.08 }}>
           {fmt(netWorth)}
         </span>
         {period ? (
           // Periodens förändring för valt tidsspann (global RangeBar, Finary-mönstret)
-          <span style={{ ...mono, fontSize: 13, fontWeight: 500, color: period.returnSek >= 0 ? "#089981" : "#f23645" }}>
+          <span style={{ ...mono, fontSize: 13, fontWeight: 500, color: period.returnSek >= 0 ? "var(--pos)" : "var(--neg)" }}>
             {period.returnSek >= 0 ? "+" : ""}{period.returnSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK
-            <span style={{ fontWeight: 400, marginLeft: 6, padding: "1px 7px", borderRadius: 999, background: period.returnSek >= 0 ? "rgba(8,153,129,0.12)" : "rgba(242,54,69,0.12)" }}>
+            <span style={{ fontWeight: 400, marginLeft: 6, padding: "1px 7px", borderRadius: 999, background: period.returnSek >= 0 ? "rgba(15,154,108,0.12)" : "rgba(205,74,64,0.12)" }}>
               {period.returnPct >= 0 ? "+" : ""}{period.returnPct.toFixed(2)}%
             </span>
             <span style={{ fontWeight: 400, color: "var(--text-secondary)", marginLeft: 8, fontFamily: "inherit" }}>{t(`range.labels.${period.range}`)}</span>
           </span>
         ) : dailyChangeSek != null && (
-          <span style={{ ...mono, fontSize: 13, fontWeight: 500, color: dailyChangeSek >= 0 ? "#089981" : "#f23645" }}>
+          <span style={{ ...mono, fontSize: 13, fontWeight: 500, color: dailyChangeSek >= 0 ? "var(--pos)" : "var(--neg)" }}>
             {dailyChangeSek >= 0 ? "+" : ""}{dailyChangeSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK {t("myFinances.todayPortfolio")}
           </span>
         )}
@@ -66,7 +66,7 @@ export default function HomeHero({ data, isMobile, onNavigate, period }) {
                 cursor: c.tab ? "pointer" : "default",
               }}>
               {c.label}
-              <span style={{ ...mono, color: c.negative ? "#f23645" : "var(--text)", fontWeight: 500 }}>
+              <span style={{ ...mono, color: c.negative ? "var(--neg)" : "var(--text)", fontWeight: 500 }}>
                 {c.negative ? "−" : ""}{fmt(Math.abs(c.value))}
               </span>
             </button>

@@ -11,7 +11,7 @@ export default function PremiumGate({ premium, loading, checkoutLoading, error, 
 
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
       padding: 40, textAlign: "center",
     }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
@@ -27,7 +27,7 @@ export default function PremiumGate({ premium, loading, checkoutLoading, error, 
         background: "var(--bg-secondary)", borderRadius: 8, padding: 20,
         maxWidth: 300, margin: "0 auto 20px",
       }}>
-        <div style={{ fontSize: 28, fontWeight: 600, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+        <div style={{ fontSize: 28, fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
           49 <span style={{ fontSize: 14, fontWeight: 400 }}>kr/mån</span>
         </div>
         <ul style={{
@@ -54,7 +54,7 @@ export default function PremiumGate({ premium, loading, checkoutLoading, error, 
         {checkoutLoading ? "Laddar..." : "Prenumerera"}
       </button>
       {error && (
-        <div style={{ fontSize: 12, color: "#f23645", marginTop: 8 }}>{error}</div>
+        <div style={{ fontSize: 12, color: "var(--neg)", marginTop: 8 }}>{error}</div>
       )}
       <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8 }}>
         Säker betalning via Stripe · Avsluta när som helst

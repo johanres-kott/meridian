@@ -83,7 +83,7 @@ export default function UpcomingEarnings({ isMobile }) {
     padding: isMobile ? "4px 0" : "5px 0",
     borderBottom: "1px solid var(--border-light)",
   };
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   // Group earnings by date
   const grouped = {};
@@ -104,7 +104,7 @@ export default function UpcomingEarnings({ isMobile }) {
   }
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("upcomingEarnings.title")}</span>
       </div>

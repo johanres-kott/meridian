@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { searchFunds } from "../lib/apiClient.js";
 import { useItpFunds } from "../hooks/useItpFunds.js";
 
-const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+const mono = { fontFamily: "var(--font-mono)" };
 
 /**
  * Autocomplete input that searches for funds.
@@ -113,7 +113,7 @@ export default function FundAutocomplete({ value, onChange, onChangeName, placeh
   }
 
   const inputStyle = {
-    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 10,
+    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
     fontSize: 13, fontFamily: "inherit", background: "var(--bg-card)", color: "var(--text)",
     outline: "none", width: "100%", boxSizing: "border-box",
   };
@@ -151,7 +151,7 @@ export default function FundAutocomplete({ value, onChange, onChangeName, placeh
               <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text)" }}>{fund.name}</div>
               <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
                 {fund._source === "itp" && (
-                  <span style={{ fontSize: 9, padding: "0 4px", borderRadius: 2, background: "rgba(33,150,243,0.12)", color: "#1976d2", fontWeight: 500 }}>
+                  <span style={{ fontSize: 9, padding: "0 4px", borderRadius: 2, background: "rgba(33,150,243,0.12)", color: "var(--green-600)", fontWeight: 500 }}>
                     ITP
                   </span>
                 )}
@@ -159,15 +159,15 @@ export default function FundAutocomplete({ value, onChange, onChangeName, placeh
                   <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{fund.category}</span>
                 )}
                 {fund.ongoingCharge != null && (
-                  <span style={{ fontSize: 10, color: fund.ongoingCharge <= 0.3 ? "#089981" : "var(--text-muted)", ...mono }}>
+                  <span style={{ fontSize: 10, color: fund.ongoingCharge <= 0.3 ? "var(--pos)" : "var(--text-muted)", ...mono }}>
                     avg. {fund.ongoingCharge.toFixed(2)}%
                   </span>
                 )}
                 {fund.starRating > 0 && (
-                  <span style={{ fontSize: 10, color: "#ff9800" }}>{"★".repeat(fund.starRating)}</span>
+                  <span style={{ fontSize: 10, color: "var(--warn)" }}>{"★".repeat(fund.starRating)}</span>
                 )}
                 {fund.indexFund && (
-                  <span style={{ fontSize: 9, padding: "0 4px", borderRadius: 2, background: "rgba(33,150,243,0.12)", color: "#1976d2", fontWeight: 500 }}>Index</span>
+                  <span style={{ fontSize: 9, padding: "0 4px", borderRadius: 2, background: "rgba(33,150,243,0.12)", color: "var(--green-600)", fontWeight: 500 }}>Index</span>
                 )}
               </div>
             </button>

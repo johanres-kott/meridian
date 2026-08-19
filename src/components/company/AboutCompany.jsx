@@ -23,7 +23,7 @@ export default function AboutCompany({ company }) {
   ].filter(Boolean);
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>Om bolaget</div>
       {shown && (
         <div style={{ fontSize: 13, lineHeight: 1.65, color: "var(--text)" }}>

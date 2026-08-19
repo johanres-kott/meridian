@@ -113,7 +113,7 @@ export default function FundAutocomplete({ value, onChange, onChangeName, placeh
   }
 
   const inputStyle = {
-    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
+    padding: "7px 10px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
     fontSize: 13, fontFamily: "inherit", background: "var(--bg-card)", color: "var(--text)",
     outline: "none", width: "100%", boxSizing: "border-box",
   };

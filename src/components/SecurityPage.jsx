@@ -43,7 +43,7 @@ const RECOMMENDATIONS = [
 
 export default function SecurityPage() {
   const isMobile = useIsMobile();
-  const card = { background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: isMobile ? 16 : 22 };
+  const card = { background: "var(--surface-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? 16 : 22 };
 
   return (
     <div style={{ maxWidth: 820 }}>

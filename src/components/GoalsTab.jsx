@@ -166,7 +166,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
 
   return (
-    <div style={{ flex: 1, minWidth: 280, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+    <div style={{ flex: 1, minWidth: 280, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--border-light)" }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{title}</span>
         <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: accent || "var(--text)" }}>{rows.length ? `${fmtKr(total)}/mån` : "—"}</span>
@@ -284,7 +284,7 @@ function CashflowDistribution({ incomes, expenses, available, isMobile, loans })
   const overspendPct = base > 0 && available < 0 ? (-available / base) * 100 : 0;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 16px" : "16px 20px", marginBottom: isMobile ? 10 : 14 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 16px" : "16px 20px", marginBottom: isMobile ? 10 : 14 }}>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Vart tar lönen vägen?</div>
       {/* Flödesstapel */}
       <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden", background: "var(--border-light)" }}>
@@ -333,7 +333,7 @@ function GoalCard({ goal, monthlySavings, onUpdateSaved, onRemove }) {
   }
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "16px 18px" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "16px 18px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
         <span style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--brand-tint)", color: "var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><GoalIcon icon={goal.icon} size={18} /></span>
         <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", flex: 1 }}>{goal.name}</span>
@@ -457,7 +457,7 @@ export default function GoalsTab() {
   }
 
   const statCard = (label, value, color, sub) => (
-    <div style={{ flex: 1, minWidth: 140, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "14px 18px" }}>
+    <div style={{ flex: 1, minWidth: 140, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "14px 18px" }}>
       <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>{label}</div>
       <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: color || "var(--text)" }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: color || "var(--text-secondary)", marginTop: 2 }}>{sub}</div>}

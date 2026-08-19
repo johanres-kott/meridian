@@ -2,7 +2,7 @@ export default function SuggestionDropdown({ suggestions, enriched, enrichRef, o
   return (
     <div style={{
       position: "absolute", top: "100%", left: 0, right: 48,
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
+      background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
       zIndex: 100, marginTop: 4,
     }}>
       {suggestions.map(s => {

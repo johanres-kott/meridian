@@ -37,7 +37,7 @@ export function PriceChart({ ticker, yahooSymbol, conv = 1, label = "Kurs" }) {
   const gradientId = `chartGrad-${(chartSymbol || "default").replace(/[^a-zA-Z0-9]/g, "")}`;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "20px 20px 12px" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "20px 20px 12px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Kursutveckling</div>
         <div style={{ display: "flex", gap: 4 }}>

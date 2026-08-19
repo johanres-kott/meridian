@@ -277,17 +277,17 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
             URL.revokeObjectURL(url);
           }}
             title={t("portfolio.exportCsv")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.exportCsvShort") : t("portfolio.exportCsv")}
           </button>
           <button onClick={() => setShowImport(true)}
             title={t("portfolio.importPortfolio")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.importPortfolioShort") : t("portfolio.importPortfolio")}
           </button>
           <button onClick={() => setShowGuide(true)}
             title={t("portfolio.importHelp")}
-            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
+            style={{ padding: "7px 10px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
             ?
           </button>
         </div>
@@ -304,7 +304,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
               : t("portfolio.emptyNoCompanies")}
           </div>
         ) : (
-          <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
               <thead>
                 <tr>

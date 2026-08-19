@@ -115,7 +115,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
                   onClick={() => selectCompany(company)}
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "14px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
+                    padding: "14px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
                     background: "var(--bg-card)", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
                     transition: "border-color 0.15s",
                   }}
@@ -207,7 +207,7 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
               <input
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
-                style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", fontSize: 13, fontFamily: "inherit", color: "var(--text)", background: "var(--bg-card)", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", fontSize: 13, fontFamily: "inherit", color: "var(--text)", background: "var(--bg-card)", boxSizing: "border-box" }}
               />
             </div>
 
@@ -231,5 +231,5 @@ export default function InvestmentCompanyModal({ onClose, existingItems, onImpor
 
 const thStyle = { padding: "8px 6px", fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 };
 const tdStyle = { padding: "8px 6px" };
-const btnSecondary = { padding: "7px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
+const btnSecondary = { padding: "7px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
 const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "var(--accent)", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };

@@ -70,7 +70,7 @@ export default function Features({ isMobile }) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 16 }}>
             {steps.map(([n, title, body]) => (
-              <div key={n} style={{ background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 28 }}>
+              <div key={n} style={{ background: "var(--surface-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 28 }}>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "var(--gold-700)", marginBottom: 12 }}>{n}</div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>{title}</div>
                 <div style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>{body}</div>

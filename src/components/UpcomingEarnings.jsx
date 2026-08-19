@@ -104,7 +104,7 @@ export default function UpcomingEarnings({ isMobile }) {
   }
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("upcomingEarnings.title")}</span>
       </div>

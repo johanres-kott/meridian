@@ -105,8 +105,8 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
         <div style={{
           position: "absolute",
           ...(direction === "up" ? { bottom: "calc(100% + 8px)", left: 0 } : { top: "calc(100% + 6px)", right: 0 }),
-          background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
-          padding: "12px 0", minWidth: 240, zIndex: 100,
+          background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
+          padding: "12px 0", width: direction === "up" ? 272 : undefined, minWidth: 240, zIndex: 100, boxShadow: "0 8px 24px rgba(20,30,25,0.10)",
         }}>
           <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid var(--border-light)" }}>
             {editingName ? (

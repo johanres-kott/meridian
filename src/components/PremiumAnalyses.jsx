@@ -10,7 +10,7 @@ function AnalysisCard({ analysis, onSelect }) {
     <div
       onClick={() => onSelect(analysis)}
       style={{
-        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
+        background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
         padding: 20, cursor: "pointer", transition: "border-color 0.15s",
       }}
       onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent)"}
@@ -41,7 +41,7 @@ function CompanyAnalysis({ company }) {
   if (!company) return null;
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
+      background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
       overflow: "hidden", marginBottom: 16,
     }}>
       <div style={{

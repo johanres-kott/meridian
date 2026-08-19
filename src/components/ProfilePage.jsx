@@ -34,7 +34,7 @@ export default function ProfilePage({ onResetProfile }) {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: isMobile ? 16 : 24, marginBottom: 16 };
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? 16 : 24, marginBottom: 16 };
   const labelStyle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
   const fieldLabel = { fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 };
   const fieldValue = { fontSize: 14, color: "var(--text)", fontWeight: 500 };

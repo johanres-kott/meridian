@@ -16,14 +16,14 @@ function FeeCalculator() {
   const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16, marginTop: 12 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16, marginTop: 12 }}>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>Avgiftens påverkan</div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
         <div>
           <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Startbelopp</label>
           <select value={amount} onChange={e => setAmount(Number(e.target.value))}
-            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
+            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
             <option value={50000}>50 000 kr</option>
             <option value={100000}>100 000 kr</option>
             <option value={500000}>500 000 kr</option>
@@ -33,7 +33,7 @@ function FeeCalculator() {
         <div>
           <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Sparhorisont</label>
           <select value={years} onChange={e => setYears(Number(e.target.value))}
-            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
+            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
             <option value={5}>5 år</option>
             <option value={10}>10 år</option>
             <option value={20}>20 år</option>
@@ -44,7 +44,7 @@ function FeeCalculator() {
         <div>
           <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Årlig avkastning (före avgift)</label>
           <select value={returnPct} onChange={e => setReturnPct(Number(e.target.value))}
-            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
+            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
             <option value={5}>5%</option>
             <option value={7}>7%</option>
             <option value={8}>8%</option>
@@ -109,7 +109,7 @@ export default function FundEducation() {
 
       <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 16 }}>
         {/* Passive vs Active */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Passiv (index) vs aktiv förvaltning</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.7 }}>
             <p style={{ margin: "0 0 8px" }}>
@@ -128,7 +128,7 @@ export default function FundEducation() {
         <FeeCalculator />
 
         {/* Star rating */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Morningstar-betyg</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.7 }}>
             <p style={{ margin: "0 0 8px" }}>

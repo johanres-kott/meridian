@@ -7,7 +7,7 @@ import MyITPSection from "./MyITPSection.jsx";
 import { useItpProviders } from "../hooks/useItpProviders.js";
 
 const mono = { fontFamily: "var(--font-mono)" };
-const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 20, marginBottom: 16 };
+const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 20, marginBottom: 16 };
 
 // ─── PPM fund suggestions (real funds available on Pensionsmyndighetens fondtorg) ───
 

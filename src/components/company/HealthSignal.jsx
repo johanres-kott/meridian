@@ -50,7 +50,7 @@ export default function HealthSignal({ ticker, investorProfile }) {
   }).filter(d => d.level);
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", background: verdict.bg }}>
         <div style={{
           width: 44, height: 44, borderRadius: "50%", flexShrink: 0,

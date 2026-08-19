@@ -21,7 +21,7 @@ export default function NotesSection({ item, onUpdate }) {
   return (
     <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
       {/* GAV */}
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Egna kop</div>
           <button onClick={() => setShowGAV(!showGAV)}
@@ -64,7 +64,7 @@ export default function NotesSection({ item, onUpdate }) {
       </div>
 
       {/* Notes */}
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Anteckningar</div>
           {!editing && (
@@ -85,7 +85,7 @@ export default function NotesSection({ item, onUpdate }) {
                 Spara
               </button>
               <button onClick={() => { setNotes(item.notes || ""); setEditing(false); }}
-                style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer" }}>
+                style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer" }}>
                 Avbryt
               </button>
             </div>

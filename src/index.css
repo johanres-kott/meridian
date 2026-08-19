@@ -9,7 +9,7 @@
 
 :root {
   /* ---- Neutrals (nära vitt — aldrig beige) ---- */
-  --bg: #FCFCFC;
+  --bg: #F6F7F5;              /* test: kantlösa kort — bakgrunden ett snäpp mörkare så vita kort lyfter */
   --bg-raised: #F5F7F6;
   --surface-card: #FFFFFF;
   --ink: #121B17;
@@ -17,6 +17,7 @@
   --text-secondary: #5C6763;
   --text-muted: #99A29D;
   --border: #E6EAE8;
+  --card-border: transparent; /* test: kortens kant borttagen (sätt till var(--border) för att få tillbaka) */
   --border-light: #F0F3F1;
 
   /* ---- Brand: grön skala ---- */
@@ -114,6 +115,7 @@
   --text-secondary: #93A19A;
   --text-muted: #5C6B64;
   --border: #1E2B25;
+  --card-border: transparent;
   --border-light: #16211C;
   --brand: var(--green-500);
   --brand-tint: rgba(20, 168, 125, 0.12);

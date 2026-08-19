@@ -244,7 +244,7 @@ function AppContent() {
 
       {/* Sidomeny + innehåll */}
       <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
-        <div style={{ width: 220, flexShrink: 0, display: "flex", flexDirection: "column", padding: "8px 12px 16px", overflowY: "auto" }}>
+        <div style={{ width: 220, flexShrink: 0, display: "flex", flexDirection: "column", padding: "8px 12px 16px", position: "relative", zIndex: 50 }}>
           <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {TABS.map(tabItem => (
               <button

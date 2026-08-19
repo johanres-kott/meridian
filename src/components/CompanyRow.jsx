@@ -18,13 +18,13 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
   }, [onClose]);
 
   if (!groups.length) return (
-    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "12px 16px", zIndex: 200, minWidth: 180, marginTop: 4 }}>
+    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "12px 16px", zIndex: 200, minWidth: 180, marginTop: 4 }}>
       <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>Inga grupper skapade</div>
     </div>
   );
 
   return (
-    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "6px 0", zIndex: 200, minWidth: 180, marginTop: 4 }}>
+    <div ref={ref} style={{ position: "absolute", top: "100%", right: 0, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "6px 0", zIndex: 200, minWidth: 180, marginTop: 4 }}>
       {groups.map(g => {
         const isMember = (g.members || []).includes(item.id);
         return (

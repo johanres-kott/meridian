@@ -55,10 +55,10 @@ export default function AddCompanyBar({ onAdd, isMobile }) {
         value={query}
         onChange={e => setQuery(e.target.value)}
         placeholder={mode === "fund" ? "Sök fond — t.ex. SEB, Handelsbanken, Avanza..." : "Lägg till bolag — sök på namn eller ticker..."}
-        style={{ width: "100%", maxWidth: isMobile ? "100%" : undefined, boxSizing: isMobile ? "border-box" : undefined, padding: "10px 14px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", fontSize: 13, fontFamily: "inherit", outline: "none", color: "var(--text)", background: "var(--bg-card)" }}
+        style={{ width: "100%", maxWidth: isMobile ? "100%" : undefined, boxSizing: isMobile ? "border-box" : undefined, padding: "10px 14px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", fontSize: 13, fontFamily: "inherit", outline: "none", color: "var(--text)", background: "var(--bg-card)" }}
       />
       {results.length > 0 && (
-        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", zIndex: 100, marginTop: 4, maxHeight: 320, overflowY: "auto" }}>
+        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", zIndex: 100, marginTop: 4, maxHeight: 320, overflowY: "auto" }}>
           {results.map(r => {
             if (mode === "fund") {
               return (

@@ -111,7 +111,7 @@ export default function FundView({ item, onBack, onUpdate }) {
               value={item.shares || ""}
               onChange={e => onUpdate(item.id, { shares: e.target.value ? Number(e.target.value) : null })}
               placeholder="0"
-              style={{ width: 90, padding: "6px 10px", fontSize: 13, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
+              style={{ width: 90, padding: "6px 10px", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
             />
           </div>
           <div>
@@ -122,7 +122,7 @@ export default function FundView({ item, onBack, onUpdate }) {
               value={item.gav || ""}
               onChange={e => onUpdate(item.id, { gav: e.target.value ? Number(e.target.value) : null })}
               placeholder="0.00"
-              style={{ width: 100, padding: "6px 10px", fontSize: 13, border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
+              style={{ width: 100, padding: "6px 10px", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
             />
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function FundView({ item, onBack, onUpdate }) {
             </div>
 
             {/* Return bars */}
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16, marginBottom: 24 }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16, marginBottom: 24 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>Avkastning</div>
               <ReturnBar label="1 vecka" value={fund.returnW1} />
               <ReturnBar label="1 månad" value={fund.returnM1} />

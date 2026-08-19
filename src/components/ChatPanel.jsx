@@ -144,7 +144,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
                 <button key={i} onClick={() => handleAction(item)}
                   style={{
                     display: "flex", alignItems: "center", gap: 8, padding: "10px 12px",
-                    background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
+                    background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
                     cursor: "pointer", fontFamily: "inherit", fontSize: 12, color: "var(--text)",
                     textAlign: "left", transition: "border-color 0.15s",
                   }}
@@ -247,7 +247,7 @@ export default function ChatPanel({ open, onClose, contextFn, sharePortfolio = t
           placeholder="Skriv en fråga..."
           disabled={streaming}
           style={{
-            flex: 1, padding: "8px 12px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", fontSize: 12, background: "var(--bg-card)", color: "var(--text)",
+            flex: 1, padding: "8px 12px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", fontSize: 12, background: "var(--bg-card)", color: "var(--text)",
             fontFamily: "inherit", outline: "none",
           }}
         />

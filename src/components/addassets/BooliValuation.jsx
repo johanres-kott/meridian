@@ -36,7 +36,7 @@ export default function BooliValuation({ onUseEstimate, initialAddress = "", ini
   };
 
   return (
-    <div style={{ padding: "16px 18px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}>
+    <div style={{ padding: "16px 18px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}>
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Värdeindikation från området</div>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: 10 }}>
         Ange adress eller område så hämtar vi faktiska slutpriser i närheten (källa: Booli).

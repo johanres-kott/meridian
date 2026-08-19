@@ -106,7 +106,7 @@ describe("GoalsTab", () => {
     render(<GoalsTab />);
     fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
     fireEvent.click(screen.getByText("Spara"));
-    expect(screen.getByText("Fyll i ett belopp i kr per månad.")).toBeTruthy();
+    expect(screen.getByText("Fyll i ett belopp i kr per mån.")).toBeTruthy();
     expect(updatePreferences).not.toHaveBeenCalled();
   });
 
@@ -121,6 +121,36 @@ describe("GoalsTab", () => {
     const call = updatePreferences.mock.calls.at(-1)[0];
     expect(call.cashflow.incomes).toHaveLength(2);
     expect(call.cashflow.incomes[1]).toMatchObject({ label: "Partners lön", amount: 28000, incomeType: "partner" });
+  });
+
+  it("converts yearly and quarterly posts to kr/month everywhere", () => {
+    prefs = {
+      cashflow: {
+        incomes: [{ id: "1", label: "Lön", amount: 30000, period: "month" }],
+        expenses: [
+          { id: "2", label: "Hemförsäkring", amount: 5400, period: "year", category: "forsakring" },   // 450/mån
+          { id: "3", label: "Fordonsskatt", amount: 900, period: "quarter", category: "transport" },   // 300/mån
+          { id: "4", label: "Hyra", amount: 9000, category: "boende" },                                // ingen period = månad
+        ],
+      },
+    };
+    render(<GoalsTab />);
+    // raden visar månadsvärde + originalet
+    expect(screen.getByText("450 kr/mån (5 400 kr/år)")).toBeTruthy();
+    expect(screen.getByText("300 kr/mån (900 kr/kvartal)")).toBeTruthy();
+    // ut = 450 + 300 + 9000 = 9 750; sparutrymme = 20 250
+    expect(screen.getAllByText(/9 750 kr/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/20 250 kr\/mån/).length).toBeGreaterThan(0);
+  });
+
+  it("saves the chosen period with the row and defaults to month", () => {
+    render(<GoalsTab />);
+    fireEvent.click(screen.getByText("+ Hemförsäkring")); // preset med period=år
+    expect(screen.getByPlaceholderText("kr/år")).toBeTruthy();
+    fireEvent.change(screen.getByPlaceholderText("kr/år"), { target: { value: "5400" } });
+    fireEvent.click(screen.getByText("Spara"));
+    const call = updatePreferences.mock.calls.at(-1)[0];
+    expect(call.cashflow.expenses[0]).toMatchObject({ label: "Hemförsäkring", amount: 5400, period: "year" });
   });
 
   it("creates a new goal", () => {

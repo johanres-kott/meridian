@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useUser } from "../contexts/UserContext.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { GOAL_ICONS, Target } from "./icons.jsx";
+import { PERIODS, PERIOD_BY_ID, monthlyAmount } from "./cashflowPeriods.js";
 
 // Mål & kassaflöde (DESIGN.md): Finarys Budget-mönster (Pengar in / ut /
 // Sparutrymme) fast med manuellt inmatad lön och utgifter — ingen bankkoppling.
@@ -20,6 +21,12 @@ function GoalIcon({ icon, size = 20 }) {
 function parseAmount(v) {
   const n = parseFloat(String(v).replace(/\s/g, "").replace(",", "."));
   return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+function fmtRowAmount(row) {
+  const m = monthlyAmount(row);
+  if (!row.period || row.period === "month") return `${fmtKr(m)}/mån`;
+  return `${fmtKr(m)}/mån (${fmtKr(row.amount)}/${PERIOD_BY_ID[row.period]?.label})`;
 }
 
 function newId() {
@@ -65,8 +72,8 @@ const EXPENSE_PRESETS = [
   { label: "El",                  category: "boende" },
   { label: "Värme / fjärrvärme",  category: "boende" },
   { label: "Vatten & avlopp",     category: "boende" },
-  { label: "Hemförsäkring",       category: "forsakring" },
-  { label: "Bilförsäkring",       category: "forsakring" },
+  { label: "Hemförsäkring",       category: "forsakring", period: "year" },
+  { label: "Bilförsäkring",       category: "forsakring", period: "year" },
   { label: "Mat",                 category: "mat" },
   { label: "Mobil",               category: "abonnemang" },
   { label: "Bredband",            category: "abonnemang" },
@@ -77,6 +84,8 @@ const EXPENSE_PRESETS = [
   { label: "Förskola / fritids",  category: "barn" },
   { label: "CSN",                 category: "lan" },
   { label: "Gym",                 category: "abonnemang" },
+  { label: "Fordonsskatt",        category: "transport",  period: "year" },
+  { label: "Semester / resa",     category: "ovrigt",     period: "year" },
 ];
 
 function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, withIncomeType = false, presets = [], accent }) {
@@ -85,6 +94,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("boende");
   const [incomeType, setIncomeType] = useState("lon");
+  const [period, setPeriod] = useState("month");
   const [error, setError] = useState(null);
 
   function save() {
@@ -93,15 +103,16 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
     const fallbackLabel = withIncomeType ? (INCOME_TYPES.find(t => t.id === incomeType)?.label || "") : "";
     const finalLabel = (label.trim() || fallbackLabel).trim();
     if (!finalLabel) { setError("Skriv ett namn på posten."); return; }
-    if (parsed == null) { setError("Fyll i ett belopp i kr per månad."); return; }
+    if (parsed == null) { setError(`Fyll i ett belopp i kr per ${PERIOD_BY_ID[period]?.label || "månad"}.`); return; }
     setError(null);
     onAdd({
-      id: newId(), label: finalLabel, amount: parsed,
+      id: newId(), label: finalLabel, amount: parsed, period,
       ...(withCategory ? { category } : {}),
       ...(withIncomeType ? { incomeType } : {}),
     });
     setLabel("");
     setAmount("");
+    setPeriod("month");
     setAdding(false);
   }
   function cancel() { setAdding(false); setError(null); setLabel(""); setAmount(""); }
@@ -110,12 +121,13 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   function pickPreset(preset) {
     setLabel(preset.label);
     setCategory(preset.category);
+    setPeriod(preset.period || "month");
     setAdding(true);
   }
   const usedLabels = new Set(rows.map(r => r.label.toLowerCase()));
   const unusedPresets = presets.filter(p => !usedLabels.has(p.label.toLowerCase()));
 
-  const total = rows.reduce((s, r) => s + r.amount, 0);
+  const total = rows.reduce((s, r) => s + monthlyAmount(r), 0);
   const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
 
   return (
@@ -135,7 +147,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
               {cat && <span title={cat.label} style={{ width: 8, height: 8, borderRadius: "50%", background: cat.color, flexShrink: 0 }} />}
               <span style={{ color: "var(--text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
               {cat && <span style={{ fontSize: 10, color: "var(--text-secondary)", background: "var(--bg-secondary)", borderRadius: 999, padding: "1px 7px", flexShrink: 0 }}>{cat.label}</span>}
-              <span style={{ ...mono, color: "var(--text)", flexShrink: 0 }}>{fmtKr(r.amount)}</span>
+              <span style={{ ...mono, color: "var(--text)", flexShrink: 0, fontSize: 11.5 }}>{fmtRowAmount(r)}</span>
               <button onClick={() => onRemove(r.id)} title="Ta bort"
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>
@@ -154,8 +166,11 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
                 {EXPENSE_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             )}
-            <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="kr/mån" inputMode="numeric" autoFocus={!!label} style={{ ...inputStyle, width: 90 }}
+            <input value={amount} onChange={e => setAmount(e.target.value)} placeholder={`kr/${PERIOD_BY_ID[period]?.label || "mån"}`} inputMode="numeric" autoFocus={!!label} style={{ ...inputStyle, width: 90 }}
               onKeyDown={e => { if (e.key === "Enter") save(); }} />
+            <select value={period} onChange={e => setPeriod(e.target.value)} title="Period" style={inputStyle}>
+              {PERIODS.map(p => <option key={p.id} value={p.id}>per {p.label}</option>)}
+            </select>
             <button onClick={save} style={{ fontSize: 12, padding: "7px 14px", borderRadius: 16, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>Spara</button>
             <button onClick={cancel} style={{ fontSize: 12, padding: "7px 10px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
             {error && <div style={{ width: "100%", fontSize: 11.5, color: "var(--neg)", marginTop: 2 }}>{error}</div>}
@@ -190,14 +205,14 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
 
 // Fördelning av utgifter per kategori (Finarys "Distribution") + flödesstapel lön → utgifter → sparande
 function CashflowDistribution({ incomes, expenses, available, isMobile }) {
-  const totalIn = incomes.reduce((s, r) => s + r.amount, 0);
-  const totalOut = expenses.reduce((s, r) => s + r.amount, 0);
+  const totalIn = incomes.reduce((s, r) => s + monthlyAmount(r), 0);
+  const totalOut = expenses.reduce((s, r) => s + monthlyAmount(r), 0);
   if (totalIn === 0 && totalOut === 0) return null;
 
   const byCat = {};
   for (const e of expenses) {
     const id = CAT_BY_ID[e.category] ? e.category : "ovrigt";
-    byCat[id] = (byCat[id] || 0) + e.amount;
+    byCat[id] = (byCat[id] || 0) + monthlyAmount(e);
   }
   const cats = EXPENSE_CATEGORIES.filter(c => byCat[c.id] > 0).map(c => ({ ...c, amount: byCat[c.id] }))
     .sort((a, b) => b.amount - a.amount);
@@ -363,8 +378,8 @@ export default function GoalsTab() {
   const cashflow = preferences.cashflow || { incomes: [], expenses: [] };
   const goals = preferences.savingsGoals || [];
 
-  const totalIn = cashflow.incomes.reduce((s, r) => s + r.amount, 0);
-  const totalOut = cashflow.expenses.reduce((s, r) => s + r.amount, 0);
+  const totalIn = cashflow.incomes.reduce((s, r) => s + monthlyAmount(r), 0);
+  const totalOut = cashflow.expenses.reduce((s, r) => s + monthlyAmount(r), 0);
   const available = totalIn - totalOut;
   const savingsRate = totalIn > 0 ? (available / totalIn) * 100 : null;
   const hasFlow = cashflow.incomes.length > 0 || cashflow.expenses.length > 0;

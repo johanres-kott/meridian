@@ -3,6 +3,7 @@ import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import BostadWizard from "./BostadWizard.jsx";
 import FordonWizard from "./FordonWizard.jsx";
+import VinstandelWizard from "./VinstandelWizard.jsx";
 import { KindIcon } from "../icons.jsx";
 
 // Helsides "Komplettera din portfölj" — Finary-inspirerad Add Assets-katalog
@@ -19,6 +20,7 @@ const CATEGORIES = [
   { id: "sparkonto", kind: "sparkonto", title: "Sparkonto & buffert", desc: "Kontanter, sparkonton och din buffert" },
   { id: "lan", kind: "skuld", title: "Bolån & skulder", desc: "Lån dras av från din nettoförmögenhet" },
   { id: "pension", kind: "pension", title: "Pension (ITP)", desc: "Din tjänstepension — följ värdet och jämför fondval" },
+  { id: "vinstandel", kind: "vinstandel", title: "Vinstandelsstiftelse", desc: "Vinstandelar från arbetsgivaren (t.ex. via PRI) — årgångar, låstid och när pengarna frisläpps" },
   { id: "ovrigt", kind: "ovrigt", title: "Övrigt", desc: "Konst, klockor eller andra tillgångar värda att räkna med" },
 ];
 
@@ -204,6 +206,8 @@ export default function AddAssetsPage({ onClose, onNavigate }) {
           <BostadWizard onSaved={handleSaved} onBack={() => setView(null)} />
         ) : view === "fordon" ? (
           <FordonWizard onSaved={handleSaved} onBack={() => setView(null)} />
+        ) : view === "vinstandel" ? (
+          <VinstandelWizard onSaved={handleSaved} onBack={() => setView(null)} />
         ) : view ? (
           <ManualForm formId={view} onSaved={handleSaved} onBack={() => setView(null)} />
         ) : (

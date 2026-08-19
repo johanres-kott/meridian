@@ -14,12 +14,13 @@ const COLORS = {
   bostad: "#7c4dff",
   fordon: "var(--warn)",
   cash: "#26a69a",
+  vinstandel: "var(--gold-500)",
   ovrigt: "#8d6e63",
   bolan: "var(--neg)",
   skuld: "#ef6c00",
 };
 
-const KIND_TO_CAT = { bostad: "bostad", fordon: "fordon", sparkonto: "cash", buffert: "cash", ovrigt: "ovrigt", bolan: "bolan", skuld: "skuld" };
+const KIND_TO_CAT = { bostad: "bostad", fordon: "fordon", sparkonto: "cash", buffert: "cash", vinstandel: "vinstandel", ovrigt: "ovrigt", bolan: "bolan", skuld: "skuld" };
 
 export default function AssetBreakdown({ data, isMobile, onNavigate }) {
   const { t, i18n } = useTranslation();

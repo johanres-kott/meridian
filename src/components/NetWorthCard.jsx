@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
 import { deleteManualAsset } from "../lib/manualAssets.js";
 import { KindIcon } from "./icons.jsx";
+import { vinstandelHint } from "./addassets/vinstandel.js";
 
 // "Min ekonomi" (PIVOT.md fas 3): listar och raderar manuella tillgångar/
 // skulder. Nya poster läggs till via Add Assets-katalogen (onAddAssets) —
@@ -70,7 +71,12 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
           {assets.map(r => (
             <div key={r.id} style={rowStyle}>
               <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--text-secondary)" }}><KindIcon kind={r.kind} /></span>
-              <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>
+              <span style={{ color: "var(--text)", flex: 1, minWidth: 0 }}>
+                {r.label}
+                {r.kind === "vinstandel" && vinstandelHint(r.metadata) && (
+                  <span style={{ display: "block", fontSize: 10.5, color: "var(--text-muted)" }}>{vinstandelHint(r.metadata)}</span>
+                )}
+              </span>
               <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(Number(r.value_sek))}</span>
               <button onClick={() => removeRow(r.id)} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>

@@ -8,7 +8,7 @@ import { getSupabase } from "./_supabase.js";
 // hela felklassen, samma mönster som övriga JWT-proxys. RLS gäller fortfarande:
 // anon-nyckel + användarens token, user_id sätts server-side från verifierad JWT.
 
-const KINDS = ["bostad", "fordon", "sparkonto", "buffert", "ovrigt", "bolan", "skuld"];
+const KINDS = ["bostad", "fordon", "sparkonto", "buffert", "ovrigt", "bolan", "skuld", "vinstandel"];
 
 export default async function handler(req, res) {
   setCors(req, res);

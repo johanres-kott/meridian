@@ -1,13 +1,13 @@
 import {
   Home, Car, Landmark, LifeBuoy, Package, FileText, TrendingUp, Hexagon,
-  Egg, Wallet, Plane, GraduationCap, Gem, Ship, Gift,
+  Egg, Wallet, Plane, GraduationCap, Gem, Ship, Gift, Vault,
 } from "lucide-react";
 
 // Ikon-mappningar enligt designsystemet (Lucide, stroke 1.5 — inga emoji).
 // Komponenterna (KindIcon, IconBadge) bor i icons.jsx.
 
 export const KIND_ICON = {
-  bostad: Home, fordon: Car, sparkonto: Landmark, buffert: LifeBuoy, ovrigt: Package,
+  bostad: Home, fordon: Car, sparkonto: Landmark, buffert: LifeBuoy, ovrigt: Package, vinstandel: Vault,
   bolan: Home, skuld: FileText, stock: TrendingUp, stocks: TrendingUp, fund: Hexagon,
   funds: Hexagon, pension: Egg, cash: Wallet, portfolio: TrendingUp,
 };

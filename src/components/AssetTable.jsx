@@ -15,6 +15,7 @@ const TYPE_META = {
   fordon:   { label: "Fordon",    color: "var(--warn)" },
   sparkonto:{ label: "Sparkonto", color: "#26a69a" },
   buffert:  { label: "Buffert",   color: "#26a69a" },
+  vinstandel:{ label: "Vinstandel", color: "var(--gold-500)" },
   ovrigt:   { label: "Övrigt",    color: "#8d6e63" },
   bolan:    { label: "Bolån",     color: "var(--neg)" },
   skuld:    { label: "Skuld",     color: "#ef6c00" },

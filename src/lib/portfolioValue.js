@@ -32,11 +32,22 @@ async function computeValuation(userId) {
     return { empty: true, watchlist: [], priced: [], holdings: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null, stocksSek: 0, fundsSek: 0, fxToSek: {} };
   }
 
-  // Fetch prices + FX rates in parallel
+  // Prissätt ALLA rader med innehav (shares > 0) + upp till 20 övriga bevakningar.
+  // Tidigare bara de 20 första raderna oavsett — innehav längre ner försvann tyst.
+  const withShares = watchlist.filter(i => Number(i.shares) > 0);
+  const others = watchlist.filter(i => !(Number(i.shares) > 0)).slice(0, 20);
+  const toPrice = [...withShares, ...others];
+
+  // Fetch prices + FX rates in parallel. Fonder via NAV (/api/fund), aktier via /api/company.
   const [pricedResults, commoditiesRes] = await Promise.all([
     Promise.all(
-      watchlist.slice(0, 20).map(async (item) => {
+      toPrice.map(async (item) => {
         try {
+          if (item.type === "fund") {
+            const res = await fetch(`/api/fund?secId=${encodeURIComponent(item.ticker)}`);
+            const d = await res.json();
+            return { ...item, price: d?.nav || 0, changePercent: d?.returnD1 || 0, currency: d?.currency || "SEK" };
+          }
           const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
           const d = await res.json();
           return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
@@ -53,8 +64,9 @@ async function computeValuation(userId) {
   // Build FX rates to SEK from commodities API
   const fxToSek = parseFxRates(commoditiesRes);
 
-  // Portfolio value (only "Äger" with shares), grouped by currency
-  const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);
+  // Innehav = rader med antal > 0 och kurs. Status ("Äger"/"Bevakar") styr inte —
+  // PDF-import och "lägg till" sparar som Bevakar, och har man aktier äger man dem.
+  const holdings = priced.filter(i => Number(i.shares) > 0 && i.price);
 
   // Fetch missing FX rates from Yahoo Finance
   const holdingCurrencies = [...new Set(holdings.map(h => h.currency || "SEK"))];

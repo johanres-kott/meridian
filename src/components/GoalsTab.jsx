@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useUser } from "../contexts/UserContext.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { GOAL_ICONS, Target } from "./icons.jsx";
-import { PERIODS, PERIOD_BY_ID, monthlyAmount } from "./cashflowPeriods.js";
+import { PERIODS, PERIOD_BY_ID, monthlyAmount, loanInterestMonthly } from "./cashflowPeriods.js";
+import useNetWorth from "../hooks/useNetWorth.js";
 
 // Mål & kassaflöde (DESIGN.md): Finarys Budget-mönster (Pengar in / ut /
 // Sparutrymme) fast med manuellt inmatad lön och utgifter — ingen bankkoppling.
@@ -23,9 +24,9 @@ function parseAmount(v) {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
-function fmtRowAmount(row) {
-  const m = monthlyAmount(row);
-  if (!row.period || row.period === "month") return `${fmtKr(m)}/mån`;
+function fmtRowAmount(row, loans) {
+  const m = monthlyAmount(row, loans);
+  if (row.loanId || !row.period || row.period === "month") return `${fmtKr(m)}/mån`;
   return `${fmtKr(m)}/mån (${fmtKr(row.amount)}/${PERIOD_BY_ID[row.period]?.label})`;
 }
 
@@ -67,7 +68,7 @@ const INCOME_TYPES = [
 // kategori förifyllt, användaren fyller bara i beloppet.
 const EXPENSE_PRESETS = [
   { label: "Hyra / avgift",       category: "boende" },
-  { label: "Bolåneränta",         category: "boende" },
+  { label: "Bolåneränta",         category: "lan", loanKind: "bolan" },
   { label: "Amortering",          category: "lan" },
   { label: "El",                  category: "boende" },
   { label: "Värme / fjärrvärme",  category: "boende" },
@@ -80,7 +81,7 @@ const EXPENSE_PRESETS = [
   { label: "Streaming",           category: "abonnemang" },
   { label: "Kollektivtrafik",     category: "transport" },
   { label: "Bensin / laddning",   category: "transport" },
-  { label: "Billån / leasing",    category: "lan" },
+  { label: "Billån / leasing",    category: "lan", loanKind: "skuld" },
   { label: "Förskola / fritids",  category: "barn" },
   { label: "CSN",                 category: "lan" },
   { label: "Gym",                 category: "abonnemang" },
@@ -88,16 +89,44 @@ const EXPENSE_PRESETS = [
   { label: "Semester / resa",     category: "ovrigt",     period: "year" },
 ];
 
-function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, withIncomeType = false, presets = [], accent }) {
+function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, withIncomeType = false, presets = [], accent, loans = [] }) {
   const [adding, setAdding] = useState(false);
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("boende");
   const [incomeType, setIncomeType] = useState("lon");
   const [period, setPeriod] = useState("month");
+  const [loanId, setLoanId] = useState("");   // utgift kopplad till ett inmatat lån → ränta räknas ut
+  const [rate, setRate] = useState("");
   const [error, setError] = useState(null);
+  const loansById = Object.fromEntries(loans.map(l => [l.id, l]));
+  const linkedLoan = loanId ? loansById[loanId] : null;
+  const linkedMonthly = linkedLoan ? loanInterestMonthly(linkedLoan.value_sek, parseAmount(rate)) : null;
+
+  // Välj lån: namn + kategori sätts från lånet, räntan förifylls från wizarden om den finns
+  function pickLoan(id) {
+    setLoanId(id);
+    const loan = loansById[id];
+    if (!loan) return;
+    setLabel(`Ränta · ${loan.label.replace(/^(Bolån|Billån) · /, "")}`);
+    setCategory("lan");
+    setPeriod("month");
+    const known = loan.metadata?.interestRate;
+    setRate(known != null ? String(known).replace(".", ",") : "");
+  }
 
   function save() {
+    if (linkedLoan) {
+      const r = parseAmount(rate);
+      if (r == null || r <= 0) { setError("Fyll i räntan i procent."); return; }
+      setError(null);
+      onAdd({
+        id: newId(), label: label.trim() || `Ränta · ${linkedLoan.label}`, category: "lan", period: "month",
+        loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(linkedLoan.value_sek, r),
+      });
+      reset(); setAdding(false);
+      return;
+    }
     const parsed = parseAmount(amount);
     // Inkomst: typens etikett duger som namn om fältet lämnats tomt
     const typeLabel = withIncomeType && incomeType !== "ovrigt" ? (INCOME_TYPES.find(t => t.id === incomeType)?.label || "") : "";
@@ -110,24 +139,30 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
       ...(withCategory ? { category } : {}),
       ...(withIncomeType ? { incomeType } : {}),
     });
-    setLabel("");
-    setAmount("");
-    setPeriod("month");
+    reset();
     setAdding(false);
   }
-  function cancel() { setAdding(false); setError(null); setLabel(""); setAmount(""); }
+  function reset() { setLabel(""); setAmount(""); setPeriod("month"); setLoanId(""); setRate(""); }
+  function cancel() { setAdding(false); setError(null); reset(); }
 
-  // Snabbval: förifyll namn + kategori, öppna formuläret med fokus på beloppet
+  // Snabbval: förifyll namn + kategori, öppna formuläret med fokus på beloppet.
+  // "Bolåneränta" med ett inmatat bolån → koppla direkt till lånet.
   function pickPreset(preset) {
+    setAdding(true);
+    if (preset.loanKind) {
+      const loan = loans.find(l => l.kind === preset.loanKind) || loans[0];
+      if (loan) { pickLoan(loan.id); return; }
+    }
     setLabel(preset.label);
     setCategory(preset.category);
     setPeriod(preset.period || "month");
-    setAdding(true);
   }
   const usedLabels = new Set(rows.map(r => r.label.toLowerCase()));
-  const unusedPresets = presets.filter(p => !usedLabels.has(p.label.toLowerCase()));
+  const linkedLoanIds = new Set(rows.map(r => r.loanId).filter(Boolean));
+  const unusedPresets = presets.filter(p => !usedLabels.has(p.label.toLowerCase()) && !(p.loanKind && loans.some(l => l.kind === p.loanKind && linkedLoanIds.has(l.id))));
+  const linkableLoans = loans.filter(l => !linkedLoanIds.has(l.id));
 
-  const total = rows.reduce((s, r) => s + monthlyAmount(r), 0);
+  const total = rows.reduce((s, r) => s + monthlyAmount(r, loansById), 0);
   const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
 
   return (
@@ -146,8 +181,14 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 }}>
               {cat && <span title={cat.label} style={{ width: 8, height: 8, borderRadius: "50%", background: cat.color, flexShrink: 0 }} />}
               <span style={{ color: "var(--text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
+              {r.loanId && (
+                <span title={loansById[r.loanId] ? `${fmtKr(Number(loansById[r.loanId].value_sek))} × ${r.rate} % — följer lånet` : "Lånet är borttaget — visar senast sparade belopp"}
+                  style={{ fontSize: 10, color: loansById[r.loanId] ? "var(--brand)" : "var(--text-muted)", flexShrink: 0 }}>
+                  {loansById[r.loanId] ? `${String(r.rate).replace(".", ",")} %` : "lån saknas"}
+                </span>
+              )}
               {cat && <span style={{ fontSize: 10, color: "var(--text-secondary)", background: "var(--bg-secondary)", borderRadius: 999, padding: "1px 7px", flexShrink: 0 }}>{cat.label}</span>}
-              <span style={{ ...mono, color: "var(--text)", flexShrink: 0, fontSize: 11.5 }}>{fmtRowAmount(r)}</span>
+              <span style={{ ...mono, color: "var(--text)", flexShrink: 0, fontSize: 11.5 }}>{fmtRowAmount(r, loansById)}</span>
               <button onClick={() => onRemove(r.id)} title="Ta bort"
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>
@@ -155,24 +196,44 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
         })}
         {adding ? (
           <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-            {withIncomeType && (
+            {withCategory && linkableLoans.length > 0 && (
+              <select value={loanId} onChange={e => e.target.value ? pickLoan(e.target.value) : reset()} title="Koppla till ett lån du lagt in" style={{ ...inputStyle, width: "100%" }}>
+                <option value="">Koppla till lån… (räntan räknas ut automatiskt)</option>
+                {linkableLoans.map(l => <option key={l.id} value={l.id}>{l.label} — {fmtKr(Number(l.value_sek))}</option>)}
+              </select>
+            )}
+            {linkedLoan ? (
+              <>
+                <input value={label} onChange={e => setLabel(e.target.value)} style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
+                <input value={rate} onChange={e => setRate(e.target.value)} placeholder="ränta %" inputMode="decimal" autoFocus style={{ ...inputStyle, width: 80 }}
+                  onKeyDown={e => { if (e.key === "Enter") save(); }} />
+                <span style={{ ...mono, fontSize: 12, color: "var(--text)", alignSelf: "center", whiteSpace: "nowrap" }}>
+                  {linkedMonthly != null ? `= ${fmtKr(linkedMonthly)}/mån` : "= — kr/mån"}
+                </span>
+              </>
+            ) : null}
+            {!linkedLoan && withIncomeType && (
               <select value={incomeType} onChange={e => { setIncomeType(e.target.value); setLabel(""); }} style={inputStyle}>
                 {INCOME_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
               </select>
             )}
-            {(!withIncomeType || incomeType === "ovrigt") && (
+            {!linkedLoan && (!withIncomeType || incomeType === "ovrigt") && (
               <input value={label} onChange={e => setLabel(e.target.value)} placeholder={withIncomeType ? "Vad för inkomst?" : placeholder} autoFocus={!label && !withIncomeType} onKeyDown={e => { if (e.key === "Enter") save(); }} style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
             )}
-            {withCategory && (
+            {!linkedLoan && withCategory && (
               <select value={category} onChange={e => setCategory(e.target.value)} style={inputStyle}>
                 {EXPENSE_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             )}
-            <input value={amount} onChange={e => setAmount(e.target.value)} placeholder={`kr/${PERIOD_BY_ID[period]?.label || "mån"}`} inputMode="numeric" autoFocus={!!label || (withIncomeType && incomeType !== "ovrigt")} style={{ ...inputStyle, width: 90 }}
-              onKeyDown={e => { if (e.key === "Enter") save(); }} />
-            <select value={period} onChange={e => setPeriod(e.target.value)} title="Period" style={inputStyle}>
-              {PERIODS.map(p => <option key={p.id} value={p.id}>per {p.label}</option>)}
-            </select>
+            {!linkedLoan && (
+              <>
+                <input value={amount} onChange={e => setAmount(e.target.value)} placeholder={`kr/${PERIOD_BY_ID[period]?.label || "mån"}`} inputMode="numeric" autoFocus={!!label || (withIncomeType && incomeType !== "ovrigt")} style={{ ...inputStyle, width: 90 }}
+                  onKeyDown={e => { if (e.key === "Enter") save(); }} />
+                <select value={period} onChange={e => setPeriod(e.target.value)} title="Period" style={inputStyle}>
+                  {PERIODS.map(p => <option key={p.id} value={p.id}>per {p.label}</option>)}
+                </select>
+              </>
+            )}
             <button onClick={save} style={{ fontSize: 12, padding: "7px 14px", borderRadius: 16, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>Spara</button>
             <button onClick={cancel} style={{ fontSize: 12, padding: "7px 10px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
             {error && <div style={{ width: "100%", fontSize: 11.5, color: "var(--neg)", marginTop: 2 }}>{error}</div>}
@@ -206,15 +267,15 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
 }
 
 // Fördelning av utgifter per kategori (Finarys "Distribution") + flödesstapel lön → utgifter → sparande
-function CashflowDistribution({ incomes, expenses, available, isMobile }) {
-  const totalIn = incomes.reduce((s, r) => s + monthlyAmount(r), 0);
-  const totalOut = expenses.reduce((s, r) => s + monthlyAmount(r), 0);
+function CashflowDistribution({ incomes, expenses, available, isMobile, loans }) {
+  const totalIn = incomes.reduce((s, r) => s + monthlyAmount(r, loans), 0);
+  const totalOut = expenses.reduce((s, r) => s + monthlyAmount(r, loans), 0);
   if (totalIn === 0 && totalOut === 0) return null;
 
   const byCat = {};
   for (const e of expenses) {
     const id = CAT_BY_ID[e.category] ? e.category : "ovrigt";
-    byCat[id] = (byCat[id] || 0) + monthlyAmount(e);
+    byCat[id] = (byCat[id] || 0) + monthlyAmount(e, loans);
   }
   const cats = EXPENSE_CATEGORIES.filter(c => byCat[c.id] > 0).map(c => ({ ...c, amount: byCat[c.id] }))
     .sort((a, b) => b.amount - a.amount);
@@ -376,12 +437,14 @@ function NewGoalCard({ onAdd }) {
 export default function GoalsTab() {
   const { preferences, updatePreferences } = useUser();
   const isMobile = useIsMobile();
+  const { debts } = useNetWorth(); // inmatade lån (bolån, billån…) — utgifter kan kopplas till dem
+  const loansById = Object.fromEntries(debts.map(l => [l.id, l]));
 
   const cashflow = preferences.cashflow || { incomes: [], expenses: [] };
   const goals = preferences.savingsGoals || [];
 
-  const totalIn = cashflow.incomes.reduce((s, r) => s + monthlyAmount(r), 0);
-  const totalOut = cashflow.expenses.reduce((s, r) => s + monthlyAmount(r), 0);
+  const totalIn = cashflow.incomes.reduce((s, r) => s + monthlyAmount(r, loansById), 0);
+  const totalOut = cashflow.expenses.reduce((s, r) => s + monthlyAmount(r, loansById), 0);
   const available = totalIn - totalOut;
   const savingsRate = totalIn > 0 ? (available / totalIn) * 100 : null;
   const hasFlow = cashflow.incomes.length > 0 || cashflow.expenses.length > 0;
@@ -406,7 +469,7 @@ export default function GoalsTab() {
       {/* ── Kassaflöde ── */}
       <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Kassaflöde</div>
       <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 14 }}>
-        Mata in alla inkomster (lön, partners lön, bidrag…) och dina fasta utgifter per månad, så ser du ditt sparutrymme. Siffrorna är dina egna — vi kopplar inte till banken.
+        Mata in alla inkomster (lön, partners lön, bidrag…) och dina fasta utgifter per månad, så ser du ditt sparutrymme. Räntor kan kopplas till lån du lagt in under Min ekonomi och följer då skulden automatiskt. Siffrorna är dina egna — vi kopplar inte till banken.
       </div>
 
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 14 }}>
@@ -415,7 +478,7 @@ export default function GoalsTab() {
         {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "var(--pos)" : "var(--neg)", savingsRate != null ? `${savingsRate.toFixed(0)} % sparkvot` : null)}
       </div>
 
-      <CashflowDistribution incomes={cashflow.incomes} expenses={cashflow.expenses} available={available} isMobile={isMobile} />
+      <CashflowDistribution incomes={cashflow.incomes} expenses={cashflow.expenses} available={available} isMobile={isMobile} loans={loansById} />
 
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 32 }}>
         <FlowColumn
@@ -432,6 +495,7 @@ export default function GoalsTab() {
           accent="var(--neg)"
           withCategory
           presets={EXPENSE_PRESETS}
+          loans={debts}
           rows={cashflow.expenses}
           placeholder="T.ex. Hyra, bolåneränta, mat"
           onAdd={row => setCashflow({ ...cashflow, expenses: [...cashflow.expenses, row] })}

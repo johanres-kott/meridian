@@ -3,15 +3,64 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import GoalsTab from "../GoalsTab.jsx";
 
 let prefs = {};
+let debts = [];
 const updatePreferences = vi.fn();
 vi.mock("../../contexts/UserContext.jsx", () => ({
   useUser: () => ({ userId: "test-user", preferences: prefs, updatePreferences }),
+}));
+vi.mock("../../hooks/useNetWorth.js", () => ({
+  default: () => ({ debts }),
 }));
 
 describe("GoalsTab", () => {
   beforeEach(() => {
     prefs = {};
+    debts = [];
     updatePreferences.mockClear();
+  });
+
+  it("computes a loan-linked interest expense from the loan's current balance × rate", () => {
+    debts = [{ id: "loan-1", kind: "bolan", label: "Bolån · Villan", value_sek: 1500000, metadata: { interestRate: 3.5 } }];
+    prefs = {
+      cashflow: {
+        incomes: [{ id: "1", label: "Lön", amount: 50000 }],
+        // amount är ett gammalt snapshot — lånets aktuella skuld ska vinna
+        expenses: [{ id: "2", label: "Ränta · Villan", category: "lan", loanId: "loan-1", rate: 3.5, amount: 9999 }],
+      },
+    };
+    render(<GoalsTab />);
+    // 1 500 000 × 3,5 % / 12 = 4 375 kr/mån
+    expect(screen.getAllByText(/4 375 kr/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/9 999 kr/)).toBeNull();
+    expect(screen.getByText("3,5 %")).toBeTruthy();
+  });
+
+  it("links the 'Bolåneränta' preset to an entered mortgage and prefills the rate from the wizard", () => {
+    debts = [{ id: "loan-1", kind: "bolan", label: "Bolån · Villan", value_sek: 1500000, metadata: { interestRate: 3.5 } }];
+    prefs = { cashflow: { incomes: [], expenses: [] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getByText("+ Bolåneränta"));
+    expect(screen.getByPlaceholderText("ränta %").value).toBe("3,5");
+    expect(screen.getByText("= 4 375 kr/mån")).toBeTruthy();
+    fireEvent.click(screen.getByText("Spara"));
+    const row = updatePreferences.mock.calls[0][0].cashflow.expenses[0];
+    expect(row.loanId).toBe("loan-1");
+    expect(row.rate).toBe(3.5);
+    expect(row.category).toBe("lan");
+    expect(row.label).toBe("Ränta · Villan");
+  });
+
+  it("falls back to the saved amount when the linked loan has been deleted", () => {
+    debts = [];
+    prefs = {
+      cashflow: {
+        incomes: [{ id: "1", label: "Lön", amount: 50000 }],
+        expenses: [{ id: "2", label: "Ränta · Villan", category: "lan", loanId: "gone", rate: 3.5, amount: 4375 }],
+      },
+    };
+    render(<GoalsTab />);
+    expect(screen.getAllByText(/4 375 kr/).length).toBeGreaterThan(0);
+    expect(screen.getByText("lån saknas")).toBeTruthy();
   });
 
   it("computes savings capacity from manually entered income and expenses", () => {

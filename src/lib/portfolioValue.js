@@ -50,7 +50,9 @@ async function computeValuation(userId) {
           }
           const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
           const d = await res.json();
-          return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
+          // London noterar i pence (GBp/GBX) — räkna om till pund så FX-kursen stämmer
+          const pence = d.currency === "GBp" || d.currency === "GBX";
+          return { ...item, price: pence ? (d.price || 0) / 100 : (d.price || 0), changePercent: d.changePercent || 0, currency: pence ? "GBP" : d.currency };
         } catch (err) {
           console.error(`portfolioValue: failed to fetch ${item.ticker}:`, err);
           return { ...item, price: 0, changePercent: 0 };

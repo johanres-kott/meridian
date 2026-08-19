@@ -50,6 +50,28 @@ describe("GoalsTab", () => {
     expect(row.label).toBe("Ränta · Villan");
   });
 
+  it("treats amortering as saving: excluded from 'Pengar ut', included in sparkvot, own stat card", () => {
+    prefs = {
+      cashflow: {
+        incomes: [{ id: "1", label: "Lön", amount: 50000 }],
+        expenses: [
+          { id: "2", label: "Hyra", amount: 20000, category: "boende" },
+          { id: "3", label: "Amortering", amount: 5000, category: "amortering" },
+        ],
+      },
+    };
+    render(<GoalsTab />);
+    // Pengar ut = 20 000 (konsumtion), amortering eget kort, fritt sparutrymme 25 000
+    expect(screen.getAllByText(/20 000 kr/).length).toBeGreaterThan(0);
+    expect(screen.getByText("Amortering", { selector: "div" })).toBeTruthy();
+    expect(screen.getByText(/minskar lånet — räknas som sparande/)).toBeTruthy();
+    expect(screen.getAllByText(/25 000 kr\/mån/).length).toBeGreaterThan(0);
+    // sparkvot inkl. amortering = (25 000 + 5 000) / 50 000 = 60 %
+    expect(screen.getByText(/60 % sparkvot inkl\. amortering/)).toBeTruthy();
+    // stapeln: amortering som eget segment, inte som utgiftskategori
+    expect(screen.getByTitle(/Amortering: 5 000 kr/)).toBeTruthy();
+  });
+
   it("falls back to the saved amount when the linked loan has been deleted", () => {
     debts = [];
     prefs = {

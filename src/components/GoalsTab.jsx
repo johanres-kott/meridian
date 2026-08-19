@@ -48,12 +48,16 @@ const EXPENSE_CATEGORIES = [
   { id: "mat",       label: "Mat",            color: "var(--warn)", hint: "Mat, restaurang" },
   { id: "transport", label: "Transport",      color: "#26a69a", hint: "Bil, bensin, kollektivtrafik" },
   { id: "barn",      label: "Barn & familj",  color: "#ec407a", hint: "Förskola, aktiviteter" },
-  { id: "lan",       label: "Lån & amortering", color: "var(--neg)", hint: "Amortering, billån, CSN" },
-  { id: "abonnemang",label: "Abonnemang",     color: "var(--green-400)", hint: "Mobil, streaming, gym" },
+  { id: "lan",       label: "Lån & räntor",   color: "var(--neg)", hint: "Ränta på bolån, billån, CSN" },
+  { id: "amortering",label: "Amortering",     color: "var(--green-400)", hint: "Minskar lånet — räknas som sparande", saving: true },
+  { id: "abonnemang",label: "Abonnemang",     color: "#5c6bc0", hint: "Mobil, streaming, gym" },
   { id: "forsakring",label: "Försäkringar",   color: "#8d6e63", hint: "Hem, bil, liv" },
   { id: "ovrigt",    label: "Övrigt",         color: "#78909c", hint: "Allt annat" },
 ];
 const CAT_BY_ID = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.id, c]));
+// Amortering lämnar kontot men bygger nettoförmögenhet (lånet minskar) — vi
+// räknar den som sparande, inte konsumtion, i statrad, stapel och sparkvot.
+const isSaving = row => !!CAT_BY_ID[row.category]?.saving;
 
 const INCOME_TYPES = [
   { id: "lon",      label: "Lön efter skatt" },
@@ -69,7 +73,7 @@ const INCOME_TYPES = [
 const EXPENSE_PRESETS = [
   { label: "Hyra / avgift",       category: "boende" },
   { label: "Bolåneränta",         category: "lan", loanKind: "bolan" },
-  { label: "Amortering",          category: "lan" },
+  { label: "Amortering",          category: "amortering" },
   { label: "El & elnät",         category: "boende" },
   { label: "Värme / fjärrvärme",  category: "boende" },
   { label: "Vatten & avlopp",     category: "boende" },
@@ -162,14 +166,18 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const unusedPresets = presets.filter(p => !usedLabels.has(p.label.toLowerCase()) && !(p.loanKind && loans.some(l => l.kind === p.loanKind && linkedLoanIds.has(l.id))));
   const linkableLoans = loans.filter(l => !linkedLoanIds.has(l.id));
 
-  const total = rows.reduce((s, r) => s + monthlyAmount(r, loansById), 0);
+  const total = rows.filter(r => !isSaving(r)).reduce((s, r) => s + monthlyAmount(r, loansById), 0);
+  const savingPart = rows.filter(isSaving).reduce((s, r) => s + monthlyAmount(r, loansById), 0);
   const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
 
   return (
     <div style={{ flex: 1, minWidth: 280, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--border-light)" }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{title}</span>
-        <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: accent || "var(--text)" }}>{rows.length ? `${fmtKr(total)}/mån` : "—"}</span>
+        <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: accent || "var(--text)", textAlign: "right" }}>
+          {rows.length ? `${fmtKr(total)}/mån` : "—"}
+          {savingPart > 0 && <div style={{ fontSize: 10.5, fontWeight: 500, color: "var(--pos)" }}>+ {fmtKr(savingPart)} amortering</div>}
+        </span>
       </div>
       <div style={{ padding: "6px 16px 12px" }}>
         {rows.length === 0 && !adding && (
@@ -267,19 +275,22 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
 }
 
 // Fördelning av utgifter per kategori (Finarys "Distribution") + flödesstapel lön → utgifter → sparande
-function CashflowDistribution({ incomes, expenses, available, isMobile, loans }) {
+function CashflowDistribution({ incomes, expenses, available, amortization = 0, isMobile, loans }) {
   const totalIn = incomes.reduce((s, r) => s + monthlyAmount(r, loans), 0);
   const totalOut = expenses.reduce((s, r) => s + monthlyAmount(r, loans), 0);
   if (totalIn === 0 && totalOut === 0) return null;
 
   const byCat = {};
   for (const e of expenses) {
+    if (isSaving(e)) continue; // amortering ritas som sparande, inte som utgift
     const id = CAT_BY_ID[e.category] ? e.category : "ovrigt";
     byCat[id] = (byCat[id] || 0) + monthlyAmount(e, loans);
   }
   const cats = EXPENSE_CATEGORIES.filter(c => byCat[c.id] > 0).map(c => ({ ...c, amount: byCat[c.id] }))
     .sort((a, b) => b.amount - a.amount);
   const base = Math.max(totalIn, totalOut);
+  const amortPct = base > 0 && amortization > 0 ? (amortization / base) * 100 : 0;
+  const amortPattern = "repeating-linear-gradient(45deg, var(--pos), var(--pos) 3px, var(--green-200) 3px, var(--green-200) 6px)";
   const savingsPct = base > 0 && available > 0 ? (available / base) * 100 : 0;
   const overspendPct = base > 0 && available < 0 ? (-available / base) * 100 : 0;
 
@@ -291,6 +302,7 @@ function CashflowDistribution({ incomes, expenses, available, isMobile, loans })
         {cats.map(c => (
           <div key={c.id} title={`${c.label}: ${fmtKr(c.amount)}`} style={{ width: `${base > 0 ? (c.amount / base) * 100 : 0}%`, background: c.color }} />
         ))}
+        {amortPct > 0 && <div title={`Amortering: ${fmtKr(amortization)} — minskar lånet`} style={{ width: `${amortPct}%`, background: amortPattern }} />}
         {savingsPct > 0 && <div title={`Sparutrymme: ${fmtKr(available)}`} style={{ width: `${savingsPct}%`, background: "var(--pos)" }} />}
         {overspendPct > 0 && <div title={`Underskott: ${fmtKr(-available)}`} style={{ width: `${overspendPct}%`, background: "repeating-linear-gradient(45deg,var(--neg),var(--neg) 4px,transparent 4px,transparent 8px)" }} />}
       </div>
@@ -302,6 +314,12 @@ function CashflowDistribution({ incomes, expenses, available, isMobile, loans })
             {c.label} <span style={{ ...mono, color: "var(--text)" }}>{base > 0 ? Math.round((c.amount / base) * 100) : 0}%</span>
           </span>
         ))}
+        {amortPct > 0 && (
+          <span title="Amortering minskar lånet och bygger din nettoförmögenhet — vi räknar den som sparande" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-secondary)" }}>
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: amortPattern }} />
+            Amortering <span style={{ ...mono, color: "var(--pos)", fontWeight: 600 }}>{Math.round(amortPct)}%</span>
+          </span>
+        )}
         {available > 0 && (
           <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-secondary)" }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: "var(--pos)" }} />
@@ -440,13 +458,20 @@ export default function GoalsTab() {
   const { debts } = useNetWorth(); // inmatade lån (bolån, billån…) — utgifter kan kopplas till dem
   const loansById = Object.fromEntries(debts.map(l => [l.id, l]));
 
-  const cashflow = preferences.cashflow || { incomes: [], expenses: [] };
+  const rawCashflow = preferences.cashflow || { incomes: [], expenses: [] };
+  // Rader inlagda innan amortering blev egen kategori (preset låg under "Lån") → läs som amortering
+  const cashflow = {
+    ...rawCashflow,
+    expenses: (rawCashflow.expenses || []).map(r => r.category === "lan" && /amorter/i.test(r.label || "") ? { ...r, category: "amortering" } : r),
+  };
   const goals = preferences.savingsGoals || [];
 
   const totalIn = cashflow.incomes.reduce((s, r) => s + monthlyAmount(r, loansById), 0);
-  const totalOut = cashflow.expenses.reduce((s, r) => s + monthlyAmount(r, loansById), 0);
-  const available = totalIn - totalOut;
-  const savingsRate = totalIn > 0 ? (available / totalIn) * 100 : null;
+  const amortization = cashflow.expenses.filter(isSaving).reduce((s, r) => s + monthlyAmount(r, loansById), 0);
+  const totalOut = cashflow.expenses.filter(r => !isSaving(r)).reduce((s, r) => s + monthlyAmount(r, loansById), 0); // konsumtion
+  const available = totalIn - totalOut - amortization; // fritt sparutrymme (till sparmålen)
+  const totalSaving = available + amortization;        // sparande inkl. amortering → sparkvot
+  const savingsRate = totalIn > 0 ? (totalSaving / totalIn) * 100 : null;
   const hasFlow = cashflow.incomes.length > 0 || cashflow.expenses.length > 0;
 
   function setCashflow(next) {
@@ -469,16 +494,17 @@ export default function GoalsTab() {
       {/* ── Kassaflöde ── */}
       <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Kassaflöde</div>
       <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 14 }}>
-        Mata in alla inkomster (lön, partners lön, bidrag…) och dina fasta utgifter per månad, så ser du ditt sparutrymme. Räntor kan kopplas till lån du lagt in under Min ekonomi och följer då skulden automatiskt. Siffrorna är dina egna — vi kopplar inte till banken.
+        Mata in alla inkomster (lön, partners lön, bidrag…) och dina fasta utgifter per månad, så ser du ditt sparutrymme. Räntor kan kopplas till lån du lagt in under Min ekonomi och följer då skulden automatiskt. Amortering räknas som sparande — den minskar lånet och bygger din nettoförmögenhet. Siffrorna är dina egna — vi kopplar inte till banken.
       </div>
 
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 14 }}>
         {statCard("Pengar in", hasFlow ? fmtKr(totalIn) : "—")}
-        {statCard("Pengar ut", hasFlow ? fmtKr(totalOut) : "—")}
-        {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "var(--pos)" : "var(--neg)", savingsRate != null ? `${savingsRate.toFixed(0)} % sparkvot` : null)}
+        {statCard("Pengar ut", hasFlow ? fmtKr(totalOut) : "—", null, amortization > 0 ? "exkl. amortering" : null)}
+        {amortization > 0 && statCard("Amortering", `${fmtKr(amortization)}/mån`, "var(--pos)", "minskar lånet — räknas som sparande")}
+        {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "var(--pos)" : "var(--neg)", savingsRate != null ? `${savingsRate.toFixed(0)} % sparkvot${amortization > 0 ? " inkl. amortering" : ""}` : null)}
       </div>
 
-      <CashflowDistribution incomes={cashflow.incomes} expenses={cashflow.expenses} available={available} isMobile={isMobile} loans={loansById} />
+      <CashflowDistribution incomes={cashflow.incomes} expenses={cashflow.expenses} available={available} amortization={amortization} isMobile={isMobile} loans={loansById} />
 
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 32 }}>
         <FlowColumn

@@ -4,6 +4,8 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { GOAL_ICONS, Target } from "./icons.jsx";
 import { PERIODS, PERIOD_BY_ID, monthlyAmount, loanInterestMonthly } from "./cashflowPeriods.js";
 import useNetWorth from "../hooks/useNetWorth.js";
+import { EXPENSE_CATEGORIES, CAT_BY_ID, isSaving } from "./cashflowCategories.js";
+import CashflowSankey from "./CashflowSankey.jsx";
 
 // Mål & kassaflöde (DESIGN.md): Finarys Budget-mönster (Pengar in / ut /
 // Sparutrymme) fast med manuellt inmatad lön och utgifter — ingen bankkoppling.
@@ -41,23 +43,6 @@ function fmtKr(v) {
 }
 
 // ── Kassaflödesrader (inkomster/utgifter) ────────────────────────────────────
-
-// Utgiftskategorier (Finary-mönstret: fördelning av "Money out")
-const EXPENSE_CATEGORIES = [
-  { id: "boende",    label: "Boende",         color: "#7c4dff", hint: "Hyra, avgift, bolåneränta, el" },
-  { id: "mat",       label: "Mat",            color: "var(--warn)", hint: "Mat, restaurang" },
-  { id: "transport", label: "Transport",      color: "#26a69a", hint: "Bil, bensin, kollektivtrafik" },
-  { id: "barn",      label: "Barn & familj",  color: "#ec407a", hint: "Förskola, aktiviteter" },
-  { id: "lan",       label: "Lån & räntor",   color: "var(--neg)", hint: "Ränta på bolån, billån, CSN" },
-  { id: "amortering",label: "Amortering",     color: "var(--green-400)", hint: "Minskar lånet — räknas som sparande", saving: true },
-  { id: "abonnemang",label: "Abonnemang",     color: "#5c6bc0", hint: "Mobil, streaming, gym" },
-  { id: "forsakring",label: "Försäkringar",   color: "#8d6e63", hint: "Hem, bil, liv" },
-  { id: "ovrigt",    label: "Övrigt",         color: "#78909c", hint: "Allt annat" },
-];
-const CAT_BY_ID = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.id, c]));
-// Amortering lämnar kontot men bygger nettoförmögenhet (lånet minskar) — vi
-// räknar den som sparande, inte konsumtion, i statrad, stapel och sparkvot.
-const isSaving = row => !!CAT_BY_ID[row.category]?.saving;
 
 const INCOME_TYPES = [
   { id: "lon",      label: "Lön efter skatt" },
@@ -297,6 +282,9 @@ function CashflowDistribution({ incomes, expenses, available, amortization = 0, 
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 16px" : "16px 20px", marginBottom: isMobile ? 10 : 14 }}>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Vart tar lönen vägen?</div>
+      {/* Desktop: flödesgraf (Finary-Sankey). Mobil: kompakt stapel + legend. */}
+      {!isMobile && <CashflowSankey incomes={incomes} expenses={expenses} loans={loans} />}
+      {isMobile && <>
       {/* Flödesstapel */}
       <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden", background: "var(--border-light)" }}>
         {cats.map(c => (
@@ -326,10 +314,11 @@ function CashflowDistribution({ incomes, expenses, available, amortization = 0, 
             Sparutrymme <span style={{ ...mono, color: "var(--pos)", fontWeight: 600 }}>{Math.round(savingsPct)}%</span>
           </span>
         )}
-        {available < 0 && (
-          <span style={{ fontSize: 11, color: "var(--neg)", fontWeight: 600 }}>Utgifterna överstiger inkomsterna med {fmtKr(-available)}/mån</span>
-        )}
       </div>
+      </>}
+      {available < 0 && (
+        <div style={{ fontSize: 11, color: "var(--neg)", fontWeight: 600, marginTop: 8 }}>Utgifterna överstiger inkomsterna med {fmtKr(-available)}/mån</div>
+      )}
     </div>
   );
 }

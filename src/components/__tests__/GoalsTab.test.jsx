@@ -11,6 +11,9 @@ vi.mock("../../contexts/UserContext.jsx", () => ({
 vi.mock("../../hooks/useNetWorth.js", () => ({
   default: () => ({ debts }),
 }));
+// Mobilläge i testerna: fördelningen renderas då som stapel + legend (text vi kan
+// läsa i jsdom). Desktop-Sankeyn testas via buildSankeyData i cashflowSankey.test.js.
+vi.mock("../../hooks/useIsMobile.js", () => ({ useIsMobile: () => true }));
 
 describe("GoalsTab", () => {
   beforeEach(() => {

@@ -133,11 +133,11 @@ describe("GoalsTab", () => {
     expect(screen.getByText("+ Hemförsäkring")).toBeTruthy();
     fireEvent.click(screen.getByText("+ El"));
     // formuläret öppnas med namnet förifyllt; fyll i belopp och spara
-    expect(screen.getByDisplayValue("El")).toBeTruthy();
+    expect(screen.getByDisplayValue("El & elnät")).toBeTruthy();
     fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "900" } });
     fireEvent.click(screen.getByText("Spara"));
     const call = updatePreferences.mock.calls.at(-1)[0];
-    expect(call.cashflow.expenses[0]).toMatchObject({ label: "El", amount: 900, category: "boende" });
+    expect(call.cashflow.expenses[0]).toMatchObject({ label: "El & elnät", amount: 900, category: "boende" });
   });
 
   it("saves an income when only the amount is filled (type label becomes the name)", () => {

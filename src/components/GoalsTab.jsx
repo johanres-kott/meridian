@@ -70,7 +70,7 @@ const EXPENSE_PRESETS = [
   { label: "Hyra / avgift",       category: "boende" },
   { label: "Bolåneränta",         category: "lan", loanKind: "bolan" },
   { label: "Amortering",          category: "lan" },
-  { label: "El",                  category: "boende" },
+  { label: "El & elnät",         category: "boende" },
   { label: "Värme / fjärrvärme",  category: "boende" },
   { label: "Vatten & avlopp",     category: "boende" },
   { label: "Hemförsäkring",       category: "forsakring", period: "year" },

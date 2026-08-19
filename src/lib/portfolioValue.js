@@ -29,7 +29,7 @@ async function computeValuation(userId) {
     .order("created_at");
 
   if (!watchlist || watchlist.length === 0) {
-    return { empty: true, watchlist: [], priced: [], holdings: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null };
+    return { empty: true, watchlist: [], priced: [], holdings: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null, stocksSek: 0, fundsSek: 0 };
   }
 
   // Fetch prices + FX rates in parallel
@@ -104,5 +104,22 @@ async function computeValuation(userId) {
       ? currencyGroups[0].value
       : currencyGroups.length === 0 ? 0 : null;
 
-  return { empty: false, watchlist, priced, holdings, currencyGroups, totalSek, dailyChangeSek, portfolioSek };
+  // Aktier vs fonder i SEK (för donuten på Portfölj). Null om någon kurs saknas.
+  const toSek = (h) => {
+    const cur = h.currency || "SEK";
+    const rate = cur === "SEK" ? 1 : fxToSek[cur];
+    return rate != null ? h.price * h.shares * rate : null;
+  };
+  let stocksSek = 0, fundsSek = 0, splitOk = true;
+  for (const h of holdings) {
+    const v = toSek(h);
+    if (v == null) { splitOk = false; break; }
+    if (h.type === "fund") fundsSek += v; else stocksSek += v;
+  }
+
+  return {
+    empty: false, watchlist, priced, holdings, currencyGroups, totalSek, dailyChangeSek, portfolioSek,
+    stocksSek: splitOk ? stocksSek : null,
+    fundsSek: splitOk ? fundsSek : null,
+  };
 }

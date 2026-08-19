@@ -12,6 +12,7 @@ export default function useNetWorth() {
   const { userId, preferences } = useUser();
   const [portfolioSek, setPortfolioSek] = useState(null);
   const [dailyChangeSek, setDailyChangeSek] = useState(null);
+  const [split, setSplit] = useState({ stocksSek: null, fundsSek: null });
   const [portfolioLoaded, setPortfolioLoaded] = useState(false);
   const [manualRows, setManualRows] = useState([]);
 
@@ -23,6 +24,7 @@ export default function useNetWorth() {
         if (cancelled) return;
         setPortfolioSek(v.portfolioSek);
         setDailyChangeSek(v.dailyChangeSek);
+        setSplit({ stocksSek: v.stocksSek ?? null, fundsSek: v.fundsSek ?? null });
         setPortfolioLoaded(true);
       })
       .catch(err => {
@@ -61,6 +63,8 @@ export default function useNetWorth() {
   return {
     portfolioSek,
     dailyChangeSek,
+    stocksSek: split.stocksSek,
+    fundsSek: split.fundsSek,
     portfolioLoaded,
     manualRows,
     assets,

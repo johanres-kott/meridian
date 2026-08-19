@@ -165,5 +165,23 @@
       "skuld": "Other debt"
     },
     "todayPortfolio": "today (portfolio)"
+  },
+  "assetBreakdown": {
+    "title": "Breakdown",
+    "assets": "Assets",
+    "debts": "Debts",
+    "total": "Total",
+    "empty": "Add assets to see your breakdown.",
+    "cats": {
+      "stocks": "Stocks",
+      "funds": "Funds",
+      "pension": "Pension",
+      "bostad": "Home",
+      "fordon": "Vehicles",
+      "cash": "Savings & cash",
+      "ovrigt": "Other",
+      "bolan": "Mortgage",
+      "skuld": "Other debts"
+    }
   }
 }

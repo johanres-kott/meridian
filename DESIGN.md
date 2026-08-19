@@ -100,7 +100,17 @@ SEK-först-perspektiv.
       lån/värde-kvot och eget kapital → summering). Delade byggstenar i
       wizardShared.jsx + wizardHelpers.js. Leasing-notering: leasat fordon är
       ingen tillgång och ska inte läggas in.
-- [ ] Portfölj: donut per tillgångsslag + tabell med filterchips à la Finary
+- [!] Bostadsvärdering via API — Booli ger inte ut API-nycklar (svar aug
+      2026), så /api/property-valuation förblir vilande (501). Mr Koll är
+      persons-sök, ingen värderingsdata. Realistiska B2B-alternativ när det
+      finns intäkter: UC bostadsvärdering (uc.se/api) eller Metria
+      (avtalstjänster). Tills dess: manuell inmatning + Booli/hitta.se-länkar.
+- [x] Portfölj: AssetBreakdown-hero överst — Finarys Assets|Liabilities-donut
+      per tillgångsslag (aktier/fonder/pension/bostad/fordon/sparkonto/övrigt,
+      skulder separat) med legend, andel och klick-navigering. Data via
+      useNetWorth (portfolioValue levererar nu stocksSek/fundsSek), så
+      siffrorna är identiska med Hem. Innehavstabellen har fått radie 10 +
+      kortbakgrund. Kvar: filterchips (Typ/Institution) ovanför tabellen.
 - [ ] Kortradier/spacing-pass över samtliga vyer (10 px radius, luftigare)
 - [ ] Sparmål ↔ tillgångar: låt ett mål peka på t.ex. buffert-posten i
       manual_assets så "sparat" uppdateras därifrån

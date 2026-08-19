@@ -132,7 +132,7 @@ function AppContent() {
       {tab === "markets" && <Overview onNavigate={navigate} onAddAssets={() => setShowAddAssets(true)} />}
       {tab === "goals" && <GoalsTab />}
       {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
-      {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
+      {tab === "portfolio" && <Portfolio deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} onNavigate={navigate} />}
       {tab === "analysis" && <AnalysisTab onNavigate={navigate} isMobile={isMobile} />}
       {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
       {tab === "investment" && <InvestmentCompanies onNavigate={navigate} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}

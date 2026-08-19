@@ -19,12 +19,15 @@ import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import ThesisReview from "./ThesisReview.jsx";
+import AssetBreakdown from "./AssetBreakdown.jsx";
+import useNetWorth from "../hooks/useNetWorth.js";
 import { useTranslation } from "react-i18next";
 
-export default function Portfolio({ deepLink, onClearDeepLink }) {
+export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   const { userId, preferences, updatePreferences } = useUser();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const netWorthData = useNetWorth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
@@ -198,7 +201,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       )}
 
       {/* Header */}
-      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 4, gap: isMobile ? 12 : 0 }}>
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 12, gap: isMobile ? 12 : 0 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>{t("portfolio.title")}</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
@@ -208,6 +211,9 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
           </div>
         </div>
       </div>
+
+      {/* Fördelning per tillgångsslag — Finarys Assets|Liabilities-donut (DESIGN.md) */}
+      <AssetBreakdown data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} />
 
       {/* Sub-tabs */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 20 }}>
@@ -265,7 +271,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
               : t("portfolio.emptyNoCompanies")}
           </div>
         ) : (
-          <div style={{ border: "1px solid var(--border)", borderRadius: 4, overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
               <thead>
                 <tr>

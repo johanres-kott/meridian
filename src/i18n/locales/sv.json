@@ -165,5 +165,23 @@
       "skuld": "Övrig skuld"
     },
     "todayPortfolio": "idag (portföljen)"
+  },
+  "assetBreakdown": {
+    "title": "Fördelning",
+    "assets": "Tillgångar",
+    "debts": "Skulder",
+    "total": "Totalt",
+    "empty": "Lägg till tillgångar för att se din fördelning.",
+    "cats": {
+      "stocks": "Aktier",
+      "funds": "Fonder",
+      "pension": "Pension",
+      "bostad": "Bostad",
+      "fordon": "Fordon",
+      "cash": "Sparkonto & buffert",
+      "ovrigt": "Övrigt",
+      "bolan": "Bolån",
+      "skuld": "Övriga skulder"
+    }
   }
 }

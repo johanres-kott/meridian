@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         .eq("user_id", user.id);
       if (error) {
         console.error("manual-assets delete error:", error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: "Could not delete" });
       }
       return res.status(200).json({ ok: true });
     }
@@ -58,8 +58,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "invalid label" });
     }
     const value = Number(value_sek);
-    if (!Number.isFinite(value) || value < 0) {
+    if (!Number.isFinite(value) || value < 0 || value > 1e12) {
       return res.status(400).json({ error: "invalid value" });
+    }
+    const meta = metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {};
+    if (JSON.stringify(meta).length > 20_000) {
+      return res.status(413).json({ error: "metadata too large" });
     }
 
     const { data, error } = await supabase
@@ -70,13 +74,13 @@ export default async function handler(req, res) {
         label: label.trim(),
         value_sek: value,
         is_debt: !!is_debt,
-        metadata: metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {},
+        metadata: meta,
       })
       .select()
       .single();
     if (error) {
       console.error("manual-assets insert error:", error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: "Could not save" });
     }
     return res.status(200).json(data);
   } catch (err) {

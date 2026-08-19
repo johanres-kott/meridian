@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       .maybeSingle();
     if (readErr) {
       console.error("user-prefs read error:", readErr);
-      return res.status(500).json({ error: readErr.message });
+      return res.status(500).json({ error: "Could not read preferences" });
     }
 
     const merged = { ...(existing?.preferences || {}), ...patch };
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       : await supabase.from("user_prefs").insert({ user_id: user.id, preferences: merged });
     if (writeErr) {
       console.error("user-prefs write error:", writeErr);
-      return res.status(500).json({ error: writeErr.message });
+      return res.status(500).json({ error: "Could not save preferences" });
     }
     return res.status(200).json({ preferences: merged });
   } catch (err) {

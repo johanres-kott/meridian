@@ -1,5 +1,6 @@
-/* global process */
+/* global process, Buffer */
 import { createClient } from "@supabase/supabase-js";
+import { timingSafeEqual } from "node:crypto";
 
 // Daglig nettoförmögenhets-snapshot (Vercel cron, se vercel.json). Körs med
 // service role över alla användare: senaste portföljsnapshot + pension ur
@@ -10,6 +11,12 @@ import { createClient } from "@supabase/supabase-js";
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const CRON_SECRET = process.env.CRON_SECRET;
+
+function bearerMatches(header, secret) {
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const got = Buffer.from(String(header || ""));
+  return got.length === expected.length && timingSafeEqual(got, expected);
+}
 
 function pensionTotal(pension) {
   // Speglar src/lib/pension.js getPensionTotalValue utan att importera klientkod
@@ -25,8 +32,13 @@ function pensionTotal(pension) {
 }
 
 export default async function handler(req, res) {
-  // Vercel cron skickar Authorization: Bearer <CRON_SECRET>; tillåt även manuell körning med samma hemlighet.
-  if (CRON_SECRET && req.headers.authorization !== `Bearer ${CRON_SECRET}`) {
+  // Vercel cron skickar Authorization: Bearer <CRON_SECRET>; tillåt även manuell
+  // körning med samma hemlighet. Fail-closed: utan CRON_SECRET i miljön körs
+  // inget alls (annars vore endpointen öppen för vem som helst att trigga).
+  if (!CRON_SECRET) {
+    return res.status(500).json({ error: "CRON_SECRET not configured" });
+  }
+  if (!bearerMatches(req.headers.authorization, CRON_SECRET)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   if (!SUPABASE_URL || !SERVICE_KEY) {

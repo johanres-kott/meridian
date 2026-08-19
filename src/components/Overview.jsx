@@ -1,5 +1,7 @@
-import { Component } from "react";
+import { Component, useState } from "react";
 import { useTranslation } from "react-i18next";
+import RangeBar from "./RangeBar.jsx";
+import { DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";
@@ -25,13 +27,17 @@ export default function Overview({ onNavigate, onAddAssets }) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const netWorthData = useNetWorth();
+  // Globalt tidsspann (Finary): styr hero-förändringen och grafen samtidigt
+  const [range, setRange] = useState(DEFAULT_RANGE);
+  const [period, setPeriod] = useState(null);
 
   return (
     <div>
-      <div style={{ marginBottom: isMobile ? 12 : 20 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: isMobile ? 4 : 8, flexWrap: "wrap" }}>
         <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 2 }}>
           {t("overview.greeting", { name: displayName })}
         </h1>
+        {userId && <RangeBar value={range} onChange={setRange} isMobile={isMobile} />}
       </div>
       {preferences.todos?.length > 0 && (
         <TodoList
@@ -40,11 +46,17 @@ export default function Overview({ onNavigate, onAddAssets }) {
           isMobile={isMobile}
         />
       )}
-      <SafeCard><HomeHero data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
+      <SafeCard><HomeHero data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} period={period} /></SafeCard>
       {userId && (
         <SafeCard>
           <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-            <PortfolioChart compact offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0} />
+            <PortfolioChart
+              compact
+              offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0}
+              range={range}
+              onRangeChange={setRange}
+              onPeriodChange={setPeriod}
+            />
           </div>
         </SafeCard>
       )}

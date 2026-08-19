@@ -201,5 +201,17 @@
     "empty": "Inga tillgångar ännu — klicka ”+ Lägg till” uppe till höger.",
     "noMatch": "Inget matchar filtret."
   },
-  "homeMovers": "Rörelser idag"
+  "homeMovers": "Rörelser idag",
+  "range": {
+    "periodChange": "{{label}}",
+    "labels": {
+      "1w": "senaste veckan",
+      "1m": "senaste månaden",
+      "3m": "senaste 3 mån",
+      "6m": "senaste 6 mån",
+      "ytd": "i år",
+      "1y": "senaste året",
+      "all": "totalt"
+    }
+  }
 }

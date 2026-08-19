@@ -201,5 +201,17 @@
     "empty": "No assets yet — click “+ Add assets” at the top right.",
     "noMatch": "Nothing matches the filter."
   },
-  "homeMovers": "Today's movers"
+  "homeMovers": "Today's movers",
+  "range": {
+    "periodChange": "{{label}}",
+    "labels": {
+      "1w": "past week",
+      "1m": "past month",
+      "3m": "past 3 months",
+      "6m": "past 6 months",
+      "ytd": "year to date",
+      "1y": "past year",
+      "all": "all time"
+    }
+  }
 }

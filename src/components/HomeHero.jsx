@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 // dagsförändring och breakdown-chips — Finarys dashboard-mönster.
 // Data kommer från useNetWorth i Overview; ingen egen hämtning här.
 
-export default function HomeHero({ data, isMobile, onNavigate }) {
+export default function HomeHero({ data, isMobile, onNavigate, period }) {
   const { t, i18n } = useTranslation();
   const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
 
@@ -33,7 +33,16 @@ export default function HomeHero({ data, isMobile, onNavigate }) {
         <span style={{ ...mono, fontSize: isMobile ? 28 : 36, fontWeight: 600, color: "var(--text)", letterSpacing: "-0.02em" }}>
           {fmt(netWorth)}
         </span>
-        {dailyChangeSek != null && (
+        {period ? (
+          // Periodens förändring för valt tidsspann (global RangeBar, Finary-mönstret)
+          <span style={{ ...mono, fontSize: 13, fontWeight: 500, color: period.returnSek >= 0 ? "#089981" : "#f23645" }}>
+            {period.returnSek >= 0 ? "+" : ""}{period.returnSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK
+            <span style={{ fontWeight: 400, marginLeft: 6, padding: "1px 7px", borderRadius: 999, background: period.returnSek >= 0 ? "rgba(8,153,129,0.12)" : "rgba(242,54,69,0.12)" }}>
+              {period.returnPct >= 0 ? "+" : ""}{period.returnPct.toFixed(2)}%
+            </span>
+            <span style={{ fontWeight: 400, color: "var(--text-secondary)", marginLeft: 8, fontFamily: "inherit" }}>{t(`range.labels.${period.range}`)}</span>
+          </span>
+        ) : dailyChangeSek != null && (
           <span style={{ ...mono, fontSize: 13, fontWeight: 500, color: dailyChangeSek >= 0 ? "#089981" : "#f23645" }}>
             {dailyChangeSek >= 0 ? "+" : ""}{dailyChangeSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK {t("myFinances.todayPortfolio")}
           </span>

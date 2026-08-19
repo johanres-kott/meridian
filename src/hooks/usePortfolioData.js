@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
-import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
+import { INDEXES, rangeCutoff } from "../lib/portfolioChartConstants.js";
 
 /**
  * Custom hook that fetches portfolio history and index comparison data,
@@ -62,11 +62,8 @@ export default function usePortfolioData(userId, range) {
 
   const points = useMemo(() => {
     if (allPoints.length === 0) return [];
-    const rangeDef = RANGES.find(r => r.id === range);
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - (rangeDef?.days || 90));
-    const cutoffStr = cutoff.toISOString().slice(0, 10);
-    const filtered = allPoints.filter(p => p.date >= cutoffStr);
+    const cutoffStr = rangeCutoff(range);
+    const filtered = cutoffStr ? allPoints.filter(p => p.date >= cutoffStr) : allPoints;
     if (filtered.length === 0) return [];
 
     // Normalize to % change from first point

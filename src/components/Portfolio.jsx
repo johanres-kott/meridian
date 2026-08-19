@@ -21,6 +21,8 @@ import ThesisReview from "./ThesisReview.jsx";
 import AssetBreakdown from "./AssetBreakdown.jsx";
 import AssetTable from "./AssetTable.jsx";
 import useNetWorth from "../hooks/useNetWorth.js";
+import RangeBar from "./RangeBar.jsx";
+import { DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
 import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
 import WeeklySummary from "./WeeklySummary.jsx";
@@ -43,6 +45,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   const { scores } = useScores();
   const [prices, setPrices] = useState({});
   const [subTab, setSubTab] = useState("innehav");
+  const [range, setRange] = useState(DEFAULT_RANGE); // globalt tidsspann (Finary)
 
   const groups = preferences.groups || [];
 
@@ -218,11 +221,19 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
         </div>
       </div>
 
-      {/* Finary-IA (DESIGN.md): Portfölj = allt. Graf + donut överst, sedan tillgångstabellen. */}
+      {/* Finary-IA (DESIGN.md): Portfölj = allt. Tidsspann + graf + donut överst, sedan tillgångstabellen. */}
       {userId && (
-        <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-          <PortfolioChart compact offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0} />
-        </div>
+        <>
+          <RangeBar value={range} onChange={setRange} isMobile={isMobile} />
+          <div style={{ marginBottom: isMobile ? 12 : 20 }}>
+            <PortfolioChart
+              compact
+              offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0}
+              range={range}
+              onRangeChange={setRange}
+            />
+          </div>
+        </>
       )}
       <AssetBreakdown data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} />
       <AssetTable

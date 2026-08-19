@@ -2,16 +2,23 @@ import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
-import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
+import { RANGES, INDEXES, DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
+import { useEffect } from "react";
 import usePortfolioData from "../hooks/usePortfolioData.js";
 
 // offsetSek: pension + manuella tillgångar − skulder från useNetWorth. När det
 // är satt visar grafen nettoförmögenhet — de posterna har ingen kurshistorik,
 // så de ingår med sitt nuvarande inmatade värde (plattas bakåt, noteras i UI).
-export default function PortfolioChart({ compact = false, offsetSek = 0 }) {
+// range/onRangeChange: styrt utifrån (global RangeBar à la Finary); utan dem
+// har grafen egen lokal väljare (äldre användning). onPeriodChange rapporterar
+// periodens förändring uppåt så heron kan visa den.
+export default function PortfolioChart({ compact = false, offsetSek = 0, range: controlledRange, onRangeChange, onPeriodChange }) {
   const { userId } = useUser();
   const isMobile = useIsMobile();
-  const [range, setRange] = useState("3m");
+  const [localRange, setLocalRange] = useState(DEFAULT_RANGE);
+  const range = controlledRange ?? localRange;
+  const setRange = onRangeChange ?? setLocalRange;
+  const showRangeButtons = controlledRange == null;
   const [rawActiveIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
 
   const { points: rawPoints, indexDataMap, loading, error } = usePortfolioData(userId, range);
@@ -54,6 +61,13 @@ export default function PortfolioChart({ compact = false, offsetSek = 0 }) {
 
   // Best-performing index for "beat" indicator
   const bestIdx = Object.entries(indexReturns).sort((a, b) => b[1] - a[1])[0];
+
+  // Rapportera periodens förändring till föräldern (heron visar den bredvid siffran)
+  useEffect(() => {
+    if (!onPeriodChange) return;
+    onPeriodChange(canRender ? { returnSek, returnPct, range } : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canRender, returnSek, returnPct, range]);
 
   const gradientId = `portfolioChartGrad-${range}`;
   const chartHeight = compact ? 160 : (isMobile ? 180 : 220);
@@ -161,8 +175,8 @@ export default function PortfolioChart({ compact = false, offsetSek = 0 }) {
           ))}
           {/* Spacer */}
           {!isNetWorth && INDEXES.some(idx => indexDataMap[idx.id]) && <div style={{ width: compact ? 4 : 8 }} />}
-          {/* Range buttons */}
-          {RANGES.map(r => (
+          {/* Range buttons — bara när grafen inte styrs av en global RangeBar */}
+          {showRangeButtons && RANGES.map(r => (
             <button key={r.id} onClick={() => setRange(r.id)}
               style={{
                 fontSize: 11, padding: "4px 10px", borderRadius: 3, border: "none", cursor: "pointer",

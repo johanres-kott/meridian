@@ -12,6 +12,8 @@ import InfoCard from "./investment/InfoCard.jsx";
 import CompanySelector, { COMPANIES } from "./investment/CompanySelector.jsx";
 import HoldingsTable from "./investment/HoldingsTable.jsx";
 import InvestLanding from "./investment/InvestLanding.jsx";
+import BaseFundCard from "./BaseFundCard.jsx";
+import FeeScanCard from "./FeeScanCard.jsx";
 import FundSuggestions from "./FundSuggestions.jsx";
 import FundEducation from "./FundEducation.jsx";
 import PensionInvest from "./PensionInvest.jsx";
@@ -92,20 +94,25 @@ export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepL
 
       {/* ── Start: produktkort (Finary-inspirerat, se PIVOT.md) ── */}
       {subTab === "start" && (
-        <InvestLanding
-          isMobile={isMobile}
-          onNavigate={onNavigate}
-          onFunds={() => {
-            setSuggestMode("fund");
-            setFundDefaults({ category: "aktie_global", type: "index" });
-            setSubTab("toppforslag");
-          }}
-          onStocks={() => {
-            setSuggestMode("stock");
-            setSubTab("toppforslag");
-          }}
-          onPension={() => setSubTab("pension")}
-        />
+        <>
+          {/* Råd-korten (flyttade från Hem i Finary-IA-städningen): status på basen + avgiftskoll */}
+          <BaseFundCard isMobile={isMobile} onNavigate={onNavigate} />
+          <FeeScanCard isMobile={isMobile} onNavigate={onNavigate} />
+          <InvestLanding
+            isMobile={isMobile}
+            onNavigate={onNavigate}
+            onFunds={() => {
+              setSuggestMode("fund");
+              setFundDefaults({ category: "aktie_global", type: "index" });
+              setSubTab("toppforslag");
+            }}
+            onStocks={() => {
+              setSuggestMode("stock");
+              setSubTab("toppforslag");
+            }}
+            onPension={() => setSubTab("pension")}
+          />
+        </>
       )}
 
       {/* ── Smart Suggestions ── */}

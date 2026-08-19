@@ -13,6 +13,7 @@ export default function useNetWorth() {
   const [portfolioSek, setPortfolioSek] = useState(null);
   const [dailyChangeSek, setDailyChangeSek] = useState(null);
   const [split, setSplit] = useState({ stocksSek: null, fundsSek: null });
+  const [holdingsInfo, setHoldingsInfo] = useState({ holdings: [], priced: [], fxToSek: {} });
   const [portfolioLoaded, setPortfolioLoaded] = useState(false);
   const [manualRows, setManualRows] = useState([]);
 
@@ -25,6 +26,7 @@ export default function useNetWorth() {
         setPortfolioSek(v.portfolioSek);
         setDailyChangeSek(v.dailyChangeSek);
         setSplit({ stocksSek: v.stocksSek ?? null, fundsSek: v.fundsSek ?? null });
+        setHoldingsInfo({ holdings: v.holdings || [], priced: v.priced || [], fxToSek: v.fxToSek || {} });
         setPortfolioLoaded(true);
       })
       .catch(err => {
@@ -65,6 +67,10 @@ export default function useNetWorth() {
     dailyChangeSek,
     stocksSek: split.stocksSek,
     fundsSek: split.fundsSek,
+    holdings: holdingsInfo.holdings,
+    priced: holdingsInfo.priced,
+    fxToSek: holdingsInfo.fxToSek,
+    pensionLabel: preferences?.pension?.itpType || null,
     portfolioLoaded,
     manualRows,
     assets,

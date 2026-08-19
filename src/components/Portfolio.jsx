@@ -4,7 +4,6 @@ import PdfImportModal from "./PdfImportModal.jsx";
 import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { sanitizeInput } from "../lib/sanitize.js";
 import { fetchCompany, fetchFund } from "../lib/apiClient.js";
 import FundView from "./FundView.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";
@@ -20,7 +19,13 @@ import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import ThesisReview from "./ThesisReview.jsx";
 import AssetBreakdown from "./AssetBreakdown.jsx";
+import AssetTable from "./AssetTable.jsx";
 import useNetWorth from "../hooks/useNetWorth.js";
+import SedanSist from "./SedanSist.jsx";
+import PortfolioSummary from "./PortfolioSummary.jsx";
+import WeeklySummary from "./WeeklySummary.jsx";
+import UpcomingEarnings from "./UpcomingEarnings.jsx";
+import InvestmentPlanTracker from "./InvestmentPlanTracker.jsx";
 import { useTranslation } from "react-i18next";
 
 export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
@@ -40,8 +45,6 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   const [subTab, setSubTab] = useState("innehav");
 
   const groups = preferences.groups || [];
-
-  useEffect(() => { load(); }, []);
 
   // Handle deep link from Översikt
   useEffect(() => {
@@ -88,6 +91,9 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
       }
     }
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- kör en gång vid mount
+  useEffect(() => { load(); }, []);
 
   async function addCompany({ ticker, name, type = "stock" }) {
     const { data: { user } } = await supabase.auth.getUser();
@@ -212,14 +218,30 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
         </div>
       </div>
 
-      {/* Fördelning per tillgångsslag — Finarys Assets|Liabilities-donut (DESIGN.md) */}
+      {/* Finary-IA (DESIGN.md): Portfölj = allt. Graf + donut överst, sedan tillgångstabellen. */}
+      {userId && (
+        <div style={{ marginBottom: isMobile ? 12 : 20 }}>
+          <PortfolioChart compact offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0} />
+        </div>
+      )}
       <AssetBreakdown data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} />
+      <AssetTable
+        data={netWorthData}
+        holdings={netWorthData.holdings}
+        fxToSek={netWorthData.fxToSek}
+        isMobile={isMobile}
+        onNavigate={onNavigate}
+        onSelectHolding={(h) => {
+          const match = items.find(i => i.id === h.id || i.ticker === h.ticker);
+          if (match) setSelected(match);
+        }}
+      />
 
       {/* Sub-tabs */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 20 }}>
         {[
           { id: "innehav", label: t("portfolio.tabs.holdings") },
-          { id: "oversikt", label: t("portfolio.tabs.overview") },
+          { id: "bevakning", label: t("portfolio.tabs.watch") },
           { id: "tesgranskning", label: t("portfolio.tabs.thesisReview") },
           { id: "pension", label: t("portfolio.tabs.pension") },
         ].map(tab => (
@@ -336,10 +358,12 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
         )}
       </>}
 
-      {/* ── Översikt tab ── */}
-      {subTab === "oversikt" && <>
+      {/* ── Bevakning tab: aktie-pulsen (flyttad från Hem i Finary-IA-städningen) ── */}
+      {subTab === "bevakning" && <>
+        <SedanSist isMobile={isMobile} onNavigate={onNavigate} />
+        <PortfolioSummary isMobile={isMobile} onNavigate={onNavigate} />
+        <InvestmentPlanTracker isMobile={isMobile} onNavigate={onNavigate} />
         <StrategyCard isMobile={isMobile} />
-
         <AllocationCard
           items={items}
           scores={scores}
@@ -348,8 +372,8 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
           riskProfile={preferences.investorProfile?.riskProfile || "medium"}
           isMobile={isMobile}
         />
-
-        {items.some(i => i.shares) && userId && <PortfolioChart />}
+        <WeeklySummary isMobile={isMobile} onNavigate={onNavigate} />
+        <UpcomingEarnings isMobile={isMobile} />
       </>}
 
       {/* ── Tesgranskning tab ── */}

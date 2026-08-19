@@ -29,7 +29,7 @@ async function computeValuation(userId) {
     .order("created_at");
 
   if (!watchlist || watchlist.length === 0) {
-    return { empty: true, watchlist: [], priced: [], holdings: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null, stocksSek: 0, fundsSek: 0 };
+    return { empty: true, watchlist: [], priced: [], holdings: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null, stocksSek: 0, fundsSek: 0, fxToSek: {} };
   }
 
   // Fetch prices + FX rates in parallel
@@ -121,5 +121,6 @@ async function computeValuation(userId) {
     empty: false, watchlist, priced, holdings, currencyGroups, totalSek, dailyChangeSek, portfolioSek,
     stocksSek: splitOk ? stocksSek : null,
     fundsSek: splitOk ? fundsSek : null,
+    fxToSek,
   };
 }

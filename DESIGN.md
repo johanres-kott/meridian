@@ -117,6 +117,31 @@ SEK-först-perspektiv.
 - [ ] Nettoförmögenhetshistorik på riktigt: snapshotta netWorth (cron) i stil
       med portfolio_snapshots så grafen slipper platta bakåt
 
+## Informationsarkitektur — en fråga per sida (beslut aug 2026)
+
+Finarys modell rakt av: **Home är en enkel dashboard, Portfolio har allt**,
+"+ Lägg till" finns överst på varje sida.
+
+| Sida | Frågan den svarar på | Innehåll |
+|---|---|---|
+| **Hem** | Hur mår min ekonomi? | Hero (nettoförmögenhet + dagsförändring), nettoförmögenhetsgraf, Rörelser idag, Min ekonomi, att-göra |
+| **Portfölj** | Vad äger jag? | Graf, AssetBreakdown-donut, **AssetTable** (en rad per tillgång över alla slag, typ-chips + sök), underflikar Innehav / Bevakning / Tesgranskning / Pension |
+| **Mål** | Vart är jag på väg? | Kassaflöde (lön → sparutrymme), sparmål |
+| **Investera** | Vad ska jag göra? | Din bas, Avgiftskoll, produktkorten, Toppförslag, Pension (investera), Investmentbolag |
+| **Analys / Marknader / Sök** | Kryddan | Oförändrade (arv) |
+
+Regel: en komponent som inte passar in i sidans fråga flyttas eller tas bort
+— aldrig "behålls för säkerhets skull". Inga dubbletter: pensionsvyn bor under
+Portfölj (Investera länkar dit), portföljgrafen på Hem och Portfölj är samma
+komponent med samma data.
+
+### Strangler-läge: arv under observation
+Komponenter som lever vidare bakom Portfölj → Bevakning tills de antingen
+byggs om i Finary-stil eller visar sig oanvända och tas bort:
+SedanSist, PortfolioSummary, InvestmentPlanTracker, StrategyCard,
+AllocationCard, WeeklySummary, UpcomingEarnings, PortfolioTreemap,
+GroupFilterBar. Beslut per komponent tas när Bevakning-fliken utvärderas.
+
 ## Målgrupp (aug 2026)
 
 Människor som vill ha **helhetssyn på sin ekonomi och sina tillgångar** —

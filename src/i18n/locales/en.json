@@ -26,7 +26,9 @@
       "holdings": "Holdings",
       "overview": "Overview",
       "thesisReview": "Thesis review",
-      "pension": "Pension"
+      "pension": "Pension",
+      "watch": "Watchlist",
+      "assets": "Assets"
     },
     "exportCsv": "Export CSV",
     "exportCsvShort": "⬇ CSV",
@@ -183,5 +185,21 @@
       "bolan": "Mortgage",
       "skuld": "Other debts"
     }
-  }
+  },
+  "assetTable": {
+    "title": "Assets",
+    "assets": "Assets",
+    "debts": "Debts",
+    "search": "Search",
+    "allTypes": "All types",
+    "name": "Name",
+    "type": "Type",
+    "share": "Share",
+    "value": "Value",
+    "total": "Total",
+    "count": "{{count}} items",
+    "empty": "No assets yet — click “+ Add assets” at the top right.",
+    "noMatch": "Nothing matches the filter."
+  },
+  "homeMovers": "Today's movers"
 }

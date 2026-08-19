@@ -26,7 +26,9 @@
       "holdings": "Innehav",
       "overview": "Översikt",
       "thesisReview": "Tesgranskning",
-      "pension": "Pension"
+      "pension": "Pension",
+      "watch": "Bevakning",
+      "assets": "Tillgångar"
     },
     "exportCsv": "Exportera CSV",
     "exportCsvShort": "⬇ CSV",
@@ -183,5 +185,21 @@
       "bolan": "Bolån",
       "skuld": "Övriga skulder"
     }
-  }
+  },
+  "assetTable": {
+    "title": "Tillgångar",
+    "assets": "Tillgångar",
+    "debts": "Skulder",
+    "search": "Sök",
+    "allTypes": "Alla typer",
+    "name": "Namn",
+    "type": "Typ",
+    "share": "Andel",
+    "value": "Värde",
+    "total": "Totalt",
+    "count": "{{count}} poster",
+    "empty": "Inga tillgångar ännu — klicka ”+ Lägg till” uppe till höger.",
+    "noMatch": "Inget matchar filtret."
+  },
+  "homeMovers": "Rörelser idag"
 }

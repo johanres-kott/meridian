@@ -75,7 +75,7 @@ export default function InvestLanding({ isMobile, onFunds, onStocks, onPension, 
           ]}
           ctaLabel="Utforska fonder"
           onCta={onFunds}
-          secondary={{ label: "Avgiftskollen", onClick: () => onNavigate?.("markets") }}
+          secondary={null}
           gradient="linear-gradient(135deg, rgba(59,106,230,0.10), rgba(59,106,230,0.02))"
         />
         <Card

@@ -85,12 +85,18 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("boende");
   const [incomeType, setIncomeType] = useState("lon");
+  const [error, setError] = useState(null);
 
   function save() {
     const parsed = parseAmount(amount);
-    if (!label.trim() || parsed == null) return;
+    // Inkomst: typens etikett duger som namn om fältet lämnats tomt
+    const fallbackLabel = withIncomeType ? (INCOME_TYPES.find(t => t.id === incomeType)?.label || "") : "";
+    const finalLabel = (label.trim() || fallbackLabel).trim();
+    if (!finalLabel) { setError("Skriv ett namn på posten."); return; }
+    if (parsed == null) { setError("Fyll i ett belopp i kr per månad."); return; }
+    setError(null);
     onAdd({
-      id: newId(), label: label.trim(), amount: parsed,
+      id: newId(), label: finalLabel, amount: parsed,
       ...(withCategory ? { category } : {}),
       ...(withIncomeType ? { incomeType } : {}),
     });
@@ -98,6 +104,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
     setAmount("");
     setAdding(false);
   }
+  function cancel() { setAdding(false); setError(null); setLabel(""); setAmount(""); }
 
   // Snabbval: förifyll namn + kategori, öppna formuläret med fokus på beloppet
   function pickPreset(preset) {
@@ -137,11 +144,11 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
         {adding ? (
           <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
             {withIncomeType && (
-              <select value={incomeType} onChange={e => { setIncomeType(e.target.value); if (!label) setLabel(INCOME_TYPES.find(t => t.id === e.target.value)?.label || ""); }} style={inputStyle}>
+              <select value={incomeType} onChange={e => { const t = INCOME_TYPES.find(x => x.id === e.target.value); setIncomeType(e.target.value); if (!label || INCOME_TYPES.some(x => x.label === label)) setLabel(t?.label || ""); }} style={inputStyle}>
                 {INCOME_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
               </select>
             )}
-            <input value={label} onChange={e => setLabel(e.target.value)} placeholder={placeholder} autoFocus={!label} style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
+            <input value={label} onChange={e => setLabel(e.target.value)} placeholder={placeholder} autoFocus={!label} onKeyDown={e => { if (e.key === "Enter") save(); }} style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
             {withCategory && (
               <select value={category} onChange={e => setCategory(e.target.value)} style={inputStyle}>
                 {EXPENSE_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -150,10 +157,11 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
             <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="kr/mån" inputMode="numeric" autoFocus={!!label} style={{ ...inputStyle, width: 90 }}
               onKeyDown={e => { if (e.key === "Enter") save(); }} />
             <button onClick={save} style={{ fontSize: 12, padding: "7px 14px", borderRadius: 16, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>Spara</button>
-            <button onClick={() => setAdding(false)} style={{ fontSize: 12, padding: "7px 10px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
+            <button onClick={cancel} style={{ fontSize: 12, padding: "7px 10px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
+            {error && <div style={{ width: "100%", fontSize: 11.5, color: "var(--neg)", marginTop: 2 }}>{error}</div>}
           </div>
         ) : (
-          <button onClick={() => setAdding(true)}
+          <button onClick={() => { setAdding(true); if (withIncomeType && !label) setLabel(INCOME_TYPES.find(t => t.id === incomeType)?.label || ""); }}
             style={{ marginTop: 8, fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
             + Lägg till
           </button>

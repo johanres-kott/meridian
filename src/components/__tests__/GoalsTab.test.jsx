@@ -90,11 +90,32 @@ describe("GoalsTab", () => {
     expect(call.cashflow.expenses[0]).toMatchObject({ label: "El", amount: 900, category: "boende" });
   });
 
+  it("saves an income when only the amount is filled (type label becomes the name)", () => {
+    render(<GoalsTab />);
+    fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
+    // namnet är förifyllt med typens etikett — användaren skriver bara beloppet
+    const nameInput = screen.getAllByDisplayValue("Lön efter skatt").find(el => el.tagName === "INPUT");
+    expect(nameInput).toBeTruthy();
+    fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "42000" } });
+    fireEvent.click(screen.getByText("Spara"));
+    const call = updatePreferences.mock.calls.at(-1)[0];
+    expect(call.cashflow.incomes[0]).toMatchObject({ label: "Lön efter skatt", amount: 42000, incomeType: "lon" });
+  });
+
+  it("explains why when the amount is missing instead of silently doing nothing", () => {
+    render(<GoalsTab />);
+    fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
+    fireEvent.click(screen.getByText("Spara"));
+    expect(screen.getByText("Fyll i ett belopp i kr per månad.")).toBeTruthy();
+    expect(updatePreferences).not.toHaveBeenCalled();
+  });
+
   it("supports several incomes with a type", () => {
     prefs = { cashflow: { incomes: [{ id: "1", label: "Lön efter skatt", amount: 35000, incomeType: "lon" }], expenses: [] } };
     render(<GoalsTab />);
     fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
-    fireEvent.change(screen.getByDisplayValue("Lön efter skatt", { selector: "select" }), { target: { value: "partner" } });
+    const typeSelect = screen.getAllByDisplayValue("Lön efter skatt").find(el => el.tagName === "SELECT");
+    fireEvent.change(typeSelect, { target: { value: "partner" } });
     fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "28000" } });
     fireEvent.click(screen.getByText("Spara"));
     const call = updatePreferences.mock.calls.at(-1)[0];

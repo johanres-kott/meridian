@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { updateManualAsset, deleteManualAsset } from "../lib/manualAssets.js";
 import { IconBadge } from "./icons.jsx";
+import { KIND_COLORS } from "./iconMaps.js";
 import { KIND_LABELS, VALUE_LABELS, FIELDS_BY_KIND, formatFieldValue, parseFieldInput, fieldToInput } from "./assetFields.js";
 import { summarizeTranches, DEFAULT_LOCK_YEARS } from "./addassets/vinstandel.js";
 
@@ -13,7 +14,6 @@ import { summarizeTranches, DEFAULT_LOCK_YEARS } from "./addassets/vinstandel.js
 
 const mono = { fontFamily: "var(--font-mono)" };
 const fmtKr = v => `${Math.round(Number(v)).toLocaleString("sv-SE")} kr`;
-const KIND_COLORS = { bostad: "#7c4dff", fordon: "var(--warn)", sparkonto: "#26a69a", buffert: "#26a69a", vinstandel: "var(--gold-500)", ovrigt: "#8d6e63", bolan: "var(--neg)", skuld: "#ef6c00" };
 
 const card = { background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "16px 20px" };
 const sectionTitle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 };

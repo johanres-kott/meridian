@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
 import { deleteManualAsset } from "../lib/manualAssets.js";
-import { KindIcon } from "./icons.jsx";
+import { IconBadge } from "./icons.jsx";
+import { KIND_COLORS } from "./iconMaps.js";
 import { vinstandelHint } from "./addassets/vinstandel.js";
 
 // "Min ekonomi" (PIVOT.md fas 3): listar och raderar manuella tillgångar/
@@ -31,7 +32,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
   }
 
   const mono = { fontFamily: "var(--font-mono)" };
-  const rowStyle = { display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 };
+  const rowStyle = { display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 };
 
   function fmtKr(v) {
     return `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
@@ -53,7 +54,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
         <div style={{ marginTop: 10 }}>
           {portfolioSek != null && portfolioSek > 0 && (
             <div style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio")}>
-              <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--text-secondary)" }}><KindIcon kind="portfolio" /></span>
+              <IconBadge kind="portfolio" color={KIND_COLORS.portfolio} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1 }}>{t("myFinances.portfolio")}</span>
               <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(portfolioSek)}</span>
             </div>
@@ -63,14 +64,14 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
           )}
           {pensionValue != null && (
             <div style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("investment", { subTab: "pension" })}>
-              <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--text-secondary)" }}><KindIcon kind="pension" /></span>
+              <IconBadge kind="pension" color={KIND_COLORS.pension} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1 }}>{t("myFinances.pension")} · {preferences?.pension?.itpType || "ITP"}</span>
               <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(pensionValue)}</span>
             </div>
           )}
           {assets.map(r => (
             <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna tillgången">
-              <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--text-secondary)" }}><KindIcon kind={r.kind} /></span>
+              <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--brand)"} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1, minWidth: 0 }}>
                 {r.label}
                 {r.kind === "vinstandel" && vinstandelHint(r.metadata) && (
@@ -84,7 +85,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
           ))}
           {debts.map(r => (
             <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna lånet">
-              <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--neg)" }}><KindIcon kind={r.kind} /></span>
+              <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--neg)"} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>
               <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(Number(r.value_sek))}</span>
               <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}

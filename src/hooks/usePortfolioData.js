@@ -8,6 +8,7 @@ import { INDEXES, rangeCutoff } from "../lib/portfolioChartConstants.js";
  */
 export default function usePortfolioData(userId, range) {
   const [allPoints, setAllPoints] = useState([]);
+  const [netWorthPoints, setNetWorthPoints] = useState([]); // äkta nettoförmögenhets-snapshots (cron)
   const [indexDataMap, setIndexDataMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -17,17 +18,20 @@ export default function usePortfolioData(userId, range) {
     setLoading(true);
     setError(false);
 
-    // Fetch portfolio + all indexes in parallel
+    // Fetch portfolio + net worth history + all indexes in parallel
     Promise.all([
-      supabase.auth.getSession().then(({ data: { session: s } }) =>
-        fetch("/api/portfolio-history", {
-          headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : {},
-        }).then(r => r.ok ? r.json() : null)
-      ),
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        const headers = s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : {};
+        return Promise.all([
+          fetch("/api/portfolio-history", { headers }).then(r => r.ok ? r.json() : null),
+          fetch("/api/net-worth-history", { headers }).then(r => r.ok ? r.json() : null).catch(() => null),
+        ]);
+      }),
       ...INDEXES.map(idx =>
         fetch(`/api/chart?ticker=${encodeURIComponent(idx.ticker)}&range=1y`).then(r => r.ok ? r.json() : null).catch(() => null)
       ),
-    ]).then(([portfolioData, ...indexResults]) => {
+    ]).then(([[portfolioData, netWorthData], ...indexResults]) => {
+      setNetWorthPoints((netWorthData?.snapshots || []).map(p => ({ date: p.date, value: p.value })));
       // Portfolio
       const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
       const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
@@ -93,5 +97,5 @@ export default function usePortfolioData(userId, range) {
     });
   }, [allPoints, range, indexDataMap]);
 
-  return { points, indexDataMap, loading, error };
+  return { points, netWorthPoints, indexDataMap, loading, error };
 }

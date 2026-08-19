@@ -114,8 +114,13 @@ SEK-först-perspektiv.
 - [ ] Kortradier/spacing-pass över samtliga vyer (10 px radius, luftigare)
 - [ ] Sparmål ↔ tillgångar: låt ett mål peka på t.ex. buffert-posten i
       manual_assets så "sparat" uppdateras därifrån
-- [ ] Nettoförmögenhetshistorik på riktigt: snapshotta netWorth (cron) i stil
-      med portfolio_snapshots så grafen slipper platta bakåt
+- [x] Nettoförmögenhetshistorik på riktigt: net_worth_snapshots (migration
+      körd) fylls dagligen 05:00 UTC av /api/cron/net-worth-snapshot (Vercel
+      cron i vercel.json, service role, upsert per user+dag; första körningen
+      gjord 2026-08-19). /api/net-worth-history läser (JWT/RLS). Grafen kör
+      hybrid i nettoläge: äkta punkter där de finns, portfölj + offset innan.
+      **Deploy-krav:** sätt `CRON_SECRET` (finns i .env.local) som env i
+      Vercel — utan den svarar cron-endpointen öppet.
 
 ## Informationsarkitektur — en fråga per sida (beslut aug 2026)
 

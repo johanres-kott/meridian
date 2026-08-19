@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
-import { RANGES, INDEXES, DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
+import { RANGES, INDEXES, DEFAULT_RANGE, rangeCutoff } from "../lib/portfolioChartConstants.js";
 import { useEffect } from "react";
 import usePortfolioData from "../hooks/usePortfolioData.js";
 
@@ -21,15 +21,24 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   const showRangeButtons = controlledRange == null;
   const [rawActiveIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
 
-  const { points: rawPoints, indexDataMap, loading, error } = usePortfolioData(userId, range);
+  const { points: rawPoints, netWorthPoints, indexDataMap, loading, error } = usePortfolioData(userId, range);
   const isNetWorth = offsetSek !== 0;
   const chartTitle = isNetWorth ? "Nettoförmögenhet" : "Portföljutveckling";
   // Indexjämförelse i % gäller portföljen — döljs i nettoläge för att inte blanda äpplen och päron.
   const activeIndexes = isNetWorth ? [] : rawActiveIndexes;
-  const points = useMemo(
-    () => (isNetWorth ? rawPoints.map(p => ({ ...p, value: p.value + offsetSek })) : rawPoints),
-    [rawPoints, isNetWorth, offsetSek]
-  );
+  // Nettoläge, hybrid: äkta nettoförmögenhets-snapshots (cron) där de finns, annars
+  // portfölj + nuvarande offset för dagarna innan snapshotten började.
+  const { points, hasRealNetWorth } = useMemo(() => {
+    if (!isNetWorth) return { points: rawPoints, hasRealNetWorth: false };
+    const cutoff = rangeCutoff(range);
+    const real = netWorthPoints.filter(p => !cutoff || p.date >= cutoff);
+    const firstReal = real[0]?.date;
+    const fallback = rawPoints
+      .filter(p => !firstReal || p.date < firstReal)
+      .map(p => ({ ...p, value: p.value + offsetSek }));
+    const merged = [...fallback, ...real.map(p => ({ date: p.date, value: p.value, real: true }))];
+    return { points: merged, hasRealNetWorth: real.length > 0 };
+  }, [rawPoints, netWorthPoints, isNetWorth, offsetSek, range]);
 
   const toggleIndex = (id) => {
     setActiveIndexes(prev =>
@@ -275,7 +284,9 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
       )}
       {isNetWorth && (
         <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
-          Pension och manuellt inmatade tillg\u00e5ngar/skulder ing\u00e5r med sitt nuvarande v\u00e4rde \u2014 deras historik f\u00f6ljer inte grafen.
+          {hasRealNetWorth
+            ? "Nettof\u00f6rm\u00f6genheten sparas dagligen \u2014 tiden innan f\u00f6rsta sparningen visas som portf\u00f6lj + nuvarande v\u00e4rde p\u00e5 \u00f6vriga tillg\u00e5ngar."
+            : "Pension och manuellt inmatade tillg\u00e5ngar/skulder ing\u00e5r med sitt nuvarande v\u00e4rde. Fr\u00e5n och med idag sparas nettof\u00f6rm\u00f6genheten dagligen, s\u00e5 historiken byggs upp fram\u00e5t."}
         </div>
       )}
     </div>

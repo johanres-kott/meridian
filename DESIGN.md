@@ -173,6 +173,22 @@ SedanSist, PortfolioSummary, InvestmentPlanTracker, StrategyCard,
 AllocationCard, WeeklySummary, UpcomingEarnings, PortfolioTreemap,
 GroupFilterBar. Beslut per komponent tas när Bevakning-fliken utvärderas.
 
+## Onboarding = ekonomiprofil (aug 2026)
+
+Den gamla investerarprofilen ("Vilken typ av investerare är du? Värde/
+Tillväxt/Utdelning…" + fem starter-aktier i bevakningen) är ersatt av en
+**ekonomiprofil** i fyra steg: livsskede → ekonomisk situation (bostad, bolån,
+ITP, sparande, fonder, aktier, andra lån) → mål (buffert, helhet, amortera,
+bostad, långsiktigt, barn, något roligt, komma igång) → stil (tryggt/
+balanserat/engagerat) + erfarenhet. Summeringen landar i **"Dina första steg"**
+— konkreta handlingar härledda ur svaren (lägg in bostaden, bufferten,
+pensionen, titta på basen, sätt ett mål), aldrig "köp X".
+
+Bakåtkompatibilitet: `deriveLegacyProfile()` härleder investorType/
+riskProfile/experience ur nya svaren (score-systemet, bolagssidan, förslagen
+läser dem). Profilen markeras `version: 2`; gamla profiler visas med en nudge
+om att göra om den. Inga starter-aktier läggs längre till.
+
 ## Målgrupp (aug 2026)
 
 Människor som vill ha **helhetssyn på sin ekonomi och sina tillgångar** —

@@ -140,27 +140,30 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
 
           {preferences.investorProfile && (
             <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
-              <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 6 }}>Din investerarprofil</div>
+              <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 6 }}>Din ekonomiprofil</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {[
-                  { value: preferences.investorProfile.investorType, map: { value: "Värde", growth: "Tillväxt", dividend: "Utdelning", index: "Index", mixed: "Blandat" } },
-                  { value: preferences.investorProfile.experience, map: { beginner: "Nybörjare", intermediate: "Lite erfarenhet", advanced: "Erfaren" } },
-                  { value: preferences.investorProfile.riskProfile, map: { low: "Låg risk", medium: "Medel risk", high: "Hög risk" } },
-                  { value: preferences.investorProfile.focus, map: { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" } },
-                  { value: preferences.investorProfile.geography, map: { nordic: "Norden", global: "Globalt", both: "Blandat geo" } },
-                ].filter(x => x.value && x.map[x.value]).map((x, i) => (
-                  <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "var(--border-light)", color: "var(--accent)", fontWeight: 500 }}>
-                    {x.map[x.value]}
-                  </span>
-                ))}
+                {(() => {
+                  const p = preferences.investorProfile;
+                  const chips = p.version === 2
+                    ? [
+                        { value: p.lifeStage, map: { starting: "I början", building: "Bygger upp", established: "Etablerad", preRetire: "Närmar mig pension" } },
+                        { value: p.style, map: { safe: "Tryggt och enkelt", balanced: "Balanserat", active: "Engagerat" } },
+                        { value: p.experience, map: { beginner: "Nybörjare", intermediate: "Lite van", advanced: "Van" } },
+                      ]
+                    : [
+                        { value: p.investorType, map: { value: "Värde", growth: "Tillväxt", dividend: "Utdelning", index: "Index", mixed: "Blandat" } },
+                        { value: p.experience, map: { beginner: "Nybörjare", intermediate: "Lite erfarenhet", advanced: "Erfaren" } },
+                        { value: p.riskProfile, map: { low: "Låg risk", medium: "Medel risk", high: "Hög risk" } },
+                      ];
+                  return chips.filter(x => x.value && x.map[x.value]).map((x, i) => (
+                    <span key={i} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 999, background: "var(--brand-tint)", color: "var(--green-700)", fontWeight: 600 }}>
+                      {x.map[x.value]}
+                    </span>
+                  ));
+                })()}
               </div>
-              {preferences.investorProfile.interests?.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-                  {preferences.investorProfile.interests.map(i => {
-                    const labels = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
-                    return <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "#e8f5e9", color: "#1b5e20", fontWeight: 500 }}>{labels[i] || i}</span>;
-                  })}
-                </div>
+              {preferences.investorProfile.version !== 2 && (
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>Gjord med den gamla profilen — gör om den för att få den nya ekonomiprofilen.</div>
               )}
               <button
                 onClick={() => { updatePreferences({ investorProfile: null }); setOpen(false); }}

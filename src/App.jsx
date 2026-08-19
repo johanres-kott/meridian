@@ -18,6 +18,7 @@ import ScoringMethodology from "./components/ScoringMethodology.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
 import Documentation from "./components/Documentation.jsx";
 import AboutPage from "./components/AboutPage.jsx";
+import SecurityPage from "./components/SecurityPage.jsx";
 import ProfileMenu from "./components/ProfileMenu.jsx";
 import AddAssetsPage from "./components/addassets/AddAssetsPage.jsx";
 import GoalsTab from "./components/GoalsTab.jsx";
@@ -139,7 +140,8 @@ function AppContent() {
       {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
       {tab === "profile" && <ProfilePage onResetProfile={() => updatePreferences({ investorProfile: null })} />}
       {tab === "docs" && <Documentation />}
-      {tab === "about" && <AboutPage />}
+      {tab === "about" && <AboutPage onNavigate={navigate} />}
+      {tab === "security" && <SecurityPage />}
     </>
   );
 

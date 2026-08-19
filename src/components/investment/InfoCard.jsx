@@ -8,7 +8,7 @@ export default function InfoCard({ company, leadershipData }) {
   ];
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-light)" }}>
         <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>
           Bolagsinfo

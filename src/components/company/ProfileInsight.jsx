@@ -167,7 +167,7 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
   }
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 16 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {allItems.map((item, i) => (

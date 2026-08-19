@@ -105,7 +105,7 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
         <div style={{
           position: "absolute",
           ...(direction === "up" ? { bottom: "calc(100% + 8px)", left: 0 } : { top: "calc(100% + 6px)", right: 0 }),
-          background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
+          background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
           padding: "12px 0", minWidth: 240, zIndex: 100,
         }}>
           <div style={{ padding: "8px 16px 12px", borderBottom: "1px solid var(--border-light)" }}>
@@ -205,6 +205,7 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
 
           <button onClick={() => go("profile")} style={itemStyle} {...hover}>Profil & inställningar</button>
           <button onClick={() => go("docs")} style={itemStyle} {...hover}>Dokumentation</button>
+          <button onClick={() => go("security")} style={itemStyle} {...hover}>Din data & säkerhet</button>
           <button onClick={() => go("about")} style={itemStyle} {...hover}>Om Thesion</button>
 
           <div style={{ padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>

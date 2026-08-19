@@ -16,7 +16,7 @@ export default function HomeMovers({ data, isMobile, onNavigate }) {
   const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 16px" : "16px 22px", marginBottom: isMobile ? 12 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 16px" : "16px 22px", marginBottom: isMobile ? 12 : 20 }}>
       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>{t("homeMovers")}</div>
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 10 }}>
         {movers.map(m => (

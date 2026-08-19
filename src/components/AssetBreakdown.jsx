@@ -66,7 +66,7 @@ export default function AssetBreakdown({ data, isMobile, onNavigate }) {
   };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: isMobile ? "14px 16px" : "18px 22px", marginBottom: isMobile ? 12 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 16px" : "18px 22px", marginBottom: isMobile ? 12 : 20 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
         <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{t("assetBreakdown.title")}</span>
         <div style={{ display: "flex", gap: 14 }}>

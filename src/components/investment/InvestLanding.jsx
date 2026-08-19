@@ -10,7 +10,7 @@ function Card({ icon, title, headline, text, points, ctaLabel, onCta, secondary,
   const IconCmp = icon.Cmp;
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
       overflow: "hidden", display: "flex", flexDirection: "column",
     }}>
       <div style={{ padding: isMobile ? "14px 16px" : "18px 20px", background: gradient }}>

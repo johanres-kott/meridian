@@ -98,7 +98,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   // ALL hooks above this line — no early returns before here!
   if (loading) {
     return (
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
         <div style={{ height: chartHeight, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", fontSize: 12 }}>
           Laddar portföljutveckling...
         </div>
@@ -109,7 +109,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   if (!canRender) return null;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
       {/* Header with return info and range selector */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: compact ? "center" : "flex-start", marginBottom: compact ? 10 : 16, flexDirection: compact && isMobile ? "column" : "row", gap: compact && isMobile ? 8 : 0 }}>
         <div>

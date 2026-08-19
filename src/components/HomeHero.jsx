@@ -25,7 +25,7 @@ export default function HomeHero({ data, isMobile, onNavigate, period }) {
 
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
       padding: isMobile ? "16px 16px" : "22px 24px", marginBottom: isMobile ? 12 : 20,
     }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>{dateLabel}</div>

@@ -135,7 +135,7 @@ export default function WeeklySummary({ isMobile, onNavigate }) {
   const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("weeklySummary.title")}</span>
       </div>

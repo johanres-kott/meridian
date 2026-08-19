@@ -117,7 +117,7 @@ function ManualForm({ formId, onSaved, onBack }) {
       </div>
 
       {(form.hint || form.lookups) && (
-        <div style={{ marginTop: 20, padding: "14px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", background: "var(--bg-card)" }}>
+        <div style={{ marginTop: 20, padding: "14px 16px", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}>
           {form.hint && (
             <div style={{ display: "flex", gap: 8, fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.55 }}>
               <span style={{ flexShrink: 0 }}>ⓘ</span>
@@ -228,7 +228,7 @@ export default function AddAssetsPage({ onClose, onNavigate }) {
                 <button key={cat.id} onClick={() => openCategory(cat.id)}
                   style={{
                     position: "relative", overflow: "hidden", textAlign: "left",
-                    background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
+                    background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)",
                     padding: "18px 110px 18px 20px", cursor: "pointer", fontFamily: "inherit", minHeight: 96,
                   }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent)"}

@@ -66,7 +66,7 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
   const fmt = v => `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", overflow: "hidden", marginBottom: isMobile ? 12 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden", marginBottom: isMobile ? 12 : 20 }}>
       {/* Tabs */}
       <div style={{ display: "flex", gap: 18, padding: isMobile ? "10px 14px 0" : "12px 22px 0", borderBottom: "1px solid var(--border-light)" }}>
         {["assets", "debts"].map(m => (

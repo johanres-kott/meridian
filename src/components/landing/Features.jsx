@@ -48,7 +48,7 @@ export default function Features({ isMobile }) {
             </div>
           </div>
           {bento.map(b => (
-            <div key={b.tag} style={{ background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-card)", padding: isMobile ? 24 : 28, display: "flex", flexDirection: "column", gap: 10 }}>
+            <div key={b.tag} style={{ background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", padding: isMobile ? 24 : 28, display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ width: 34, height: 34, borderRadius: 10, background: "var(--brand-tint)", color: "var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
                   <b.Icon size={17} strokeWidth={1.5} aria-hidden />
@@ -70,7 +70,7 @@ export default function Features({ isMobile }) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 16 }}>
             {steps.map(([n, title, body]) => (
-              <div key={n} style={{ background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)", padding: 28 }}>
+              <div key={n} style={{ background: "var(--surface-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 28 }}>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "var(--gold-700)", marginBottom: 12 }}>{n}</div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>{title}</div>
                 <div style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>{body}</div>

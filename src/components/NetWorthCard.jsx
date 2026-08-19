@@ -69,7 +69,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
             </div>
           )}
           {assets.map(r => (
-            <div key={r.id} style={rowStyle}>
+            <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna tillgången">
               <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--text-secondary)" }}><KindIcon kind={r.kind} /></span>
               <span style={{ color: "var(--text)", flex: 1, minWidth: 0 }}>
                 {r.label}
@@ -78,16 +78,16 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
                 )}
               </span>
               <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(Number(r.value_sek))}</span>
-              <button onClick={() => removeRow(r.id)} title={t("common.delete", { defaultValue: "Ta bort" })}
+              <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>
           ))}
           {debts.map(r => (
-            <div key={r.id} style={rowStyle}>
+            <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna lånet">
               <span style={{ width: 18, display: "inline-flex", justifyContent: "center", color: "var(--neg)" }}><KindIcon kind={r.kind} /></span>
               <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>
               <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(Number(r.value_sek))}</span>
-              <button onClick={() => removeRow(r.id)} title={t("common.delete", { defaultValue: "Ta bort" })}
+              <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>
           ))}

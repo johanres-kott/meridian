@@ -23,7 +23,7 @@ const TYPE_META = {
 
 const mono = { fontFamily: "var(--font-mono)" };
 
-export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile, onSelectHolding, onNavigate }) {
+export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile, onSelectHolding, onSelectManual, onNavigate }) {
   const { t, i18n } = useTranslation();
   const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [mode, setMode] = useState("assets");
@@ -46,10 +46,10 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
       assets.push({ id: "pension", type: "pension", name: t("myFinances.pension"), sub: data.pensionLabel || "ITP", valueSek: data.pensionValue, nav: ["investment", { subTab: "pension" }] });
     }
     for (const r of data.assets || []) {
-      assets.push({ id: r.id, type: r.kind, name: r.label, sub: r.metadata?.address || r.metadata?.regNumber || null, valueSek: Number(r.value_sek) });
+      assets.push({ id: r.id, type: r.kind, name: r.label, sub: r.metadata?.address || r.metadata?.regNumber || null, valueSek: Number(r.value_sek), manual: r });
     }
     const debts = (data.debts || []).map(r => ({
-      id: r.id, type: r.kind, name: r.label, sub: r.metadata?.lender || null, valueSek: Number(r.value_sek),
+      id: r.id, type: r.kind, name: r.label, sub: r.metadata?.lender || null, valueSek: Number(r.value_sek), manual: r,
     }));
     const sortDesc = (a, b) => (b.valueSek ?? -1) - (a.valueSek ?? -1);
     return { assets: assets.sort(sortDesc), debts: debts.sort(sortDesc) };
@@ -135,9 +135,10 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
               {filtered.map(r => {
                 const meta = TYPE_META[r.type] || TYPE_META.ovrigt;
                 const pct = total > 0 && r.valueSek != null ? (r.valueSek / total) * 100 : null;
-                const clickable = !!(r.holding || r.nav);
+                const clickable = !!(r.holding || r.nav || (r.manual && onSelectManual));
                 const onClick = () => {
                   if (r.holding) onSelectHolding?.(r.holding);
+                  else if (r.manual) onSelectManual?.(r.manual);
                   else if (r.nav) onNavigate?.(...r.nav);
                 };
                 return (

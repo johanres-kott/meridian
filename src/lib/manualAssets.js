@@ -31,3 +31,14 @@ export async function deleteManualAsset(id) {
   if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
   return data;
 }
+
+export async function updateManualAsset(id, patch) {
+  const res = await fetch("/api/manual-assets", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify({ id, ...patch }),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+  return data;
+}

@@ -53,10 +53,11 @@ describe("GoalsTab", () => {
     expect(screen.getByText("15%")).toBeTruthy();
   });
 
-  it("adds an income row via updatePreferences", () => {
+  it("adds an income row via updatePreferences (custom name via 'Övrig inkomst')", () => {
     render(<GoalsTab />);
     fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
-    fireEvent.change(screen.getByPlaceholderText("T.ex. Lön efter skatt"), { target: { value: "Lön" } });
+    fireEvent.change(screen.getByDisplayValue("Lön efter skatt"), { target: { value: "ovrigt" } });
+    fireEvent.change(screen.getByPlaceholderText("Vad för inkomst?"), { target: { value: "Lön" } });
     fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "30000" } });
     fireEvent.click(screen.getByText("Spara"));
     const call = updatePreferences.mock.calls.at(-1)[0];
@@ -93,9 +94,8 @@ describe("GoalsTab", () => {
   it("saves an income when only the amount is filled (type label becomes the name)", () => {
     render(<GoalsTab />);
     fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
-    // namnet är förifyllt med typens etikett — användaren skriver bara beloppet
-    const nameInput = screen.getAllByDisplayValue("Lön efter skatt").find(el => el.tagName === "INPUT");
-    expect(nameInput).toBeTruthy();
+    // typen ÄR namnet — inget separat namnfält, bara typ + belopp
+    expect(screen.queryByPlaceholderText("Vad för inkomst?")).toBeNull();
     fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "42000" } });
     fireEvent.click(screen.getByText("Spara"));
     const call = updatePreferences.mock.calls.at(-1)[0];
@@ -114,8 +114,7 @@ describe("GoalsTab", () => {
     prefs = { cashflow: { incomes: [{ id: "1", label: "Lön efter skatt", amount: 35000, incomeType: "lon" }], expenses: [] } };
     render(<GoalsTab />);
     fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
-    const typeSelect = screen.getAllByDisplayValue("Lön efter skatt").find(el => el.tagName === "SELECT");
-    fireEvent.change(typeSelect, { target: { value: "partner" } });
+    fireEvent.change(screen.getByDisplayValue("Lön efter skatt"), { target: { value: "partner" } });
     fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "28000" } });
     fireEvent.click(screen.getByText("Spara"));
     const call = updatePreferences.mock.calls.at(-1)[0];

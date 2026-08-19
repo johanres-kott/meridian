@@ -21,7 +21,7 @@ export default function InsiderSection({ ticker }) {
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>
         Insiderhandel
       </div>

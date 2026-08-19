@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 24, marginBottom: 16 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 24, marginBottom: 16 };
 const h2Style = { fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 12 };
 const h3Style = { fontSize: 13, fontWeight: 600, color: "var(--text)", marginTop: 16, marginBottom: 6 };
 const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };

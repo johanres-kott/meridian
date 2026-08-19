@@ -414,7 +414,7 @@ function ThesisCard({ row, reviewMonths, onUpdate, onSelect, isMobile }) {
             <button
               onClick={() => { setThesisText(item.thesis_text || ""); setEditing(false); }}
               disabled={saving}
-              style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}
+              style={{ fontSize: 11, padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}
             >
               Avbryt
             </button>

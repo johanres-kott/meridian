@@ -116,7 +116,7 @@ function ManualForm({ formId, onSaved, onBack }) {
       </div>
 
       {(form.hint || form.lookups) && (
-        <div style={{ marginTop: 20, padding: "14px 16px", border: "1px solid var(--border)", borderRadius: 8, background: "var(--bg-card)" }}>
+        <div style={{ marginTop: 20, padding: "14px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)" }}>
           {form.hint && (
             <div style={{ display: "flex", gap: 8, fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.55 }}>
               <span style={{ flexShrink: 0 }}>ⓘ</span>

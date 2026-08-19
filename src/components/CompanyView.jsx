@@ -169,7 +169,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
 
             {/* News */}
             {company.news?.length > 0 && (
-              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 20 }}>
+              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20 }}>
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 }}>Senaste nyheter</div>
                 {company.news.map((n, i) => (
                   <a key={i} href={n.url} target="_blank" rel="noopener noreferrer"
@@ -213,7 +213,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
               const metrics = getMetricOrder(investorType, exp);
               const isFiltered = !showAllMetrics && (investorProfile?.experience === "beginner" || investorProfile?.experience === "intermediate");
               return (
-                <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 12 : 20 }}>
+                <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? 12 : 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Nyckeltal</div>
                     {isFiltered && (
@@ -245,7 +245,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
             {(company.targetPrice > 0 || company.recommendation !== "—") && (
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {company.targetPrice > 0 && (
-                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: "16px 20px" }}>
+                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "16px 20px" }}>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>Kursmål (snitt)</div>
                     <div style={{ fontSize: 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "#089981" }}>
                       {company.targetPrice.toFixed(2)} {company.currency}
@@ -270,7 +270,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
                   </div>
                 )}
                 {company.recommendation !== "—" && (
-                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: "16px 20px" }}>
+                  <div style={{ flex: 1, minWidth: 160, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "16px 20px" }}>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>Rekommendation</div>
                     <div style={{
                       fontSize: 16, fontWeight: 500, textTransform: "uppercase",

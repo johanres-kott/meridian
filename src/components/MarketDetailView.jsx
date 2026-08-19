@@ -55,7 +55,7 @@ export default function MarketDetailView({ item, onBack, isMobile }) {
       {(high > 0 || low > 0) && (
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 10 : 24, marginTop: isMobile ? 12 : 20 }}>
           {high > 0 && (
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
               <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginBottom: isMobile ? 4 : 6 }}>Dagens hogsta</div>
               <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {high.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
@@ -64,7 +64,7 @@ export default function MarketDetailView({ item, onBack, isMobile }) {
             </div>
           )}
           {low > 0 && (
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "12px 14px" : "16px 20px", minWidth: isMobile ? undefined : 140 }}>
               <div style={{ fontSize: isMobile ? 10 : 11, color: "var(--text-secondary)", marginBottom: isMobile ? 4 : 6 }}>Dagens lagsta</div>
               <div style={{ fontSize: isMobile ? 14 : 16, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace" }}>
                 {low.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 4 })}

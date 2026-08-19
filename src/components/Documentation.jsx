@@ -5,7 +5,7 @@ import OwnershipDocs from "./docs/OwnershipDocs.jsx";
 import PensionDocs from "./docs/PensionDocs.jsx";
 import ReferenceDocs from "./docs/ReferenceDocs.jsx";
 
-const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 24, marginBottom: 16 };
+const sectionStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 24, marginBottom: 16 };
 
 export default function Documentation() {
   const isMobile = useIsMobile();

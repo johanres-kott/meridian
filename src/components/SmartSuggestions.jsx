@@ -55,7 +55,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
   const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
       <div style={{
         padding: isMobile ? "10px 12px" : "14px 20px", borderBottom: "1px solid var(--border-light)",
         background: "var(--bg-secondary)", display: "flex", justifyContent: "space-between", alignItems: "center",

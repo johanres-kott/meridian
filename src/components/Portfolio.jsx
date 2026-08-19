@@ -277,17 +277,17 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
             URL.revokeObjectURL(url);
           }}
             title={t("portfolio.exportCsv")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.exportCsvShort") : t("portfolio.exportCsv")}
           </button>
           <button onClick={() => setShowImport(true)}
             title={t("portfolio.importPortfolio")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.importPortfolioShort") : t("portfolio.importPortfolio")}
           </button>
           <button onClick={() => setShowGuide(true)}
             title={t("portfolio.importHelp")}
-            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
+            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 10, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
             ?
           </button>
         </div>

@@ -165,7 +165,7 @@ export default function FordonWizard({ onSaved, onBack }) {
 
         {step === 1 && isLeasing && (
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
               ⓘ Vid leasing äger du inte fordonet — det räknas varken som tillgång eller skuld i din nettoförmögenhet.
               Vi sparar det ändå (med värde 0 kr) så att hela din ekonomi finns samlad på ett ställe.
             </div>
@@ -183,7 +183,7 @@ export default function FordonWizard({ onSaved, onBack }) {
             <Field label="Vad är fordonet värt idag?">
               <input value={d.value} onChange={set("value")} placeholder="Uppskattat andrahandsvärde, kr" inputMode="numeric" autoFocus style={inputStyle} />
             </Field>
-            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
               ⓘ Osäker på värdet? <a href="https://www.blocket.se/bilvardering" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", textDecoration: "none" }}>Värdera bilen på Blocket ↗</a> eller
               jämför liknande annonser — fyll sedan i själv.
             </div>
@@ -199,7 +199,7 @@ export default function FordonWizard({ onSaved, onBack }) {
         )}
 
         {step === 2 && isLeasing && (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, padding: "12px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
             ⓘ Leasing — inget lån läggs in eftersom fordonet inte är din tillgång.
             {monthlyCost != null && <> Månadskostnaden ({fmtKr(monthlyCost)}/mån) sparas som info på fordonet.</>}
           </div>

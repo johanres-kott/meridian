@@ -41,14 +41,14 @@ export default function SaveMenu({ content, onSaveStrategy, onSaveTodo }) {
         Spara ▾
       </button>
       {open && (
-        <div style={{ position: "absolute", bottom: "100%", left: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 12px rgba(0,0,0,0.12)", padding: "4px 0", zIndex: 100, minWidth: 180, marginBottom: 4 }}>
+        <div style={{ position: "absolute", bottom: "100%", left: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, boxShadow: "0 4px 12px rgba(0,0,0,0.12)", padding: "4px 0", zIndex: 100, minWidth: 180, marginBottom: 4 }}>
           {onSaveTodo && <button style={menuBtn} onClick={() => { onSaveTodo(content); setSaved("todo"); setOpen(false); }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>📋 Spara som att-göra</button>}
           {onSaveStrategy && <button style={menuBtn} onClick={() => { onSaveStrategy(content); setSaved("strategy"); setOpen(false); }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>🎯 Spara som strategi</button>}
           <button style={menuBtn} onClick={loadStocks} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>💡 Spara insikt till bolag</button>
         </div>
       )}
       {showStocks && (
-        <div style={{ position: "absolute", bottom: "100%", left: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, boxShadow: "0 4px 12px rgba(0,0,0,0.12)", padding: "4px 0", zIndex: 100, minWidth: 200, maxHeight: 200, overflow: "auto", marginBottom: 4 }}>
+        <div style={{ position: "absolute", bottom: "100%", left: 0, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, boxShadow: "0 4px 12px rgba(0,0,0,0.12)", padding: "4px 0", zIndex: 100, minWidth: 200, maxHeight: 200, overflow: "auto", marginBottom: 4 }}>
           {stocks.map(s => (
             <button key={s.id} style={menuBtn} onClick={() => saveInsight(s)} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "none"}>
               {s.name || s.ticker} <span style={{ fontSize: 9, color: "var(--text-muted)" }}>{s.ticker}</span>

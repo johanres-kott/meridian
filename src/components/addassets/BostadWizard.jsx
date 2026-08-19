@@ -212,7 +212,7 @@ export default function BostadWizard({ onSaved, onBack }) {
             )}
 
             {pantbrevGap != null && (
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6, padding: "10px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6, padding: "10px 14px", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10 }}>
                 ⓘ Lånet överstiger uttagna pantbrev med {fmtKr(pantbrevGap)}. Nya pantbrev kostar 2 % i stämpelskatt
                 på det nya beloppet plus 375 kr i expeditionsavgift (gäller fastigheter, inte bostadsrätter). Generell information.
               </div>

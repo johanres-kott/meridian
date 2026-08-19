@@ -3,7 +3,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 export default function AboutPage() {
   const isMobile = useIsMobile();
 
-  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 16 : 24, marginBottom: 16 };
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? 16 : 24, marginBottom: 16 };
   const labelStyle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
   const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
 

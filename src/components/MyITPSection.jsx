@@ -4,7 +4,7 @@ import { useItpProviders } from "../hooks/useItpProviders.js";
 import { getPensionEntries, getPensionTotalValue, newPensionEntry } from "../lib/pension.js";
 
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
-const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: 20, marginBottom: 16 };
+const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: 20, marginBottom: 16 };
 
 function formatKr(n) {
   return Number(n).toLocaleString("sv-SE");
@@ -84,7 +84,7 @@ export default function MyITPSection({ pension, updatePreferences, isMobile }) {
   }
 
   const inputStyle = {
-    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 4,
+    padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 10,
     fontSize: 13, fontFamily: "inherit", background: "var(--bg-card)", color: "var(--text)",
     outline: "none", width: "100%", boxSizing: "border-box",
   };

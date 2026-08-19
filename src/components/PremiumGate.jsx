@@ -11,7 +11,7 @@ export default function PremiumGate({ premium, loading, checkoutLoading, error, 
 
   return (
     <div style={{
-      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8,
+      background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10,
       padding: 40, textAlign: "center",
     }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>

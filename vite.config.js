@@ -21,9 +21,9 @@ function vercelApiPlugin() {
         const fnPath = path.resolve('api', `${fnName}.js`);
 
         try {
-          // Read request body for POST/PUT
+          // Read request body for POST/PUT/PATCH/DELETE (som Vercel gör)
           let body = null;
-          if (req.method === 'POST' || req.method === 'PUT') {
+          if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
             body = await new Promise((resolve, reject) => {
               let data = '';
               req.on('data', chunk => { data += chunk; });

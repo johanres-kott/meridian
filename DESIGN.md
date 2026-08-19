@@ -17,9 +17,9 @@
 >
 > **Gjort:** tokens in, 559 typ/färg-ersättningar i 89 filer, 100 kort →
 > radie 14 + skugga, appskal (logo, Newsreader på hälsning/hero), emoji →
-> Lucide i alla nya vyer. **Kvar:** emoji i arv-komponenter (PensionInvest,
-> InvestmentPlanTracker, QuickGuide, docs/, chat/ — chat är avmonterad),
-> LandingPage i nya brandet (ui_kits/marketing som förebild), dark mode-QA.
+> Lucide överallt (noll kvar utanför den avmonterade chatten), landningssida
+> i nya brandet med pivotens berättelse. **Kvar:** dark mode-QA (avvaktar
+> enligt Johan), ny logotyp + namn (utreds senare).
 
 Underlag: designstudie av app.finary.com (aug 2026) med uppmätta värden ur
 deras DOM, se PIVOT.md för produktanalysen. Principen är **copy with pride**:

@@ -22,11 +22,35 @@ describe("GoalsTab", () => {
       },
     };
     render(<GoalsTab />);
-    expect(screen.getByText("35 000 kr")).toBeTruthy();
-    expect(screen.getByText("17 000 kr")).toBeTruthy();
-    expect(screen.getByText("18 000 kr/mån")).toBeTruthy();
-    // sparkvot 18000/35000 ≈ 51%
-    expect(screen.getByText("51%")).toBeTruthy();
+    // statkorten (Pengar in/ut) + kolumnhuvudena visar samma summor
+    expect(screen.getAllByText(/35 000 kr/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/17 000 kr/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/18 000 kr\/mån/).length).toBeGreaterThan(0);
+    // sparkvot 18000/35000 ≈ 51 % (inbakad i Sparutrymme-kortet)
+    expect(screen.getByText(/51 % sparkvot/)).toBeTruthy();
+    // fördelningsstapeln visar sparutrymmet som andel av lönen
+    expect(screen.getByText("Vart tar lönen vägen?")).toBeTruthy();
+    expect(screen.getByText("Sparutrymme", { selector: "span" })).toBeTruthy();
+  });
+
+  it("shows expense categories in the distribution", () => {
+    prefs = {
+      cashflow: {
+        incomes: [{ id: "1", label: "Lön", amount: 40000 }],
+        expenses: [
+          { id: "2", label: "Hyra", amount: 12000, category: "boende" },
+          { id: "3", label: "ICA", amount: 6000, category: "mat" },
+          { id: "4", label: "Gammal post utan kategori", amount: 2000 },
+        ],
+      },
+    };
+    render(<GoalsTab />);
+    // 12000/40000 = 30 %, 6000/40000 = 15 %, okategoriserad → Övrigt 5 %
+    expect(screen.getAllByText("Boende").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Mat").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Övrigt").length).toBeGreaterThan(0);
+    expect(screen.getByText("30%")).toBeTruthy();
+    expect(screen.getByText("15%")).toBeTruthy();
   });
 
   it("adds an income row via updatePreferences", () => {

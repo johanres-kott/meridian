@@ -26,49 +26,130 @@ function fmtKr(v) {
 
 // ── Kassaflödesrader (inkomster/utgifter) ────────────────────────────────────
 
-function FlowColumn({ title, rows, onAdd, onRemove, placeholder }) {
+// Utgiftskategorier (Finary-mönstret: fördelning av "Money out")
+const EXPENSE_CATEGORIES = [
+  { id: "boende",    label: "Boende",         color: "#7c4dff", hint: "Hyra, avgift, bolåneränta, el" },
+  { id: "mat",       label: "Mat",            color: "#ff9800", hint: "Mat, restaurang" },
+  { id: "transport", label: "Transport",      color: "#26a69a", hint: "Bil, bensin, kollektivtrafik" },
+  { id: "barn",      label: "Barn & familj",  color: "#ec407a", hint: "Förskola, aktiviteter" },
+  { id: "lan",       label: "Lån & amortering", color: "#f23645", hint: "Amortering, billån, CSN" },
+  { id: "abonnemang",label: "Abonnemang",     color: "#5b9aff", hint: "Mobil, streaming, gym" },
+  { id: "forsakring",label: "Försäkringar",   color: "#8d6e63", hint: "Hem, bil, liv" },
+  { id: "ovrigt",    label: "Övrigt",         color: "#78909c", hint: "Allt annat" },
+];
+const CAT_BY_ID = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.id, c]));
+
+function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, accent }) {
   const [adding, setAdding] = useState(false);
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("boende");
 
   function save() {
     const parsed = parseAmount(amount);
     if (!label.trim() || parsed == null) return;
-    onAdd({ id: newId(), label: label.trim(), amount: parsed });
+    onAdd({ id: newId(), label: label.trim(), amount: parsed, ...(withCategory ? { category } : {}) });
     setLabel("");
     setAmount("");
     setAdding(false);
   }
 
-  const inputStyle = { fontSize: 12, padding: "6px 8px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
 
   return (
-    <div style={{ flex: 1, minWidth: 260, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 16px" }}>
-      <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 8 }}>{title}</div>
-      {rows.length === 0 && !adding && (
-        <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8 }}>Inget inlagt ännu</div>
-      )}
-      {rows.map(r => (
-        <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 }}>
-          <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>
-          <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(r.amount)}/mån</span>
-          <button onClick={() => onRemove(r.id)} title="Ta bort"
-            style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
-        </div>
-      ))}
-      {adding ? (
-        <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-          <input value={label} onChange={e => setLabel(e.target.value)} placeholder={placeholder} autoFocus style={{ ...inputStyle, flex: 1, minWidth: 120 }} />
-          <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="kr/mån" inputMode="numeric" style={{ ...inputStyle, width: 90 }}
-            onKeyDown={e => { if (e.key === "Enter") save(); }} />
-          <button onClick={save} style={{ fontSize: 12, padding: "6px 12px", borderRadius: 4, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Spara</button>
-        </div>
-      ) : (
-        <button onClick={() => setAdding(true)}
-          style={{ marginTop: 8, fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
-          + Lägg till
-        </button>
-      )}
+    <div style={{ flex: 1, minWidth: 280, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--border-light)" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{title}</span>
+        <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: accent || "var(--text)" }}>{rows.length ? `${fmtKr(total)}/mån` : "—"}</span>
+      </div>
+      <div style={{ padding: "6px 16px 12px" }}>
+        {rows.length === 0 && !adding && (
+          <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "8px 0" }}>Inget inlagt ännu</div>
+        )}
+        {rows.map(r => {
+          const cat = withCategory ? (CAT_BY_ID[r.category] || CAT_BY_ID.ovrigt) : null;
+          return (
+            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 }}>
+              {cat && <span title={cat.label} style={{ width: 8, height: 8, borderRadius: "50%", background: cat.color, flexShrink: 0 }} />}
+              <span style={{ color: "var(--text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
+              {cat && <span style={{ fontSize: 10, color: "var(--text-secondary)", background: "var(--bg-secondary)", borderRadius: 999, padding: "1px 7px", flexShrink: 0 }}>{cat.label}</span>}
+              <span style={{ ...mono, color: "var(--text)", flexShrink: 0 }}>{fmtKr(r.amount)}</span>
+              <button onClick={() => onRemove(r.id)} title="Ta bort"
+                style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
+            </div>
+          );
+        })}
+        {adding ? (
+          <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+            <input value={label} onChange={e => setLabel(e.target.value)} placeholder={placeholder} autoFocus style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
+            {withCategory && (
+              <select value={category} onChange={e => setCategory(e.target.value)} style={inputStyle}>
+                {EXPENSE_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+              </select>
+            )}
+            <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="kr/mån" inputMode="numeric" style={{ ...inputStyle, width: 90 }}
+              onKeyDown={e => { if (e.key === "Enter") save(); }} />
+            <button onClick={save} style={{ fontSize: 12, padding: "7px 14px", borderRadius: 16, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>Spara</button>
+            <button onClick={() => setAdding(false)} style={{ fontSize: 12, padding: "7px 10px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
+          </div>
+        ) : (
+          <button onClick={() => setAdding(true)}
+            style={{ marginTop: 8, fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+            + Lägg till
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Fördelning av utgifter per kategori (Finarys "Distribution") + flödesstapel lön → utgifter → sparande
+function CashflowDistribution({ incomes, expenses, available, isMobile }) {
+  const totalIn = incomes.reduce((s, r) => s + r.amount, 0);
+  const totalOut = expenses.reduce((s, r) => s + r.amount, 0);
+  if (totalIn === 0 && totalOut === 0) return null;
+
+  const byCat = {};
+  for (const e of expenses) {
+    const id = CAT_BY_ID[e.category] ? e.category : "ovrigt";
+    byCat[id] = (byCat[id] || 0) + e.amount;
+  }
+  const cats = EXPENSE_CATEGORIES.filter(c => byCat[c.id] > 0).map(c => ({ ...c, amount: byCat[c.id] }))
+    .sort((a, b) => b.amount - a.amount);
+  const base = Math.max(totalIn, totalOut);
+  const savingsPct = base > 0 && available > 0 ? (available / base) * 100 : 0;
+  const overspendPct = base > 0 && available < 0 ? (-available / base) * 100 : 0;
+
+  return (
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: isMobile ? "14px 16px" : "16px 20px", marginBottom: isMobile ? 10 : 14 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>Vart tar lönen vägen?</div>
+      {/* Flödesstapel */}
+      <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden", background: "var(--border-light)" }}>
+        {cats.map(c => (
+          <div key={c.id} title={`${c.label}: ${fmtKr(c.amount)}`} style={{ width: `${base > 0 ? (c.amount / base) * 100 : 0}%`, background: c.color }} />
+        ))}
+        {savingsPct > 0 && <div title={`Sparutrymme: ${fmtKr(available)}`} style={{ width: `${savingsPct}%`, background: "#089981" }} />}
+        {overspendPct > 0 && <div title={`Underskott: ${fmtKr(-available)}`} style={{ width: `${overspendPct}%`, background: "repeating-linear-gradient(45deg,#f23645,#f23645 4px,transparent 4px,transparent 8px)" }} />}
+      </div>
+      {/* Legend */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginTop: 10 }}>
+        {cats.map(c => (
+          <span key={c.id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-secondary)" }}>
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: c.color }} />
+            {c.label} <span style={{ ...mono, color: "var(--text)" }}>{base > 0 ? Math.round((c.amount / base) * 100) : 0}%</span>
+          </span>
+        ))}
+        {available > 0 && (
+          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-secondary)" }}>
+            <span style={{ width: 8, height: 8, borderRadius: 2, background: "#089981" }} />
+            Sparutrymme <span style={{ ...mono, color: "#089981", fontWeight: 600 }}>{Math.round(savingsPct)}%</span>
+          </span>
+        )}
+        {available < 0 && (
+          <span style={{ fontSize: 11, color: "#f23645", fontWeight: 600 }}>Utgifterna överstiger inkomsterna med {fmtKr(-available)}/mån</span>
+        )}
+      </div>
     </div>
   );
 }
@@ -209,10 +290,11 @@ export default function GoalsTab() {
     updatePreferences({ savingsGoals: next });
   }
 
-  const statCard = (label, value, color) => (
+  const statCard = (label, value, color, sub) => (
     <div style={{ flex: 1, minWidth: 140, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 18px" }}>
       <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>{label}</div>
       <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: color || "var(--text)" }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: color || "var(--text-secondary)", marginTop: 2 }}>{sub}</div>}
     </div>
   );
 
@@ -227,20 +309,24 @@ export default function GoalsTab() {
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 14 }}>
         {statCard("Pengar in", hasFlow ? fmtKr(totalIn) : "—")}
         {statCard("Pengar ut", hasFlow ? fmtKr(totalOut) : "—")}
-        {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "#089981" : "#f23645")}
-        {savingsRate != null && statCard("Sparkvot", `${savingsRate.toFixed(0)}%`, savingsRate >= 0 ? "#089981" : "#f23645")}
+        {statCard("Sparutrymme", hasFlow ? `${fmtKr(available)}/mån` : "—", available >= 0 ? "#089981" : "#f23645", savingsRate != null ? `${savingsRate.toFixed(0)} % sparkvot` : null)}
       </div>
+
+      <CashflowDistribution incomes={cashflow.incomes} expenses={cashflow.expenses} available={available} isMobile={isMobile} />
 
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 32 }}>
         <FlowColumn
-          title="Inkomster"
+          title="Pengar in"
+          accent="#089981"
           rows={cashflow.incomes}
           placeholder="T.ex. Lön efter skatt"
           onAdd={row => setCashflow({ ...cashflow, incomes: [...cashflow.incomes, row] })}
           onRemove={id => setCashflow({ ...cashflow, incomes: cashflow.incomes.filter(r => r.id !== id) })}
         />
         <FlowColumn
-          title="Utgifter"
+          title="Pengar ut"
+          accent="#f23645"
+          withCategory
           rows={cashflow.expenses}
           placeholder="T.ex. Hyra, bolåneränta, mat"
           onAdd={row => setCashflow({ ...cashflow, expenses: [...cashflow.expenses, row] })}

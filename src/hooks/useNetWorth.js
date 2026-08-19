@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import { ownedValue } from "../lib/manualAssetsMath.js";
 import { getPensionTotalValue } from "../lib/pension.js";
 import { getPortfolioValuation } from "../lib/portfolioValue.js";
 
@@ -57,8 +58,9 @@ export default function useNetWorth() {
   const pensionValue = getPensionTotalValue(preferences?.pension);
   const assets = manualRows.filter(r => !r.is_debt);
   const debts = manualRows.filter(r => r.is_debt);
-  const assetSum = assets.reduce((s, r) => s + Number(r.value_sek), 0);
-  const debtSum = debts.reduce((s, r) => s + Number(r.value_sek), 0);
+  // Din andel (metadata.ownershipShare) — delat hus/lån räknas inte till 100 %
+  const assetSum = assets.reduce((s, r) => s + ownedValue(r), 0);
+  const debtSum = debts.reduce((s, r) => s + ownedValue(r), 0);
   const netWorth = (portfolioSek ?? 0) + (pensionValue ?? 0) + assetSum - debtSum;
   const hasAnything = (portfolioSek != null && portfolioSek > 0) || pensionValue != null || manualRows.length > 0;
 

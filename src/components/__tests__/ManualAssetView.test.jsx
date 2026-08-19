@@ -62,6 +62,34 @@ describe("ManualAssetView", () => {
     expect(patch.metadata.tranches).toEqual([{ year: 2020, value: 10000 }, { year: 2023, value: 25000 }]);
   });
 
+  it("shows 'din andel' of equity when house and loan are co-owned", () => {
+    const h = { ...house, value_sek: 8600000, metadata: { ...house.metadata, ownershipShare: 50 } };
+    const l = { ...loan, value_sek: 7657448, metadata: { ...loan.metadata, ownershipShare: 50 } };
+    render(<ManualAssetView row={h} allRows={[h, l]} onBack={() => {}} />);
+    // hela: 8 600 000 − 7 657 448 = 942 552; din andel: 4 300 000 − 3 828 724 = 471 276
+    expect(screen.getByText("Eget kapital, hela")).toBeTruthy();
+    expect(screen.getAllByText(/942 552 kr/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Din andel \(50 % av bostaden, 50 % av lånet\)/)).toBeTruthy();
+    expect(screen.getAllByText(/471 276 kr/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Din andel 50 %:/)).toBeTruthy();
+  });
+
+  it("records renovations with financing and sums total invested", async () => {
+    render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} onChanged={() => {}} />);
+    fireEvent.click(screen.getByText("Redigera"));
+    fireEvent.click(screen.getByText("+ Lägg till renovering"));
+    fireEvent.change(screen.getByLabelText("Renovering 1 namn"), { target: { value: "Nytt kök" } });
+    fireEvent.change(screen.getByLabelText("Renovering 1 belopp"), { target: { value: "350000" } });
+    fireEvent.change(screen.getByLabelText("Renovering 1 finansiering"), { target: { value: "lan" } });
+    // total investerat = köpeskilling 2 500 000 + 350 000
+    expect(screen.getAllByText(/2 850 000 kr/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/varav 350 000 kr lånefinansierat/)).toBeTruthy();
+    fireEvent.click(screen.getByText("Spara ändringar"));
+    await waitFor(() => expect(updateManualAsset).toHaveBeenCalledTimes(1));
+    const [, patch] = updateManualAsset.mock.calls[0];
+    expect(patch.metadata.renovations).toEqual([{ date: null, label: "Nytt kök", amount: 350000, financing: "lan" }]);
+  });
+
   it("asks before deleting and then calls the proxy", async () => {
     const onBack = vi.fn();
     render(<ManualAssetView row={house} allRows={[house]} onBack={onBack} onChanged={() => {}} />);

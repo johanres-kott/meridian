@@ -27,12 +27,13 @@ export const KIND_LABELS = {
 };
 
 export const VALUE_LABELS = {
-  bostad: "Uppskattat värde", fordon: "Uppskattat värde", sparkonto: "Saldo", buffert: "Saldo",
+  bostad: "Bostadens värde", fordon: "Fordonets värde", sparkonto: "Saldo", buffert: "Saldo",
   vinstandel: "Totalt värde", ovrigt: "Uppskattat värde", bolan: "Kvarvarande skuld", skuld: "Kvarvarande skuld",
 };
 
 export const FIELDS_BY_KIND = {
   bostad: [
+    { key: "ownershipShare", label: "Din ägarandel", type: "percent", placeholder: "100" },
     { key: "propertyType", label: "Typ", type: "select", options: PROPERTY_TYPES },
     { key: "address", label: "Adress", type: "text" },
     { key: "livingArea", label: "Boyta", type: "number", unit: "m²" },
@@ -43,6 +44,7 @@ export const FIELDS_BY_KIND = {
     { key: "pantbrev", label: "Pantbrev", type: "money" },
   ],
   fordon: [
+    { key: "ownershipShare", label: "Din ägarandel", type: "percent", placeholder: "100" },
     { key: "vehicleType", label: "Typ", type: "select", options: VEHICLE_TYPES },
     { key: "financing", label: "Finansiering", type: "select", options: FINANCING },
     { key: "regNumber", label: "Regnummer", type: "text" },
@@ -53,18 +55,23 @@ export const FIELDS_BY_KIND = {
     { key: "monthlyCost", label: "Månadskostnad (leasing)", type: "kr-per-month" },
   ],
   bolan: [
+    { key: "ownershipShare", label: "Din andel av lånet", type: "percent", placeholder: "100" },
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
+    { key: "startDate", label: "Lånet togs", type: "date" },
   ],
   skuld: [
+    { key: "ownershipShare", label: "Din andel av lånet", type: "percent", placeholder: "100" },
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
+    { key: "startDate", label: "Lånet togs", type: "date" },
   ],
   vinstandel: [
     { key: "provider", label: "Stiftelse / förvaltare", type: "text" },
     { key: "lockYears", label: "Låstid per årgång", type: "number", unit: "år" },
   ],
   sparkonto: [
+    { key: "ownershipShare", label: "Din andel", type: "percent", placeholder: "100" },
     { key: "bank", label: "Bank", type: "text" },
     { key: "interestRate", label: "Sparränta", type: "percent" },
   ],
@@ -73,7 +80,9 @@ export const FIELDS_BY_KIND = {
     { key: "interestRate", label: "Sparränta", type: "percent" },
   ],
   ovrigt: [
+    { key: "ownershipShare", label: "Din ägarandel", type: "percent", placeholder: "100" },
     { key: "note", label: "Anteckning", type: "text" },
+    { key: "startDate", label: "Ägt sedan", type: "date" },
   ],
 };
 

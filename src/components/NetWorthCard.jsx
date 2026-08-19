@@ -4,6 +4,7 @@ import { useUser } from "../contexts/UserContext.jsx";
 import { deleteManualAsset } from "../lib/manualAssets.js";
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
+import { ownedValue, shareOf } from "../lib/manualAssetsMath.js";
 import { vinstandelHint } from "./addassets/vinstandel.js";
 
 // "Min ekonomi" (PIVOT.md fas 3): listar och raderar manuella tillgångar/
@@ -78,7 +79,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
                   <span style={{ display: "block", fontSize: 10.5, color: "var(--text-muted)" }}>{vinstandelHint(r.metadata)}</span>
                 )}
               </span>
-              <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(Number(r.value_sek))}</span>
+              <span style={{ ...mono, color: "var(--text)" }} title={shareOf(r) < 1 ? `${Math.round(shareOf(r) * 100)} % av ${fmtKr(Number(r.value_sek))}` : undefined}>{fmtKr(ownedValue(r))}</span>
               <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>
@@ -87,7 +88,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
             <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna lånet">
               <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--neg)"} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>
-              <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(Number(r.value_sek))}</span>
+              <span style={{ ...mono, color: "var(--neg)" }} title={shareOf(r) < 1 ? `${Math.round(shareOf(r) * 100)} % av ${fmtKr(Number(r.value_sek))}` : undefined}>−{fmtKr(ownedValue(r))}</span>
               <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>

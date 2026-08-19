@@ -52,7 +52,7 @@ export default function Overview({ onNavigate, onAddAssets }) {
           <div style={{ marginBottom: isMobile ? 12 : 20 }}>
             <PortfolioChart
               compact
-              offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0}
+              netWorth={netWorthData.portfolioLoaded ? { pensionValue: netWorthData.pensionValue ?? 0, manualRows: netWorthData.manualRows } : null}
               range={range}
               onRangeChange={setRange}
               onPeriodChange={setPeriod}

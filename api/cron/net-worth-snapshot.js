@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   try {
     const [{ data: prefsRows, error: prefsErr }, { data: manualRows, error: manualErr }, { data: snapRows, error: snapErr }] = await Promise.all([
       supabase.from("user_prefs").select("user_id, preferences"),
-      supabase.from("manual_assets").select("user_id, value_sek, is_debt"),
+      supabase.from("manual_assets").select("user_id, value_sek, is_debt, metadata"),
       supabase.from("portfolio_snapshots").select("user_id, snapshot_date, total_value_sek").order("snapshot_date", { ascending: false }),
     ]);
     if (prefsErr || manualErr || snapErr) {
@@ -67,7 +67,10 @@ export default async function handler(req, res) {
     const manualByUser = {};
     for (const r of manualRows || []) {
       const m = manualByUser[r.user_id] || (manualByUser[r.user_id] = { assets: 0, debts: 0 });
-      if (r.is_debt) m.debts += Number(r.value_sek); else m.assets += Number(r.value_sek);
+      // din andel (metadata.ownershipShare i %) — speglar src/lib/manualAssetsMath.js
+      const sh = Number(r.metadata?.ownershipShare);
+      const owned = Number(r.value_sek) * (Number.isFinite(sh) && sh > 0 && sh <= 100 ? sh / 100 : 1);
+      if (r.is_debt) m.debts += owned; else m.assets += owned;
     }
     const pensionByUser = {};
     for (const p of prefsRows || []) pensionByUser[p.user_id] = pensionTotal(p.preferences?.pension);

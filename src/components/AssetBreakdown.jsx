@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { ownedValue } from "../lib/manualAssetsMath.js";
 import { useTranslation } from "react-i18next";
 
 // Portfölj-heron (DESIGN.md): Finarys "Assets | Liabilities"-donut per
@@ -41,9 +42,9 @@ export default function AssetBreakdown({ data, isMobile, onNavigate }) {
       push(assets, "stocks", data.portfolioSek);
     }
     push(assets, "pension", data.pensionValue);
-    for (const r of data.assets || []) push(assets, KIND_TO_CAT[r.kind] || "ovrigt", Number(r.value_sek));
+    for (const r of data.assets || []) push(assets, KIND_TO_CAT[r.kind] || "ovrigt", ownedValue(r));
     const debts = [];
-    for (const r of data.debts || []) push(debts, KIND_TO_CAT[r.kind] || "skuld", Number(r.value_sek));
+    for (const r of data.debts || []) push(debts, KIND_TO_CAT[r.kind] || "skuld", ownedValue(r));
     assets.sort((a, b) => b.value - a.value);
     debts.sort((a, b) => b.value - a.value);
     return {

@@ -22,6 +22,7 @@ import AssetBreakdown from "./AssetBreakdown.jsx";
 import AssetTable from "./AssetTable.jsx";
 import useNetWorth from "../hooks/useNetWorth.js";
 import RangeBar from "./RangeBar.jsx";
+import ManualAssetView from "./ManualAssetView.jsx";
 import { DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
 import SedanSist from "./SedanSist.jsx";
 import PortfolioSummary from "./PortfolioSummary.jsx";
@@ -46,8 +47,17 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   const [prices, setPrices] = useState({});
   const [subTab, setSubTab] = useState("innehav");
   const [range, setRange] = useState(DEFAULT_RANGE); // globalt tidsspann (Finary)
+  const [selectedManual, setSelectedManual] = useState(null); // tillgångssida för manuell tillgång/skuld
 
   const groups = preferences.groups || [];
+
+  // Deep link till manuell tillgång (från Min ekonomi på Hem)
+  useEffect(() => {
+    if (!deepLink?.manualId) return;
+    const match = netWorthData.manualRows.find(r => r.id === deepLink.manualId);
+    if (match) { setSelectedManual(match); onClearDeepLink?.(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLink, netWorthData.manualRows]);
 
   // Handle deep link from Översikt
   useEffect(() => {
@@ -165,6 +175,20 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
     return { data, error };
   }
 
+  if (selectedManual) {
+    // Färsk rad efter redigering (reloadManual uppdaterar manualRows)
+    const fresh = netWorthData.manualRows.find(r => r.id === selectedManual.id) || selectedManual;
+    return (
+      <ManualAssetView
+        row={fresh}
+        allRows={netWorthData.manualRows}
+        onBack={() => setSelectedManual(null)}
+        onChanged={() => netWorthData.reloadManual?.()}
+        onOpenRow={(r) => setSelectedManual(r)}
+      />
+    );
+  }
+
   if (selected) {
     const freshItem = items.find(i => i.id === selected.id) || selected;
     if (freshItem.type === "fund") {
@@ -242,6 +266,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
         fxToSek={netWorthData.fxToSek}
         isMobile={isMobile}
         onNavigate={onNavigate}
+        onSelectManual={(r) => setSelectedManual(r)}
         onSelectHolding={(h) => {
           const match = items.find(i => i.id === h.id || i.ticker === h.ticker);
           if (match) setSelected(match);

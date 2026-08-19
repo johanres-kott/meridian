@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (rateLimit(req, res, 60)) return;
-  if (req.method !== "POST" && req.method !== "DELETE") {
+  if (req.method !== "POST" && req.method !== "DELETE" && req.method !== "PATCH") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -48,6 +48,40 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Could not delete" });
       }
       return res.status(200).json({ ok: true });
+    }
+
+    if (req.method === "PATCH") {
+      // Uppdatera namn/värde/metadata på egen rad (RLS + user_id-filter). kind/is_debt ändras inte.
+      const { id, label, value_sek, metadata } = req.body || {};
+      if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return res.status(400).json({ error: "id required" });
+      const patch = {};
+      if (label !== undefined) {
+        if (typeof label !== "string" || !label.trim() || label.length > 120) return res.status(400).json({ error: "invalid label" });
+        patch.label = label.trim();
+      }
+      if (value_sek !== undefined) {
+        const v = Number(value_sek);
+        if (!Number.isFinite(v) || v < 0 || v > 1e12) return res.status(400).json({ error: "invalid value" });
+        patch.value_sek = v;
+      }
+      if (metadata !== undefined) {
+        if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return res.status(400).json({ error: "invalid metadata" });
+        if (JSON.stringify(metadata).length > 20_000) return res.status(413).json({ error: "metadata too large" });
+        patch.metadata = metadata;
+      }
+      if (Object.keys(patch).length === 0) return res.status(400).json({ error: "nothing to update" });
+      const { data, error } = await supabase
+        .from("manual_assets")
+        .update(patch)
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+      if (error) {
+        console.error("manual-assets update error:", error);
+        return res.status(500).json({ error: "Could not update" });
+      }
+      return res.status(200).json(data);
     }
 
     const { kind, label, value_sek, is_debt, metadata } = req.body || {};

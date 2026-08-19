@@ -12,6 +12,17 @@ export const KIND_ICON = {
   funds: Hexagon, pension: Egg, cash: Wallet, portfolio: TrendingUp,
 };
 
+// Färg per tillgångstyp — används av IconBadge i tabell, Min ekonomi och tillgångssidan
+export const KIND_COLORS = {
+  stock: "var(--brand)", stocks: "var(--brand)", portfolio: "var(--brand)",
+  fund: "var(--green-400)", funds: "var(--green-400)",
+  pension: "var(--pos)",
+  bostad: "#7c4dff", fordon: "var(--warn)",
+  sparkonto: "#26a69a", buffert: "#26a69a", cash: "#26a69a",
+  vinstandel: "var(--gold-500)", ovrigt: "#8d6e63",
+  bolan: "var(--neg)", skuld: "#ef6c00",
+};
+
 export const GOAL_ICONS = [
   { id: "buffert", Icon: LifeBuoy, label: "Buffert" },
   { id: "bostad", Icon: Home, label: "Bostad" },

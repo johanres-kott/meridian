@@ -1,3 +1,4 @@
+import { Hexagon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { STATUSES, STATUS_COLORS } from "../constants.js";
@@ -58,7 +59,7 @@ export default function FundView({ item, onBack, onUpdate }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 500, color: "var(--text)" }}>
-              <span style={{ fontSize: 18, marginRight: 8 }}>📊</span>
+              <span style={{ color: "var(--green-400)", display: "inline-flex", marginRight: 8 }}><Hexagon size={18} strokeWidth={1.5} aria-hidden /></span>
               {item.name || item.ticker}
             </div>
             {fund && (

@@ -61,7 +61,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 16 }}>{allDone ? "✅" : "📋"}</span>
+          <span style={{ fontSize: 16 }}>{allDone ? "✓" : ""}</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
               {allDone ? "Plan genomförd!" : "Din investeringsplan"}
@@ -110,7 +110,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
                 {monthLabels[monthDate.getMonth()]}
               </div>
               <div style={{ fontSize: 14, marginTop: 2 }}>
-                {monthAllDone ? "✅" : isCurrent ? "👉" : isPast ? "⚠️" : "⏳"}
+                {monthAllDone ? "✓" : isCurrent ? "→" : isPast ? "⚠️" : "⏳"}
               </div>
               <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>
                 {m.totalAmount.toLocaleString("sv-SE")}
@@ -124,7 +124,7 @@ export default function InvestmentPlanTracker({ isMobile, onNavigate }) {
       {currentMonthData && !allDone && (
         <div style={{ background: "var(--bg-card)", borderRadius: 6, border: "1px solid var(--border)", padding: "10px 12px" }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>
-            {currentMonthAllDone ? "✅ Klart för denna månad!" : `Att göra — Månad ${currentMonthData.month}`}
+            {currentMonthAllDone ? "Klart för denna månad!" : `Att göra — Månad ${currentMonthData.month}`}
           </div>
           {currentMonthData.purchases.map((p, pi) => {
             const done = isComplete(currentMonthData.month, pi);
@@ -222,7 +222,7 @@ function ExpandableMonths({ months, dcaPlan, isComplete, markStepComplete, month
                 opacity: monthAllDone ? 0.7 : 1,
               }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: isPast && !monthAllDone ? "var(--neg)" : "var(--text-secondary)", marginBottom: 6 }}>
-                  {monthAllDone ? "✅" : isPast ? "⚠️" : "⏳"} Månad {m.month} — {monthLabels[monthDate.getMonth()]} {monthDate.getFullYear()}
+                  {monthAllDone ? "✓" : isPast ? "⚠️" : "⏳"} Månad {m.month} — {monthLabels[monthDate.getMonth()]} {monthDate.getFullYear()}
                 </div>
                 {m.purchases.map((p, pi) => {
                   const done = isComplete(m.month, pi);

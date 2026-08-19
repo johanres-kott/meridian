@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Rocket, Scale, Shield, Umbrella, Landmark, Building2, PiggyBank } from "lucide-react";
+const PICONS = { Rocket, Scale, Shield, Umbrella, Landmark, Building2, PiggyBank };
 import { searchFunds } from "../lib/apiClient.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
@@ -25,7 +27,7 @@ const PPM_SUGGESTIONS = [
 const MODEL_PORTFOLIOS = [
   {
     label: "Ung (25–40 år)",
-    icon: "🚀",
+    Icon: "Rocket",
     color: "var(--pos)",
     allocation: "90–100% aktier",
     suggestion: "AP7 Såfa eller 100% global indexfond",
@@ -33,7 +35,7 @@ const MODEL_PORTFOLIOS = [
   },
   {
     label: "Mitt i karriären (40–55)",
-    icon: "⚖️",
+    Icon: "Scale",
     color: "#5b9bd5",
     allocation: "60–80% aktier, 20–40% räntor",
     suggestion: "Blanda globalfond + räntefond",
@@ -41,7 +43,7 @@ const MODEL_PORTFOLIOS = [
   },
   {
     label: "Nära pension (55–65)",
-    icon: "🛡️",
+    Icon: "Shield",
     color: "var(--warn)",
     allocation: "40–60% aktier, 40–60% räntor",
     suggestion: "Trad.försäkring eller balanserad mix",
@@ -49,7 +51,7 @@ const MODEL_PORTFOLIOS = [
   },
   {
     label: "Pensionär (65+)",
-    icon: "🏖️",
+    Icon: "Umbrella",
     color: "#9c27b0",
     allocation: "20–40% aktier, 60–80% räntor",
     suggestion: "Räntefonder + lite aktiefond",
@@ -57,14 +59,15 @@ const MODEL_PORTFOLIOS = [
   },
 ];
 
-function PensionPillarCard({ icon, title, pct, children, color }) {
+function PensionPillarCard({ Icon, title, pct, children, color }) {
+  const PillarIcon = Icon;
   return (
     <div style={{
       background: `rgba(${color},0.04)`, border: `1px solid rgba(${color},0.15)`,
       borderRadius: 8, padding: 20, marginBottom: 12,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <span style={{ fontSize: 22 }}>{icon}</span>
+        <span style={{ color: `rgb(${color})`, display: "inline-flex" }}><PillarIcon size={22} strokeWidth={1.5} aria-hidden /></span>
         <div>
           <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{title}</div>
           <div style={{ fontSize: 11, color: `rgb(${color})`, fontWeight: 600, ...mono }}>{pct}</div>
@@ -199,21 +202,21 @@ function OverviewTab({ isMobile }) {
         </p>
 
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <PensionPillarCard icon="🏛️" title="Allmän pension" pct="~55% av pensionen" color="8,153,129">
+          <PensionPillarCard Icon={PICONS.Landmark} title="Allmän pension" pct="~55% av pensionen" color="8,153,129">
             <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
               Inkomstpension (16%) + premiepension (2.5%). Du kan välja fonder för premiepensionsdelen
               via Pensionsmyndigheten.
             </p>
           </PensionPillarCard>
 
-          <PensionPillarCard icon="🏢" title="Tjänstepension" pct="~30% av pensionen" color="91,155,213">
+          <PensionPillarCard Icon={PICONS.Building2} title="Tjänstepension" pct="~30% av pensionen" color="91,155,213">
             <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
               Arbetsgivaren betalar in. ITP1 (premiebestämd) eller ITP2 (förmånsbestämd).
               Du väljer ofta hur pengarna placeras via Collectum.
             </p>
           </PensionPillarCard>
 
-          <PensionPillarCard icon="🏦" title="Privat sparande" pct="~15% av pensionen" color="156,39,176">
+          <PensionPillarCard Icon={PICONS.PiggyBank} title="Privat sparande" pct="~15% av pensionen" color="156,39,176">
             <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
               ISK, kapitalförsäkring, aktier, fonder. Det du sparar själv utöver pensionen.
               Behövs för att behålla levnadsstandarden.
@@ -238,7 +241,7 @@ function OverviewTab({ isMobile }) {
               borderLeft: `3px solid ${mp.color}`,
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 18 }}>{mp.icon}</span>
+                <span style={{ color: "var(--brand)", display: "inline-flex" }}>{(() => { const I = PICONS[mp.Icon] || PICONS.Shield; return <I size={18} strokeWidth={1.5} aria-hidden />; })()}</span>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{mp.label}</div>
               </div>
               <div style={{ fontSize: 12, color: mp.color, fontWeight: 500, marginBottom: 4, ...mono }}>{mp.allocation}</div>
@@ -255,7 +258,7 @@ function OverviewTab({ isMobile }) {
         background: "rgba(15,154,108,0.04)", border: "1px solid rgba(15,154,108,0.15)",
       }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-          💡 Det viktigaste att komma ihåg
+          Det viktigaste att komma ihåg
         </div>
         <ul style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, paddingLeft: 18, margin: 0 }}>
           <li>Allmän pension + tjänstepension ger ofta bara 50–60% av slutlönen</li>
@@ -287,7 +290,7 @@ function PPMTab({ isMobile }) {
           borderRadius: 6, padding: 16, marginBottom: 16,
         }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-            📊 AP7 Såfa — statens defaultval
+            AP7 Såfa — statens defaultval
           </div>
           <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, margin: "4px 0 0 0" }}>
             Om du inte gör ett aktivt val placeras allt i AP7 Såfa — en generationsfond med 0.05% avgift
@@ -450,7 +453,7 @@ function ITPTab({ isMobile, pension, updatePreferences, providers }) {
         background: "rgba(15,154,108,0.04)", border: "1px solid rgba(15,154,108,0.15)",
       }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-          📌 Sammanfattning
+          Sammanfattning
         </div>
         <ul style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, paddingLeft: 18, margin: 0 }}>
           <li><strong>ITP1:</strong> Välj fondförsäkring med globala indexfonder om du har 15+ år kvar</li>

@@ -104,7 +104,7 @@ export default function SearchResultDetail({ result, scoreData, added, onAddToPo
             const rc = risk === "low" ? "var(--pos)" : risk === "medium" ? "var(--warn)" : "var(--neg)";
             items.push({ icon: "◉", color: rc, text: isInvestmentCompany(result.ticker) ? `${riskLabel(risk)} — diversifierat investmentbolag` : result.beta != null ? betaDescription(result.beta) : `${riskLabel(risk)} (baserat på börsvärde)` });
           }
-          if (result.dividendYield > 0) items.push({ icon: "💰", color: "var(--pos)", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
+          if (result.dividendYield > 0) items.push({ icon: "", color: "var(--pos)", text: `Direktavkastning ${result.dividendYield.toFixed(1)}%` });
           else items.push({ icon: "–", color: "var(--text-secondary)", text: "Ingen utdelning" });
           return (
             <div style={{ border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>

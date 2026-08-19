@@ -1,3 +1,4 @@
+import { Hexagon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { formatHoldingValue } from "./PortfolioTreemap.jsx";
@@ -90,7 +91,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
     >
       <td style={{ ...tdBase, width: 36 }}>
         {item.type === "fund"
-          ? <span style={{ fontSize: 16 }} title="Fond">📊</span>
+          ? <span title="Fond" style={{ color: "var(--green-400)", display: "inline-flex" }}><Hexagon size={16} strokeWidth={1.5} aria-hidden /></span>
           : getFlag(item.ticker)}
       </td>
       <td style={tdBase}>

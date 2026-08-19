@@ -81,7 +81,7 @@ export default function ImportGuide({ onClose, onStartImport }) {
                     background: "var(--bg-secondary)", fontSize: 11, color: "var(--text-secondary)",
                     lineHeight: 1.5, borderLeft: "3px solid var(--accent)",
                   }}>
-                    💡 {step.tip}
+                    {step.tip}
                   </div>
                 )}
                 {/* Placeholder for future screenshots */}

@@ -14,7 +14,7 @@ export default function PremiumGate({ premium, loading, checkoutLoading, error, 
       background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)",
       padding: 40, textAlign: "center",
     }}>
-      <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+      <div style={{ fontSize: 32, marginBottom: 12 }}></div>
       <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
         Thesion Premium
       </div>

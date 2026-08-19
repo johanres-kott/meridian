@@ -24,7 +24,7 @@ export default function AllocationDocs() {
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8, marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
-            <span style={{ fontSize: 16 }}>🛡️</span>
+            <span style={{ fontSize: 16 }}></span>
             <div>
               <strong style={{ color: "var(--pos)" }}>Kärna (Core)</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
@@ -35,7 +35,7 @@ export default function AllocationDocs() {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
-            <span style={{ fontSize: 16 }}>🚀</span>
+            <span style={{ fontSize: 16 }}></span>
             <div>
               <strong style={{ color: "#5b9bd5" }}>Satellit (Satellite)</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>
@@ -46,7 +46,7 @@ export default function AllocationDocs() {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13 }}>
-            <span style={{ fontSize: 16 }}>🎲</span>
+            <span style={{ fontSize: 16 }}></span>
             <div>
               <strong style={{ color: "var(--neg)" }}>Spekulation (Speculation)</strong>
               <div style={{ color: "var(--text-secondary)", fontSize: 12, marginTop: 2 }}>

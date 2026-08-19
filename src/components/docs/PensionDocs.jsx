@@ -129,21 +129,21 @@ export default function PensionDocs() {
 
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 16, marginBottom: 16 }}>
           <PensionPillar
-            icon="🏛️"
+            icon=""
             title="Allmän pension"
             share="~55% av pensionen"
             desc="Inkomstpension (16%) + premiepension (2.5%). Staten sköter inkomstpensionen, du väljer fonder för premiepensionen."
             color="8,153,129"
           />
           <PensionPillar
-            icon="🏢"
+            icon=""
             title="Tjänstepension"
             share="~30% av pensionen"
             desc="Arbetsgivaren betalar in. ITP1 eller ITP2 för privatanställda. Du kan ofta välja hur den placeras."
             color="91,155,213"
           />
           <PensionPillar
-            icon="🏦"
+            icon=""
             title="Privat sparande"
             share="~15% av pensionen"
             desc="ISK, kapitalförsäkring, aktier, fonder. Det du sparar själv utöver pension."
@@ -152,7 +152,7 @@ export default function PensionDocs() {
         </div>
 
         <div style={calloutStyle("8,153,129")}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>💡 Viktigt att förstå</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Viktigt att förstå</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6 }}>
             Allmän pension + tjänstepension ger ofta bara 50–60% av slutlönen. Privat sparande behövs
             för att behålla sin levnadsstandard.
@@ -180,7 +180,7 @@ export default function PensionDocs() {
         </ul>
 
         <div style={calloutStyle("91,155,213")}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>📊 Historisk avkastning AP7</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Historisk avkastning AP7</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6 }}>
             AP7 Aktiefond har gett ca 10–12% per år i snitt sedan start (2010). Med en avgift på bara 0.05%
             är den svårslagen. Majoriteten av aktivt förvaltade fonder underpresterar AP7 på lång sikt.
@@ -324,7 +324,7 @@ export default function PensionDocs() {
         </ul>
 
         <div style={calloutStyle("8,153,129")}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>📌 Sammanfattning</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Sammanfattning</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6 }}>
             <strong>Premiepension:</strong> AP7 Såfa är svårslagen. Gör inget om du inte har en tydlig plan.<br />
             <strong>ITP1:</strong> Välj fondförsäkring med globala indexfonder om du har 15+ år kvar till pension.<br />

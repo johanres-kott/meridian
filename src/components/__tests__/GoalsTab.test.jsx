@@ -77,6 +77,31 @@ describe("GoalsTab", () => {
     expect(screen.getByText(/räkneexempel/)).toBeTruthy();
   });
 
+  it("offers must-have expense presets that prefill name + category", () => {
+    render(<GoalsTab />);
+    expect(screen.getByText("+ El")).toBeTruthy();
+    expect(screen.getByText("+ Hemförsäkring")).toBeTruthy();
+    fireEvent.click(screen.getByText("+ El"));
+    // formuläret öppnas med namnet förifyllt; fyll i belopp och spara
+    expect(screen.getByDisplayValue("El")).toBeTruthy();
+    fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "900" } });
+    fireEvent.click(screen.getByText("Spara"));
+    const call = updatePreferences.mock.calls.at(-1)[0];
+    expect(call.cashflow.expenses[0]).toMatchObject({ label: "El", amount: 900, category: "boende" });
+  });
+
+  it("supports several incomes with a type", () => {
+    prefs = { cashflow: { incomes: [{ id: "1", label: "Lön efter skatt", amount: 35000, incomeType: "lon" }], expenses: [] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getAllByText("+ Lägg till")[0]);
+    fireEvent.change(screen.getByDisplayValue("Lön efter skatt", { selector: "select" }), { target: { value: "partner" } });
+    fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "28000" } });
+    fireEvent.click(screen.getByText("Spara"));
+    const call = updatePreferences.mock.calls.at(-1)[0];
+    expect(call.cashflow.incomes).toHaveLength(2);
+    expect(call.cashflow.incomes[1]).toMatchObject({ label: "Partners lön", amount: 28000, incomeType: "partner" });
+  });
+
   it("creates a new goal", () => {
     render(<GoalsTab />);
     fireEvent.click(screen.getByText("+ Nytt sparmål"));

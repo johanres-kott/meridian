@@ -39,20 +39,66 @@ const EXPENSE_CATEGORIES = [
 ];
 const CAT_BY_ID = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.id, c]));
 
-function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, accent }) {
+const INCOME_TYPES = [
+  { id: "lon",      label: "Lön efter skatt" },
+  { id: "partner",  label: "Partners lön" },
+  { id: "bidrag",   label: "Bidrag (barn-, bostads-)" },
+  { id: "hyra",     label: "Hyresintäkt" },
+  { id: "utdelning",label: "Utdelning / ränta" },
+  { id: "ovrigt",   label: "Övrig inkomst" },
+];
+
+// "Måste-ha"-utgifter — det man har som människa. Klick = ny rad med namn +
+// kategori förifyllt, användaren fyller bara i beloppet.
+const EXPENSE_PRESETS = [
+  { label: "Hyra / avgift",       category: "boende" },
+  { label: "Bolåneränta",         category: "boende" },
+  { label: "Amortering",          category: "lan" },
+  { label: "El",                  category: "boende" },
+  { label: "Värme / fjärrvärme",  category: "boende" },
+  { label: "Vatten & avlopp",     category: "boende" },
+  { label: "Hemförsäkring",       category: "forsakring" },
+  { label: "Bilförsäkring",       category: "forsakring" },
+  { label: "Mat",                 category: "mat" },
+  { label: "Mobil",               category: "abonnemang" },
+  { label: "Bredband",            category: "abonnemang" },
+  { label: "Streaming",           category: "abonnemang" },
+  { label: "Kollektivtrafik",     category: "transport" },
+  { label: "Bensin / laddning",   category: "transport" },
+  { label: "Billån / leasing",    category: "lan" },
+  { label: "Förskola / fritids",  category: "barn" },
+  { label: "CSN",                 category: "lan" },
+  { label: "Gym",                 category: "abonnemang" },
+];
+
+function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, withIncomeType = false, presets = [], accent }) {
   const [adding, setAdding] = useState(false);
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("boende");
+  const [incomeType, setIncomeType] = useState("lon");
 
   function save() {
     const parsed = parseAmount(amount);
     if (!label.trim() || parsed == null) return;
-    onAdd({ id: newId(), label: label.trim(), amount: parsed, ...(withCategory ? { category } : {}) });
+    onAdd({
+      id: newId(), label: label.trim(), amount: parsed,
+      ...(withCategory ? { category } : {}),
+      ...(withIncomeType ? { incomeType } : {}),
+    });
     setLabel("");
     setAmount("");
     setAdding(false);
   }
+
+  // Snabbval: förifyll namn + kategori, öppna formuläret med fokus på beloppet
+  function pickPreset(preset) {
+    setLabel(preset.label);
+    setCategory(preset.category);
+    setAdding(true);
+  }
+  const usedLabels = new Set(rows.map(r => r.label.toLowerCase()));
+  const unusedPresets = presets.filter(p => !usedLabels.has(p.label.toLowerCase()));
 
   const total = rows.reduce((s, r) => s + r.amount, 0);
   const inputStyle = { fontSize: 12, padding: "7px 9px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" };
@@ -82,13 +128,18 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
         })}
         {adding ? (
           <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-            <input value={label} onChange={e => setLabel(e.target.value)} placeholder={placeholder} autoFocus style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
+            {withIncomeType && (
+              <select value={incomeType} onChange={e => { setIncomeType(e.target.value); if (!label) setLabel(INCOME_TYPES.find(t => t.id === e.target.value)?.label || ""); }} style={inputStyle}>
+                {INCOME_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </select>
+            )}
+            <input value={label} onChange={e => setLabel(e.target.value)} placeholder={placeholder} autoFocus={!label} style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
             {withCategory && (
               <select value={category} onChange={e => setCategory(e.target.value)} style={inputStyle}>
                 {EXPENSE_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             )}
-            <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="kr/mån" inputMode="numeric" style={{ ...inputStyle, width: 90 }}
+            <input value={amount} onChange={e => setAmount(e.target.value)} placeholder="kr/mån" inputMode="numeric" autoFocus={!!label} style={{ ...inputStyle, width: 90 }}
               onKeyDown={e => { if (e.key === "Enter") save(); }} />
             <button onClick={save} style={{ fontSize: 12, padding: "7px 14px", borderRadius: 16, border: "none", background: "var(--accent)", color: "#fff", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>Spara</button>
             <button onClick={() => setAdding(false)} style={{ fontSize: 12, padding: "7px 10px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
@@ -98,6 +149,23 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
             style={{ marginTop: 8, fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
             + Lägg till
           </button>
+        )}
+        {unusedPresets.length > 0 && (
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid var(--border-light)" }}>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Vanliga poster — klicka för att lägga till</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {unusedPresets.map(p => {
+                const cat = CAT_BY_ID[p.category];
+                return (
+                  <button key={p.label} onClick={() => pickPreset(p)}
+                    style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, padding: "4px 10px", borderRadius: 999, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-secondary)", cursor: "pointer", fontFamily: "inherit" }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: cat?.color || "#78909c" }} />
+                    + {p.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -303,7 +371,7 @@ export default function GoalsTab() {
       {/* ── Kassaflöde ── */}
       <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Kassaflöde</div>
       <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 14 }}>
-        Mata in lön och fasta utgifter per månad, så ser du ditt sparutrymme. Siffrorna är dina egna — vi kopplar inte till banken.
+        Mata in alla inkomster (lön, partners lön, bidrag…) och dina fasta utgifter per månad, så ser du ditt sparutrymme. Siffrorna är dina egna — vi kopplar inte till banken.
       </div>
 
       <div style={{ display: "flex", gap: isMobile ? 10 : 14, flexWrap: "wrap", marginBottom: 14 }}>
@@ -318,6 +386,7 @@ export default function GoalsTab() {
         <FlowColumn
           title="Pengar in"
           accent="#089981"
+          withIncomeType
           rows={cashflow.incomes}
           placeholder="T.ex. Lön efter skatt"
           onAdd={row => setCashflow({ ...cashflow, incomes: [...cashflow.incomes, row] })}
@@ -327,6 +396,7 @@ export default function GoalsTab() {
           title="Pengar ut"
           accent="#f23645"
           withCategory
+          presets={EXPENSE_PRESETS}
           rows={cashflow.expenses}
           placeholder="T.ex. Hyra, bolåneränta, mat"
           onAdd={row => setCashflow({ ...cashflow, expenses: [...cashflow.expenses, row] })}

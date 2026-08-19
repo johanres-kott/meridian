@@ -9,9 +9,9 @@ const CATEGORIES = [
   { id: "rantefond", label: "Räntefonder" },
 ];
 
-export default function FundSuggestions({ isMobile, onNavigate }) {
-  const [category, setCategory] = useState("aktie_sverige");
-  const [typeFilter, setTypeFilter] = useState("all"); // "all" | "index" | "active"
+export default function FundSuggestions({ isMobile, onNavigate, initialCategory, initialType }) {
+  const [category, setCategory] = useState(initialCategory || "aktie_sverige");
+  const [typeFilter, setTypeFilter] = useState(initialType || "all"); // "all" | "index" | "active"
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(new Set());
@@ -45,13 +45,13 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
     onNavigate?.("portfolio", { ticker: fund.secId });
   }
 
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
   const filtered = (data?.results || []).filter(f =>
     typeFilter === "all" ? true : typeFilter === "index" ? f.indexFund : !f.indexFund
   );
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{
         padding: isMobile ? "10px 12px" : "14px 20px", borderBottom: "1px solid var(--border-light)",
         background: "var(--bg-secondary)",
@@ -89,7 +89,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                   ? (opt.id === "index" ? "rgba(33,150,243,0.15)" : opt.id === "active" ? "rgba(156,39,176,0.12)" : "var(--bg-card)")
                   : "var(--bg-card)",
                 color: typeFilter === opt.id
-                  ? (opt.id === "index" ? "#1976d2" : opt.id === "active" ? "#7b1fa2" : "var(--text)")
+                  ? (opt.id === "index" ? "var(--green-600)" : opt.id === "active" ? "#7b1fa2" : "var(--text)")
                   : "var(--text-muted)",
               }}
             >
@@ -141,7 +141,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                         <span style={{
                           fontSize: 9, padding: "1px 5px", borderRadius: 3, fontWeight: 500, flexShrink: 0,
                           background: fund.indexFund ? "rgba(33,150,243,0.12)" : "rgba(156,39,176,0.10)",
-                          color: fund.indexFund ? "#1976d2" : "#7b1fa2",
+                          color: fund.indexFund ? "var(--green-600)" : "#7b1fa2",
                         }}>
                           {fund.indexFund ? "Index" : "Aktiv"}
                         </span>
@@ -162,7 +162,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                     )}
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
                       {fund.returnM12 != null ? (
-                        <span style={{ color: fund.returnM12 >= 0 ? "#089981" : "#f23645" }}>
+                        <span style={{ color: fund.returnM12 >= 0 ? "var(--pos)" : "var(--neg)" }}>
                           {fund.returnM12 > 0 ? "+" : ""}{fund.returnM12.toFixed(1)}%
                         </span>
                       ) : "–"}
@@ -170,7 +170,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                     {!isMobile && (
                       <td style={{ ...tdStyle, textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
                         {fund.returnM36 != null ? (
-                          <span style={{ color: fund.returnM36 >= 0 ? "#089981" : "#f23645" }}>
+                          <span style={{ color: fund.returnM36 >= 0 ? "var(--pos)" : "var(--neg)" }}>
                             {fund.returnM36 > 0 ? "+" : ""}{fund.returnM36.toFixed(1)}%
                           </span>
                         ) : "–"}
@@ -179,7 +179,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                     {!isMobile && (
                       <td style={{ ...tdStyle, textAlign: "right", ...mono, fontVariantNumeric: "tabular-nums" }}>
                         {fund.returnM60 != null ? (
-                          <span style={{ color: fund.returnM60 >= 0 ? "#089981" : "#f23645" }}>
+                          <span style={{ color: fund.returnM60 >= 0 ? "var(--pos)" : "var(--neg)" }}>
                             {fund.returnM60 > 0 ? "+" : ""}{fund.returnM60.toFixed(1)}%
                           </span>
                         ) : "–"}
@@ -187,7 +187,7 @@ export default function FundSuggestions({ isMobile, onNavigate }) {
                     )}
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       {isAdded ? (
-                        <span style={{ fontSize: 10, color: "#089981" }}>✓ Tillagd</span>
+                        <span style={{ fontSize: 10, color: "var(--pos)" }}>✓ Tillagd</span>
                       ) : (
                         <button
                           onClick={(e) => { e.stopPropagation(); addToWatchlist(fund); }}

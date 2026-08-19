@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
-import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
+import { INDEXES, rangeCutoff } from "../lib/portfolioChartConstants.js";
 
 /**
  * Custom hook that fetches portfolio history and index comparison data,
@@ -8,6 +8,7 @@ import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
  */
 export default function usePortfolioData(userId, range) {
   const [allPoints, setAllPoints] = useState([]);
+  const [netWorthPoints, setNetWorthPoints] = useState([]); // äkta nettoförmögenhets-snapshots (cron)
   const [indexDataMap, setIndexDataMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -17,17 +18,20 @@ export default function usePortfolioData(userId, range) {
     setLoading(true);
     setError(false);
 
-    // Fetch portfolio + all indexes in parallel
+    // Fetch portfolio + net worth history + all indexes in parallel
     Promise.all([
-      supabase.auth.getSession().then(({ data: { session: s } }) =>
-        fetch("/api/portfolio-history", {
-          headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : {},
-        }).then(r => r.ok ? r.json() : null)
-      ),
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        const headers = s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : {};
+        return Promise.all([
+          fetch("/api/portfolio-history", { headers }).then(r => r.ok ? r.json() : null),
+          fetch("/api/net-worth-history", { headers }).then(r => r.ok ? r.json() : null).catch(() => null),
+        ]);
+      }),
       ...INDEXES.map(idx =>
         fetch(`/api/chart?ticker=${encodeURIComponent(idx.ticker)}&range=1y`).then(r => r.ok ? r.json() : null).catch(() => null)
       ),
-    ]).then(([portfolioData, ...indexResults]) => {
+    ]).then(([[portfolioData, netWorthData], ...indexResults]) => {
+      setNetWorthPoints((netWorthData?.snapshots || []).map(p => ({ date: p.date, value: p.value })));
       // Portfolio
       const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
       const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
@@ -62,11 +66,8 @@ export default function usePortfolioData(userId, range) {
 
   const points = useMemo(() => {
     if (allPoints.length === 0) return [];
-    const rangeDef = RANGES.find(r => r.id === range);
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - (rangeDef?.days || 90));
-    const cutoffStr = cutoff.toISOString().slice(0, 10);
-    const filtered = allPoints.filter(p => p.date >= cutoffStr);
+    const cutoffStr = rangeCutoff(range);
+    const filtered = cutoffStr ? allPoints.filter(p => p.date >= cutoffStr) : allPoints;
     if (filtered.length === 0) return [];
 
     // Normalize to % change from first point
@@ -96,5 +97,5 @@ export default function usePortfolioData(userId, range) {
     });
   }, [allPoints, range, indexDataMap]);
 
-  return { points, indexDataMap, loading, error };
+  return { points, netWorthPoints, indexDataMap, loading, error };
 }

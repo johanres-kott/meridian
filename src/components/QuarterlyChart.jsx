@@ -54,7 +54,7 @@ export default function QuarterlyChart({ ticker }) {
               style={{
                 fontSize: 11, padding: "4px 10px", borderRadius: 3, border: "none", cursor: "pointer",
                 fontFamily: "inherit", fontWeight: 500,
-                background: view === v.id ? "#2962ff" : "#f0f3fa",
+                background: view === v.id ? "var(--brand)" : "#f0f3fa",
                 color: view === v.id ? "#fff" : "#787b86",
               }}>
               {v.label}
@@ -74,8 +74,8 @@ export default function QuarterlyChart({ ticker }) {
               labelStyle={{ fontSize: 11 }}
               contentStyle={{ fontSize: 11, borderRadius: 4 }}
             />
-            <Bar dataKey="revenue" fill="#2962ff" radius={[3, 3, 0, 0]} name="revenue" />
-            <Bar dataKey="operatingIncome" fill="#089981" radius={[3, 3, 0, 0]} name="operatingIncome" />
+            <Bar dataKey="revenue" fill="var(--brand)" radius={[3, 3, 0, 0]} name="revenue" />
+            <Bar dataKey="operatingIncome" fill="var(--pos)" radius={[3, 3, 0, 0]} name="operatingIncome" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -89,9 +89,9 @@ export default function QuarterlyChart({ ticker }) {
               labelStyle={{ fontSize: 11 }}
               contentStyle={{ fontSize: 11, borderRadius: 4 }}
             />
-            <Line type="monotone" dataKey="grossMargin" stroke="#2962ff" strokeWidth={2} dot={false} name="grossMargin" />
-            <Line type="monotone" dataKey="operatingMargin" stroke="#089981" strokeWidth={2} dot={false} name="operatingMargin" />
-            <Line type="monotone" dataKey="netMargin" stroke="#f23645" strokeWidth={2} dot={false} name="netMargin" />
+            <Line type="monotone" dataKey="grossMargin" stroke="var(--brand)" strokeWidth={2} dot={false} name="grossMargin" />
+            <Line type="monotone" dataKey="operatingMargin" stroke="var(--pos)" strokeWidth={2} dot={false} name="operatingMargin" />
+            <Line type="monotone" dataKey="netMargin" stroke="var(--neg)" strokeWidth={2} dot={false} name="netMargin" />
           </LineChart>
         </ResponsiveContainer>
       )}
@@ -114,9 +114,9 @@ export default function QuarterlyChart({ ticker }) {
               <tr key={i} style={{ borderBottom: "1px solid #f0f3fa" }}>
                 <td style={{ ...tdStyle, color: "#131722", fontWeight: 500 }}>{q.label}</td>
                 <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{formatMSEK(q.revenue)}</td>
-                <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums", color: q.operatingIncome < 0 ? "#f23645" : "#131722" }}>{formatMSEK(q.operatingIncome)}</td>
-                <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums", color: q.operatingMargin < 0 ? "#f23645" : "#131722" }}>{q.operatingMargin != null ? `${q.operatingMargin.toFixed(1)}%` : "–"}</td>
-                {!isMobile && <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums", color: q.netIncome < 0 ? "#f23645" : "#131722" }}>{formatMSEK(q.netIncome)}</td>}
+                <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums", color: q.operatingIncome < 0 ? "var(--neg)" : "#131722" }}>{formatMSEK(q.operatingIncome)}</td>
+                <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums", color: q.operatingMargin < 0 ? "var(--neg)" : "#131722" }}>{q.operatingMargin != null ? `${q.operatingMargin.toFixed(1)}%` : "–"}</td>
+                {!isMobile && <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums", color: q.netIncome < 0 ? "var(--neg)" : "#131722" }}>{formatMSEK(q.netIncome)}</td>}
                 {!isMobile && <td style={{ ...tdStyle, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{q.eps?.toFixed(2) ?? "–"}</td>}
               </tr>
             ))}

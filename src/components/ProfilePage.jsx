@@ -2,15 +2,16 @@ import { useState } from "react";
 import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
+import { GOAL_LABELS, SITUATION_LABELS } from "./onboarding/steps.js";
+
+const LIFE_LABELS = { starting: "I början", building: "Bygger upp", established: "Etablerad", preRetire: "Närmar mig pension" };
+const STYLE_LABELS = { safe: "Tryggt och enkelt", balanced: "Balanserat", active: "Engagerat" };
 import { useUser } from "../contexts/UserContext.jsx";
 import { getPensionEntries, getPensionTotalValue } from "../lib/pension.js";
 
 const INVESTOR_LABELS = { value: "Värdeinvesterare", growth: "Tillväxtinvesterare", dividend: "Utdelningsinvesterare", index: "Indexinvesterare", mixed: "Blandat" };
 const RISK_LABELS = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" };
-const FOCUS_LABELS = { dividends: "Utdelning", appreciation: "Kursökning", both: "Totalavkastning" };
 const EXP_LABELS = { beginner: "Nybörjare", intermediate: "Lite erfarenhet", advanced: "Erfaren" };
-const GEO_LABELS = { nordic: "Norden", global: "Globalt", both: "Blandat" };
-const INTEREST_LABELS = { tech: "Tech & AI", finance: "Finans", industry: "Industri", healthcare: "Hälsovård", realestate: "Fastigheter", food: "Mat & Livsmedel", energy: "Energi", gold: "Guld", sustainability: "Hållbarhet", gaming: "Gaming", fashion: "Mode", defense: "Försvar", ev: "Elbilar", crypto: "Krypto" };
 
 export default function ProfilePage({ onResetProfile }) {
   const { session, preferences, updatePreferences } = useUser();
@@ -33,7 +34,7 @@ export default function ProfilePage({ onResetProfile }) {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 16 : 24, marginBottom: 16 };
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? 16 : 24, marginBottom: 16 };
   const labelStyle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
   const fieldLabel = { fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 };
   const fieldValue = { fontSize: 14, color: "var(--text)", fontWeight: 500 };
@@ -78,7 +79,7 @@ export default function ProfilePage({ onResetProfile }) {
                     style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                     Ändra
                   </button>
-                  {saved && <span style={{ fontSize: 11, color: "#089981" }}>Sparat!</span>}
+                  {saved && <span style={{ fontSize: 11, color: "var(--pos)" }}>Sparat!</span>}
                 </div>
               )}
             </div>
@@ -92,51 +93,62 @@ export default function ProfilePage({ onResetProfile }) {
         </div>
       </div>
 
-      {/* Investor Profile */}
+      {/* Ekonomiprofil (v2) — äldre profiler visas med gamla fälten + nudge */}
       <div style={cardStyle}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <div style={labelStyle}>Investerarprofil</div>
+          <div style={labelStyle}>Ekonomiprofil</div>
           <button onClick={onResetProfile}
             style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-            Ändra profil →
+            {profile?.version === 2 ? "Gör om profilen →" : "Skapa ekonomiprofil →"}
           </button>
         </div>
 
-        {profile ? (
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 16 }}>
-            <div>
-              <div style={fieldLabel}>Investerartyp</div>
-              <div style={fieldValue}>{INVESTOR_LABELS[profile.investorType] || "–"}</div>
-            </div>
-            <div>
-              <div style={fieldLabel}>Risknivå</div>
-              <div style={fieldValue}>{RISK_LABELS[profile.riskProfile] || "–"}</div>
-            </div>
-            <div>
-              <div style={fieldLabel}>Fokus</div>
-              <div style={fieldValue}>{FOCUS_LABELS[profile.focus] || "–"}</div>
-            </div>
-            <div>
-              <div style={fieldLabel}>Erfarenhet</div>
-              <div style={fieldValue}>{EXP_LABELS[profile.experience] || "–"}</div>
-            </div>
-            <div>
-              <div style={fieldLabel}>Geografi</div>
-              <div style={fieldValue}>{GEO_LABELS[profile.geography] || "–"}</div>
-            </div>
-            <div>
-              <div style={fieldLabel}>Intressen</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {(profile.interests || []).map(i => (
-                  <span key={i} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 3, background: "#e8f5e9", color: "#1b5e20", fontWeight: 500 }}>
-                    {INTEREST_LABELS[i] || i}
-                  </span>
-                ))}
+        {profile?.version === 2 ? (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 16 }}>
+              <div>
+                <div style={fieldLabel}>Var i livet</div>
+                <div style={fieldValue}>{LIFE_LABELS[profile.lifeStage] || "–"}</div>
+              </div>
+              <div>
+                <div style={fieldLabel}>Hur du vill ha det</div>
+                <div style={fieldValue}>{STYLE_LABELS[profile.style] || "–"}</div>
+              </div>
+              <div>
+                <div style={fieldLabel}>Erfarenhet</div>
+                <div style={fieldValue}>{EXP_LABELS[profile.experience] || "–"}</div>
               </div>
             </div>
-          </div>
+            {(profile.situation?.length > 0) && (
+              <div style={{ marginTop: 14 }}>
+                <div style={fieldLabel}>Din situation</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+                  {profile.situation.map(k => <span key={k} style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 999, background: "var(--bg-raised)", color: "var(--text-secondary)", fontWeight: 500 }}>{SITUATION_LABELS[k] || k}</span>)}
+                </div>
+              </div>
+            )}
+            {(profile.goals?.length > 0) && (
+              <div style={{ marginTop: 12 }}>
+                <div style={fieldLabel}>Dina mål</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+                  {profile.goals.map(k => <span key={k} style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 999, background: "var(--brand-tint)", color: "var(--green-700)", fontWeight: 600 }}>{GOAL_LABELS[k] || k}</span>)}
+                </div>
+              </div>
+            )}
+          </>
+        ) : profile ? (
+          <>
+            <div style={{ fontSize: 12.5, color: "var(--text-secondary)", lineHeight: 1.55, marginBottom: 12, padding: "10px 12px", background: "var(--bg-raised)", borderRadius: "var(--radius-md)" }}>
+              Den här profilen är gjord med den gamla investerarprofilen. Thesion handlar nu om hela din ekonomi — gör om profilen (tar en minut) så anpassas appen efter din situation och dina mål.
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 16 }}>
+              <div><div style={fieldLabel}>Investerartyp</div><div style={fieldValue}>{INVESTOR_LABELS[profile.investorType] || "–"}</div></div>
+              <div><div style={fieldLabel}>Risknivå</div><div style={fieldValue}>{RISK_LABELS[profile.riskProfile] || "–"}</div></div>
+              <div><div style={fieldLabel}>Erfarenhet</div><div style={fieldValue}>{EXP_LABELS[profile.experience] || "–"}</div></div>
+            </div>
+          </>
         ) : (
-          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Ingen profil skapad ännu. Klicka "Ändra profil" för att komma igång.</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Ingen profil skapad ännu. Klicka ”Skapa ekonomiprofil” för att komma igång.</div>
         )}
       </div>
 
@@ -152,7 +164,7 @@ export default function ProfilePage({ onResetProfile }) {
               </div>
               <div>
                 <div style={fieldLabel}>Månadsinbetalning</div>
-                <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                <div style={{ ...fieldValue, fontFamily: "var(--font-mono)" }}>
                   {preferences.pension?.monthlyContribution != null
                     ? `${Number(preferences.pension.monthlyContribution).toLocaleString("sv-SE")} kr`
                     : "–"}
@@ -160,7 +172,7 @@ export default function ProfilePage({ onResetProfile }) {
               </div>
               <div>
                 <div style={fieldLabel}>Totalt kapital</div>
-                <div style={{ ...fieldValue, fontFamily: "'IBM Plex Mono', monospace" }}>
+                <div style={{ ...fieldValue, fontFamily: "var(--font-mono)" }}>
                   {getPensionTotalValue(preferences.pension) != null
                     ? `${getPensionTotalValue(preferences.pension).toLocaleString("sv-SE")} kr`
                     : "–"}
@@ -178,7 +190,7 @@ export default function ProfilePage({ onResetProfile }) {
                       </span>
                     </div>
                     {e.currentValue != null && (
-                      <span style={{ fontSize: 12, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                      <span style={{ fontSize: 12, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                         {Number(e.currentValue).toLocaleString("sv-SE")} kr
                       </span>
                     )}
@@ -186,14 +198,14 @@ export default function ProfilePage({ onResetProfile }) {
                   {e.funds?.length > 0 && e.funds.map((f, fi) => (
                     <div key={fi} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--text-secondary)", padding: "2px 0" }}>
                       <span>{f.name}</span>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
+                      <span style={{ fontFamily: "var(--font-mono)" }}>{f.allocation}%{f.fee != null ? ` (avg. ${f.fee}%)` : ""}</span>
                     </div>
                   ))}
                 </div>
               ))}
             </div>
             <button onClick={() => updatePreferences({ pension: {} })}
-              style={{ fontSize: 11, color: "#c62828", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
+              style={{ fontSize: 11, color: "var(--neg)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", marginTop: 4 }}>
               Rensa pensionsdata
             </button>
           </>
@@ -251,7 +263,7 @@ export default function ProfilePage({ onResetProfile }) {
               onClick={() => updatePreferences({ sharePortfolioWithAI: !(preferences.sharePortfolioWithAI !== false) })}
               style={{
                 width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
-                background: (preferences.sharePortfolioWithAI !== false) ? "#089981" : "var(--border)",
+                background: (preferences.sharePortfolioWithAI !== false) ? "var(--pos)" : "var(--border)",
                 position: "relative", transition: "background 0.2s",
               }}
             >
@@ -285,11 +297,11 @@ export default function ProfilePage({ onResetProfile }) {
           </div>
           <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <div style={{ fontSize: 13, color: "#c62828" }}>Radera konto</div>
+              <div style={{ fontSize: 13, color: "var(--neg)" }}>Radera konto</div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>All data raderas permanent</div>
             </div>
             <button disabled
-              style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "#c62828", border: "1px solid #fce4ec", borderRadius: 4, cursor: "not-allowed", fontFamily: "inherit", opacity: 0.5 }}
+              style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "var(--neg)", border: "1px solid #fce4ec", borderRadius: 4, cursor: "not-allowed", fontFamily: "inherit", opacity: 0.5 }}
               title="Kontakta support för att radera konto">
               Radera
             </button>

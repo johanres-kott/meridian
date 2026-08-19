@@ -157,7 +157,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
             </div>
           </div>
           {candidateCount > 0 && (
-            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 12, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600 }}>
+            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 12, background: "rgba(255,152,0,0.15)", color: "var(--warn)", fontWeight: 600 }}>
               {candidateCount} spin-off-kandidat{candidateCount === 1 ? "" : "er"}
             </span>
           )}
@@ -172,7 +172,7 @@ export default function OwnershipOverlay({ onSelect, isMobile }) {
               style={{
                 padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 12,
                 background: sort === opt.id ? "var(--accent-light)" : "var(--bg-card)",
-                color: sort === opt.id ? "#089981" : "var(--text-secondary)",
+                color: sort === opt.id ? "var(--pos)" : "var(--text-secondary)",
                 fontSize: 11, fontWeight: sort === opt.id ? 600 : 500, cursor: "pointer",
                 fontFamily: "inherit",
               }}
@@ -260,7 +260,7 @@ function DualBar({ pctCapital, pctVotes, width = 70 }) {
         <div style={{ height: 4, marginTop: 2, background: "var(--bg-secondary)", borderRadius: 2, overflow: "hidden" }}>
           <div style={{
             width: `${Math.min(votes, 100)}%`, height: "100%",
-            background: votesHigher ? "#ff9800" : "#089981",
+            background: votesHigher ? "var(--warn)" : "var(--pos)",
           }} />
         </div>
       )}
@@ -276,7 +276,7 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
     borderBottom: "1px solid var(--border-light)",
     fontSize: 12, color: "var(--text)",
   };
-  const numStyle = { ...cellStyle, textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" };
+  const numStyle = { ...cellStyle, textAlign: "right", fontFamily: "var(--font-mono)" };
 
   const handleClick = () => onSelect?.(item);
 
@@ -315,7 +315,7 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
         </div>
         <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{tickerLabel}</div>
       </td>
-      <td style={{ ...numStyle, color: ownership.isLowFloat ? "#ff9800" : "var(--text)", fontWeight: ownership.isLowFloat ? 600 : 500 }}>
+      <td style={{ ...numStyle, color: ownership.isLowFloat ? "var(--warn)" : "var(--text)", fontWeight: ownership.isLowFloat ? 600 : 500 }}>
         {float != null ? `${float.toFixed(1)}%` : "—"}
       </td>
       <td style={cellStyle}>
@@ -334,10 +334,10 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
               : `${largest.pctHeld.toFixed(1)}% kapital`}
           >
             <DualBar pctCapital={largest.pctHeld} pctVotes={largest.pctVotes} width={isMobile ? 50 : 70} />
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, lineHeight: 1.2, color: "var(--text-secondary)" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, lineHeight: 1.2, color: "var(--text-secondary)" }}>
               <div style={{ color: "var(--text)" }}>{largest.pctHeld.toFixed(1)}%</div>
               {largest.pctVotes != null && Math.abs(largest.pctVotes - largest.pctHeld) >= 0.5 && (
-                <div style={{ color: largest.pctVotes > largest.pctHeld ? "#ff9800" : "var(--text-muted)" }}>
+                <div style={{ color: largest.pctVotes > largest.pctHeld ? "var(--warn)" : "var(--text-muted)" }}>
                   {largest.pctVotes.toFixed(1)}%
                 </div>
               )}
@@ -358,10 +358,10 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
                   title={showVotes ? `${h.pctHeld.toFixed(1)}% kapital · ${h.pctVotes.toFixed(1)}% röster` : `${h.pctHeld.toFixed(1)}% kapital`}
                 >
                   <DualBar pctCapital={h.pctHeld} pctVotes={h.pctVotes} width={50} />
-                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: "var(--text-muted)", minWidth: 32 }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-muted)", minWidth: 32 }}>
                     {h.pctHeld.toFixed(1)}%
                     {showVotes && (
-                      <span style={{ color: votesHigher ? "#ff9800" : "var(--text-muted)", marginLeft: 3 }}>
+                      <span style={{ color: votesHigher ? "var(--warn)" : "var(--text-muted)", marginLeft: 3 }}>
                         /{h.pctVotes.toFixed(1)}
                       </span>
                     )}
@@ -378,25 +378,25 @@ function OwnershipRow({ item, ownership, classes = [], onSelect, isMobile }) {
       <td style={cellStyle}>
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {ownership.isSpinOffCandidate && (
-            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600 }}>
+            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "var(--warn)", fontWeight: 600 }}>
               Spin-off
             </span>
           )}
           {(isDualClassHolder(ownership.largestHolder || {}) || (ownership.topHolders || []).some(isDualClassHolder)) && (
             <span
               title="Största ägaren har väsentligt fler röster än kapital (A/B-struktur)"
-              style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.12)", color: "#ff9800", fontWeight: 600 }}
+              style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(255,152,0,0.12)", color: "var(--warn)", fontWeight: 600 }}
             >
               A/B-struktur
             </span>
           )}
           {ownership.isLowFloat && !ownership.isSpinOffCandidate && (
-            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(242,54,69,0.12)", color: "#f23645", fontWeight: 600 }}>
+            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(205,74,64,0.12)", color: "var(--neg)", fontWeight: 600 }}>
               Lågt float
             </span>
           )}
           {ownership.source === "curated" && (
-            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(8,153,129,0.12)", color: "#089981", fontWeight: 500 }}>
+            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 3, background: "rgba(15,154,108,0.12)", color: "var(--pos)", fontWeight: 500 }}>
               Kurerad
             </span>
           )}

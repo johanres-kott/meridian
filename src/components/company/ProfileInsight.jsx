@@ -70,7 +70,7 @@ export function ScoreDetail({ scoreKey, scoreData }) {
     }}>
       <div style={{ fontWeight: 500, color: "var(--text)", marginBottom: 4, fontSize: 12 }}>{detail.title}</div>
       {rawScore && (
-        <div style={{ marginBottom: 6, fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500, color: "var(--text)" }}>
+        <div style={{ marginBottom: 6, fontFamily: "var(--font-mono)", fontWeight: 500, color: "var(--text)" }}>
           {"Poäng: "}{rawScore}
         </div>
       )}
@@ -89,7 +89,7 @@ export function ScoreDetail({ scoreKey, scoreData }) {
 
 export function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle }) {
   if (value == null) return null;
-  const color = value >= 70 ? "#089981" : value >= 40 ? "#ff9800" : "#f23645";
+  const color = value >= 70 ? "var(--pos)" : value >= 40 ? "var(--warn)" : "var(--neg)";
   const hasDetail = !!SCORE_DETAILS[scoreKey];
   return (
     <div>
@@ -107,7 +107,7 @@ export function ScoreBar({ label, value, scoreKey, scoreData, expanded, onToggle
         <div style={{ flex: 1, height: 6, background: "var(--border-light)", borderRadius: 3, overflow: "hidden" }}>
           <div style={{ width: `${Math.min(value, 100)}%`, height: "100%", background: color, borderRadius: 3 }} />
         </div>
-        <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{Math.round(value)}</span>
+        <span style={{ width: 28, textAlign: "right", fontWeight: 500, color, fontFamily: "var(--font-mono)", fontSize: 10 }}>{Math.round(value)}</span>
       </div>
       {expanded && <ScoreDetail scoreKey={scoreKey} scoreData={scoreData} />}
     </div>
@@ -142,7 +142,7 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
 
   // Beta / Risk
   if (risk) {
-    const riskColor = risk === "low" ? "#089981" : risk === "medium" ? "#ff9800" : "#f23645";
+    const riskColor = risk === "low" ? "var(--pos)" : risk === "medium" ? "var(--warn)" : "var(--neg)";
     if (isInvestmentCompany(ticker)) {
       allItems.push({ icon: "\u25C9", color: riskColor, text: `${riskText} \u2014 diversifierat investmentbolag` });
     } else if (company?.beta != null) {
@@ -154,7 +154,7 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
 
   // Dividend
   if (hasDiv) {
-    allItems.push({ icon: "\uD83D\uDCB0", color: "#089981", text: `Direktavkastning ${company.dividendYield.toFixed(1)}%` });
+    allItems.push({ icon: "\uD83D\uDCB0", color: "var(--pos)", text: `Direktavkastning ${company.dividendYield.toFixed(1)}%` });
   } else {
     allItems.push({ icon: "\u2013", color: "var(--text-secondary)", text: "Ingen utdelning" });
   }
@@ -167,7 +167,7 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
   }
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Din profil & detta bolag</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {allItems.map((item, i) => (
@@ -191,10 +191,10 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
             const profileType = investorProfile?.investorType || "mixed";
             const compositeScore = scoreData.composite[profileType] ?? scoreData.composite.mixed;
             if (compositeScore == null) return null;
-            const color = compositeScore >= 70 ? "#089981" : compositeScore >= 40 ? "#ff9800" : "#f23645";
+            const color = compositeScore >= 70 ? "var(--pos)" : compositeScore >= 40 ? "var(--warn)" : "var(--neg)";
             return (
               <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "'IBM Plex Mono', monospace" }}>{Math.round(compositeScore)}</span>
+                <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: "var(--font-mono)" }}>{Math.round(compositeScore)}</span>
                 <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>/ 100 \u2014 totalpo\u00e4ng f\u00f6r {PROFILE_LABELS[profileType] || profileType}</span>
               </div>
             );
@@ -204,8 +204,8 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
       {(() => {
         const profileType = investorProfile?.investorType || "mixed";
         const cs = scoreData?.composite?.[profileType] ?? scoreData?.composite?.mixed ?? score;
-        const matchColor = cs >= 70 ? "#089981" : cs >= 40 ? "#e65100" : "#c62828";
-        const matchBg = cs >= 70 ? "rgba(8,153,129,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
+        const matchColor = cs >= 70 ? "var(--pos)" : cs >= 40 ? "var(--warn)" : "var(--neg)";
+        const matchBg = cs >= 70 ? "rgba(15,154,108,0.12)" : cs >= 40 ? "rgba(255,152,0,0.12)" : "rgba(200,40,40,0.12)";
         const matchText = cs >= 70 ? "Stark matchning" : cs >= 40 ? "Delvis matchning" : "Svag matchning";
         return (
           <div style={{ marginTop: 10, padding: "8px 10px", background: matchBg, borderRadius: 4 }}>
@@ -223,15 +223,15 @@ export default function ProfileInsight({ ticker, company, investorProfile }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#089981", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
+              <span style={{ color: "var(--pos)", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
               <strong>{"Låg risk"}</strong> {" — Beta < 0.8. Aktien rör sig mindre än marknaden. Stabilare kursutveckling."}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#ff9800", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
+              <span style={{ color: "var(--warn)", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
               <strong>{"Medel risk"}</strong> {" — Beta 0.8–1.2. Följer marknaden relativt nära."}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#f23645", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
+              <span style={{ color: "var(--neg)", fontSize: 11, width: 14, textAlign: "center" }}>{"◉"}</span>
               <strong>{"Hög risk"}</strong> {" — Beta > 1.2. Större kurssvängningar än marknaden."}
             </div>
           </div>

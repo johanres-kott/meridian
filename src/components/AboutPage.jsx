@@ -1,9 +1,9 @@
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-export default function AboutPage() {
+export default function AboutPage({ onNavigate }) {
   const isMobile = useIsMobile();
 
-  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: isMobile ? 16 : 24, marginBottom: 16 };
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? 16 : 24, marginBottom: 16 };
   const labelStyle = { fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 12 };
   const pStyle = { fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 8 };
 
@@ -14,17 +14,20 @@ export default function AboutPage() {
       <div style={cardStyle}>
         <div style={labelStyle}>Om projektet</div>
         <p style={pStyle}>
-          Thesion är ett hobbyprojekt skapat av Johan Resare för att utforska hur man kan bygga en produktionsapp med Claude Code (AI-assisterad utveckling). Appen analyserar aktier med etablerade finansiella modeller och ger personliga investeringsförslag.
+          Thesion hjälper dig få koll på hela din ekonomi — portfölj, pension, bostad, fordon, sparande och lån i en samlad bild av din nettoförmögenhet. Grundidén är enkel: en billig global indexfond som bas, aktier i bolag du tror på som krydda, och mål du faktiskt når. Thesion är skapat av Johan Resare och byggt med AI-assisterad utveckling (Claude Code). Generell information, inte personlig finansiell rådgivning.
         </p>
+        <button onClick={() => onNavigate?.("security")} style={{ fontSize: 12, color: "var(--brand)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, fontWeight: 600 }}>
+          Läs om din data & säkerhet →
+        </button>
       </div>
 
       <div style={cardStyle}>
         <div style={labelStyle}>Teknik</div>
         <p style={pStyle}>
-          Hela appen är byggd med AI-assisterad utveckling via Claude Code (Anthropic). Tech-stacken inkluderar React för frontend, Vercel för hosting, Supabase för databas och autentisering, Yahoo Finance för marknadsdata och Claude AI för chattassistenten.
+          Hela appen är byggd med AI-assisterad utveckling via Claude Code (Anthropic). Tech-stacken: React för frontend, Vercel för hosting, Supabase för databas och autentisering, Yahoo Finance och Finnhub för kurser, Morningstar för fonddata.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
-          {["React", "Vercel", "Supabase", "Yahoo Finance", "Claude AI"].map(tech => (
+          {["React", "Vercel", "Supabase", "Yahoo Finance", "Morningstar", "Claude Code"].map(tech => (
             <span key={tech} style={{ fontSize: 10, padding: "3px 8px", borderRadius: 3, background: "var(--border-light)", color: "var(--accent)", fontWeight: 500 }}>
               {tech}
             </span>

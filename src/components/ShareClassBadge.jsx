@@ -23,7 +23,7 @@ export default function ShareClassBadge({ ticker, classes, size = "sm" }) {
         color: "var(--text-secondary)",
         fontWeight: 600,
         letterSpacing: "0.04em",
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "var(--font-mono)",
         lineHeight: 1.4,
       }}
     >

@@ -32,11 +32,11 @@ export default function AllocationCard({ items, scores, prices, fxRates, riskPro
           </div>
         </div>
         {isBalanced ? (
-          <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, background: "rgba(8,153,129,0.1)", color: "#089981", fontWeight: 500 }}>
+          <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, background: "rgba(15,154,108,0.1)", color: "var(--pos)", fontWeight: 500 }}>
             ✓ Balanserad
           </span>
         ) : (
-          <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, background: "rgba(242,54,69,0.1)", color: "#f23645", fontWeight: 500 }}>
+          <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, background: "rgba(205,74,64,0.1)", color: "var(--neg)", fontWeight: 500 }}>
             Obalanserad
           </span>
         )}
@@ -103,7 +103,7 @@ export default function AllocationCard({ items, scores, prices, fxRates, riskPro
                   <span style={{ fontSize: 12, fontWeight: 600, color: meta.color }}>{meta.label}</span>
                   <span style={{ fontSize: 11, color: "var(--text)", fontWeight: 500 }}>{pct}%</span>
                 </div>
-                <div style={{ fontSize: 10, color: gapVal === 0 ? "var(--text-muted)" : Math.abs(gapVal) <= 5 ? "#ff9800" : "#f23645", fontWeight: 500 }}>
+                <div style={{ fontSize: 10, color: gapVal === 0 ? "var(--text-muted)" : Math.abs(gapVal) <= 5 ? "var(--warn)" : "var(--neg)", fontWeight: 500 }}>
                   {gapVal === 0 ? "= mål" : `${gapVal > 0 ? "+" : ""}${gapVal}pp vs mål`}
                 </div>
               </div>

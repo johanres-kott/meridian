@@ -3,12 +3,12 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 
 const COLORS = [
-  "#089981", "#2962ff", "#ff9800", "#ab47bc", "#26a69a",
+  "var(--pos)", "var(--brand)", "var(--warn)", "#ab47bc", "#26a69a",
   "#ef5350", "#42a5f5", "#66bb6a", "#ffa726", "#8d6e63",
   "#78909c", "#7e57c2",
 ];
 
-const INSIDER_COLOR = "#e65100";
+const INSIDER_COLOR = "var(--warn)";
 const RETAIL_COLOR = "#b0bec5";
 const OTHER_INST_COLOR = "#546e7a";
 
@@ -55,7 +55,7 @@ export default function OwnershipChart({ ticker }) {
 
   if (loading) {
     return (
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
         <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>Ägare</div>
         <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "20px 0", textAlign: "center" }}>Hämtar ägardata...</div>
       </div>
@@ -122,7 +122,7 @@ export default function OwnershipChart({ ticker }) {
   if (pieData.length === 0) return null;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 16 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
       <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 10 }}>
         Ägare
         {data.institutionsCount && (
@@ -164,7 +164,7 @@ export default function OwnershipChart({ ticker }) {
               <span style={{ color: "var(--text)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {entry.name}
               </span>
-              <span style={{ color: "var(--text-secondary)", fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, flexShrink: 0 }}>
+              <span style={{ color: "var(--text-secondary)", fontFamily: "var(--font-mono)", fontSize: 10, flexShrink: 0 }}>
                 {entry.value.toFixed(1)}%
               </span>
             </div>
@@ -177,7 +177,7 @@ export default function OwnershipChart({ ticker }) {
         {data.institutionsPercent != null && (
           <div>
             <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Institutionellt</div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
               {data.institutionsPercent.toFixed(1)}%
             </div>
           </div>
@@ -185,7 +185,7 @@ export default function OwnershipChart({ ticker }) {
         {data.insidersPercent != null && (
           <div>
             <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Insiders</div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
               {data.insidersPercent.toFixed(1)}%
             </div>
           </div>
@@ -193,7 +193,7 @@ export default function OwnershipChart({ ticker }) {
         {data.retailPercent != null && (
           <div>
             <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Privata</div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
               {data.retailPercent.toFixed(1)}%
             </div>
           </div>

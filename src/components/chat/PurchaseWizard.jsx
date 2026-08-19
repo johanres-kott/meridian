@@ -211,10 +211,10 @@ export default function PurchaseWizard({ onComplete, onCancel, contextFn }) {
               Totalt: {(parseFloat(shares) * parseFloat(price)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} kr
             </div>
           </div>
-          {error && <div style={{ fontSize: 11, color: "#f23645", marginTop: 6 }}>{error}</div>}
+          {error && <div style={{ fontSize: 11, color: "var(--neg)", marginTop: 6 }}>{error}</div>}
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <button onClick={submitPurchase} disabled={saving}
-              style={{ ...chipStyle, flex: 1, background: "#089981", color: "#fff", border: "none", textAlign: "center", opacity: saving ? 0.6 : 1 }}>
+              style={{ ...chipStyle, flex: 1, background: "var(--pos)", color: "#fff", border: "none", textAlign: "center", opacity: saving ? 0.6 : 1 }}>
               {saving ? "Sparar..." : "✓ Registrera köp"}
             </button>
             <button onClick={() => setStep(0)} style={{ ...chipStyle, fontSize: 11, color: "var(--text-secondary)" }}>

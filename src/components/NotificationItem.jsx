@@ -17,7 +17,7 @@ export default function NotificationItem({ notification: n, onMarkRead }) {
         borderBottom: "1px solid var(--border-light)",
         background: n.read
           ? "transparent"
-          : "var(--bg-secondary, rgba(41,98,255,0.04))",
+          : "var(--bg-secondary, rgba(15,122,92,0.04))",
         cursor: n.read ? "default" : "pointer",
         transition: "background 0.15s",
       }}
@@ -28,7 +28,7 @@ export default function NotificationItem({ notification: n, onMarkRead }) {
       onMouseLeave={(e) => {
         e.currentTarget.style.background = n.read
           ? "transparent"
-          : "var(--bg-secondary, rgba(41,98,255,0.04))";
+          : "var(--bg-secondary, rgba(15,122,92,0.04))";
       }}
     >
       <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0, paddingTop: 2 }}>
@@ -79,7 +79,7 @@ export default function NotificationItem({ notification: n, onMarkRead }) {
             width: 8,
             height: 8,
             borderRadius: "50%",
-            background: "#2962ff",
+            background: "var(--brand)",
             flexShrink: 0,
             marginTop: 4,
           }}

@@ -3,7 +3,13 @@ import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const useBorgen = process.env.LLM_BACKEND === "borgen";
+const client = new Anthropic(
+  useBorgen
+    ? { apiKey: process.env.BORGEN_API_KEY, baseURL: process.env.BORGEN_BASE_URL ?? "http://localhost:8080" }
+    : { apiKey: process.env.ANTHROPIC_API_KEY }
+);
+const CHAT_MODEL = useBorgen ? "claude-haiku-4-5" : "claude-haiku-4-5-20251001";
 
 export default async function handler(req, res) {
   setCors(req, res);
@@ -243,7 +249,7 @@ DU FÅR ABSOLUT INTE fråga om risktolerans, investeringsstil, mål, tidshorison
 
   try {
     const stream = await client.messages.stream({
-      model: "claude-haiku-4-5-20251001",
+      model: CHAT_MODEL,
       max_tokens: 1024,
       temperature: 0.3,
       system: systemPrompt,

@@ -1,36 +1,38 @@
 import { useState } from "react";
+import { Hand, BarChart3, Briefcase, Target, Search, Bot } from "lucide-react";
+const ICONS = { Hand, BarChart3, Briefcase, Target, Search, Bot };
 import { useIsMobile } from "../hooks/useIsMobile.js";
 
-const jakarta = "'Plus Jakarta Sans', sans-serif";
+const jakarta = "var(--font-display)";
 
 const SLIDES = [
   {
-    emoji: "👋",
+    Icon: "Hand",
     title: "Välkommen till Thesion!",
     body: "Här får du en snabb genomgång av vad du kan göra. Vi har lagt till 5 aktier baserat på din profil — du kan ändra dem när som helst.",
   },
   {
-    emoji: "📊",
+    Icon: "BarChart3",
     title: "Översikt",
     body: "Din startsida. Här ser du portföljens utveckling, marknadsrörelser och nyheter sedan du senast var inloggad.",
   },
   {
-    emoji: "💼",
+    Icon: "Briefcase",
     title: "Portfölj",
     body: "Alla dina aktier. Importera från Avanza (PDF), lägg till manuellt, eller gruppera i egna fonder. Här ser du också din investeringsstrategi.",
   },
   {
-    emoji: "🎯",
+    Icon: "Target",
     title: "Investera",
     body: "Personliga aktieförslag rankade med 5 etablerade modeller (Piotroski, Magic Formula m.fl.). Följ också 7 svenska investmentbolag med innehav och ledning.",
   },
   {
-    emoji: "🔍",
+    Icon: "Search",
     title: "Analys & Sök",
     body: "Jämför aktier sida vid sida, se nyckeltal, och sök på vilket bolag som helst. Varje aktie får en riskbedömning och profilmatchning.",
   },
   {
-    emoji: "🤖",
+    Icon: "Bot",
     title: "Mats — din finansassistent",
     body: "Klicka på AI-knappen för att prata med Mats. Fråga om din portfölj, be om strategiråd, eller spara insikter direkt till dina aktier.",
   },
@@ -62,7 +64,9 @@ export default function QuickGuide({ onComplete }) {
         </div>
 
         {/* Emoji */}
-        <div style={{ fontSize: 48, marginBottom: 16 }}>{slide.emoji}</div>
+        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--brand-tint)", color: "var(--brand)", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+          {(() => { const I = ICONS[slide.Icon] || ICONS.Target; return <I size={32} strokeWidth={1.5} aria-hidden />; })()}
+        </div>
 
         {/* Title */}
         <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", fontFamily: jakarta, marginBottom: 10, letterSpacing: "-0.02em" }}>

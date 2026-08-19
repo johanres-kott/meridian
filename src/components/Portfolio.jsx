@@ -4,7 +4,6 @@ import PdfImportModal from "./PdfImportModal.jsx";
 import ImportGuide from "./ImportGuide.jsx";
 import CompanyView from "./CompanyView.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { sanitizeInput } from "../lib/sanitize.js";
 import { fetchCompany, fetchFund } from "../lib/apiClient.js";
 import FundView from "./FundView.jsx";
 import PortfolioChart from "./PortfolioChart.jsx";
@@ -19,12 +18,23 @@ import { useScores } from "../hooks/useScores.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import MyITPSection from "./MyITPSection.jsx";
 import ThesisReview from "./ThesisReview.jsx";
+import AssetBreakdown from "./AssetBreakdown.jsx";
+import AssetTable from "./AssetTable.jsx";
+import useNetWorth from "../hooks/useNetWorth.js";
+import RangeBar from "./RangeBar.jsx";
+import { DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
+import SedanSist from "./SedanSist.jsx";
+import PortfolioSummary from "./PortfolioSummary.jsx";
+import WeeklySummary from "./WeeklySummary.jsx";
+import UpcomingEarnings from "./UpcomingEarnings.jsx";
+import InvestmentPlanTracker from "./InvestmentPlanTracker.jsx";
 import { useTranslation } from "react-i18next";
 
-export default function Portfolio({ deepLink, onClearDeepLink }) {
+export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   const { userId, preferences, updatePreferences } = useUser();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const netWorthData = useNetWorth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
@@ -35,10 +45,9 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
   const { scores } = useScores();
   const [prices, setPrices] = useState({});
   const [subTab, setSubTab] = useState("innehav");
+  const [range, setRange] = useState(DEFAULT_RANGE); // globalt tidsspann (Finary)
 
   const groups = preferences.groups || [];
-
-  useEffect(() => { load(); }, []);
 
   // Handle deep link from Översikt
   useEffect(() => {
@@ -85,6 +94,9 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       }
     }
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- kör en gång vid mount
+  useEffect(() => { load(); }, []);
 
   async function addCompany({ ticker, name, type = "stock" }) {
     const { data: { user } } = await supabase.auth.getUser();
@@ -198,7 +210,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
       )}
 
       {/* Header */}
-      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 4, gap: isMobile ? 12 : 0 }}>
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "flex-start", marginBottom: 12, gap: isMobile ? 12 : 0 }}>
         <div>
           <div style={{ fontWeight: 600, fontSize: 18, color: "var(--text)", marginBottom: 4 }}>{t("portfolio.title")}</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
@@ -209,11 +221,38 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         </div>
       </div>
 
+      {/* Finary-IA (DESIGN.md): Portfölj = allt. Tidsspann + graf + donut överst, sedan tillgångstabellen. */}
+      {userId && (
+        <>
+          <RangeBar value={range} onChange={setRange} isMobile={isMobile} />
+          <div style={{ marginBottom: isMobile ? 12 : 20 }}>
+            <PortfolioChart
+              compact
+              offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0}
+              range={range}
+              onRangeChange={setRange}
+            />
+          </div>
+        </>
+      )}
+      <AssetBreakdown data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} />
+      <AssetTable
+        data={netWorthData}
+        holdings={netWorthData.holdings}
+        fxToSek={netWorthData.fxToSek}
+        isMobile={isMobile}
+        onNavigate={onNavigate}
+        onSelectHolding={(h) => {
+          const match = items.find(i => i.id === h.id || i.ticker === h.ticker);
+          if (match) setSelected(match);
+        }}
+      />
+
       {/* Sub-tabs */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 20 }}>
         {[
           { id: "innehav", label: t("portfolio.tabs.holdings") },
-          { id: "oversikt", label: t("portfolio.tabs.overview") },
+          { id: "bevakning", label: t("portfolio.tabs.watch") },
           { id: "tesgranskning", label: t("portfolio.tabs.thesisReview") },
           { id: "pension", label: t("portfolio.tabs.pension") },
         ].map(tab => (
@@ -238,17 +277,17 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
             URL.revokeObjectURL(url);
           }}
             title={t("portfolio.exportCsv")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.exportCsvShort") : t("portfolio.exportCsv")}
           </button>
           <button onClick={() => setShowImport(true)}
             title={t("portfolio.importPortfolio")}
-            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
+            style={{ padding: isMobile ? "7px 10px" : "7px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" }}>
             {isMobile ? t("portfolio.importPortfolioShort") : t("portfolio.importPortfolio")}
           </button>
           <button onClick={() => setShowGuide(true)}
             title={t("portfolio.importHelp")}
-            style={{ padding: "7px 10px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
+            style={{ padding: "7px 10px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text-secondary)" }}>
             ?
           </button>
         </div>
@@ -265,7 +304,7 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
               : t("portfolio.emptyNoCompanies")}
           </div>
         ) : (
-          <div style={{ border: "1px solid var(--border)", borderRadius: 4, overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", overflow: "hidden", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? 480 : undefined }}>
               <thead>
                 <tr>
@@ -306,19 +345,19 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
             <div style={{ marginTop: 8, padding: "12px 16px", background: "var(--bg-secondary)", borderRadius: 6, fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.6 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>82</span>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(15,154,108,0.15)", color: "var(--pos)", fontWeight: 600, fontFamily: "var(--font-mono)", flexShrink: 0 }}>82</span>
                   {t("portfolio.scoring.strong")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "#ff9800", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>55</span>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,152,0,0.15)", color: "var(--warn)", fontWeight: 600, fontFamily: "var(--font-mono)", flexShrink: 0 }}>55</span>
                   {t("portfolio.scoring.ok")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(242,54,69,0.15)", color: "#f23645", fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>25</span>
+                  <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(205,74,64,0.15)", color: "var(--neg)", fontWeight: 600, fontFamily: "var(--font-mono)", flexShrink: 0 }}>25</span>
                   {t("portfolio.scoring.weak")}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "#089981", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
+                  <span style={{ fontSize: 8, padding: "1px 4px", borderRadius: 2, background: "var(--accent-light)", color: "var(--pos)", fontWeight: 500, flexShrink: 0 }}>F-Score 8/9</span>
                   {t("portfolio.scoring.fscore")}
                 </div>
               </div>
@@ -330,10 +369,12 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
         )}
       </>}
 
-      {/* ── Översikt tab ── */}
-      {subTab === "oversikt" && <>
+      {/* ── Bevakning tab: aktie-pulsen (flyttad från Hem i Finary-IA-städningen) ── */}
+      {subTab === "bevakning" && <>
+        <SedanSist isMobile={isMobile} onNavigate={onNavigate} />
+        <PortfolioSummary isMobile={isMobile} onNavigate={onNavigate} />
+        <InvestmentPlanTracker isMobile={isMobile} onNavigate={onNavigate} />
         <StrategyCard isMobile={isMobile} />
-
         <AllocationCard
           items={items}
           scores={scores}
@@ -342,8 +383,8 @@ export default function Portfolio({ deepLink, onClearDeepLink }) {
           riskProfile={preferences.investorProfile?.riskProfile || "medium"}
           isMobile={isMobile}
         />
-
-        {items.some(i => i.shares) && userId && <PortfolioChart />}
+        <WeeklySummary isMobile={isMobile} onNavigate={onNavigate} />
+        <UpcomingEarnings isMobile={isMobile} />
       </>}
 
       {/* ── Tesgranskning tab ── */}

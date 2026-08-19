@@ -156,7 +156,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
               style={{
                 width: "100%", padding: "10px 14px", border: "1px solid var(--border)",
                 borderRadius: 4, fontSize: 13, outline: "none",
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "var(--font-sans)",
               }}
             />
             {suggestLoading && (
@@ -168,7 +168,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
           <button
             onClick={() => { setShowSuggestions(false); fetchCompany(sanitizeInput(query).toUpperCase()); }}
             disabled={loading}
-            style={{ padding: "10px 20px", background: "#2962ff", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }}
+            style={{ padding: "10px 20px", background: "var(--brand)", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }}
           >
             {loading ? "Söker..." : "Sök"}
           </button>
@@ -186,7 +186,7 @@ export default function CompanySearch({ deepLink, onClearDeepLink }) {
       </div>
 
       {error && (
-        <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "#f23645", marginBottom: 16 }}>
+        <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "var(--neg)", marginBottom: 16 }}>
           Fel: {error}
         </div>
       )}

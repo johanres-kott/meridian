@@ -75,7 +75,7 @@ export default function TodoList({ todos = [], onUpdate, isMobile }) {
                 </div>
                 <button onClick={() => remove(realIdx)}
                   style={{ fontSize: 12, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", flexShrink: 0, lineHeight: 1 }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#f23645"}
+                  onMouseEnter={e => e.currentTarget.style.color = "var(--neg)"}
                   onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                 >×</button>
               </div>

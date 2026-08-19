@@ -4,8 +4,8 @@ import { Chg } from "./SharedComponents.jsx";
 import { getFlag, SECTOR_EMOJI, SECTOR_SV, PROFILE_LABELS } from "../constants.js";
 
 function ScoreBadge({ score }) {
-  const color = score >= 70 ? "#089981" : score >= 40 ? "#e65100" : "#f23645";
-  const bg = score >= 70 ? "rgba(8,153,129,0.15)" : score >= 40 ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)";
+  const color = score >= 70 ? "var(--pos)" : score >= 40 ? "var(--warn)" : "var(--neg)";
+  const bg = score >= 70 ? "rgba(15,154,108,0.15)" : score >= 40 ? "rgba(255,152,0,0.15)" : "rgba(205,74,64,0.15)";
   return (
     <span style={{
       display: "inline-block", fontSize: 10, fontWeight: 600, padding: "2px 6px",
@@ -52,10 +52,10 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
 
   if (!loading && (!data?.suggestions || data.suggestions.length === 0)) return null;
 
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{
         padding: isMobile ? "10px 12px" : "14px 20px", borderBottom: "1px solid var(--border-light)",
         background: "var(--bg-secondary)", display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -121,7 +121,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                       <td style={tdStyle}>
                         <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                           {item.highlights?.slice(0, 2).map(tag => (
-                            <span key={tag} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(8,153,129,0.15)", color: "#089981", fontWeight: 500 }}>
+                            <span key={tag} style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(15,154,108,0.15)", color: "var(--pos)", fontWeight: 500 }}>
                               {tag}
                             </span>
                           ))}
@@ -142,8 +142,8 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                       <td style={{ ...tdStyle, textAlign: "center" }}>
                         <span style={{
                           fontSize: 9, padding: "2px 6px", borderRadius: 3, fontWeight: 500,
-                          background: item.risk === "low" ? "rgba(8,153,129,0.15)" : item.risk === "medium" ? "rgba(255,152,0,0.15)" : "rgba(242,54,69,0.15)",
-                          color: item.risk === "low" ? "#089981" : item.risk === "medium" ? "#e65100" : "#f23645",
+                          background: item.risk === "low" ? "rgba(15,154,108,0.15)" : item.risk === "medium" ? "rgba(255,152,0,0.15)" : "rgba(205,74,64,0.15)",
+                          color: item.risk === "low" ? "var(--pos)" : item.risk === "medium" ? "var(--warn)" : "var(--neg)",
                         }}>
                           {item.risk === "low" ? "Låg" : item.risk === "medium" ? "Medel" : "Hög"}
                         </span>
@@ -155,7 +155,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
                     </td>
                     <td style={{ ...tdStyle, ...(isMobile ? tdMobile : {}), textAlign: "center" }}>
                       {isAdded ? (
-                        <span style={{ fontSize: 10, color: "#089981" }}>✓ Tillagd</span>
+                        <span style={{ fontSize: 10, color: "var(--pos)" }}>✓ Tillagd</span>
                       ) : (
                         <button
                           onClick={(e) => { e.stopPropagation(); addToWatchlist(item); }}

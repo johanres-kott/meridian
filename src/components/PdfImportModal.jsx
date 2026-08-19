@@ -86,7 +86,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
         <div style={{ fontWeight: 600, fontSize: 16, color: "var(--text)", marginBottom: 20 }}>Importera portfölj från PDF</div>
 
         {error && (
-          <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "#c62828", marginBottom: 16 }}>
+          <div style={{ background: "var(--bg-secondary)", border: "1px solid #fce4ec", borderRadius: 6, padding: "10px 14px", fontSize: 12, color: "var(--neg)", marginBottom: 16 }}>
             {error}
           </div>
         )}
@@ -169,7 +169,7 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                           style={{
                             width: 110,
                             padding: "3px 6px",
-                            border: `1px solid ${row.matched ? "var(--border)" : "#f23645"}`,
+                            border: `1px solid ${row.matched ? "var(--border)" : "var(--neg)"}`,
                             borderRadius: 3,
                             fontSize: 11,
                             fontFamily: "monospace",
@@ -196,11 +196,11 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
                       </td>
                       <td style={tdStyle}>
                         {row.duplicate ? (
-                          <span style={{ color: "#e65100", fontSize: 11 }}>Finns redan</span>
+                          <span style={{ color: "var(--warn)", fontSize: 11 }}>Finns redan</span>
                         ) : row.matched ? (
                           <span style={{ color: "#1b5e20", fontSize: 11 }}>Ny</span>
                         ) : (
-                          <span style={{ color: "#c62828", fontSize: 11 }}>Ej matchad</span>
+                          <span style={{ color: "var(--neg)", fontSize: 11 }}>Ej matchad</span>
                         )}
                       </td>
                     </tr>
@@ -238,5 +238,5 @@ export default function PdfImportModal({ onClose, onImport, existingTickers }) {
 
 const thStyle = { padding: "8px 6px", fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 };
 const tdStyle = { padding: "8px 6px" };
-const btnSecondary = { padding: "7px 16px", border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
+const btnSecondary = { padding: "7px 16px", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", color: "var(--text)" };
 const btnPrimary = { padding: "7px 16px", border: "none", borderRadius: 4, background: "var(--accent)", color: "#fff", cursor: "pointer", fontSize: 12, fontFamily: "inherit" };

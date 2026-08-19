@@ -8,7 +8,7 @@ export default function InfoCard({ company, leadershipData }) {
   ];
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-light)" }}>
         <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 12 }}>
           Bolagsinfo
@@ -17,10 +17,10 @@ export default function InfoCard({ company, leadershipData }) {
           <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
             <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{r.label}</span>
             {r.href
-              ? <a href={r.href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", fontFamily: "'IBM Plex Mono', monospace" }}>
+              ? <a href={r.href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", fontFamily: "var(--font-mono)" }}>
                   {r.value}
                 </a>
-              : <span style={{ fontSize: 11, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
+              : <span style={{ fontSize: 11, color: "var(--text)", fontFamily: "var(--font-mono)", fontWeight: 500 }}>
                   {r.value}
                 </span>
             }
@@ -35,7 +35,7 @@ export default function InfoCard({ company, leadershipData }) {
             <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Ledarskapsdata</span>
             <Badge
               text={leadershipData.source === "live" ? "● Live" : "Cached"}
-              color={leadershipData.source === "live" ? "#089981" : "#b2b5be"}
+              color={leadershipData.source === "live" ? "var(--pos)" : "#b2b5be"}
               bg={leadershipData.source === "live" ? "#e8f5f1" : "#f5f5f5"}
             />
           </div>

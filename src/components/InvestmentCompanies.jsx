@@ -11,20 +11,40 @@ import LeadershipPanel from "./investment/LeadershipPanel.jsx";
 import InfoCard from "./investment/InfoCard.jsx";
 import CompanySelector, { COMPANIES } from "./investment/CompanySelector.jsx";
 import HoldingsTable from "./investment/HoldingsTable.jsx";
+import InvestLanding from "./investment/InvestLanding.jsx";
+import BaseFundCard from "./BaseFundCard.jsx";
+import FeeScanCard from "./FeeScanCard.jsx";
 import FundSuggestions from "./FundSuggestions.jsx";
 import FundEducation from "./FundEducation.jsx";
 import PensionInvest from "./PensionInvest.jsx";
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function InvestmentCompanies({ onNavigate }) {
+export default function InvestmentCompanies({ onNavigate, deepLink, onClearDeepLink }) {
   const { userId, preferences } = useUser();
   const isMobile = useIsMobile();
   const [selectedId, setSelectedId] = useState("investor");
   const [tickers, setTickers] = useState([]);
   const [suggestMode, setSuggestMode] = useState("stock"); // "stock" | "fund"
-  const [subTab, setSubTab] = useState("toppforslag");
+  const [subTab, setSubTab] = useState("start");
+  const [fundDefaults, setFundDefaults] = useState(null); // { category, type } from deep link
+  const [handledLink, setHandledLink] = useState(null);
   const company = COMPANIES.find(c => c.id === selectedId);
+
+  // Deep link från t.ex. "Din bas"-kortet: hoppa till rätt underflik och fondfilter.
+  // Lokal state justeras under render (React-mönstret för härledd state);
+  // förälderns deepLink nollställs i en effekt eftersom det är extern state.
+  if (deepLink?.subTab && deepLink !== handledLink) {
+    setHandledLink(deepLink);
+    setSubTab(deepLink.subTab);
+    if (deepLink.suggestMode) setSuggestMode(deepLink.suggestMode);
+    if (deepLink.fundCategory || deepLink.fundType) {
+      setFundDefaults({ category: deepLink.fundCategory, type: deepLink.fundType });
+    }
+  }
+  useEffect(() => {
+    if (deepLink?.subTab) onClearDeepLink?.();
+  }, [deepLink, onClearDeepLink]);
 
   useEffect(() => {
     if (!userId) return;
@@ -49,6 +69,7 @@ export default function InvestmentCompanies({ onNavigate }) {
       {/* ── Sub-navigation ── */}
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", marginBottom: 24 }}>
         {[
+          { id: "start", label: "Start" },
           { id: "toppforslag", label: "Toppförslag" },
           { id: "pension", label: "Pension" },
           { id: "investmentbolag", label: "Investmentbolag" },
@@ -70,6 +91,29 @@ export default function InvestmentCompanies({ onNavigate }) {
           </button>
         ))}
       </div>
+
+      {/* ── Start: produktkort (Finary-inspirerat, se PIVOT.md) ── */}
+      {subTab === "start" && (
+        <>
+          {/* Råd-korten (flyttade från Hem i Finary-IA-städningen): status på basen + avgiftskoll */}
+          <BaseFundCard isMobile={isMobile} onNavigate={onNavigate} />
+          <FeeScanCard isMobile={isMobile} onNavigate={onNavigate} />
+          <InvestLanding
+            isMobile={isMobile}
+            onNavigate={onNavigate}
+            onFunds={() => {
+              setSuggestMode("fund");
+              setFundDefaults({ category: "aktie_global", type: "index" });
+              setSubTab("toppforslag");
+            }}
+            onStocks={() => {
+              setSuggestMode("stock");
+              setSubTab("toppforslag");
+            }}
+            onPension={() => setSubTab("pension")}
+          />
+        </>
+      )}
 
       {/* ── Smart Suggestions ── */}
       {subTab === "toppforslag" && <div style={{ marginBottom: 32 }}>
@@ -98,7 +142,7 @@ export default function InvestmentCompanies({ onNavigate }) {
         </div>
         {suggestMode === "fund" ? (
           <>
-            <FundSuggestions isMobile={isMobile} onNavigate={onNavigate} />
+            <FundSuggestions key={fundDefaults ? `${fundDefaults.category}-${fundDefaults.type}` : "default"} isMobile={isMobile} onNavigate={onNavigate} initialCategory={fundDefaults?.category} initialType={fundDefaults?.type} />
             <FundEducation />
           </>
         ) : preferences.investorProfile ? (
@@ -109,7 +153,7 @@ export default function InvestmentCompanies({ onNavigate }) {
             onNavigate={onNavigate}
           />
         ) : (
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: 20, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: 20, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)" }}>
             Skapa en investerarprofil för att få aktieförslag anpassade efter dig.
           </div>
         )}
@@ -134,7 +178,7 @@ export default function InvestmentCompanies({ onNavigate }) {
 
       {/* ── Company hero ── */}
       <div style={{
-        background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8,
+        background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
         padding: isMobile ? "14px 12px" : "20px 24px", marginBottom: 16,
         display: "flex", flexDirection: isMobile ? "column" : "row",
         alignItems: isMobile ? "flex-start" : "center",
@@ -165,12 +209,12 @@ export default function InvestmentCompanies({ onNavigate }) {
         <div style={{ display: "flex", gap: 12, alignItems: "center", ...(isMobile ? { width: "100%", justifyContent: "space-between" } : {}) }}>
           {companyData?.price != null && (
             <div style={{ textAlign: isMobile ? "left" : "right" }}>
-              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "'IBM Plex Mono', monospace", color: "var(--text)" }}>
+              <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 300, fontFamily: "var(--font-mono)", color: "var(--text)" }}>
                 {companyData.price.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 4 }}>{companyData.currency}</span>
               </div>
               {companyData.changePercent != null && (
-                <div style={{ fontSize: 12, fontWeight: 500, color: companyData.changePercent >= 0 ? "#089981" : "#f23645" }}>
+                <div style={{ fontSize: 12, fontWeight: 500, color: companyData.changePercent >= 0 ? "var(--pos)" : "var(--neg)" }}>
                   {companyData.changePercent >= 0 ? "+" : ""}{companyData.changePercent.toFixed(2)}%
                 </div>
               )}
@@ -179,7 +223,7 @@ export default function InvestmentCompanies({ onNavigate }) {
           {leadershipData && (
             <Badge
               text={leadershipData.source === "live" ? "● Live data" : "Cached data"}
-              color={leadershipData.source === "live" ? "#089981" : "#b2b5be"}
+              color={leadershipData.source === "live" ? "var(--pos)" : "#b2b5be"}
               bg={leadershipData.source === "live" ? "#e8f5f1" : "#f5f5f5"}
             />
           )}
@@ -193,25 +237,25 @@ export default function InvestmentCompanies({ onNavigate }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
           {/* Leadership */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Ledning</SectionLabel>
             <LeadershipPanel companyId={selectedId} isMobile={isMobile} />
           </div>
 
           {/* Price chart */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Kursutveckling</SectionLabel>
             <PriceChart ticker={fullTicker} />
           </div>
 
           {/* Holdings */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel>Innehav</SectionLabel>
             <HoldingsTable companyId={selectedId} />
           </div>
 
           {/* Press releases */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
                 <Badge text="Pressreleaser" color="var(--text-secondary)" bg="var(--border-light)" />
@@ -226,7 +270,7 @@ export default function InvestmentCompanies({ onNavigate }) {
           </div>
 
           {/* EFN */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: isMobile ? "14px 12px" : "18px 20px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 12px" : "18px 20px" }}>
             <SectionLabel
               action={
                 <Badge text="EFN.se" color="var(--accent)" bg="var(--accent-light)" />
@@ -246,7 +290,7 @@ export default function InvestmentCompanies({ onNavigate }) {
           <InfoCard company={company} leadershipData={leadershipData} />
 
           {/* Quick links */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 16px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: "14px 16px" }}>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 10 }}>
               Snabblänkar
             </div>

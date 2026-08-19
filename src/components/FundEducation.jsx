@@ -13,17 +13,17 @@ function FeeCalculator() {
   }
 
   const maxValue = calcValue(0);
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: 16, marginTop: 12 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16, marginTop: 12 }}>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>Avgiftens påverkan</div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
         <div>
           <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Startbelopp</label>
           <select value={amount} onChange={e => setAmount(Number(e.target.value))}
-            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
+            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
             <option value={50000}>50 000 kr</option>
             <option value={100000}>100 000 kr</option>
             <option value={500000}>500 000 kr</option>
@@ -33,7 +33,7 @@ function FeeCalculator() {
         <div>
           <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Sparhorisont</label>
           <select value={years} onChange={e => setYears(Number(e.target.value))}
-            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
+            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
             <option value={5}>5 år</option>
             <option value={10}>10 år</option>
             <option value={20}>20 år</option>
@@ -44,7 +44,7 @@ function FeeCalculator() {
         <div>
           <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Årlig avkastning (före avgift)</label>
           <select value={returnPct} onChange={e => setReturnPct(Number(e.target.value))}
-            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--border)", borderRadius: 4, background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
+            style={{ padding: "5px 8px", fontSize: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "inherit" }}>
             <option value={5}>5%</option>
             <option value={7}>7%</option>
             <option value={8}>8%</option>
@@ -66,7 +66,7 @@ function FeeCalculator() {
                 <span style={{ ...mono, fontWeight: 500, color: "var(--text)" }}>
                   {Math.round(value).toLocaleString("sv-SE")} kr
                 </span>
-                <span style={{ ...mono, fontSize: 11, color: "#f23645", width: 120, textAlign: "right" }}>
+                <span style={{ ...mono, fontSize: 11, color: "var(--neg)", width: 120, textAlign: "right" }}>
                   {lost > 0 ? `−${Math.round(lost).toLocaleString("sv-SE")} kr` : ""}
                 </span>
               </div>
@@ -74,7 +74,7 @@ function FeeCalculator() {
                 <div style={{
                   height: "100%",
                   width: `${pctOfMax}%`,
-                  background: isLow ? "#089981" : fee >= 1.5 ? "#f23645" : "#ff9800",
+                  background: isLow ? "var(--pos)" : fee >= 1.5 ? "var(--neg)" : "var(--warn)",
                   borderRadius: 4,
                   transition: "width 0.3s",
                 }} />
@@ -109,7 +109,7 @@ export default function FundEducation() {
 
       <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 16 }}>
         {/* Passive vs Active */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: 16 }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Passiv (index) vs aktiv förvaltning</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.7 }}>
             <p style={{ margin: "0 0 8px" }}>
@@ -128,7 +128,7 @@ export default function FundEducation() {
         <FeeCalculator />
 
         {/* Star rating */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, padding: 16 }}>
+        <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>Morningstar-betyg</div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.7 }}>
             <p style={{ margin: "0 0 8px" }}>
@@ -141,8 +141,8 @@ export default function FundEducation() {
         </div>
 
         {/* Tips */}
-        <div style={{ background: "rgba(8,153,129,0.06)", border: "1px solid rgba(8,153,129,0.2)", borderRadius: 8, padding: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#089981", marginBottom: 8 }}>Tumregler</div>
+        <div style={{ background: "rgba(15,154,108,0.06)", border: "1px solid rgba(15,154,108,0.2)", borderRadius: 8, padding: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--pos)", marginBottom: 8 }}>Tumregler</div>
           <ul style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, margin: 0, paddingLeft: 18 }}>
             <li>Jämför alltid avgiften — det är det enda du kan kontrollera</li>
             <li>En indexfond med 0.2% avgift behöver ingen förvaltare som "slår marknaden"</li>

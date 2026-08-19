@@ -52,7 +52,7 @@ function TreemapCell({ x, y, width, height, name, ticker, valueSek, changePercen
         </text>
       )}
       {showPct && (
-        <text x={x + 6} y={y + 6 + fontSize * 2.1} fontSize={Math.max(10, fontSize - 1)} fontWeight={600} fill={fg} fontFamily="'IBM Plex Mono', monospace">
+        <text x={x + 6} y={y + 6 + fontSize * 2.1} fontSize={Math.max(10, fontSize - 1)} fontWeight={600} fill={fg} fontFamily="var(--font-mono)">
           {fmtPct(changePercent)}
         </text>
       )}
@@ -128,7 +128,7 @@ export default function PortfolioTreemap({ items, prices, fxRates, onSelect, isM
             <div key={i} style={{ flex: 1, background: s.bg }} />
           ))}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--text-secondary, #787b86)", fontFamily: "'IBM Plex Mono', monospace" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--text-secondary, #787b86)", fontFamily: "var(--font-mono)" }}>
           <span>≤ −3%</span>
           <span>−1,5%</span>
           <span>0%</span>

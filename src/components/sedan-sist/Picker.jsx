@@ -22,7 +22,7 @@ export default function Picker({ items, selected, onSave, onCancel, isMobile }) 
               style={{ accentColor: "var(--accent)" }}
             />
             <span style={{ color: "var(--text)" }}>{item.name}</span>
-            <span style={{ color: "var(--text-muted)", fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}>{item.symbol}</span>
+            <span style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontSize: 10 }}>{item.symbol}</span>
           </label>
         ))}
       </div>

@@ -47,7 +47,7 @@ export default function ImportGuide({ onClose, onStartImport }) {
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>
               Importera från Avanza
             </div>
             <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>
@@ -64,7 +64,7 @@ export default function ImportGuide({ onClose, onStartImport }) {
                 width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
                 background: "var(--accent)", color: "#fff",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 13, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 13, fontWeight: 700, fontFamily: "var(--font-mono)",
               }}>
                 {step.number}
               </div>
@@ -81,7 +81,7 @@ export default function ImportGuide({ onClose, onStartImport }) {
                     background: "var(--bg-secondary)", fontSize: 11, color: "var(--text-secondary)",
                     lineHeight: 1.5, borderLeft: "3px solid var(--accent)",
                   }}>
-                    💡 {step.tip}
+                    {step.tip}
                   </div>
                 )}
                 {/* Placeholder for future screenshots */}

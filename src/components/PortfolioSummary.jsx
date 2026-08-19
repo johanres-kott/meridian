@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "../supabase.js";
 import { Chg, StatCard } from "./SharedComponents.jsx";
-import { parseFxRates } from "../hooks/useFxRates.js";
 import { STATUS_COLORS } from "../constants.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import { getPensionTotalValue } from "../lib/pension.js";
+import { getPortfolioValuation } from "../lib/portfolioValue.js";
 
 export default function PortfolioSummary({ isMobile, onNavigate }) {
   const { userId, preferences } = useUser();
@@ -19,80 +18,12 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
 
     async function load() {
       try {
-        const { data: watchlist } = await supabase
-          .from("watchlist")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at");
+        const { empty, watchlist, priced, holdings, currencyGroups, totalSek, dailyChangeSek } = await getPortfolioValuation(userId);
 
-        if (!watchlist || watchlist.length === 0) {
+        if (empty) {
           setData({ empty: true });
           setLoading(false);
           return;
-        }
-
-        // Fetch prices + FX rates in parallel
-        const [pricedResults, commoditiesRes] = await Promise.all([
-          Promise.all(
-            watchlist.slice(0, 20).map(async (item) => {
-              try {
-                const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
-                const d = await res.json();
-                return { ...item, price: d.price || 0, changePercent: d.changePercent || 0, currency: d.currency };
-              } catch (err) {
-                console.error(`PortfolioSummary: failed to fetch ${item.ticker}:`, err);
-                return { ...item, price: 0, changePercent: 0 };
-              }
-            })
-          ),
-          fetch("/api/commodities").then(r => r.json()).catch(() => []),
-        ]);
-        const priced = pricedResults;
-
-        // Build FX rates to SEK from commodities API
-        const fxToSek = parseFxRates(commoditiesRes);
-
-        // Portfolio value (only "Äger" with shares), grouped by currency
-        const holdings = priced.filter(i => i.status === "Äger" && i.shares && i.price);
-
-        // Fetch missing FX rates from Yahoo Finance
-        const holdingCurrencies = [...new Set(holdings.map(h => h.currency || "SEK"))];
-        const missingCurrencies = holdingCurrencies.filter(c => !fxToSek[c]);
-        if (missingCurrencies.length > 0) {
-          await Promise.all(missingCurrencies.map(async (cur) => {
-            try {
-              const res = await fetch(`/api/company?ticker=${encodeURIComponent(cur + "SEK=X")}`);
-              const d = await res.json();
-              if (d.price > 0) fxToSek[cur] = d.price;
-            } catch (err) { console.error(`PortfolioSummary: FX rate fetch failed for ${cur}:`, err); }
-          }));
-        }
-        const byCurrency = {};
-        for (const h of holdings) {
-          const cur = h.currency || "SEK";
-          if (!byCurrency[cur]) byCurrency[cur] = { value: 0, dailyChange: 0 };
-          byCurrency[cur].value += h.price * h.shares;
-          const prevPrice = h.price / (1 + h.changePercent / 100);
-          byCurrency[cur].dailyChange += (h.price - prevPrice) * h.shares;
-        }
-        const currencyGroups = Object.entries(byCurrency).map(([currency, { value, dailyChange }]) => ({
-          currency,
-          value,
-          dailyChange,
-          dailyChangePct: value > 0 ? (dailyChange / (value - dailyChange)) * 100 : 0,
-        }));
-
-        // Calculate total in SEK if multiple currencies
-        let totalSek = null;
-        let dailyChangeSek = null;
-        const hasMultipleCurrencies = currencyGroups.length > 1;
-        const allConvertible = currencyGroups.every(g => fxToSek[g.currency] != null);
-        if (hasMultipleCurrencies && allConvertible) {
-          totalSek = currencyGroups.reduce((sum, g) => sum + g.value * fxToSek[g.currency], 0);
-          dailyChangeSek = currencyGroups.reduce((sum, g) => sum + g.dailyChange * fxToSek[g.currency], 0);
-        } else if (currencyGroups.length === 1 && currencyGroups[0].currency !== "SEK" && fxToSek[currencyGroups[0].currency]) {
-          totalSek = currencyGroups[0].value * fxToSek[currencyGroups[0].currency];
-          dailyChangeSek = currencyGroups[0].dailyChange * fxToSek[currencyGroups[0].currency];
         }
 
         // Status counts
@@ -143,10 +74,10 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
 
   const sectionHeader = { fontSize: isMobile ? 10 : 11, fontWeight: 500, color: "var(--text-secondary)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: isMobile ? 6 : 10 };
   const listItem = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: isMobile ? "4px 0" : "5px 0", borderBottom: "1px solid var(--border-light)" };
-  const mono = { fontFamily: "'IBM Plex Mono', monospace" };
+  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "10px 12px" : "12px 20px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)" }}>{t("portfolioSummary.title")}</span>
         <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>{t("portfolioSummary.companiesCount", { count: data.totalCount })}</span>
@@ -162,7 +93,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
                 <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>
                   {data.totalSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK
                 </div>
-                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: data.dailyChangeSek >= 0 ? "#089981" : "#f23645" }}>
+                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: data.dailyChangeSek >= 0 ? "var(--pos)" : "var(--neg)" }}>
                   {data.dailyChangeSek >= 0 ? "+" : ""}{data.dailyChangeSek.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK {t("portfolioSummary.today")} ({data.dailyChangeSekPct >= 0 ? "+" : ""}{data.dailyChangeSekPct.toFixed(2)}%)
                 </div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>{t("portfolioSummary.convertedToSek")}</div>
@@ -173,7 +104,7 @@ export default function PortfolioSummary({ isMobile, onNavigate }) {
                 <div style={{ ...mono, fontSize: 14, fontWeight: 500, color: "var(--text)" }}>
                   {g.value.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} {g.currency}
                 </div>
-                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "#089981" : "#f23645" }}>
+                <div style={{ ...mono, fontSize: 11, marginTop: 2, color: g.dailyChange >= 0 ? "var(--pos)" : "var(--neg)" }}>
                   {g.dailyChange >= 0 ? "+" : ""}{g.dailyChange.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} {g.currency} {t("portfolioSummary.today")} ({g.dailyChangePct >= 0 ? "+" : ""}{g.dailyChangePct.toFixed(2)}%)
                 </div>
               </div>

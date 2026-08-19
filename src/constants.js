@@ -8,10 +8,10 @@ export const STATUSES = ["Bevakar", "Analyserar", "Intressant", "Äger", "Avstå
 
 export const STATUS_COLORS = {
   Bevakar:     { bg: "var(--bg-secondary)", color: "var(--text-secondary)" },
-  Analyserar:  { bg: "rgba(255,152,0,0.15)", color: "#e65100" },
-  Intressant:  { bg: "rgba(8,153,129,0.15)", color: "#089981" },
-  Äger:        { bg: "rgba(41,98,255,0.15)", color: "var(--accent)" },
-  Avstår:      { bg: "rgba(242,54,69,0.15)", color: "#f23645" },
+  Analyserar:  { bg: "rgba(255,152,0,0.15)", color: "var(--warn)" },
+  Intressant:  { bg: "rgba(15,154,108,0.15)", color: "var(--pos)" },
+  Äger:        { bg: "rgba(15,122,92,0.15)", color: "var(--accent)" },
+  Avstår:      { bg: "rgba(205,74,64,0.15)", color: "var(--neg)" },
 };
 
 // --- Country flags by exchange suffix ---
@@ -62,7 +62,7 @@ export const SECTOR_SV = {
 
 // --- Risk colors (also available via CSS vars --green/--red/--orange) ---
 export const COLORS = {
-  green: "#089981",
-  red: "#f23645",
-  orange: "#ff9800",
+  green: "var(--pos)",
+  red: "var(--neg)",
+  orange: "var(--warn)",
 };

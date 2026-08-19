@@ -14,7 +14,7 @@ export default function LandingPage({ onShowPrivacy }) {
     return (
       <div>
         <div style={{ padding: isMobile ? "12px 16px" : "12px 48px", display: "flex", alignItems: "center" }}>
-          <button onClick={() => setShowLogin(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#2962ff", fontFamily: "inherit" }}>
+          <button onClick={() => setShowLogin(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--brand)", fontFamily: "inherit" }}>
             ← Tillbaka
           </button>
         </div>
@@ -27,17 +27,10 @@ export default function LandingPage({ onShowPrivacy }) {
   const handleSignup = () => { setDefaultMode("signup"); setShowLogin(true); };
 
   return (
-    <div style={{ minHeight: "100vh", fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", fontFamily: "var(--font-sans)", background: "var(--bg)", color: "var(--ink)", overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .fu { animation: fadeUp 0.7s ease-out both; }
-        .fu1 { animation-delay: 0.15s; }
-        .fu2 { animation-delay: 0.3s; }
-        .fu3 { animation-delay: 0.45s; }
-        .fu4 { animation-delay: 0.6s; }
+        html { scroll-behavior: smooth; }
       `}</style>
 
       <Hero isMobile={isMobile} onLogin={handleLogin} onSignup={handleSignup} />

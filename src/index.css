@@ -1,22 +1,105 @@
-:root {
-  --bg: #fff;
-  --bg-secondary: #f8f9fd;
-  --bg-card: #fff;
-  --text: #131722;
-  --text-secondary: #787b86;
-  --text-muted: #b2b5be;
-  --border: #e0e3eb;
-  --border-light: #f0f3fa;
-  --accent: #2962ff;
-  --accent-light: #eef2ff;
-  --green: #089981;
-  --red: #f23645;
-  --orange: #ff9800;
+/* ============================================================
+   Thesion designsystem (2026) — tokens
+   Källa: "Thesion design-system" (readme/tokens). Grönt brand med guldaccent,
+   Newsreader (display) / Schibsted Grotesk (UI) / Spline Sans Mono (siffror).
+   Nära-vit bakgrund, aldrig beige. Inga gradienter. Se DESIGN.md.
+   ============================================================ */
 
-  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Spline+Sans+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ---- Neutrals (nära vitt — aldrig beige) ---- */
+  --bg: #F6F7F5;              /* test: kantlösa kort — bakgrunden ett snäpp mörkare så vita kort lyfter */
+  --bg-raised: #F5F7F6;
+  --surface-card: #FFFFFF;
+  --ink: #121B17;
+  --text: var(--ink);
+  --text-secondary: #5C6763;
+  --text-muted: #99A29D;
+  --border: #E6EAE8;
+  --card-border: transparent; /* test: kortens kant borttagen (sätt till var(--border) för att få tillbaka) */
+  --border-light: #F0F3F1;
+
+  /* ---- Brand: grön skala ---- */
+  --green-050: #F0FAF5;
+  --green-100: #DFF3EA;
+  --green-200: #B9E6D3;
+  --green-400: #2CB98D;
+  --green-500: #14A87D;
+  --green-600: #0F7A5C;
+  --green-700: #0C5C46;
+  --green-900: #0B2E24;
+
+  /* ---- Accent: guld/sand ---- */
+  --gold-100: #F5EDDF;
+  --gold-300: #DFC9A1;
+  --gold-500: #C39A5E;
+  --gold-700: #96733C;
+
+  /* ---- Semantiska alias ---- */
+  --brand: var(--green-600);          /* knappar, länkar, aktiva states */
+  --brand-strong: var(--green-500);   /* grafer, badges, livlig grön */
+  --brand-tint: var(--green-050);     /* tonade ytor bakom grönt innehåll */
+  --gold: var(--gold-500);            /* premium-detaljer, markörer (sparsamt) */
+  --surface-page: var(--bg);
+  --surface-dark: var(--green-900);   /* mörka sektioner, footer, hero-inslag */
+  --on-dark: #F3F7F5;
+  --on-dark-secondary: rgba(243, 247, 245, 0.62);
+  --on-dark-muted: rgba(243, 247, 245, 0.38);
+  --on-dark-border: rgba(243, 247, 245, 0.14);
+
+  /* ---- Marknadsdata ---- */
+  --pos: #0F9A6C;
+  --pos-bg: #E4F5EE;
+  --neg: #CD4A40;
+  --neg-bg: #FAEBE9;
+  --warn: #B97B1E;
+  --warn-bg: #F8EFDC;
+
+  /* ---- Status (bevakningslistan) ---- */
+  --status-bevakar-bg: var(--bg-raised);     --status-bevakar-fg: var(--text-secondary);
+  --status-analyserar-bg: var(--warn-bg);    --status-analyserar-fg: var(--warn);
+  --status-intressant-bg: var(--green-100);  --status-intressant-fg: var(--green-600);
+  --status-ager-bg: var(--gold-100);         --status-ager-fg: var(--gold-700);
+  --status-avstar-bg: var(--neg-bg);         --status-avstar-fg: var(--neg);
+
+  /* ---- Typografi ---- */
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Schibsted Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Spline Sans Mono', 'SF Mono', Menlo, monospace;
+
+  /* ---- Spacing & radier ---- */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px; --space-5: 20px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px;
+  --radius-sm: 6px;     /* inputs, små chips i tabeller */
+  --radius-md: 10px;    /* selects, mindre kort */
+  --radius-lg: 14px;    /* kort, paneler */
+  --radius-xl: 20px;    /* stora marknadsföringskort */
+  --radius-pill: 999px; /* knappar, badges, taggar */
+  --container-app: 1160px;
+
+  /* ---- Effekter ---- */
+  --shadow-xs: 0 1px 2px rgba(11, 46, 36, 0.05);
+  --shadow-card: 0 1px 2px rgba(11, 46, 36, 0.04), 0 2px 8px rgba(11, 46, 36, 0.04);
+  --shadow-raised: 0 4px 12px rgba(11, 46, 36, 0.07), 0 12px 32px rgba(11, 46, 36, 0.07);
+  --shadow-overlay: 0 8px 24px rgba(11, 46, 36, 0.1), 0 24px 64px rgba(11, 46, 36, 0.14);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --focus-ring: 0 0 0 3px rgba(20, 168, 125, 0.28);
+
+  /* ---- Bakåtkompatibla alias (befintlig kod) ---- */
+  --bg-secondary: var(--bg-raised);
+  --bg-card: var(--surface-card);
+  --accent: var(--brand);
+  --accent-light: var(--green-050);
+  --green: var(--pos);
+  --red: var(--neg);
+  --orange: var(--warn);
+
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,51 +107,54 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0f1118;
-  --bg-secondary: #1a1d29;
-  --bg-card: #1e2130;
-  --text: #e1e3e8;
-  --text-secondary: #8b8fa3;
-  --text-muted: #555971;
-  --border: #2a2d3a;
-  --border-light: #1e2130;
-  --accent: #5b9aff;
-  --accent-light: #1a2744;
+  --bg: #0C1411;
+  --bg-raised: #121D18;
+  --surface-card: #101A15;
+  --ink: #E8EEEB;
+  --text: var(--ink);
+  --text-secondary: #93A19A;
+  --text-muted: #5C6B64;
+  --border: #1E2B25;
+  --card-border: transparent;
+  --border-light: #16211C;
+  --brand: var(--green-500);
+  --brand-tint: rgba(20, 168, 125, 0.12);
+  --pos-bg: rgba(15, 154, 108, 0.14);
+  --neg-bg: rgba(205, 74, 64, 0.14);
+  --warn-bg: rgba(185, 123, 30, 0.14);
+  --gold-100: rgba(195, 154, 94, 0.16);
+  --status-bevakar-bg: var(--bg-raised);
+  --status-ager-fg: var(--gold-300);
+  --accent-light: rgba(20, 168, 125, 0.12);
 }
 
-a {
-  font-weight: 500;
-  color: var(--accent);
-  text-decoration: inherit;
-}
-a:hover {
-  color: var(--accent);
-}
+* { box-sizing: border-box; }
+
+a { font-weight: 500; color: var(--brand); text-decoration: inherit; }
+a:hover { color: var(--green-700); }
+
+::selection { background: var(--green-100); color: var(--green-900); }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--surface-page);
   color: var(--text);
+  font-family: var(--font-sans);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+h1 { font-size: 3.2em; line-height: 1.1; }
 
 button {
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color var(--duration-base) var(--ease-out), background var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out);
 }
-
-* {
-  box-sizing: border-box;
-}
+button:focus-visible, input:focus-visible, select:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+input, select, textarea { font-family: inherit; }

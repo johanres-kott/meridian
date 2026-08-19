@@ -9,7 +9,9 @@
     "investment": "Invest",
     "analysis": "Analysis",
     "commodities": "Markets",
-    "search": "Search"
+    "search": "Search",
+    "addAssets": "Add assets",
+    "goals": "Goals"
   },
   "profile": {
     "language": "Language"
@@ -24,7 +26,9 @@
       "holdings": "Holdings",
       "overview": "Overview",
       "thesisReview": "Thesis review",
-      "pension": "Pension"
+      "pension": "Pension",
+      "watch": "Watchlist",
+      "assets": "Assets"
     },
     "exportCsv": "Export CSV",
     "exportCsvShort": "⬇ CSV",
@@ -120,5 +124,94 @@
     "noNews": "No news",
     "customize": "Customize",
     "cancel": "Cancel"
+  },
+  "baseFund": {
+    "title": "Your base",
+    "inPlaceTitle": "Your base is in place",
+    "inPlaceText": "You own a global index fund — a broad, low-cost foundation to build on.",
+    "fee": "Fee",
+    "index": "Index fund",
+    "nudgeText": "A common way to build savings is a low-cost global index fund as the base — individual stocks become the spice on top. You don't own a global index fund yet.",
+    "cta": "Explore global index funds →",
+    "disclaimer": "General information, not personal financial advice."
+  },
+  "feeScan": {
+    "title": "Fee check",
+    "intro": "Your active funds compared with the cheapest global index fund in our list ({{name}}, {{fee}} % fee):",
+    "perYear": "kr/year difference",
+    "feeLabel": "fee",
+    "total": "Total ≈ {{amount}} kr per year in fee difference",
+    "disclaimer": "Based on current holding value and fees (source: Morningstar). Funds differ in focus and risk — general information, not personal financial advice."
+  },
+  "myFinances": {
+    "title": "My finances",
+    "netWorth": "Net worth",
+    "portfolio": "Portfolio",
+    "pension": "Pension",
+    "assets": "Assets",
+    "debts": "Debts",
+    "portfolioUnavailable": "The portfolio value could not be converted to SEK and is not included in the total.",
+    "add": "+ Add asset or debt",
+    "labelPlaceholder": "Name (e.g. Apartment)",
+    "valuePlaceholder": "Value in kr",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveError": "Could not save. Has the manual_assets migration been run in Supabase?",
+    "kinds": {
+      "bostad": "Home",
+      "fordon": "Vehicle",
+      "sparkonto": "Savings account",
+      "buffert": "Emergency fund",
+      "ovrigt": "Other asset",
+      "bolan": "Mortgage",
+      "skuld": "Other debt"
+    },
+    "todayPortfolio": "today (portfolio)"
+  },
+  "assetBreakdown": {
+    "title": "Breakdown",
+    "assets": "Assets",
+    "debts": "Debts",
+    "total": "Total",
+    "empty": "Add assets to see your breakdown.",
+    "cats": {
+      "stocks": "Stocks",
+      "funds": "Funds",
+      "pension": "Pension",
+      "bostad": "Home",
+      "fordon": "Vehicles",
+      "cash": "Savings & cash",
+      "ovrigt": "Other",
+      "bolan": "Mortgage",
+      "skuld": "Other debts"
+    }
+  },
+  "assetTable": {
+    "title": "Assets",
+    "assets": "Assets",
+    "debts": "Debts",
+    "search": "Search",
+    "allTypes": "All types",
+    "name": "Name",
+    "type": "Type",
+    "share": "Share",
+    "value": "Value",
+    "total": "Total",
+    "count": "{{count}} items",
+    "empty": "No assets yet — click “+ Add assets” at the top right.",
+    "noMatch": "Nothing matches the filter."
+  },
+  "homeMovers": "Today's movers",
+  "range": {
+    "periodChange": "{{label}}",
+    "labels": {
+      "1w": "past week",
+      "1m": "past month",
+      "3m": "past 3 months",
+      "6m": "past 6 months",
+      "ytd": "year to date",
+      "1y": "past year",
+      "all": "all time"
+    }
   }
 }

@@ -2,16 +2,43 @@ import { useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Line, ComposedChart } from "recharts";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { useUser } from "../contexts/UserContext.jsx";
-import { RANGES, INDEXES } from "../lib/portfolioChartConstants.js";
+import { RANGES, INDEXES, DEFAULT_RANGE, rangeCutoff } from "../lib/portfolioChartConstants.js";
+import { useEffect } from "react";
 import usePortfolioData from "../hooks/usePortfolioData.js";
 
-export default function PortfolioChart({ compact = false }) {
+// offsetSek: pension + manuella tillgångar − skulder från useNetWorth. När det
+// är satt visar grafen nettoförmögenhet — de posterna har ingen kurshistorik,
+// så de ingår med sitt nuvarande inmatade värde (plattas bakåt, noteras i UI).
+// range/onRangeChange: styrt utifrån (global RangeBar à la Finary); utan dem
+// har grafen egen lokal väljare (äldre användning). onPeriodChange rapporterar
+// periodens förändring uppåt så heron kan visa den.
+export default function PortfolioChart({ compact = false, offsetSek = 0, range: controlledRange, onRangeChange, onPeriodChange }) {
   const { userId } = useUser();
   const isMobile = useIsMobile();
-  const [range, setRange] = useState("3m");
-  const [activeIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
+  const [localRange, setLocalRange] = useState(DEFAULT_RANGE);
+  const range = controlledRange ?? localRange;
+  const setRange = onRangeChange ?? setLocalRange;
+  const showRangeButtons = controlledRange == null;
+  const [rawActiveIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
 
-  const { points, indexDataMap, loading, error } = usePortfolioData(userId, range);
+  const { points: rawPoints, netWorthPoints, indexDataMap, loading, error } = usePortfolioData(userId, range);
+  const isNetWorth = offsetSek !== 0;
+  const chartTitle = isNetWorth ? "Nettoförmögenhet" : "Portföljutveckling";
+  // Indexjämförelse i % gäller portföljen — döljs i nettoläge för att inte blanda äpplen och päron.
+  const activeIndexes = isNetWorth ? [] : rawActiveIndexes;
+  // Nettoläge, hybrid: äkta nettoförmögenhets-snapshots (cron) där de finns, annars
+  // portfölj + nuvarande offset för dagarna innan snapshotten började.
+  const { points, hasRealNetWorth } = useMemo(() => {
+    if (!isNetWorth) return { points: rawPoints, hasRealNetWorth: false };
+    const cutoff = rangeCutoff(range);
+    const real = netWorthPoints.filter(p => !cutoff || p.date >= cutoff);
+    const firstReal = real[0]?.date;
+    const fallback = rawPoints
+      .filter(p => !firstReal || p.date < firstReal)
+      .map(p => ({ ...p, value: p.value + offsetSek }));
+    const merged = [...fallback, ...real.map(p => ({ date: p.date, value: p.value, real: true }))];
+    return { points: merged, hasRealNetWorth: real.length > 0 };
+  }, [rawPoints, netWorthPoints, isNetWorth, offsetSek, range]);
 
   const toggleIndex = (id) => {
     setActiveIndexes(prev =>
@@ -28,7 +55,7 @@ export default function PortfolioChart({ compact = false }) {
   const last = points.length >= 2 ? points[points.length - 1]?.value : null;
   const canRender = !error && first != null && last != null;
   const isUp = canRender ? last >= first : true;
-  const color = isUp ? "#089981" : "#f23645";
+  const color = isUp ? "var(--pos)" : "var(--neg)";
   const returnSek = canRender ? last - first : 0;
   const returnPct = canRender && first > 0 ? ((last - first) / first) * 100 : 0;
 
@@ -43,6 +70,13 @@ export default function PortfolioChart({ compact = false }) {
 
   // Best-performing index for "beat" indicator
   const bestIdx = Object.entries(indexReturns).sort((a, b) => b[1] - a[1])[0];
+
+  // Rapportera periodens förändring till föräldern (heron visar den bredvid siffran)
+  useEffect(() => {
+    if (!onPeriodChange) return;
+    onPeriodChange(canRender ? { returnSek, returnPct, range } : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canRender, returnSek, returnPct, range]);
 
   const gradientId = `portfolioChartGrad-${range}`;
   const chartHeight = compact ? 160 : (isMobile ? 180 : 220);
@@ -64,7 +98,7 @@ export default function PortfolioChart({ compact = false }) {
   // ALL hooks above this line — no early returns before here!
   if (loading) {
     return (
-      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
         <div style={{ height: chartHeight, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)", fontSize: 12 }}>
           Laddar portföljutveckling...
         </div>
@@ -75,20 +109,20 @@ export default function PortfolioChart({ compact = false }) {
   if (!canRender) return null;
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: compact ? "12px 14px" : "20px 20px 12px", marginBottom: compact ? 0 : 20 }}>
       {/* Header with return info and range selector */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: compact ? "center" : "flex-start", marginBottom: compact ? 10 : 16, flexDirection: compact && isMobile ? "column" : "row", gap: compact && isMobile ? 8 : 0 }}>
         <div>
           <div style={{ fontSize: compact ? 10 : 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: compact ? 2 : 4 }}>
-            Portföljutveckling
+            {chartTitle}
           </div>
           {!compact && (
             <div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-                <span style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                <span style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-mono)" }}>
                   {last.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK
                 </span>
-                <span style={{ fontSize: 13, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color, fontFamily: "var(--font-mono)" }}>
                   {returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK ({returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%)
                 </span>
               </div>
@@ -97,13 +131,13 @@ export default function PortfolioChart({ compact = false }) {
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   {INDEXES.filter(idx => indexReturns[idx.id] != null && activeIndexes.includes(idx.id)).map(idx => (
                     <span key={idx.id}>
-                      {idx.label}: <span style={{ color: indexReturns[idx.id] >= 0 ? "#089981" : "#f23645", fontFamily: "'IBM Plex Mono', monospace" }}>
+                      {idx.label}: <span style={{ color: indexReturns[idx.id] >= 0 ? "var(--pos)" : "var(--neg)", fontFamily: "var(--font-mono)" }}>
                         {indexReturns[idx.id] >= 0 ? "+" : ""}{indexReturns[idx.id].toFixed(1)}%
                       </span>
                     </span>
                   ))}
                   {bestIdx && (
-                    <span style={{ color: returnPct > bestIdx[1] ? "#089981" : "#f23645", fontWeight: 500 }}>
+                    <span style={{ color: returnPct > bestIdx[1] ? "var(--pos)" : "var(--neg)", fontWeight: 500 }}>
                       {returnPct > bestIdx[1] ? "▲" : "▼"} {Math.abs(returnPct - bestIdx[1]).toFixed(1)}% vs index
                     </span>
                   )}
@@ -113,7 +147,7 @@ export default function PortfolioChart({ compact = false }) {
           )}
           {compact && (
             <div>
-              <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "'IBM Plex Mono', monospace" }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color, fontFamily: "var(--font-mono)" }}>
                 {returnPct >= 0 ? "+" : ""}{returnPct.toFixed(1)}%
                 <span style={{ color: "var(--text-secondary)", fontWeight: 400, marginLeft: 6 }}>
                   ({returnSek >= 0 ? "+" : ""}{returnSek.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK)
@@ -124,7 +158,7 @@ export default function PortfolioChart({ compact = false }) {
                 <div style={{ fontSize: 10, color: "var(--text-secondary)", marginTop: 3, display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {INDEXES.filter(idx => indexReturns[idx.id] != null && activeIndexes.includes(idx.id)).map(idx => (
                     <span key={idx.id}>
-                      <span style={{ color: idx.color, fontSize: 8 }}>●</span> {idx.label}: <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: indexReturns[idx.id] >= 0 ? "#089981" : "#f23645" }}>
+                      <span style={{ color: idx.color, fontSize: 8 }}>●</span> {idx.label}: <span style={{ fontFamily: "var(--font-mono)", color: indexReturns[idx.id] >= 0 ? "var(--pos)" : "var(--neg)" }}>
                         {indexReturns[idx.id] >= 0 ? "+" : ""}{indexReturns[idx.id].toFixed(1)}%
                       </span>
                     </span>
@@ -136,7 +170,7 @@ export default function PortfolioChart({ compact = false }) {
         </div>
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {/* Index toggle buttons */}
-          {INDEXES.filter(idx => indexDataMap[idx.id]).map(idx => (
+          {!isNetWorth && INDEXES.filter(idx => indexDataMap[idx.id]).map(idx => (
             <button key={idx.id} onClick={() => toggleIndex(idx.id)}
               style={{
                 fontSize: 10, padding: "3px 8px", borderRadius: 3, cursor: "pointer",
@@ -149,9 +183,9 @@ export default function PortfolioChart({ compact = false }) {
             </button>
           ))}
           {/* Spacer */}
-          {INDEXES.some(idx => indexDataMap[idx.id]) && <div style={{ width: compact ? 4 : 8 }} />}
-          {/* Range buttons */}
-          {RANGES.map(r => (
+          {!isNetWorth && INDEXES.some(idx => indexDataMap[idx.id]) && <div style={{ width: compact ? 4 : 8 }} />}
+          {/* Range buttons — bara när grafen inte styrs av en global RangeBar */}
+          {showRangeButtons && RANGES.map(r => (
             <button key={r.id} onClick={() => setRange(r.id)}
               style={{
                 fontSize: 11, padding: "4px 10px", borderRadius: 3, border: "none", cursor: "pointer",
@@ -234,8 +268,8 @@ export default function PortfolioChart({ compact = false }) {
       {/* Footer */}
       {!compact && points.length > 1 && (
         <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 11, color: "var(--text-secondary)", flexWrap: "wrap" }}>
-          <span>{"\u0048\u00f6gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
-          <span>{"\u004c\u00e4gst: "}<span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{"\u0048\u00f6gst: "}<span style={{ fontFamily: "var(--font-mono)" }}>{Math.max(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
+          <span>{"\u004c\u00e4gst: "}<span style={{ fontFamily: "var(--font-mono)" }}>{Math.min(...points.map(p => p.value)).toLocaleString("sv-SE", { maximumFractionDigits: 0 })} SEK</span></span>
           {hasEstimated && (
             <span style={{ fontStyle: "italic", color: "var(--text-muted)" }}>
               {"Estimerat baserat p\u00e5 nuvarande innehav"}
@@ -246,6 +280,13 @@ export default function PortfolioChart({ compact = false }) {
       {compact && hasEstimated && (
         <div style={{ fontSize: 10, color: "var(--text-muted)", fontStyle: "italic", marginTop: 6 }}>
           {"Estimerat baserat p\u00e5 nuvarande innehav"}
+        </div>
+      )}
+      {isNetWorth && (
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
+          {hasRealNetWorth
+            ? "Nettof\u00f6rm\u00f6genheten sparas dagligen \u2014 tiden innan f\u00f6rsta sparningen visas som portf\u00f6lj + nuvarande v\u00e4rde p\u00e5 \u00f6vriga tillg\u00e5ngar."
+            : "Pension och manuellt inmatade tillg\u00e5ngar/skulder ing\u00e5r med sitt nuvarande v\u00e4rde. Fr\u00e5n och med idag sparas nettof\u00f6rm\u00f6genheten dagligen, s\u00e5 historiken byggs upp fram\u00e5t."}
         </div>
       )}
     </div>

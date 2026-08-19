@@ -129,9 +129,9 @@ describe("GoalsTab", () => {
 
   it("offers must-have expense presets that prefill name + category", () => {
     render(<GoalsTab />);
-    expect(screen.getByText("+ El")).toBeTruthy();
+    expect(screen.getByText("+ El & elnät")).toBeTruthy();
     expect(screen.getByText("+ Hemförsäkring")).toBeTruthy();
-    fireEvent.click(screen.getByText("+ El"));
+    fireEvent.click(screen.getByText("+ El & elnät"));
     // formuläret öppnas med namnet förifyllt; fyll i belopp och spara
     expect(screen.getByDisplayValue("El & elnät")).toBeTruthy();
     fireEvent.change(screen.getByPlaceholderText("kr/mån"), { target: { value: "900" } });

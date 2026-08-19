@@ -111,7 +111,12 @@ SEK-först-perspektiv.
       useNetWorth (portfolioValue levererar nu stocksSek/fundsSek), så
       siffrorna är identiska med Hem. Innehavstabellen har fått radie 10 +
       kortbakgrund. Kvar: filterchips (Typ/Institution) ovanför tabellen.
-- [ ] Kortradier/spacing-pass över samtliga vyer (10 px radius, luftigare)
+- [x] Kortradier/spacing-pass: 80 kortcontainrar i 46 filer → radie 10
+      (riktad transformation: bara bg-card+border-kort, inte knappar/inputs)
+- [x] Kassaflöde: inkomsttyper (flera inkomster) + 18 måste-ha-utgifter som
+      snabbval-chips med förifylld kategori. Beslut: INGEN wizard för
+      kassaflödet — det är en checklista man återvänder till, snabbvalen ger
+      vägledningen utan tvånget.
 - [ ] Sparmål ↔ tillgångar: låt ett mål peka på t.ex. buffert-posten i
       manual_assets så "sparat" uppdateras därifrån
 - [x] Nettoförmögenhetshistorik på riktigt: net_worth_snapshots (migration

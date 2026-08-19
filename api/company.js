@@ -114,8 +114,8 @@ async function getFMPData(ticker) {
   if (ticker.includes(".")) return null;
   try {
     const [profileRes, ratioRes] = await Promise.all([
-      fetch(`https://financialmodelingprep.com/api/v3/profile/${ticker}?apikey=${FMP_KEY}`),
-      fetch(`https://financialmodelingprep.com/api/v3/ratios-ttm/${ticker}?apikey=${FMP_KEY}`),
+      fetch(`https://financialmodelingprep.com/api/v3/profile/${encodeURIComponent(ticker)}?apikey=${FMP_KEY}`),
+      fetch(`https://financialmodelingprep.com/api/v3/ratios-ttm/${encodeURIComponent(ticker)}?apikey=${FMP_KEY}`),
     ]);
     const [profile, ratios] = await Promise.all([profileRes.json(), ratioRes.json()]);
     const p = Array.isArray(profile) ? profile[0] : null;
@@ -156,7 +156,8 @@ export default async function handler(req, res) {
 
   const { ticker } = req.query;
   if (!ticker) return res.status(400).json({ error: "ticker required" });
-  if (!/^[A-Za-z0-9.\-^%]+$/.test(ticker)) return res.status(400).json({ error: "invalid ticker format" });
+  // "=" tillåts för Yahoos valutasymboler (USDSEK=X) som portföljvärderingen använder som FX-fallback
+  if (!/^[A-Za-z0-9.\-^%=]+$/.test(ticker)) return res.status(400).json({ error: "invalid ticker format" });
 
   try {
     const crumbData = await getYahooCrumb();

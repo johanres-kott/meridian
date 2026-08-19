@@ -2,17 +2,28 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dev",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["vercel", "dev", "--yes"],
+      "name": "vite",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3000",
+        "--strictPort"
+      ],
       "port": 3000,
       "autoPort": true
     },
     {
-      "name": "vite",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 5173,
+      "name": "vercel-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vercel",
+        "dev",
+        "--yes"
+      ],
+      "port": 3000,
       "autoPort": true
     }
   ]

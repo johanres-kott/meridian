@@ -53,6 +53,36 @@ describe("GoalsTab", () => {
     expect(row.label).toBe("Ränta · Villan");
   });
 
+  it("adds a loan-linked amortization row: category amortering, rate prefilled from the wizard", () => {
+    debts = [{ id: "loan-1", kind: "bolan", label: "Bolån · Villan", value_sek: 1500000, metadata: { interestRate: 3.5, amortizationRate: 2 } }];
+    prefs = { cashflow: { incomes: [], expenses: [] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getByText("+ Bolåneränta"));
+    fireEvent.click(screen.getByRole("button", { name: "Amortering" }));
+    expect(screen.getByPlaceholderText("% per år").value).toBe("2");
+    // 1 500 000 × 2 % / 12 = 2 500 kr/mån
+    expect(screen.getByText("= 2 500 kr/mån")).toBeTruthy();
+    fireEvent.click(screen.getByText("Spara"));
+    const row = updatePreferences.mock.calls[0][0].cashflow.expenses[0];
+    expect(row.loanId).toBe("loan-1");
+    expect(row.rate).toBe(2);
+    expect(row.category).toBe("amortering");
+    expect(row.label).toBe("Amortering · Villan");
+  });
+
+  it("disables a loan mode that already has a row and defaults to the free one", () => {
+    debts = [{ id: "loan-1", kind: "bolan", label: "Bolån · Villan", value_sek: 1500000, metadata: { interestRate: 3.5 } }];
+    prefs = { cashflow: { incomes: [], expenses: [
+      { id: "r1", label: "Ränta · Villan", category: "lan", loanId: "loan-1", rate: 3.5, amount: 4375 },
+    ] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getAllByText("+ Lägg till")[1]); // utgiftskolumnen
+    fireEvent.change(screen.getByTitle("Koppla till ett lån du lagt in"), { target: { value: "loan-1" } });
+    // ränteraden finns redan → amortering förväljs och Ränta-knappen är låst
+    expect(screen.getByRole("button", { name: "Ränta" }).disabled).toBe(true);
+    expect(screen.getByPlaceholderText("% per år")).toBeTruthy();
+  });
+
   it("treats amortering as saving: excluded from 'Pengar ut', included in sparkvot, own stat card", () => {
     prefs = {
       cashflow: {

@@ -56,11 +56,13 @@ export const FIELDS_BY_KIND = {
   bolan: [
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
+    { key: "amortizationRate", label: "Amortering, per år", type: "percent" },
     { key: "ownershipShare", label: "Ägarandel", type: "number", unit: "%" },
   ],
   skuld: [
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
+    { key: "amortizationRate", label: "Amortering, per år", type: "percent" },
   ],
   vinstandel: [
     { key: "provider", label: "Stiftelse / förvaltare", type: "text" },

@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ownedValue, shareOf } from "../lib/manualAssetsMath.js";
 import { useTranslation } from "react-i18next";
 import { IconBadge } from "./icons.jsx";
 
@@ -22,6 +23,8 @@ const TYPE_META = {
 };
 
 const mono = { fontFamily: "var(--font-mono)" };
+// Delägd post: visa "50 % av 8 600 000 kr" under namnet
+const shareSub = (r) => shareOf(r) < 1 ? `${Math.round(shareOf(r) * 100)} % av ${Math.round(Number(r.value_sek)).toLocaleString("sv-SE")} kr` : null;
 
 export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile, onSelectHolding, onSelectManual, onNavigate }) {
   const { t, i18n } = useTranslation();
@@ -46,10 +49,10 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
       assets.push({ id: "pension", type: "pension", name: t("myFinances.pension"), sub: data.pensionLabel || "ITP", valueSek: data.pensionValue, nav: ["investment", { subTab: "pension" }] });
     }
     for (const r of data.assets || []) {
-      assets.push({ id: r.id, type: r.kind, name: r.label, sub: r.metadata?.address || r.metadata?.regNumber || null, valueSek: Number(r.value_sek), manual: r });
+      assets.push({ id: r.id, type: r.kind, name: r.label, sub: shareSub(r) || r.metadata?.address || r.metadata?.regNumber || null, valueSek: ownedValue(r), manual: r });
     }
     const debts = (data.debts || []).map(r => ({
-      id: r.id, type: r.kind, name: r.label, sub: r.metadata?.lender || null, valueSek: Number(r.value_sek), manual: r,
+      id: r.id, type: r.kind, name: r.label, sub: shareSub(r) || r.metadata?.lender || null, valueSek: ownedValue(r), manual: r,
     }));
     const sortDesc = (a, b) => (b.valueSek ?? -1) - (a.valueSek ?? -1);
     return { assets: assets.sort(sortDesc), debts: debts.sort(sortDesc) };

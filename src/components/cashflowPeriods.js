@@ -19,7 +19,10 @@ export function loanInterestMonthly(loanValueSek, ratePct) {
 export function monthlyAmount(row, loans = {}) {
   if (row.loanId && row.rate != null) {
     const loan = loans[row.loanId];
-    const m = loan ? loanInterestMonthly(loan.value_sek, row.rate) : null;
+    // din andel av lånet (delat bolån) — metadata.ownershipShare i procent
+    const share = Number(loan?.metadata?.ownershipShare);
+    const owned = loan ? Number(loan.value_sek) * (Number.isFinite(share) && share > 0 && share <= 100 ? share / 100 : 1) : null;
+    const m = loan ? loanInterestMonthly(owned, row.rate) : null;
     if (m != null) return m;
   }
   const per = PERIOD_BY_ID[row.period]?.perYear ?? 12;

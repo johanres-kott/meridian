@@ -5,6 +5,7 @@ import { useUser } from "../contexts/UserContext.jsx";
 import { RANGES, INDEXES, DEFAULT_RANGE, rangeCutoff } from "../lib/portfolioChartConstants.js";
 import { useEffect } from "react";
 import usePortfolioData from "../hooks/usePortfolioData.js";
+import { reconstructNetWorthSeries, earliestStart } from "../lib/manualAssetsMath.js";
 
 // offsetSek: pension + manuella tillgångar − skulder från useNetWorth. När det
 // är satt visar grafen nettoförmögenhet — de posterna har ingen kurshistorik,
@@ -12,7 +13,11 @@ import usePortfolioData from "../hooks/usePortfolioData.js";
 // range/onRangeChange: styrt utifrån (global RangeBar à la Finary); utan dem
 // har grafen egen lokal väljare (äldre användning). onPeriodChange rapporterar
 // periodens förändring uppåt så heron kan visa den.
-export default function PortfolioChart({ compact = false, offsetSek = 0, range: controlledRange, onRangeChange, onPeriodChange }) {
+// netWorth: { pensionValue, manualRows } → nettoförmögenhetsläge där historiken
+// räknas bakåt från posternas egna datum (bostad från köpdatum, lån från när det
+// togs, vinstandel årgång för årgång) ovanpå portföljens historik. Ersätter det
+// äldre offsetSek-läget (platt nuvarande värde bakåt) när det är satt.
+export default function PortfolioChart({ compact = false, offsetSek = 0, netWorth = null, range: controlledRange, onRangeChange, onPeriodChange }) {
   const { userId } = useUser();
   const isMobile = useIsMobile();
   const [localRange, setLocalRange] = useState(DEFAULT_RANGE);
@@ -22,7 +27,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   const [rawActiveIndexes, setActiveIndexes] = useState(["omxs30", "sp500"]);
 
   const { points: rawPoints, netWorthPoints, indexDataMap, loading, error } = usePortfolioData(userId, range);
-  const isNetWorth = offsetSek !== 0;
+  const isNetWorth = !!netWorth || offsetSek !== 0;
   const chartTitle = isNetWorth ? "Nettoförmögenhet" : "Portföljutveckling";
   // Indexjämförelse i % gäller portföljen — döljs i nettoläge för att inte blanda äpplen och päron.
   const activeIndexes = isNetWorth ? [] : rawActiveIndexes;
@@ -31,6 +36,20 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
   const { points, hasRealNetWorth } = useMemo(() => {
     if (!isNetWorth) return { points: rawPoints, hasRealNetWorth: false };
     const cutoff = rangeCutoff(range);
+    if (netWorth) {
+      // Rekonstruktion från posternas datum. Startar vid periodens början, eller
+      // (för "Allt") vid äldsta posten/första portföljpunkten. Slutar idag.
+      const today = new Date().toISOString().slice(0, 10);
+      const earliest = earliestStart(netWorth.manualRows || []);
+      const firstRaw = rawPoints[0]?.date || null;
+      const from = cutoff || [earliest, firstRaw].filter(Boolean).sort()[0] || today;
+      const span = (new Date(today) - new Date(from)) / 86400000;
+      const series = reconstructNetWorthSeries({
+        portfolioPoints: rawPoints, pensionValue: netWorth.pensionValue ?? 0, manualRows: netWorth.manualRows || [],
+        fromDate: from, toDate: today, stepDays: span > 800 ? 7 : 1,
+      });
+      return { points: series, hasRealNetWorth: false, reconstructed: true };
+    }
     const real = netWorthPoints.filter(p => !cutoff || p.date >= cutoff);
     const firstReal = real[0]?.date;
     const fallback = rawPoints
@@ -38,7 +57,7 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
       .map(p => ({ ...p, value: p.value + offsetSek }));
     const merged = [...fallback, ...real.map(p => ({ date: p.date, value: p.value, real: true }))];
     return { points: merged, hasRealNetWorth: real.length > 0 };
-  }, [rawPoints, netWorthPoints, isNetWorth, offsetSek, range]);
+  }, [rawPoints, netWorthPoints, isNetWorth, offsetSek, range, netWorth]);
 
   const toggleIndex = (id) => {
     setActiveIndexes(prev =>
@@ -282,7 +301,12 @@ export default function PortfolioChart({ compact = false, offsetSek = 0, range: 
           {"Estimerat baserat p\u00e5 nuvarande innehav"}
         </div>
       )}
-      {isNetWorth && (
+      {isNetWorth && netWorth && (
+        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
+          {"Historiken r\u00e4knas fr\u00e5n posternas egna datum: bostad fr\u00e5n k\u00f6pdatum, l\u00e5n fr\u00e5n n\u00e4r det togs, vinstandel \u00e5rg\u00e5ng f\u00f6r \u00e5rg\u00e5ng \u2014 med nuvarande v\u00e4rde bak\u00e5t. Streckat = innan portf\u00f6ljens historik b\u00f6rjar."}
+        </div>
+      )}
+      {isNetWorth && !netWorth && (
         <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6 }}>
           {hasRealNetWorth
             ? "Nettof\u00f6rm\u00f6genheten sparas dagligen \u2014 tiden innan f\u00f6rsta sparningen visas som portf\u00f6lj + nuvarande v\u00e4rde p\u00e5 \u00f6vriga tillg\u00e5ngar."

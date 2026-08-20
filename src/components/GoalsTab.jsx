@@ -4,6 +4,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { GOAL_ICONS, Target } from "./icons.jsx";
 import { PERIODS, PERIOD_BY_ID, monthlyAmount, loanInterestMonthly } from "./cashflowPeriods.js";
 import useNetWorth from "../hooks/useNetWorth.js";
+import { ownedValue } from "../lib/manualAssetsMath.js";
 import { EXPENSE_CATEGORIES, CAT_BY_ID, isSaving } from "./cashflowCategories.js";
 import CashflowSankey from "./CashflowSankey.jsx";
 
@@ -90,7 +91,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const [error, setError] = useState(null);
   const loansById = Object.fromEntries(loans.map(l => [l.id, l]));
   const linkedLoan = loanId ? loansById[loanId] : null;
-  const linkedMonthly = linkedLoan ? loanInterestMonthly(linkedLoan.value_sek, parseAmount(rate)) : null;
+  const linkedMonthly = linkedLoan ? loanInterestMonthly(ownedValue(linkedLoan), parseAmount(rate)) : null;
 
   // Välj lån: namn + kategori sätts från lånet, räntan förifylls från wizarden om den finns
   function pickLoan(id) {
@@ -111,7 +112,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
       setError(null);
       onAdd({
         id: newId(), label: label.trim() || `Ränta · ${linkedLoan.label}`, category: "lan", period: "month",
-        loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(linkedLoan.value_sek, r),
+        loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(ownedValue(linkedLoan), r),
       });
       reset(); setAdding(false);
       return;
@@ -175,7 +176,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
               {cat && <span title={cat.label} style={{ width: 8, height: 8, borderRadius: "50%", background: cat.color, flexShrink: 0 }} />}
               <span style={{ color: "var(--text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
               {r.loanId && (
-                <span title={loansById[r.loanId] ? `${fmtKr(Number(loansById[r.loanId].value_sek))} × ${r.rate} % — följer lånet` : "Lånet är borttaget — visar senast sparade belopp"}
+                <span title={loansById[r.loanId] ? `${fmtKr(ownedValue(loansById[r.loanId]))} × ${r.rate} % — följer lånet (din andel)` : "Lånet är borttaget — visar senast sparade belopp"}
                   style={{ fontSize: 10, color: loansById[r.loanId] ? "var(--brand)" : "var(--text-muted)", flexShrink: 0 }}>
                   {loansById[r.loanId] ? `${String(r.rate).replace(".", ",")} %` : "lån saknas"}
                 </span>
@@ -192,7 +193,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
             {withCategory && linkableLoans.length > 0 && (
               <select value={loanId} onChange={e => e.target.value ? pickLoan(e.target.value) : reset()} title="Koppla till ett lån du lagt in" style={{ ...inputStyle, width: "100%" }}>
                 <option value="">Koppla till lån… (räntan räknas ut automatiskt)</option>
-                {linkableLoans.map(l => <option key={l.id} value={l.id}>{l.label} — {fmtKr(Number(l.value_sek))}</option>)}
+                {linkableLoans.map(l => <option key={l.id} value={l.id}>{l.label} — {fmtKr(ownedValue(l))}</option>)}
               </select>
             )}
             {linkedLoan ? (

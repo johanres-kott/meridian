@@ -17,6 +17,12 @@ const STEPS = [
   { id: "summering", label: "Summering" },
 ];
 
+const OWNERSHIP_OPTIONS = [
+  { value: "100", label: "Bara jag (100 %)" },
+  { value: "50", label: "Hälften (50 %)" },
+  { value: "other", label: "Annan andel" },
+];
+
 const PROPERTY_TYPES = [
   { value: "lagenhet", label: "Lägenhet" },
   { value: "villa", label: "Villa" },
@@ -30,12 +36,15 @@ export default function BostadWizard({ onSaved, onBack }) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [d, setD] = useState({
-    name: "", propertyType: "lagenhet", address: "", livingArea: "", buildYear: "",
+    name: "", propertyType: "lagenhet", address: "", livingArea: "", buildYear: "", ownership: "100", ownershipOther: "",
     value: "", purchasePrice: "", purchaseDate: "",
     loanAmount: "", lender: "", interestRate: "", pantbrev: "", downPayment: "",
   });
 
   const set = (key) => (e) => setD({ ...d, [key]: e.target.value });
+  const ownershipShare = d.ownership === "other"
+    ? (parseAmount(d.ownershipOther) > 0 && parseAmount(d.ownershipOther) <= 100 ? parseAmount(d.ownershipOther) : 100)
+    : Number(d.ownership);
 
   const value = parseAmount(d.value);
   const loan = parseAmount(d.loanAmount);
@@ -53,6 +62,7 @@ export default function BostadWizard({ onSaved, onBack }) {
 
     const homeMetadata = {
       wizard: "bostad",
+      ownershipShare: ownershipShare,
       propertyType: d.propertyType,
       address: d.address.trim() || null,
       livingArea: parseAmount(d.livingArea),
@@ -80,6 +90,7 @@ export default function BostadWizard({ onSaved, onBack }) {
           is_debt: true,
           metadata: {
             wizard: "bostad",
+            ownershipShare: ownershipShare, // samma andel av lånet som av bostaden (ändras på lånets sida)
             linkedAssetId: homeRow?.id ?? null,
             lender: d.lender.trim() || null,
             interestRate: parseAmount(d.interestRate),
@@ -97,6 +108,7 @@ export default function BostadWizard({ onSaved, onBack }) {
 
   const summaryRows = [
     { label: "Namn", value: d.name.trim() || "—" },
+    { label: "Din ägarandel", value: `${ownershipShare} %` },
     { label: "Typ", value: PROPERTY_TYPES.find(t => t.value === d.propertyType)?.label },
     d.address.trim() ? { label: "Adress", value: d.address.trim() } : null,
     parseAmount(d.livingArea) != null ? { label: "Boyta", value: `${parseAmount(d.livingArea)} m²` } : null,
@@ -131,6 +143,15 @@ export default function BostadWizard({ onSaved, onBack }) {
             </Field>
             <Field label="Adress" optional>
               <input value={d.address} onChange={set("address")} placeholder="Storgatan 1, Uppsala" style={inputStyle} />
+            </Field>
+            <Field label="Hur stor del äger du?">
+              <ChipSelect options={OWNERSHIP_OPTIONS} value={d.ownership} onChange={v => setD({ ...d, ownership: v })} />
+              {d.ownership === "other" && (
+                <input value={d.ownershipOther} onChange={set("ownershipOther")} placeholder="Din andel i %" inputMode="decimal" style={{ ...inputStyle, width: 140, marginTop: 8 }} />
+              )}
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6, lineHeight: 1.5 }}>
+                Äger ni tillsammans räknas bara din andel av både bostaden och lånet in i din nettoförmögenhet.
+              </div>
             </Field>
             <div style={{ display: "flex", gap: 16 }}>
               <Field label="Boyta" optional>

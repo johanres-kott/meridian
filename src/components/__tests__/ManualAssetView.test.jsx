@@ -118,6 +118,31 @@ describe("ManualAssetView", () => {
     expect(onChanged).toHaveBeenCalled();
   });
 
+  it("computes a manual percentage estimate and applies it only on explicit click", async () => {
+    render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} onChanged={() => {}} />);
+    fireEvent.change(screen.getByLabelText("Prisutveckling i procent"), { target: { value: "15" } });
+    // köpeskilling 2 500 000 × 1,15 = 2 875 000
+    expect(screen.getByText(/2 875 000 kr/)).toBeTruthy();
+    expect(updateManualAsset).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Använd som värde" }));
+    await waitFor(() => expect(updateManualAsset).toHaveBeenCalledTimes(1));
+    expect(updateManualAsset.mock.calls[0][1].value_sek).toBe(2875000);
+  });
+
+  it("applies the manual percentage to the current value when chosen as base", () => {
+    render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} />);
+    fireEvent.change(screen.getByLabelText("Uppräkningsbas"), { target: { value: "current" } });
+    fireEvent.change(screen.getByLabelText("Prisutveckling i procent"), { target: { value: "-10" } });
+    // nuvarande värde 3 000 000 × 0,90 = 2 700 000
+    expect(screen.getByText(/2 700 000 kr/)).toBeTruthy();
+  });
+
+  it("shows no manual estimate for gibberish percentages", () => {
+    render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} />);
+    fireEvent.change(screen.getByLabelText("Prisutveckling i procent"), { target: { value: "abc" } });
+    expect(screen.queryByText(/din egen siffra/)).toBeNull();
+  });
+
   it("asks before deleting and then calls the proxy", async () => {
     const onBack = vi.fn();
     render(<ManualAssetView row={house} allRows={[house]} onBack={onBack} onChanged={() => {}} />);

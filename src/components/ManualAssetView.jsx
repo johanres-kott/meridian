@@ -71,6 +71,11 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
   const [indexLoading, setIndexLoading] = useState(false);
   const [indexResult, setIndexResult] = useState(null);
   const [indexError, setIndexError] = useState(null);
+  // Egen uppräkning: användaren läser prisutvecklingen själv (t.ex. hos
+  // Svensk Mäklarstatistik) och knappar in procenten — ren aritmetik på
+  // användarens egen siffra, aldrig något vi hittar på.
+  const [manualPct, setManualPct] = useState("");
+  const [manualBase, setManualBase] = useState(() => (Number((row.metadata || {}).purchasePrice) > 0 ? "purchase" : "current"));
   const [form, setForm] = useState(() => ({
     label: row.label,
     value: String(row.value_sek ?? ""),
@@ -189,6 +194,13 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
 
   const detailFields = fields.filter(f => editing || formatFieldValue(f, meta[f.key]) != null);
   const hasIndexBasis = Number(meta.purchasePrice) > 0 && !!meta.purchaseDate;
+  const manualBaseValue = manualBase === "purchase" && Number(meta.purchasePrice) > 0
+    ? Number(meta.purchasePrice)
+    : (Number(row.value_sek) > 0 ? Number(row.value_sek) : null);
+  const manualPctNum = parseFloat(String(manualPct).replace(/\s/g, "").replace(",", "."));
+  const manualEstimate = manualBaseValue != null && Number.isFinite(manualPctNum) && manualPctNum > -100
+    ? Math.round(manualBaseValue * (1 + manualPctNum / 100) / 1000) * 1000
+    : null;
 
   return (
     <div style={{ maxWidth: 760 }}>
@@ -388,6 +400,50 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
               Lägg till köpeskilling och köpdatum (Redigera) för att räkna upp värdet med SCB:s prisindex.
             </div>
           )}
+
+          <div style={{ borderTop: "1px solid var(--border-light)", marginTop: 14, paddingTop: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>Egen uppräkning</div>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: 10 }}>
+              Kolla prisutvecklingen för ditt område hos{" "}
+              <a href="https://www.maklarstatistik.se/omrade/riket/" target="_blank" rel="noreferrer"
+                style={{ color: "var(--brand)", textDecoration: "underline" }}>
+                Svensk Mäklarstatistik
+              </a>{" "}
+              och knappa in den här, så räknar vi om värdet.
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <input value={manualPct} onChange={e => setManualPct(e.target.value)} placeholder="t.ex. 12,5"
+                inputMode="decimal" aria-label="Prisutveckling i procent"
+                style={{ ...inputStyle, ...mono, width: 110, textAlign: "right" }} />
+              <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>% på</span>
+              <select value={manualBase} onChange={e => setManualBase(e.target.value)}
+                aria-label="Uppräkningsbas" style={{ ...inputStyle, width: 250 }}>
+                {Number(meta.purchasePrice) > 0 && (
+                  <option value="purchase">Köpeskillingen ({fmtKr(Number(meta.purchasePrice))})</option>
+                )}
+                {Number(row.value_sek) > 0 && (
+                  <option value="current">Nuvarande värde ({fmtKr(Number(row.value_sek))})</option>
+                )}
+              </select>
+            </div>
+            {manualEstimate != null && (
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-end", marginTop: 14 }}>
+                <div style={{ flex: 1, minWidth: 220 }}>
+                  <div style={{ ...mono, fontSize: isMobile ? 22 : 26, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-display)" }}>
+                    {fmtKr(manualEstimate)}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
+                    {manualBase === "purchase" && Number(meta.purchasePrice) > 0 ? "Köpeskillingen" : "Nuvarande värde"}{" "}
+                    {manualPctNum >= 0 ? "+" : "−"}{Math.abs(manualPctNum).toLocaleString("sv-SE", { maximumFractionDigits: 1 })} % — din egen siffra
+                  </div>
+                </div>
+                <button onClick={() => applyEstimate(manualEstimate, null)} disabled={saving}
+                  style={{ ...btn(true), opacity: saving ? 0.6 : 1 }}>
+                  Använd som värde
+                </button>
+              </div>
+            )}
+          </div>
 
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 12, lineHeight: 1.5 }}>
             Statistiska indikationer — ingen värdering av just din bostad. Utgör inte finansiell rådgivning.

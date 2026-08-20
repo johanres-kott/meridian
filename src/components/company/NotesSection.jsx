@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { sanitizeInput } from "../../lib/sanitize.js";
+import { useHasTransactions } from "../../hooks/useHasTransactions.js";
+import TransactionsPanel from "../TransactionsPanel.jsx";
 
 export default function NotesSection({ item, onUpdate }) {
   const [notes, setNotes] = useState(item.notes || "");
@@ -7,6 +9,9 @@ export default function NotesSection({ item, onUpdate }) {
   const [showGAV, setShowGAV] = useState(false);
   const [shares, setShares] = useState(item.shares || "");
   const [gav, setGav] = useState(item.gav || "");
+  // Finns transaktioner styr de antal/GAV — den manuella redigeringen låses.
+  const { hasTransactions, setHasTransactions } = useHasTransactions(item);
+  const [showTx, setShowTx] = useState(false);
 
   async function saveNotes() {
     await onUpdate(item.id, { notes: sanitizeInput(notes) });
@@ -24,13 +29,43 @@ export default function NotesSection({ item, onUpdate }) {
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Egna kop</div>
-          <button onClick={() => setShowGAV(!showGAV)}
-            style={{ fontSize: 11, padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 3, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}>
-            {showGAV ? "Avbryt" : "Redigera"}
-          </button>
+          {hasTransactions ? (
+            <button onClick={() => setShowTx(!showTx)}
+              style={{ fontSize: 11, padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 3, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit", color: "var(--text)" }}>
+              {showTx ? "Dölj transaktioner" : "Transaktioner"}
+            </button>
+          ) : (
+            <button onClick={() => setShowGAV(!showGAV)}
+              style={{ fontSize: 11, padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 3, background: "var(--bg-card)", cursor: "pointer", fontFamily: "inherit" }}>
+              {showGAV ? "Avbryt" : "Redigera"}
+            </button>
+          )}
         </div>
 
-        {showGAV ? (
+        {hasTransactions ? (
+          <div>
+            <div style={{ display: "flex", gap: 24 }}>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>Antal</div>
+                <div style={{ fontSize: 15, fontWeight: 500, fontFamily: "var(--font-mono)" }}>{item.shares || "—"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>GAV</div>
+                <div style={{ fontSize: 15, fontWeight: 500, fontFamily: "var(--font-mono)" }}>{item.gav ? item.gav.toLocaleString("sv-SE", { minimumFractionDigits: 2 }) : "—"}</div>
+              </div>
+            </div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 8 }}>Styrs av transaktionerna.</div>
+            {showTx && (
+              <div style={{ margin: "8px -12px 0", borderTop: "1px solid var(--border-light)" }}>
+                <TransactionsPanel
+                  item={item}
+                  onSynced={updates => onUpdate(item.id, updates)}
+                  onCountChange={n => setHasTransactions(n > 0)}
+                />
+              </div>
+            )}
+          </div>
+        ) : showGAV ? (
           <div>
             <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1 }}>

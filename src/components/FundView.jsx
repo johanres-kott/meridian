@@ -4,6 +4,8 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import { STATUSES, STATUS_COLORS } from "../constants.js";
 import { fetchFund } from "../lib/apiClient.js";
 import NotesSection from "./company/NotesSection.jsx";
+import { useHasTransactions } from "../hooks/useHasTransactions.js";
+import TransactionsPanel from "./TransactionsPanel.jsx";
 
 function StatCard({ label, value, sub, tip }) {
   return (
@@ -36,6 +38,9 @@ export default function FundView({ item, onBack, onUpdate }) {
   const isMobile = useIsMobile();
   const [fund, setFund] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Finns transaktioner styr de andelar/GAV — de manuella fälten låses.
+  const { hasTransactions, setHasTransactions } = useHasTransactions(item);
+  const [showTx, setShowTx] = useState(false);
 
   useEffect(() => {
     fetchFund(item.ticker).then(d => {
@@ -102,30 +107,63 @@ export default function FundView({ item, onBack, onUpdate }) {
           </div>
         )}
 
-        {/* Shares + GAV edit */}
-        <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-          <div>
-            <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Andelar</label>
-            <input
-              type="number"
-              value={item.shares || ""}
-              onChange={e => onUpdate(item.id, { shares: e.target.value ? Number(e.target.value) : null })}
-              placeholder="0"
-              style={{ width: 90, padding: "6px 10px", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
-            />
+        {/* Shares + GAV edit — låst till härledda värden när transaktioner styr */}
+        {hasTransactions ? (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ display: "flex", gap: 24 }}>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 2 }}>Andelar</div>
+                <div style={{ fontSize: 13, fontWeight: 500, fontFamily: "var(--font-mono)", color: "var(--text)" }}>{item.shares || "—"}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 2 }}>GAV</div>
+                <div style={{ fontSize: 13, fontWeight: 500, fontFamily: "var(--font-mono)", color: "var(--text)" }}>{item.gav ? item.gav.toLocaleString("sv-SE", { minimumFractionDigits: 2 }) : "—"}</div>
+              </div>
+            </div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6 }}>
+              Styrs av transaktionerna.{" "}
+              <button onClick={() => setShowTx(!showTx)}
+                style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                {showTx ? "Dölj transaktioner" : "Visa transaktioner"}
+              </button>
+            </div>
+            {showTx && (
+              <div style={{ marginTop: 8, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)" }}>
+                <TransactionsPanel
+                  item={item}
+                  currency={fund?.currency || null}
+                  onSynced={updates => onUpdate(item.id, updates)}
+                  onCountChange={n => setHasTransactions(n > 0)}
+                  isMobile={isMobile}
+                />
+              </div>
+            )}
           </div>
-          <div>
-            <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>GAV</label>
-            <input
-              type="number"
-              step="0.01"
-              value={item.gav || ""}
-              onChange={e => onUpdate(item.id, { gav: e.target.value ? Number(e.target.value) : null })}
-              placeholder="0.00"
-              style={{ width: 100, padding: "6px 10px", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
-            />
+        ) : (
+          <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+            <div>
+              <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>Andelar</label>
+              <input
+                type="number"
+                value={item.shares || ""}
+                onChange={e => onUpdate(item.id, { shares: e.target.value ? Number(e.target.value) : null })}
+                placeholder="0"
+                style={{ width: 90, padding: "6px 10px", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 10, color: "var(--text-muted)", display: "block", marginBottom: 2 }}>GAV</label>
+              <input
+                type="number"
+                step="0.01"
+                value={item.gav || ""}
+                onChange={e => onUpdate(item.id, { gav: e.target.value ? Number(e.target.value) : null })}
+                placeholder="0.00"
+                style={{ width: 100, padding: "6px 10px", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", background: "var(--bg-card)", color: "var(--text)", fontFamily: "var(--font-mono)" }}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {loading && <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>Laddar fonddata...</div>}

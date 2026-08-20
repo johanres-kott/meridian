@@ -18,7 +18,10 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
   const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [deleteError, setDeleteError] = useState(null);
 
-  const { portfolioSek, portfolioLoaded, assets, debts, netWorth, hasAnything, pensionValue, reloadManual } = data;
+  const { portfolioSek, portfolioLoaded, stocksSek, fundsSek, assets, debts, netWorth, hasAnything, pensionValue, reloadManual } = data;
+  // Aktier/fonder som underrader när portföljen faktiskt innehåller båda —
+  // annars är uppdelningen bara brus.
+  const showSplit = portfolioSek != null && stocksSek > 0 && fundsSek > 0;
 
   // Lån hör ihop med sin tillgång: wizardarna länkar via metadata.linkedAssetId,
   // och ett olänkat bolån läggs under bostaden när det bara finns en (entydigt).
@@ -85,10 +88,26 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
 
         <div style={{ marginTop: 10 }}>
           {portfolioSek != null && portfolioSek > 0 && (
-            <div style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio")}>
-              <IconBadge kind="portfolio" color={KIND_COLORS.portfolio} size={26} iconSize={13} />
-              <span style={{ color: "var(--text)", flex: 1 }}>{t("myFinances.portfolio")}</span>
-              <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(portfolioSek)}</span>
+            <div>
+              <div style={{ ...rowStyle, cursor: "pointer", borderBottom: showSplit ? "none" : rowStyle.borderBottom }} onClick={() => onNavigate?.("portfolio")}>
+                <IconBadge kind="portfolio" color={KIND_COLORS.portfolio} size={26} iconSize={13} />
+                <span style={{ color: "var(--text)", flex: 1 }}>{t("myFinances.portfolio")}</span>
+                <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(portfolioSek)}</span>
+              </div>
+              {showSplit && (
+                <>
+                  <div style={{ ...rowStyle, cursor: "pointer", paddingLeft: 36, paddingTop: 0, borderBottom: "none" }} onClick={() => onNavigate?.("portfolio")}>
+                    <IconBadge kind="stocks" color={KIND_COLORS.stocks} size={20} iconSize={11} />
+                    <span style={{ color: "var(--text-secondary)", flex: 1 }}>{t("myFinances.stocks")}</span>
+                    <span style={{ ...mono, color: "var(--text-secondary)" }}>{fmtKr(stocksSek)}</span>
+                  </div>
+                  <div style={{ ...rowStyle, cursor: "pointer", paddingLeft: 36, paddingTop: 0 }} onClick={() => onNavigate?.("portfolio")}>
+                    <IconBadge kind="funds" color={KIND_COLORS.funds} size={20} iconSize={11} />
+                    <span style={{ color: "var(--text-secondary)", flex: 1 }}>{t("myFinances.funds")}</span>
+                    <span style={{ ...mono, color: "var(--text-secondary)" }}>{fmtKr(fundsSek)}</span>
+                  </div>
+                </>
+              )}
             </div>
           )}
           {portfolioLoaded && portfolioSek == null && (

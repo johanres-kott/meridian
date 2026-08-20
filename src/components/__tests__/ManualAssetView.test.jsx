@@ -3,7 +3,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 const updateManualAsset = vi.fn(async () => ({}));
 const deleteManualAsset = vi.fn(async () => ({}));
-vi.mock("../../lib/manualAssets.js", () => ({
+// manualAssets.js drar in supabase-klienten — stubba den och behåll den
+// riktiga effectiveValueSek (används för "Din andel av eget kapital").
+vi.mock("../../supabase.js", () => ({ supabase: {} }));
+vi.mock("../../lib/manualAssets.js", async (importOriginal) => ({
+  ...(await importOriginal()),
   updateManualAsset: (...a) => updateManualAsset(...a),
   deleteManualAsset: (...a) => deleteManualAsset(...a),
 }));
@@ -60,6 +64,58 @@ describe("ManualAssetView", () => {
     const [, patch] = updateManualAsset.mock.calls[0];
     expect(patch.value_sek).toBe(35000);
     expect(patch.metadata.tranches).toEqual([{ year: 2020, value: 10000 }, { year: 2023, value: 25000 }]);
+  });
+
+  it("shows the owner's share of equity only when a share is below 100 %", () => {
+    const sharedHouse = { ...house, metadata: { ...house.metadata, ownershipShare: 50 } };
+    const sharedLoan = { ...loan, metadata: { ...loan.metadata, ownershipShare: 50 } };
+    render(<ManualAssetView row={sharedHouse} allRows={[sharedHouse, sharedLoan]} onBack={() => {}} />);
+    // Belåningsgrad och eget kapital gäller hela bostaden som förut
+    expect(screen.getByText("Belåningsgrad")).toBeTruthy();
+    // Din andel: 3 000 000 × 50 % − 1 500 000 × 50 % = 750 000 kr
+    expect(screen.getByText("Din andel av eget kapital")).toBeTruthy();
+    expect(screen.getByText((c) => c.replace(/\u00a0/g, " ") === "750 000 kr")).toBeTruthy();
+  });
+
+  it("hides the owner's equity share at full ownership", () => {
+    render(<ManualAssetView row={house} allRows={[house, loan]} onBack={() => {}} />);
+    expect(screen.queryByText("Din andel av eget kapital")).toBeNull();
+  });
+
+  it("prompts for purchase data when the index basis is missing", () => {
+    render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} />);
+    // house saknar purchaseDate → dämpad uppmaning i Värdeindikation-sektionen
+    expect(screen.getByText(/Lägg till köpeskilling och köpdatum/)).toBeTruthy();
+    expect(screen.queryByText("Räkna upp med prisindex")).toBeNull();
+    expect(screen.getByText(/Utgör inte finansiell rådgivning/)).toBeTruthy();
+  });
+
+  it("fetches the SCB index estimate and applies it only on explicit click", async () => {
+    const indexed = { ...house, metadata: { ...house.metadata, purchaseDate: "2024-09-03", purchasePrice: 8600000 } };
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        estimate: 8682000, factor: 951 / 942, purchaseQuarter: "2024K3", latestQuarter: "2026K1",
+        indexThen: 942, indexNow: 951, region: "00", regionText: "Riket",
+        source: "SCB fastighetsprisindex, permanenta småhus",
+      }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    const onChanged = vi.fn();
+    render(<ManualAssetView row={indexed} allRows={[indexed]} onBack={() => {}} onChanged={onChanged} />);
+    fireEvent.click(screen.getByText("Räkna upp med prisindex"));
+    await waitFor(() => expect(screen.getByText(/2024K3 → 2026K1/)).toBeTruthy());
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/property-index?price=8600000&date=2024-09-03&region=00"));
+    // uppskattningen skrivs inte förrän användaren klickar
+    expect(updateManualAsset).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Använd som värde"));
+    await waitFor(() => expect(updateManualAsset).toHaveBeenCalledTimes(1));
+    const [id, patch] = updateManualAsset.mock.calls[0];
+    expect(id).toBe("h1");
+    expect(patch.value_sek).toBe(8682000);
+    expect(patch.metadata.indexRegion).toBe("00");
+    expect(patch.metadata.purchasePrice).toBe(8600000); // övrig metadata behålls
+    expect(onChanged).toHaveBeenCalled();
   });
 
   it("asks before deleting and then calls the proxy", async () => {

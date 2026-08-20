@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { IconBadge } from "./icons.jsx";
+import { effectiveValueSek } from "../lib/manualAssets.js";
 
 // Finarys tillgångstabell (DESIGN.md): EN rad per tillgång oavsett slag —
 // aktier, fonder, pension, bostad, fordon, sparkonton, övrigt — med typ-chips,
@@ -46,10 +47,11 @@ export default function AssetTable({ data, holdings = [], fxToSek = {}, isMobile
       assets.push({ id: "pension", type: "pension", name: t("myFinances.pension"), sub: data.pensionLabel || "ITP", valueSek: data.pensionValue, nav: ["investment", { subTab: "pension" }] });
     }
     for (const r of data.assets || []) {
-      assets.push({ id: r.id, type: r.kind, name: r.label, sub: r.metadata?.address || r.metadata?.regNumber || null, valueSek: Number(r.value_sek), manual: r });
+      // effectiveValueSek: bara användarens ägarandel — samma siffror som hero/donut
+      assets.push({ id: r.id, type: r.kind, name: r.label, sub: r.metadata?.address || r.metadata?.regNumber || null, valueSek: effectiveValueSek(r), manual: r });
     }
     const debts = (data.debts || []).map(r => ({
-      id: r.id, type: r.kind, name: r.label, sub: r.metadata?.lender || null, valueSek: Number(r.value_sek), manual: r,
+      id: r.id, type: r.kind, name: r.label, sub: r.metadata?.lender || null, valueSek: effectiveValueSek(r), manual: r,
     }));
     const sortDesc = (a, b) => (b.valueSek ?? -1) - (a.valueSek ?? -1);
     return { assets: assets.sort(sortDesc), debts: debts.sort(sortDesc) };

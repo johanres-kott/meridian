@@ -6,6 +6,10 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (k) => k, i18n: { language: "sv" } }),
 }));
 
+// AssetBreakdown använder effectiveValueSek ur manualAssets.js, som drar in
+// supabase-klienten — stubba klienten så testet slipper miljövariabler.
+vi.mock("../../supabase.js", () => ({ supabase: {} }));
+
 // recharts ResponsiveContainer behöver layout — stubba till enkel wrapper i jsdom
 vi.mock("recharts", async () => {
   const actual = await vi.importActual("recharts");

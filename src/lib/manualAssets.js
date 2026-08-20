@@ -32,6 +32,17 @@ export async function deleteManualAsset(id) {
   return data;
 }
 
+// Radens värde justerat för användarens ägarandel (metadata.ownershipShare,
+// procent). Saknas andelen räknas hela värdet (100 %); andelen klampas till
+// 1–100 så en felinmatning aldrig nollar eller blåser upp nettoförmögenheten.
+export function effectiveValueSek(row) {
+  const value = Number(row?.value_sek);
+  if (!Number.isFinite(value)) return 0;
+  const raw = Number(row?.metadata?.ownershipShare ?? 100);
+  const share = Number.isFinite(raw) ? Math.min(100, Math.max(1, raw)) : 100;
+  return value * share / 100;
+}
+
 export async function updateManualAsset(id, patch) {
   const res = await fetch("/api/manual-assets", {
     method: "PATCH",

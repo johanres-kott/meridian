@@ -3,6 +3,7 @@ import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
 import { getPensionTotalValue } from "../lib/pension.js";
 import { getPortfolioValuation } from "../lib/portfolioValue.js";
+import { effectiveValueSek } from "../lib/manualAssets.js";
 
 // Delad nettoförmögenhet: portfölj (via cachad värdering) + pension (ITP i
 // preferences) + manuella tillgångar − skulder (manual_assets). Används av
@@ -57,8 +58,10 @@ export default function useNetWorth() {
   const pensionValue = getPensionTotalValue(preferences?.pension);
   const assets = manualRows.filter(r => !r.is_debt);
   const debts = manualRows.filter(r => r.is_debt);
-  const assetSum = assets.reduce((s, r) => s + Number(r.value_sek), 0);
-  const debtSum = debts.reduce((s, r) => s + Number(r.value_sek), 0);
+  // Ägarandel (metadata.ownershipShare) räknas in — bara användarens andel
+  // av t.ex. en samägd bostad och dess lån påverkar nettoförmögenheten.
+  const assetSum = assets.reduce((s, r) => s + effectiveValueSek(r), 0);
+  const debtSum = debts.reduce((s, r) => s + effectiveValueSek(r), 0);
   const netWorth = (portfolioSek ?? 0) + (pensionValue ?? 0) + assetSum - debtSum;
   const hasAnything = (portfolioSek != null && portfolioSek > 0) || pensionValue != null || manualRows.length > 0;
 

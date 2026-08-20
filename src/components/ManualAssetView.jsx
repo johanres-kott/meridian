@@ -1,10 +1,34 @@
 import { useState } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { updateManualAsset, deleteManualAsset } from "../lib/manualAssets.js";
+import { updateManualAsset, deleteManualAsset, effectiveValueSek } from "../lib/manualAssets.js";
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { KIND_LABELS, VALUE_LABELS, FIELDS_BY_KIND, formatFieldValue, parseFieldInput, fieldToInput } from "./assetFields.js";
 import { summarizeTranches, DEFAULT_LOCK_YEARS } from "./addassets/vinstandel.js";
+import BooliValuation from "./addassets/BooliValuation.jsx";
+
+// SCB:s regioner för småhusindexet (FastpiPSRegKv) — samma lista som
+// api/property-index.js validerar mot.
+const SCB_REGIONS = [
+  { value: "00", label: "Riket" },
+  { value: "0010", label: "Stor-Stockholm" },
+  { value: "0020", label: "Stor-Göteborg" },
+  { value: "0030", label: "Stor-Malmö" },
+  { value: "RIKS1", label: "Stockholms län" },
+  { value: "RIKS2", label: "Östra mellansverige" },
+  { value: "RIKS3", label: "Småland med öarna" },
+  { value: "RIKS4", label: "Sydsverige" },
+  { value: "RIKS5", label: "Västsverige" },
+  { value: "RIKS6", label: "Norra mellansverige" },
+  { value: "RIKS7", label: "Mellersta Norrland" },
+  { value: "RIKS8", label: "Övre Norrland" },
+];
+
+// Klampad ägarandel i procent (1–100), null när inget är angivet
+function ownedShare(metadata) {
+  const raw = Number(metadata?.ownershipShare);
+  return Number.isFinite(raw) ? Math.min(100, Math.max(1, raw)) : null;
+}
 
 // Tillgångssida för manuella tillgångar/skulder (hus, fordon, vinstandel,
 // konton, lån) — klick på raden i Portfölj/Min ekonomi landar här. Visar all
@@ -41,6 +65,11 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // Värdeindikation (endast bostad): SCB-indexuppräkning + Booli
+  const [indexRegion, setIndexRegion] = useState(meta.indexRegion || "00");
+  const [indexLoading, setIndexLoading] = useState(false);
+  const [indexResult, setIndexResult] = useState(null);
+  const [indexError, setIndexError] = useState(null);
   const [form, setForm] = useState(() => ({
     label: row.label,
     value: String(row.value_sek ?? ""),
@@ -57,6 +86,12 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
   const loanValue = linkedLoan ? Number(linkedLoan.value_sek) : null;
   const ltv = loanValue != null && value > 0 ? (loanValue / value) * 100 : null;
   const equity = loanValue != null ? value - loanValue : null;
+  // Ägarandelar: belåningsgrad och eget kapital ovan gäller HELA bostaden;
+  // vid samägande visas dessutom användarens andel av eget kapital.
+  const houseShare = ownedShare(meta);
+  const loanShare = linkedLoan ? ownedShare(linkedLoan.metadata) : null;
+  const anyPartialShare = (houseShare != null && houseShare < 100) || (loanShare != null && loanShare < 100);
+  const myEquity = equity != null && anyPartialShare ? effectiveValueSek(row) - effectiveValueSek(linkedLoan) : null;
 
   const isVinstandel = kind === "vinstandel";
   const lockYears = Number(editing ? form.meta.lockYears : meta.lockYears) || DEFAULT_LOCK_YEARS;
@@ -114,7 +149,45 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
     }
   }
 
+  // Hämta SCB:s indexuppräkning av köpeskillingen — bara en indikation,
+  // skrivs aldrig till värdet utan klick på "Använd som värde".
+  async function fetchIndexEstimate() {
+    if (indexLoading) return;
+    setIndexLoading(true); setIndexError(null); setIndexResult(null);
+    try {
+      const params = new URLSearchParams({
+        price: String(Math.round(Number(meta.purchasePrice))),
+        date: String(meta.purchaseDate),
+        region: indexRegion,
+      });
+      const r = await fetch(`/api/property-index?${params}`);
+      const data = await r.json().catch(() => null);
+      if (!r.ok) { setIndexError(data?.error || "Kunde inte hämta SCB-index — försök igen."); return; }
+      setIndexResult(data);
+    } catch {
+      setIndexError("Kunde inte hämta SCB-index — försök igen.");
+    } finally {
+      setIndexLoading(false);
+    }
+  }
+
+  // Skriv en vald uppskattning till värdet (samma spara/omladdnings-flöde som
+  // Redigera: updateManualAsset + onChanged → reloadManual hos föräldern).
+  async function applyEstimate(estimate, extraMeta) {
+    if (saving) return;
+    setSaving(true); setError(null);
+    try {
+      const patch = extraMeta ? { value_sek: estimate, metadata: { ...meta, ...extraMeta } } : { value_sek: estimate };
+      await updateManualAsset(row.id, patch);
+      onChanged?.();
+    } catch (err) {
+      console.error("ManualAssetView: apply estimate failed:", err);
+      setError(err.message || "Kunde inte spara");
+    } finally { setSaving(false); }
+  }
+
   const detailFields = fields.filter(f => editing || formatFieldValue(f, meta[f.key]) != null);
+  const hasIndexBasis = Number(meta.purchasePrice) > 0 && !!meta.purchaseDate;
 
   return (
     <div style={{ maxWidth: 760 }}>
@@ -194,6 +267,7 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
                 {linkedLoan.metadata?.interestRate != null && <Row label="Ränta" value={`${String(linkedLoan.metadata.interestRate).replace(".", ",")} %`} />}
                 {ltv != null && <Row label={kind === "bostad" ? "Belåningsgrad" : "Lån / värde"} value={`${ltv.toFixed(0)} %`} />}
                 {equity != null && <Row label="Eget kapital" value={fmtKr(equity)} strong />}
+                {myEquity != null && <Row label="Din andel av eget kapital" value={fmtKr(myEquity)} strong />}
                 {kind === "bostad" && ltv != null && (
                   <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 8, lineHeight: 1.5 }}>
                     {ltv > 70 ? "Över 70 % belåning: amorteringskrav 2 % per år (+1 % om skuldkvoten överstiger 4,5 × bruttoinkomst)." : ltv > 50 ? "50–70 % belåning: amorteringskrav 1 % per år (+1 % vid skuldkvot över 4,5 × bruttoinkomst)." : "Under 50 % belåning: inget krav på grund av belåningsgraden (skuldkvotskravet kan ändå gälla)."}
@@ -265,6 +339,69 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
           </div>
         )}
       </div>
+
+      {/* Värdeindikation (endast bostad): SCB-indexuppräkning + Booli.
+          Statistiska indikationer — skrivs aldrig till värdet utan uttryckligt
+          klick på "Använd som värde" (COMPLIANCE.md/PIVOT.md). */}
+      {kind === "bostad" && !row.is_debt && !editing && (
+        <div style={{ ...card, marginTop: 14 }}>
+          <div style={sectionTitle}>Värdeindikation</div>
+
+          {hasIndexBasis ? (
+            <>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <select value={indexRegion} onChange={e => { setIndexRegion(e.target.value); setIndexResult(null); }}
+                  aria-label="SCB-region" style={{ ...inputStyle, width: 200 }}>
+                  {SCB_REGIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                </select>
+                <button onClick={fetchIndexEstimate} disabled={indexLoading}
+                  style={{ ...btn(false), opacity: indexLoading ? 0.6 : 1, cursor: indexLoading ? "wait" : "pointer" }}>
+                  {indexLoading ? "Hämtar…" : "Räkna upp med prisindex"}
+                </button>
+              </div>
+              {indexError && <div style={{ fontSize: 12, color: "var(--neg)", marginTop: 8 }}>{indexError}</div>}
+              {indexResult && (
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-end", marginTop: 14 }}>
+                  <div style={{ flex: 1, minWidth: 220 }}>
+                    <div style={{ ...mono, fontSize: isMobile ? 22 : 26, fontWeight: 500, color: "var(--text)", fontFamily: "var(--font-display)" }}>
+                      {fmtKr(indexResult.estimate)}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
+                      SCB småhusindex {indexResult.regionText}, {indexResult.purchaseQuarter} → {indexResult.latestQuarter}{" "}
+                      ({indexResult.factor >= 1 ? "+" : "−"}{Math.abs((indexResult.factor - 1) * 100).toLocaleString("sv-SE", { maximumFractionDigits: 1 })} %)
+                    </div>
+                  </div>
+                  <button onClick={() => applyEstimate(indexResult.estimate, { indexRegion })} disabled={saving}
+                    style={{ ...btn(true), opacity: saving ? 0.6 : 1 }}>
+                    Använd som värde
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>
+              Lägg till köpeskilling och köpdatum (Redigera) för att räkna upp värdet med SCB:s prisindex.
+            </div>
+          )}
+
+          <details style={{ marginTop: 14 }}>
+            <summary style={{ fontSize: 12, color: "var(--text-secondary)", cursor: "pointer" }}>
+              Värdeindikation från området (Booli)
+            </summary>
+            <div style={{ marginTop: 10 }}>
+              <BooliValuation
+                initialAddress={meta.address || ""}
+                initialSqm={meta.livingArea ? String(meta.livingArea) : ""}
+                onUseEstimate={v => applyEstimate(v, null)}
+              />
+            </div>
+          </details>
+
+          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 12, lineHeight: 1.5 }}>
+            Statistiska indikationer — ingen värdering av just din bostad. Utgör inte finansiell rådgivning.
+          </div>
+        </div>
+      )}
 
       {/* Knappar */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 18, flexWrap: "wrap" }}>

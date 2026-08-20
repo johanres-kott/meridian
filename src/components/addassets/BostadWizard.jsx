@@ -33,9 +33,19 @@ export default function BostadWizard({ onSaved, onBack }) {
     name: "", propertyType: "lagenhet", address: "", livingArea: "", buildYear: "",
     value: "", purchasePrice: "", purchaseDate: "",
     loanAmount: "", lender: "", interestRate: "", pantbrev: "", downPayment: "",
+    ownershipShare: "100", loanShare: "",
   });
 
   const set = (key) => (e) => setD({ ...d, [key]: e.target.value });
+
+  // Låneandelen förifylls med ägarandelen när användaren går vidare till
+  // Finansiering (men kan ändras där — samägda hem har inte alltid delat lån).
+  function goNext() {
+    if (step === 1 && d.loanShare.trim() === "") {
+      setD(prev => ({ ...prev, loanShare: prev.ownershipShare }));
+    }
+    setStep(step + 1);
+  }
 
   const value = parseAmount(d.value);
   const loan = parseAmount(d.loanAmount);
@@ -43,6 +53,8 @@ export default function BostadWizard({ onSaved, onBack }) {
   const ltv = value > 0 && loan != null ? (loan / value) * 100 : null;
   const equity = value != null ? value - (loan ?? 0) : null;
   const pantbrevGap = pantbrev != null && loan != null && loan > pantbrev ? loan - pantbrev : null;
+  const ownershipShare = parseAmount(d.ownershipShare);
+  const loanShare = parseAmount(d.loanShare);
 
   const canNext = step === 0 ? d.name.trim().length > 0 : step === 1 ? value != null && value > 0 : true;
 
@@ -61,6 +73,7 @@ export default function BostadWizard({ onSaved, onBack }) {
       purchaseDate: d.purchaseDate || null,
       downPayment: parseAmount(d.downPayment),
       pantbrev,
+      ownershipShare,
     };
 
     try {
@@ -83,6 +96,7 @@ export default function BostadWizard({ onSaved, onBack }) {
             linkedAssetId: homeRow?.id ?? null,
             lender: d.lender.trim() || null,
             interestRate: parseAmount(d.interestRate),
+            ownershipShare: loanShare ?? ownershipShare,
           },
         });
       }
@@ -101,8 +115,10 @@ export default function BostadWizard({ onSaved, onBack }) {
     d.address.trim() ? { label: "Adress", value: d.address.trim() } : null,
     parseAmount(d.livingArea) != null ? { label: "Boyta", value: `${parseAmount(d.livingArea)} m²` } : null,
     { label: "Värde", value: value != null ? fmtKr(value) : "—", strong: true },
+    ownershipShare != null && ownershipShare < 100 ? { label: "Din ägarandel", value: `${String(d.ownershipShare).replace(".", ",")} %` } : null,
     parseAmount(d.purchasePrice) != null ? { label: "Köpeskilling", value: fmtKr(parseAmount(d.purchasePrice)) } : null,
     loan != null ? { label: "Bolån", value: `−${fmtKr(loan)}${d.lender.trim() ? ` · ${d.lender.trim()}` : ""}`, negative: true } : null,
+    loan != null && loanShare != null && loanShare < 100 ? { label: "Din andel av lånet", value: `${String(d.loanShare).replace(".", ",")} %` } : null,
     ltv != null ? { label: "Belåningsgrad", value: `${ltv.toFixed(0)}%` } : null,
     pantbrev != null ? { label: "Uttagna pantbrev", value: fmtKr(pantbrev) } : null,
     equity != null ? { label: "Eget kapital i bostaden", value: fmtKr(equity), strong: true } : null,
@@ -138,6 +154,12 @@ export default function BostadWizard({ onSaved, onBack }) {
               </Field>
               <Field label="Byggår" optional>
                 <input value={d.buildYear} onChange={set("buildYear")} placeholder="t.ex. 1962" inputMode="numeric" style={{ ...inputStyle, width: 120 }} />
+              </Field>
+              <Field label="Din ägarandel">
+                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                  <input value={d.ownershipShare} onChange={set("ownershipShare")} aria-label="Din ägarandel" inputMode="decimal" style={{ ...inputStyle, width: 70 }} />
+                  <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>%</span>
+                </div>
               </Field>
             </div>
           </div>
@@ -178,6 +200,12 @@ export default function BostadWizard({ onSaved, onBack }) {
               </Field>
               <Field label="Ränta" optional>
                 <input value={d.interestRate} onChange={set("interestRate")} placeholder="%" inputMode="decimal" style={{ ...inputStyle, width: 80 }} />
+              </Field>
+              <Field label="Din andel av lånet">
+                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                  <input value={d.loanShare} onChange={set("loanShare")} aria-label="Din andel av lånet" inputMode="decimal" style={{ ...inputStyle, width: 70 }} />
+                  <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>%</span>
+                </div>
               </Field>
             </div>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -244,7 +272,7 @@ export default function BostadWizard({ onSaved, onBack }) {
           canNext={canNext}
           saving={saving}
           onBack={() => (step === 0 ? onBack() : setStep(step - 1))}
-          onNext={() => setStep(step + 1)}
+          onNext={goNext}
           onSave={save}
           saveLabel="Spara bostaden"
         />

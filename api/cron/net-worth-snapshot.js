@@ -18,6 +18,16 @@ function bearerMatches(header, secret) {
   return got.length === expected.length && timingSafeEqual(got, expected);
 }
 
+function effectiveValueSek(row) {
+  // Speglar src/lib/manualAssets.js effectiveValueSek utan att importera
+  // klientkod: värdet × ägarandel (metadata.ownershipShare, klampad 1–100 %).
+  const value = Number(row?.value_sek);
+  if (!Number.isFinite(value)) return 0;
+  const raw = Number(row?.metadata?.ownershipShare ?? 100);
+  const share = Number.isFinite(raw) ? Math.min(100, Math.max(1, raw)) : 100;
+  return value * share / 100;
+}
+
 function pensionTotal(pension) {
   // Speglar src/lib/pension.js getPensionTotalValue utan att importera klientkod
   if (!pension) return null;
@@ -51,7 +61,7 @@ export default async function handler(req, res) {
   try {
     const [{ data: prefsRows, error: prefsErr }, { data: manualRows, error: manualErr }, { data: snapRows, error: snapErr }] = await Promise.all([
       supabase.from("user_prefs").select("user_id, preferences"),
-      supabase.from("manual_assets").select("user_id, value_sek, is_debt"),
+      supabase.from("manual_assets").select("user_id, value_sek, is_debt, metadata"),
       supabase.from("portfolio_snapshots").select("user_id, snapshot_date, total_value_sek").order("snapshot_date", { ascending: false }),
     ]);
     if (prefsErr || manualErr || snapErr) {
@@ -67,7 +77,7 @@ export default async function handler(req, res) {
     const manualByUser = {};
     for (const r of manualRows || []) {
       const m = manualByUser[r.user_id] || (manualByUser[r.user_id] = { assets: 0, debts: 0 });
-      if (r.is_debt) m.debts += Number(r.value_sek); else m.assets += Number(r.value_sek);
+      if (r.is_debt) m.debts += effectiveValueSek(r); else m.assets += effectiveValueSek(r);
     }
     const pensionByUser = {};
     for (const p of prefsRows || []) pensionByUser[p.user_id] = pensionTotal(p.preferences?.pension);

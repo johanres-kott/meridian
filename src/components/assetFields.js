@@ -41,6 +41,7 @@ export const FIELDS_BY_KIND = {
     { key: "purchaseDate", label: "Köpdatum", type: "date" },
     { key: "downPayment", label: "Kontantinsats", type: "money" },
     { key: "pantbrev", label: "Pantbrev", type: "money" },
+    { key: "ownershipShare", label: "Ägarandel", type: "number", unit: "%" },
   ],
   fordon: [
     { key: "vehicleType", label: "Typ", type: "select", options: VEHICLE_TYPES },
@@ -55,6 +56,7 @@ export const FIELDS_BY_KIND = {
   bolan: [
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
+    { key: "ownershipShare", label: "Ägarandel", type: "number", unit: "%" },
   ],
   skuld: [
     { key: "lender", label: "Långivare", type: "text" },

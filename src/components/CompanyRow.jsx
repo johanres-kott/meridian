@@ -1,10 +1,11 @@
-import { Hexagon } from "lucide-react";
+import { Hexagon, ArrowRightLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { STATUSES, STATUS_COLORS, getFlag } from "../constants.js";
 import { formatHoldingValue } from "./PortfolioTreemap.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 import { fetchCompany, fetchFund } from "../lib/apiClient.js";
 import ShareClassBadge from "./ShareClassBadge.jsx";
+import TransactionsPanel from "./TransactionsPanel.jsx";
 
 function GroupTagPopover({ item, groups, onToggle, onClose }) {
   const ref = useRef(null);
@@ -53,19 +54,22 @@ function GroupTagPopover({ item, groups, onToggle, onClose }) {
 export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates = {}, groups = [], onToggleGroup, investmentHolding = null, showInvestmentCols = false, showStatus = true, isMobile = false, scoreData = null, priceData = null }) {
   const { preferences } = useUser();
   const investorProfile = preferences.investorProfile || null;
-  const [price, setPrice] = useState(priceData);
+  const [fetchedPrice, setFetchedPrice] = useState(null);
   const [tagOpen, setTagOpen] = useState(false);
+  const [txOpen, setTxOpen] = useState(false);
 
   useEffect(() => {
-    if (priceData) { setPrice(priceData); return; }
+    if (priceData) return; // priset kommer via props — inget eget hämtande
     if (item.type === "fund") {
       fetchFund(item.ticker).then(d => {
-        if (d?.nav) setPrice({ price: d.nav, currency: d.currency || "SEK", changePercent: d.returnD1 });
+        if (d?.nav) setFetchedPrice({ price: d.nav, currency: d.currency || "SEK", changePercent: d.returnD1 });
       });
     } else {
-      fetchCompany(item.ticker).then(d => { if (d && d.price) setPrice(d); });
+      fetchCompany(item.ticker).then(d => { if (d && d.price) setFetchedPrice(d); });
     }
   }, [item.ticker, item.type, priceData]);
+
+  const price = priceData || fetchedPrice;
 
   const chg = price?.changePercent;
   const chgColor = chg > 0 ? "var(--pos)" : chg < 0 ? "var(--neg)" : "var(--text-secondary)";
@@ -73,7 +77,6 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
 
   const currency = price?.currency || "SEK";
   const fxRate = fxRates[currency] || null;
-  const priceSek = (price?.price && fxRate) ? price.price * fxRate : null;
   // P/L: compare price and GAV in original currency, then convert to SEK
   const plLocal = (item.gav && item.shares && price?.price) ? ((price.price - item.gav) * item.shares) : null;
   const pl = (plLocal !== null && fxRate) ? plLocal * fxRate : plLocal;
@@ -83,6 +86,7 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
   const tdBase = { padding: isMobile ? "6px 8px" : "10px 14px", borderBottom: "1px solid var(--border-light)" };
 
   return (
+    <>
     <tr
       onClick={() => onSelect(item)}
       style={{ cursor: "pointer" }}
@@ -198,11 +202,22 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
           ) : null}
         </td>
       )}
-      <td style={{ ...tdBase, textAlign: "center", width: 36 }} onClick={e => e.stopPropagation()}>
+      <td style={{ ...tdBase, textAlign: "right", width: 64, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
+        <button
+          onClick={() => setTxOpen(o => !o)}
+          title="Transaktioner"
+          aria-label="Transaktioner"
+          aria-expanded={txOpen}
+          style={{ background: "none", border: "none", cursor: "pointer", color: txOpen ? "var(--accent)" : "var(--text-muted)", padding: "2px 4px", lineHeight: 1, verticalAlign: "middle" }}
+          onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+          onMouseLeave={e => e.currentTarget.style.color = txOpen ? "var(--accent)" : "var(--text-muted)"}
+        >
+          <ArrowRightLeft size={14} aria-hidden />
+        </button>
         <button
           onClick={() => { if (window.confirm(`Ta bort ${item.name || item.ticker} från portföljen?`)) onDelete(item.id); }}
           title="Ta bort"
-          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 14, padding: "2px 6px", lineHeight: 1 }}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: 14, padding: "2px 6px", lineHeight: 1, verticalAlign: "middle" }}
           onMouseEnter={e => e.currentTarget.style.color = "var(--neg)"}
           onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
         >
@@ -210,5 +225,18 @@ export default function CompanyRow({ item, onUpdate, onSelect, onDelete, fxRates
         </button>
       </td>
     </tr>
+    {txOpen && (
+      <tr>
+        <td colSpan={12} style={{ padding: 0, background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-light)" }}>
+          <TransactionsPanel
+            item={item}
+            currency={price?.currency || null}
+            onSynced={updates => onUpdate(item.id, updates)}
+            isMobile={isMobile}
+          />
+        </td>
+      </tr>
+    )}
+    </>
   );
 }

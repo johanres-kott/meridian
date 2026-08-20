@@ -251,6 +251,10 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
                   <option value="">—</option>
                   {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+              ) : f.type === "boolean" ? (
+                <input type="checkbox" checked={form.meta[f.key] === true} aria-label={f.label}
+                  onChange={e => setForm({ ...form, meta: { ...form.meta, [f.key]: e.target.checked } })}
+                  style={{ width: 16, height: 16, accentColor: "var(--accent)", cursor: "pointer" }} />
               ) : (
                 <input type={f.type === "date" ? "date" : "text"} value={form.meta[f.key] || ""} aria-label={f.label}
                   onChange={e => setForm({ ...form, meta: { ...form.meta, [f.key]: e.target.value } })}
@@ -264,6 +268,12 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
           ))}
           {!editing && (
             <Row label="Tillagd" value={row.created_at ? new Date(row.created_at).toLocaleDateString("sv-SE") : "—"} />
+          )}
+          {/* Stämpel från cronen (automatisk amortering) — visas dämpad, redigeras aldrig */}
+          {!editing && row.is_debt && meta.lastAmortizedAt && (
+            <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "7px 0" }}>
+              Senast nedräknad: {meta.lastAmortizedAt}
+            </div>
           )}
         </div>
 

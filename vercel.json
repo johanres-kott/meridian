@@ -1,6 +1,7 @@
 {
   "crons": [
-    { "path": "/api/cron/net-worth-snapshot", "schedule": "0 5 * * *" }
+    { "path": "/api/cron/net-worth-snapshot", "schedule": "0 5 * * *" },
+    { "path": "/api/cron/amortize-loans", "schedule": "0 6 1 * *" }
   ],
   "headers": [
     {

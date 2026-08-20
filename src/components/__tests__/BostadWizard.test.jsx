@@ -78,6 +78,36 @@ describe("BostadWizard", () => {
     expect(inserted[1].metadata.ownershipShare).toBe(100);
   });
 
+  it("saves the auto-amortization opt-in as metadata.autoAmortize on the loan row", async () => {
+    const onSaved = vi.fn();
+    render(<BostadWizard onSaved={onSaved} onBack={vi.fn()} />);
+    fillAndAdvance();
+    fireEvent.change(screen.getAllByPlaceholderText("kr")[0], { target: { value: "3000000" } });
+    const checkbox = screen.getByRole("checkbox", { name: /Räkna ner lånet med amorteringen/ });
+    // Utan amorteringstakt är valet avstängt
+    expect(checkbox.disabled).toBe(true);
+    fireEvent.change(screen.getByPlaceholderText("% per år"), { target: { value: "2" } });
+    expect(checkbox.disabled).toBe(false);
+    fireEvent.click(checkbox);
+    expect(screen.getByText(/stäm av mot banken/)).toBeTruthy();
+    fireEvent.click(screen.getByText("Nästa"));
+    fireEvent.click(screen.getByText("Spara bostaden"));
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+    expect(inserted[1].metadata.amortizationRate).toBe(2);
+    expect(inserted[1].metadata.autoAmortize).toBe(true);
+  });
+
+  it("defaults autoAmortize to false on the loan row", async () => {
+    const onSaved = vi.fn();
+    render(<BostadWizard onSaved={onSaved} onBack={vi.fn()} />);
+    fillAndAdvance();
+    fireEvent.change(screen.getAllByPlaceholderText("kr")[0], { target: { value: "3000000" } });
+    fireEvent.click(screen.getByText("Nästa"));
+    fireEvent.click(screen.getByText("Spara bostaden"));
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+    expect(inserted[1].metadata.autoAmortize).toBe(false);
+  });
+
   it("saves the home as asset and the mortgage as linked debt", async () => {
     const onSaved = vi.fn();
     render(<BostadWizard onSaved={onSaved} onBack={vi.fn()} />);

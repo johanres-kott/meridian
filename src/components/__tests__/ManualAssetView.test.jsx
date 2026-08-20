@@ -143,6 +143,38 @@ describe("ManualAssetView", () => {
     expect(screen.queryByText(/din egen siffra/)).toBeNull();
   });
 
+  it("toggles automatisk amortering in edit mode and saves it in metadata", async () => {
+    const amortLoan = { ...loan, metadata: { ...loan.metadata, amortizationRate: 2 } };
+    render(<ManualAssetView row={amortLoan} allRows={[amortLoan]} onBack={() => {}} onChanged={() => {}} />);
+    // Av/osatt boolean döljs i visningsläget
+    expect(screen.queryByText("Automatisk amortering")).toBeNull();
+    fireEvent.click(screen.getByText("Redigera"));
+    const checkbox = screen.getByLabelText("Automatisk amortering");
+    expect(checkbox.checked).toBe(false);
+    fireEvent.click(checkbox);
+    expect(checkbox.checked).toBe(true);
+    fireEvent.click(screen.getByText("Spara ändringar"));
+    await waitFor(() => expect(updateManualAsset).toHaveBeenCalledTimes(1));
+    const [id, patch] = updateManualAsset.mock.calls[0];
+    expect(id).toBe("l1");
+    expect(patch.metadata.autoAmortize).toBe(true);
+    expect(patch.metadata.amortizationRate).toBe(2); // övriga fält orörda
+    expect(patch.metadata.lender).toBe("SBAB");
+  });
+
+  it("shows autoAmortize as 'Ja' and the lastAmortizedAt stamp in view mode", () => {
+    const amortLoan = { ...loan, metadata: { ...loan.metadata, amortizationRate: 2, autoAmortize: true, lastAmortizedAt: "2026-08-01" } };
+    render(<ManualAssetView row={amortLoan} allRows={[amortLoan]} onBack={() => {}} />);
+    expect(screen.getByText("Automatisk amortering")).toBeTruthy();
+    expect(screen.getByText("Ja")).toBeTruthy();
+    expect(screen.getByText("Senast nedräknad: 2026-08-01")).toBeTruthy();
+  });
+
+  it("hides the lastAmortizedAt stamp when it is missing", () => {
+    render(<ManualAssetView row={loan} allRows={[loan]} onBack={() => {}} />);
+    expect(screen.queryByText(/Senast nedräknad/)).toBeNull();
+  });
+
   it("asks before deleting and then calls the proxy", async () => {
     const onBack = vi.fn();
     render(<ManualAssetView row={house} allRows={[house]} onBack={onBack} onChanged={() => {}} />);

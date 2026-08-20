@@ -99,7 +99,7 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
       </div>
 
       {/* Global Indices */}
-      {idxLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hamtar index...</div>}
+      {idxLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hämtar index…</div>}
       {idxError && <div style={{ padding: 16, background: "#fff5f5", border: "1px solid #ffd0d0", borderRadius: 4, color: "var(--neg)", marginBottom: 20 }}>Fel: {idxError}</div>}
 
       {!idxLoading && !idxError && REGIONS.map(region => {
@@ -155,10 +155,10 @@ export default function MarketsView({ deepLink, onClearDeepLink }) {
 
       {/* Commodities & FX */}
       <div style={{ marginTop: 8, marginBottom: isMobile ? 12 : 20 }}>
-        <h2 style={{ fontSize: isMobile ? 13 : 15, fontWeight: 500 }}>Ravaror & Valutor</h2>
+        <h2 style={{ fontSize: isMobile ? 13 : 15, fontWeight: 500 }}>Råvaror & Valutor</h2>
       </div>
 
-      {comLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hamtar ravarudata...</div>}
+      {comLoading && <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-secondary)" }}>Hämtar råvarudata…</div>}
 
       {!comLoading && (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 12 : 16 }}>

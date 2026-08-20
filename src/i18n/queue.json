@@ -79,7 +79,17 @@
     "src/components/docs/OwnershipDocs.jsx",
     "src/components/docs/PensionDocs.jsx",
     "src/components/docs/ReferenceDocs.jsx",
-    "src/components/docs/ScoringDocs.jsx"
+    "src/components/docs/ScoringDocs.jsx",
+    "src/components/GoalsTab.jsx",
+    "src/components/ManualAssetView.jsx",
+    "src/components/CashflowSankey.jsx",
+    "src/components/addassets/AddAssetsPage.jsx",
+    "src/components/addassets/BostadWizard.jsx",
+    "src/components/addassets/FordonWizard.jsx",
+    "src/components/addassets/VinstandelWizard.jsx",
+    "src/components/addassets/BooliValuation.jsx",
+    "src/components/TransactionsPanel.jsx",
+    "src/components/SecurityPage.jsx"
   ],
   "skip": [
     "src/main.jsx",

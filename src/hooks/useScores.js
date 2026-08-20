@@ -16,11 +16,8 @@ export function useScores() {
   const [loading, setLoading] = useState(!cachedScores);
 
   useEffect(() => {
-    if (cachedScores && (Date.now() - cachedAt < CACHE_TTL_MS)) {
-      setScores(cachedScores);
-      setLoading(false);
-      return;
-    }
+    // Färsk cache → initial state (seedad från cachedScores) räcker
+    if (cachedScores && (Date.now() - cachedAt < CACHE_TTL_MS)) return;
 
     if (!loadingPromise) {
       loadingPromise = fetch("/api/suggestions?limit=300")
@@ -31,18 +28,23 @@ export function useScores() {
           list.forEach(s => { map[s.ticker?.toUpperCase()] = s; });
           cachedScores = map;
           cachedAt = Date.now();
+          loadingPromise = null; // släpp promisen så nästa TTL-utgång hämtar om
           return map;
         })
         .catch(() => {
-          cachedScores = {};
-          return {};
+          // Cacha ALDRIG ett fel som tom poänglista — nästa mount försöker igen
+          loadingPromise = null;
+          return cachedScores || {};
         });
     }
 
+    let cancelled = false;
     loadingPromise.then(map => {
+      if (cancelled) return;
       setScores(map);
       setLoading(false);
     });
+    return () => { cancelled = true; };
   }, []);
 
   return { scores, loading };

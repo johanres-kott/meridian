@@ -19,21 +19,34 @@ function formatQuarterLabel(dateStr) {
 
 export default function QuarterlyChart({ ticker }) {
   const isMobile = useIsMobile();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Nyckelbaserat resultat — loading härleds ur att svaret för AKTUELL ticker
+  // saknas, ingen synkron setLoading i effekten.
+  const [result, setResult] = useState(null); // { ticker, data } | { ticker, error }
   const [view, setView] = useState("revenue"); // revenue | margins
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     fetch(`/api/quarterly?ticker=${encodeURIComponent(ticker)}`)
       .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(d => { if (!cancelled) setResult({ ticker, data: d }); })
+      .catch(() => { if (!cancelled) setResult({ ticker, error: true }); });
+    return () => { cancelled = true; };
   }, [ticker]);
+
+  const current = result && result.ticker === ticker ? result : null;
+  const loading = !current;
+  const data = current?.data ?? null;
+  const error = current?.error ?? null;
 
   if (loading) return (
     <div style={{ background: "#fff", border: "1px solid #e0e3eb", borderRadius: 6, padding: 20, textAlign: "center" }}>
       <div style={{ fontSize: 12, color: "#787b86" }}>Laddar kvartalsdata...</div>
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 6, padding: 20, textAlign: "center" }}>
+      <div style={{ fontSize: 12, color: "var(--neg)" }}>Kunde inte hämta kvartalsdata just nu.</div>
     </div>
   );
 

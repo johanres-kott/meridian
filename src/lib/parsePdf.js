@@ -1,9 +1,15 @@
-import * as pdfjsLib from "pdfjs-dist";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-
-// Workern bundlas och serveras från vår egen domän (inte CDN): versionen
-// följer alltid paketet och CSP:ns script-src/worker-src kan vara 'self'.
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+// pdfjs-dist är ~400 kB och används bara av PDF-importen — ladda den
+// dynamiskt först när en PDF faktiskt parsas, så den hamnar i en egen chunk
+// utanför startbunten. Workern bundlas och serveras från vår egen domän
+// (inte CDN): versionen följer alltid paketet och CSP kan vara 'self'.
+async function loadPdfjs() {
+  const [pdfjsLib, { default: pdfWorkerUrl }] = await Promise.all([
+    import("pdfjs-dist"),
+    import("pdfjs-dist/build/pdf.worker.min.mjs?url"),
+  ]);
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  return pdfjsLib;
+}
 
 function parseSwedishNumber(str) {
   if (!str || typeof str !== "string") return null;
@@ -72,6 +78,7 @@ async function findHoldingsPages(pdf) {
 //   Row 3 (detail):  "492 st | Kurs 4,68 USD"
 
 export async function parseAvanzaPdf(arrayBuffer) {
+  const pdfjsLib = await loadPdfjs();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer, isEvalSupported: false }).promise;
 
   const holdingsPageNums = await findHoldingsPages(pdf);

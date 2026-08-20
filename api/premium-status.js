@@ -2,7 +2,7 @@
 import Stripe from "stripe";
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
-import { getSupabase } from "./_supabase.js";
+import { getServiceSupabase, getSupabase } from "./_supabase.js";
 
 export default async function handler(req, res) {
   setCors(req, res);
@@ -16,8 +16,17 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
   if (authError || !user) return res.status(200).json({ premium: false });
 
+  // premium_subscriptions läses med service role (RLS-låst tabell) men alltid
+  // filtrerat på den JWT-verifierade användarens id. Saknas nyckeln behåller
+  // vi anon-klienten som förr — då svarar Stripe-fallbacken nedan i stället.
+  let dbClient = getServiceSupabase();
+  if (!dbClient) {
+    console.warn("SUPABASE_SERVICE_ROLE_KEY saknas — läser premium_subscriptions med anon-klienten");
+    dbClient = supabase;
+  }
+
   // Check local DB first
-  const { data: localSub } = await supabase
+  const { data: localSub } = await dbClient
     .from("premium_subscriptions")
     .select("status")
     .eq("user_id", user.id)
@@ -45,7 +54,7 @@ export default async function handler(req, res) {
 
       if (subscriptions.data.length > 0) {
         // Sync to local DB for faster future lookups
-        await supabase.from("premium_subscriptions").upsert({
+        await dbClient.from("premium_subscriptions").upsert({
           user_id: user.id,
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptions.data[0].id,

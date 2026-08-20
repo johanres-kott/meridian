@@ -5,8 +5,10 @@ import { getSupabase } from "./_supabase.js";
 // Proxy för preferences-skrivningar (kassaflöde, sparmål, profil, todos…).
 // Direkta PATCH:ar mot *.supabase.co strups i Safari ("TypeError: Load
 // failed") — via localhost slipper vi felklassen, samma mönster som
-// /api/manual-assets. Mergen görs server-side (läs → merge → skriv) med
-// användarens egen token, så RLS gäller.
+// /api/manual-assets. Mergen görs atomiskt i databasen via RPC:n
+// merge_preferences (migrations/2026-08-20_user_prefs_merge.sql) med
+// användarens egen token, så RLS gäller. Är migrationen inte körd faller vi
+// tillbaka på gamla läs → merge → skriv-vägen (som kan kapplöpa).
 
 export default async function handler(req, res) {
   setCors(req, res);
@@ -30,6 +32,19 @@ export default async function handler(req, res) {
     const supabase = getSupabase({ global: { headers: { Authorization: `Bearer ${token}` } } });
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return res.status(401).json({ error: "Invalid token" });
+
+    // Atomisk merge i en sats — ingen läs/skriv-lucka mellan två anrop
+    const { data: rpcPrefs, error: rpcErr } = await supabase.rpc("merge_preferences", { p_patch: patch });
+    if (!rpcErr) {
+      return res.status(200).json({ preferences: rpcPrefs });
+    }
+    // 42883 (Postgres) / PGRST202 (PostgREST) = funktionen finns inte, dvs
+    // migrationen är inte körd — då tar gamla vägen över. Andra fel är hårda.
+    if (rpcErr.code !== "42883" && rpcErr.code !== "PGRST202") {
+      console.error("user-prefs merge_preferences error:", rpcErr);
+      return res.status(500).json({ error: "Could not save preferences" });
+    }
+    console.warn("merge_preferences saknas (kör migrations/2026-08-20_user_prefs_merge.sql) — faller tillbaka på läs → merge → skriv");
 
     const { data: existing, error: readErr } = await supabase
       .from("user_prefs")

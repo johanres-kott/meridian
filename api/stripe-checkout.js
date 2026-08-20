@@ -1,6 +1,6 @@
 /* global process */
 import Stripe from "stripe";
-import { setCors } from "./_cors.js";
+import { isAllowedOrigin, setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
@@ -29,7 +29,9 @@ export default async function handler(req, res) {
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    const origin = req.headers.origin || "https://thesion.tech";
+    // Skicka bara tillbaka användaren till kända origins — en förfalskad
+    // Origin-header ska inte kunna styra Stripes redirect efter köpet.
+    const origin = isAllowedOrigin(req.headers.origin) ? req.headers.origin : "https://thesion.tech";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

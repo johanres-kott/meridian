@@ -10,7 +10,11 @@ vi.mock("../../contexts/UserContext.jsx", () => ({
   useUser: () => ({ preferences: {} }),
 }));
 
-vi.mock("../../lib/manualAssets.js", () => ({
+// manualAssets.js drar in supabase-klienten — stubba den och behåll den
+// riktiga effectiveValueSek (radbeloppen ska visa användarens ägarandel).
+vi.mock("../../supabase.js", () => ({ supabase: {} }));
+vi.mock("../../lib/manualAssets.js", async (importOriginal) => ({
+  ...(await importOriginal()),
   deleteManualAsset: vi.fn(),
 }));
 
@@ -74,6 +78,42 @@ describe("NetWorthCard", () => {
     const rows = rowTexts(container);
     // fristående skulder listas sist, efter båda bostäderna
     expect(rows[2]).toContain("Bolånet");
+  });
+
+  it("shows the owner's share of value and a share badge when ownershipShare < 100", () => {
+    const data = makeData({
+      assets: [{ id: "h1", kind: "bostad", label: "Huset", value_sek: 3000000, metadata: { ownershipShare: 50 } }],
+      debts: [{ id: "l1", kind: "bolan", label: "Bolån · Huset", value_sek: 2000000, metadata: { linkedAssetId: "h1", ownershipShare: 50 } }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[0]).toContain("Huset");
+    expect(rows[0]).toContain("50 %");
+    expect(rows[0]).toContain("1 500 000 SEK"); // halva värdet
+    expect(rows[1]).toContain("50 %");
+    expect(rows[1]).toContain("−1 000 000 SEK"); // halva lånet
+  });
+
+  it("shows the share badge on standalone debts too", () => {
+    const data = makeData({
+      assets: [],
+      debts: [{ id: "d1", kind: "skuld", label: "CSN", value_sek: 150000, metadata: { ownershipShare: 50 } }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[0]).toContain("CSN");
+    expect(rows[0]).toContain("50 %");
+    expect(rows[0]).toContain("−75 000 SEK");
+  });
+
+  it("shows full value without badge at 100 % ownership", () => {
+    const data = makeData({
+      assets: [{ id: "h1", kind: "bostad", label: "Huset", value_sek: 3000000, metadata: { ownershipShare: 100 } }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[0]).toContain("3 000 000 SEK");
+    expect(rows[0]).not.toContain("100 %");
   });
 
   it("keeps other debts standalone", () => {

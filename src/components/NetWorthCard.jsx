@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
-import { deleteManualAsset } from "../lib/manualAssets.js";
+import { deleteManualAsset, effectiveValueSek } from "../lib/manualAssets.js";
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { vinstandelHint } from "./addassets/vinstandel.js";
@@ -52,6 +52,20 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
   const mono = { fontFamily: "var(--font-mono)" };
   const rowStyle = { display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 };
 
+  // Diskret andelsmarkering (samma dämpade stil som vinstandelHint) när
+  // användaren bara äger en del av raden — beloppet visar den andelen.
+  function shareBadge(r) {
+    const raw = Number(r.metadata?.ownershipShare);
+    if (!Number.isFinite(raw)) return null;
+    const share = Math.min(100, Math.max(1, raw));
+    if (share >= 100) return null;
+    return (
+      <span style={{ fontSize: 10.5, color: "var(--text-muted)", marginLeft: 5 }}>
+        {String(share).replace(".", ",")} %
+      </span>
+    );
+  }
+
   function fmtKr(v) {
     return `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
   }
@@ -93,19 +107,20 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
                 <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--brand)"} size={26} iconSize={13} />
                 <span style={{ color: "var(--text)", flex: 1, minWidth: 0 }}>
                   {r.label}
+                  {shareBadge(r)}
                   {r.kind === "vinstandel" && vinstandelHint(r.metadata) && (
                     <span style={{ display: "block", fontSize: 10.5, color: "var(--text-muted)" }}>{vinstandelHint(r.metadata)}</span>
                   )}
                 </span>
-                <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(Number(r.value_sek))}</span>
+                <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(effectiveValueSek(r))}</span>
                 <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                   style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
               </div>
               {(loansByAsset.get(r.id) || []).map(loan => (
                 <div key={loan.id} style={{ ...rowStyle, cursor: "pointer", paddingLeft: 36, paddingTop: 0 }} onClick={() => onNavigate?.("portfolio", { manualId: loan.id })} title="Öppna lånet">
                   <IconBadge kind={loan.kind} color={KIND_COLORS[loan.kind] || "var(--neg)"} size={20} iconSize={11} />
-                  <span style={{ color: "var(--text-secondary)", flex: 1, minWidth: 0 }}>{loan.label}</span>
-                  <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(Number(loan.value_sek))}</span>
+                  <span style={{ color: "var(--text-secondary)", flex: 1, minWidth: 0 }}>{loan.label}{shareBadge(loan)}</span>
+                  <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(effectiveValueSek(loan))}</span>
                   <button onClick={(e) => { e.stopPropagation(); removeRow(loan.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                     style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
                 </div>
@@ -115,8 +130,8 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
           {standaloneDebts.map(r => (
             <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna lånet">
               <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--neg)"} size={26} iconSize={13} />
-              <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>
-              <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(Number(r.value_sek))}</span>
+              <span style={{ color: "var(--text)", flex: 1 }}>{r.label}{shareBadge(r)}</span>
+              <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(effectiveValueSek(r))}</span>
               <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>

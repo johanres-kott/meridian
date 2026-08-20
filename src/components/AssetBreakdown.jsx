@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useTranslation } from "react-i18next";
+import { effectiveValueSek } from "../lib/manualAssets.js";
 
 // Portfölj-heron (DESIGN.md): Finarys "Assets | Liabilities"-donut per
 // tillgångsslag. Data från useNetWorth (delas med Hem) — aktier/fonder i SEK,
@@ -41,9 +42,10 @@ export default function AssetBreakdown({ data, isMobile, onNavigate }) {
       push(assets, "stocks", data.portfolioSek);
     }
     push(assets, "pension", data.pensionValue);
-    for (const r of data.assets || []) push(assets, KIND_TO_CAT[r.kind] || "ovrigt", Number(r.value_sek));
+    // effectiveValueSek: bara användarens ägarandel — matchar nettoförmögenheten
+    for (const r of data.assets || []) push(assets, KIND_TO_CAT[r.kind] || "ovrigt", effectiveValueSek(r));
     const debts = [];
-    for (const r of data.debts || []) push(debts, KIND_TO_CAT[r.kind] || "skuld", Number(r.value_sek));
+    for (const r of data.debts || []) push(debts, KIND_TO_CAT[r.kind] || "skuld", effectiveValueSek(r));
     assets.sort((a, b) => b.value - a.value);
     debts.sort((a, b) => b.value - a.value);
     return {

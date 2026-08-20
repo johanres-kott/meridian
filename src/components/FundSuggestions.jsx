@@ -12,18 +12,25 @@ const CATEGORIES = [
 export default function FundSuggestions({ isMobile, onNavigate, initialCategory, initialType }) {
   const [category, setCategory] = useState(initialCategory || "aktie_sverige");
   const [typeFilter, setTypeFilter] = useState(initialType || "all"); // "all" | "index" | "active"
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Nyckelbaserat resultat: loading härleds ur att svaret för AKTUELL kategori
+  // saknas — ingen synkron setLoading i effekten (react-hooks/set-state-in-effect).
+  const [result, setResult] = useState(null); // { category, data } | { category, error }
   const [adding, setAdding] = useState(new Set());
   const [added, setAdded] = useState(new Set());
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     fetch(`/api/fund-top?category=${category}`)
       .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(d => { if (!cancelled) setResult({ category, data: d }); })
+      .catch(() => { if (!cancelled) setResult({ category, error: true }); });
+    return () => { cancelled = true; };
   }, [category]);
+
+  const current = result && result.category === category ? result : null;
+  const loading = !current;
+  const data = current?.data ?? null;
+  const error = current?.error ?? null;
 
   async function addToWatchlist(fund) {
     if (adding.has(fund.secId) || added.has(fund.secId)) return;
@@ -102,6 +109,8 @@ export default function FundSuggestions({ isMobile, onNavigate, initialCategory,
       <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
           <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Hämtar fonder...</div>
+        ) : error ? (
+          <div style={{ fontSize: 12, color: "var(--neg)", padding: "20px" }}>Kunde inte hämta fondlistan just nu — försök igen om en stund.</div>
         ) : !filtered.length ? (
           <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Inga fonder hittades</div>
         ) : (

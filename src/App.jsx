@@ -1,28 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { supabase } from "./supabase.js";
 import { useIsMobile } from "./hooks/useIsMobile.js";
 import { UserProvider, useUser } from "./contexts/UserContext.jsx";
 import Login from "./components/Login.jsx";
 import LandingPage from "./components/LandingPage.jsx";
-import Overview from "./components/Overview.jsx";
-import Portfolio from "./components/Portfolio.jsx";
-import AnalysisTab from "./components/AnalysisTab.jsx";
-import CompanySearch from "./components/CompanySearch.jsx";
-import MarketsView from "./components/MarketsView.jsx";
+const Overview = lazy(() => import("./components/Overview.jsx"));
+const Portfolio = lazy(() => import("./components/Portfolio.jsx"));
+const AnalysisTab = lazy(() => import("./components/AnalysisTab.jsx"));
+const CompanySearch = lazy(() => import("./components/CompanySearch.jsx"));
+const MarketsView = lazy(() => import("./components/MarketsView.jsx"));
 import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
 import Terms from "./components/Terms.jsx";
-import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
+const InvestmentCompanies = lazy(() => import("./components/InvestmentCompanies.jsx"));
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import QuickGuide from "./components/QuickGuide.jsx";
-import ScoringMethodology from "./components/ScoringMethodology.jsx";
-import ProfilePage from "./components/ProfilePage.jsx";
-import Documentation from "./components/Documentation.jsx";
-import AboutPage from "./components/AboutPage.jsx";
-import SecurityPage from "./components/SecurityPage.jsx";
+const ScoringMethodology = lazy(() => import("./components/ScoringMethodology.jsx"));
+const ProfilePage = lazy(() => import("./components/ProfilePage.jsx"));
+const Documentation = lazy(() => import("./components/Documentation.jsx"));
+const AboutPage = lazy(() => import("./components/AboutPage.jsx"));
+const SecurityPage = lazy(() => import("./components/SecurityPage.jsx"));
 import ProfileMenu from "./components/ProfileMenu.jsx";
-import AddAssetsPage from "./components/addassets/AddAssetsPage.jsx";
-import GoalsTab from "./components/GoalsTab.jsx";
+const AddAssetsPage = lazy(() => import("./components/addassets/AddAssetsPage.jsx"));
+const GoalsTab = lazy(() => import("./components/GoalsTab.jsx"));
 import { useTranslation } from "react-i18next";
 import { LANGUAGES, setLanguage } from "./i18n/index.js";
 
@@ -46,6 +46,21 @@ const TABS = [
   { id: "commodities", key: "nav.commodities" },
   { id: "search", key: "nav.search" },
 ];
+
+// Egen komponent så sekundticket bara re-renderar klockan, inte hela appen
+// (AppContent hade setTime i state → aktiv flik inkl. grafer reconcilades 1 g/s).
+function Clock() {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>
+      {time.toLocaleTimeString("sv-SE")} CET
+    </span>
+  );
+}
 
 function Logo({ size = 22 }) {
   return (
@@ -109,18 +124,12 @@ function AppContent() {
 
   const [tab, setTab] = useState("markets");
   const [deepLink, setDeepLink] = useState(null);
-  const [time, setTime] = useState(new Date());
   const [showAddAssets, setShowAddAssets] = useState(false);
 
   function navigate(targetTab, detail) {
     setDeepLink(detail || null);
     setTab(targetTab);
   }
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const addAssetsButton = (
     <button
@@ -131,8 +140,14 @@ function AppContent() {
     </button>
   );
 
+  // Lata flikvyer: en kort laddindikator i innehållsytan vid första besöket
+  // på en flik — därefter är chunken cachead av webbläsaren.
+  const contentFallback = (
+    <div style={{ padding: 40, textAlign: "center", color: "var(--text-secondary)", fontSize: 13 }}>Laddar…</div>
+  );
+
   const content = (
-    <>
+    <Suspense fallback={contentFallback}>
       {tab === "markets" && <Overview onNavigate={navigate} onAddAssets={() => setShowAddAssets(true)} />}
       {tab === "goals" && <GoalsTab />}
       {tab === "commodities" && <MarketsView deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
@@ -147,7 +162,7 @@ function AppContent() {
       {tab === "security" && <SecurityPage />}
       {tab === "terms" && <Terms onBack={() => setTab("markets")} />}
       {tab === "privacy" && <Privacy onBack={() => setTab("markets")} />}
-    </>
+    </Suspense>
   );
 
   const modals = (
@@ -168,7 +183,9 @@ function AppContent() {
 
       {/* Add assets-katalog (helsida, Finary-inspirerad) */}
       {showAddAssets && (
-        <AddAssetsPage onClose={() => setShowAddAssets(false)} onNavigate={navigate} />
+        <Suspense fallback={contentFallback}>
+          <AddAssetsPage onClose={() => setShowAddAssets(false)} onNavigate={navigate} />
+        </Suspense>
       )}
     </>
   );
@@ -233,9 +250,7 @@ function AppContent() {
           <span style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>Thesion</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <span style={{ fontSize: 12, color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>
-            {time.toLocaleTimeString("sv-SE")} CET
-          </span>
+          <Clock />
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pos)" }} />
             <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>Live</span>

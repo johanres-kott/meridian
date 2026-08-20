@@ -19,6 +19,7 @@ function ScoreBadge({ score }) {
 export default function SmartSuggestions({ profile, existingTickers, isMobile, onNavigate }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [adding, setAdding] = useState(new Set());
   const [added, setAdded] = useState(new Set());
 
@@ -33,8 +34,8 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
 
     fetch(`/api/suggestions?${params}`)
       .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(d => { setData(d); setError(null); setLoading(false); })
+      .catch(() => { setError(true); setLoading(false); });
   }, [investorType, riskProfile, existingTickers]);
 
   async function addToWatchlist(item) {
@@ -50,7 +51,7 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
     if (!error) setAdded(prev => new Set([...prev, item.ticker]));
   }
 
-  if (!loading && (!data?.suggestions || data.suggestions.length === 0)) return null;
+  if (!loading && !error && (!data?.suggestions || data.suggestions.length === 0)) return null;
 
   const mono = { fontFamily: "var(--font-mono)" };
 
@@ -77,6 +78,8 @@ export default function SmartSuggestions({ profile, existingTickers, isMobile, o
       <div style={{ padding: isMobile ? "8px 0" : "0", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {loading ? (
           <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "20px" }}>Beräknar förslag...</div>
+        ) : error ? (
+          <div style={{ fontSize: 12, color: "var(--neg)", padding: "20px" }}>Kunde inte hämta förslagen just nu — försök igen om en stund.</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: isMobile ? 11 : 12, minWidth: isMobile ? 0 : undefined }}>
             <thead>

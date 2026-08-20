@@ -1,6 +1,6 @@
 // Fältdefinitioner per manuell tillgångstyp — används av tillgångssidan
 // (ManualAssetView) för att visa och redigera metadata med svenska etiketter.
-// type: text | number | date | select | money | percent | kr-per-month
+// type: text | number | date | select | money | percent | kr-per-month | boolean
 
 const PROPERTY_TYPES = [
   { value: "lagenhet", label: "Lägenhet" },
@@ -57,12 +57,14 @@ export const FIELDS_BY_KIND = {
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
     { key: "amortizationRate", label: "Amortering, per år", type: "percent" },
+    { key: "autoAmortize", label: "Automatisk amortering", type: "boolean" },
     { key: "ownershipShare", label: "Ägarandel", type: "number", unit: "%" },
   ],
   skuld: [
     { key: "lender", label: "Långivare", type: "text" },
     { key: "interestRate", label: "Ränta", type: "percent" },
     { key: "amortizationRate", label: "Amortering, per år", type: "percent" },
+    { key: "autoAmortize", label: "Automatisk amortering", type: "boolean" },
   ],
   vinstandel: [
     { key: "provider", label: "Stiftelse / förvaltare", type: "text" },
@@ -91,6 +93,7 @@ export function formatFieldValue(field, value) {
     case "kr-per-month": return `${Math.round(Number(value)).toLocaleString("sv-SE")} kr/mån`;
     case "percent": return `${String(value).replace(".", ",")} %`;
     case "number": return `${fmtNum(value)}${field.unit ? ` ${field.unit}` : ""}`;
+    case "boolean": return value === true ? "Ja" : null; // av/osatt döljs i visningsläget
     case "date": return String(value);
     default: return String(value);
   }
@@ -98,6 +101,7 @@ export function formatFieldValue(field, value) {
 
 // Inmatad sträng → lagrat värde (null om tomt). Tal parsas med svensk decimal.
 export function parseFieldInput(field, raw) {
+  if (field.type === "boolean") return raw === true || raw === "true"; // checkbox ger boolean
   const s = String(raw ?? "").trim();
   if (!s) return null;
   if (["money", "kr-per-month", "percent", "number"].includes(field.type)) {
@@ -109,6 +113,7 @@ export function parseFieldInput(field, raw) {
 
 // Lagrat värde → inmatad sträng
 export function fieldToInput(field, value) {
+  if (field.type === "boolean") return value === true; // checkbox vill ha boolean, inte sträng
   if (value == null) return "";
   if (["money", "kr-per-month", "number"].includes(field.type)) return String(value);
   if (field.type === "percent") return String(value).replace(".", ",");

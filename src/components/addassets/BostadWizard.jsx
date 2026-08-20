@@ -31,7 +31,7 @@ export default function BostadWizard({ onSaved, onBack }) {
   const [d, setD] = useState({
     name: "", propertyType: "lagenhet", address: "", livingArea: "", buildYear: "",
     value: "", purchasePrice: "", purchaseDate: "",
-    loanAmount: "", lender: "", interestRate: "", amortizationRate: "", pantbrev: "", downPayment: "",
+    loanAmount: "", lender: "", interestRate: "", amortizationRate: "", autoAmortize: false, pantbrev: "", downPayment: "",
     ownershipShare: "100", loanShare: "",
   });
 
@@ -96,6 +96,7 @@ export default function BostadWizard({ onSaved, onBack }) {
             lender: d.lender.trim() || null,
             interestRate: parseAmount(d.interestRate),
             amortizationRate: parseAmount(d.amortizationRate),
+            autoAmortize: d.autoAmortize === true && (parseAmount(d.amortizationRate) ?? 0) > 0,
             ownershipShare: loanShare ?? ownershipShare,
           },
         });
@@ -216,6 +217,24 @@ export default function BostadWizard({ onSaved, onBack }) {
                     style={{ fontSize: 11, color: "var(--brand)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, textDecoration: "underline" }}>
                     Använd
                   </button>
+                </div>
+              );
+            })()}
+            {(() => {
+              // Opt-in: cronen räknar ner lånet varje månad med amorteringen —
+              // meningslöst utan amorteringstakt, så avstängd (disabled) tills den fylls i.
+              const hasAmortRate = (parseAmount(d.amortizationRate) ?? 0) > 0;
+              return (
+                <div>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text)", cursor: hasAmortRate ? "pointer" : "default", opacity: hasAmortRate ? 1 : 0.5 }}>
+                    <input type="checkbox" checked={d.autoAmortize} disabled={!hasAmortRate}
+                      onChange={e => setD({ ...d, autoAmortize: e.target.checked })}
+                      style={{ width: 16, height: 16, accentColor: "var(--accent)" }} />
+                    Räkna ner lånet med amorteringen varje månad
+                  </label>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4, marginLeft: 24 }}>
+                    Saldot räknas ner den 1:a varje månad — stäm av mot banken då och då.
+                  </div>
                 </div>
               );
             })()}

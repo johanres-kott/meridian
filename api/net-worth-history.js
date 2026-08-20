@@ -26,7 +26,10 @@ export default async function handler(req, res) {
       .limit(2000);
     if (error) {
       console.error("net-worth-history error:", error);
-      return res.status(500).json({ error: error.message });
+      {
+    console.error("net-worth-history:", error.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
     }
     res.setHeader("Cache-Control", "private, max-age=300");
     return res.status(200).json({

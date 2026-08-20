@@ -1,9 +1,8 @@
-import { setCors } from "./_cors.js";
+import { withCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
-export default async function handler(req, res) {
-  if (setCors(req, res)) return;
+async function handler(req, res) {
   if (rateLimit(req, res, 60)) return;
 
   const ticker = req.query.ticker;
@@ -52,3 +51,5 @@ export default async function handler(req, res) {
     scoredAt: data.scored_at,
   });
 }
+
+export default withCors(handler);

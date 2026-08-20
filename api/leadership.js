@@ -119,11 +119,10 @@ async function getLeadership(id) {
 
 const VALID_IDS = new Set(Object.keys(FALLBACK));
 
-import { setCors } from "./_cors.js";
+import { withCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 
-export default async function handler(req, res) {
-  if (setCors(req, res)) return;
+async function handler(req, res) {
   if (rateLimit(req, res, 30)) return;
   res.setHeader("Cache-Control", "s-maxage=43200, stale-while-revalidate=86400");
 
@@ -148,3 +147,5 @@ export default async function handler(req, res) {
   const data = await getLeadership(id);
   res.status(200).json(data);
 }
+
+export default withCors(handler);

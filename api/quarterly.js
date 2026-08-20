@@ -1,25 +1,9 @@
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
+import { getYahooCrumb } from "./_yahoo.js";
 
 const UA = "Mozilla/5.0";
 
-async function getYahooCrumb() {
-  try {
-    const cookieRes = await fetch("https://fc.yahoo.com", {
-      headers: { "User-Agent": UA },
-      redirect: "follow",
-    });
-    const cookies = cookieRes.headers.get("set-cookie") ?? "";
-    const crumbRes = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
-      headers: { "User-Agent": UA, "Cookie": cookies },
-    });
-    const crumb = await crumbRes.text();
-    if (!crumb || crumb.length < 3) return null;
-    return { crumb, cookies };
-  } catch {
-    return null;
-  }
-}
 
 export default async function handler(req, res) {
   setCors(req, res);

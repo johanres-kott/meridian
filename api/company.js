@@ -1,6 +1,8 @@
+/* global process */
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
+import { getYahooCrumb } from "./_yahoo.js";
 
 const FMP_KEY = process.env.FMP_KEY;
 const FINNHUB_KEY = process.env.FINNHUB_KEY;
@@ -20,23 +22,6 @@ async function getCalculatedBeta(ticker) {
 }
 const UA = "Mozilla/5.0";
 
-async function getYahooCrumb() {
-  try {
-    const cookieRes = await fetch("https://fc.yahoo.com", {
-      headers: { "User-Agent": UA },
-      redirect: "follow",
-    });
-    const cookies = cookieRes.headers.get("set-cookie") ?? "";
-    const crumbRes = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
-      headers: { "User-Agent": UA, "Cookie": cookies },
-    });
-    const crumb = await crumbRes.text();
-    if (!crumb || crumb.length < 3) return null;
-    return { crumb, cookies };
-  } catch {
-    return null;
-  }
-}
 
 async function getYahooPriceV8(ticker) {
   try {

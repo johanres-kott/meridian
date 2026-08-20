@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     const params = new URLSearchParams({
       page: "1",
-      pageSize: "1",
+      pageSize: "10", // term-sök kan ranka annan andelsklass först — vi filtrerar på SecId nedan
       sortOrder: "LegalName asc",
       outputType: "json",
       version: "1",

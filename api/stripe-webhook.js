@@ -1,3 +1,4 @@
+/* global process, Buffer */
 import Stripe from "stripe";
 import { getSupabase } from "./_supabase.js";
 

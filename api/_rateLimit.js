@@ -1,3 +1,4 @@
+/* global process */
 // Simple in-memory rate limiter for Vercel serverless functions.
 // Note: Each serverless instance has its own memory, so this is
 // per-instance, not global. Still effective against single-source abuse.

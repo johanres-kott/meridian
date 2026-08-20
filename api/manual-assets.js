@@ -76,11 +76,12 @@ export default async function handler(req, res) {
         .eq("id", id)
         .eq("user_id", user.id)
         .select()
-        .single();
+        .maybeSingle();
       if (error) {
         console.error("manual-assets update error:", error);
         return res.status(500).json({ error: "Could not update" });
       }
+      if (!data) return res.status(404).json({ error: "not found" });
       return res.status(200).json(data);
     }
 

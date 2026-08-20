@@ -1,9 +1,8 @@
-import { setCors } from "./_cors.js";
+import { withCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
-export default async function handler(req, res) {
-  if (setCors(req, res)) return;
+async function handler(req, res) {
   if (rateLimit(req, res, 30)) return;
 
   const supabase = getSupabase();
@@ -30,7 +29,10 @@ export default async function handler(req, res) {
   if (market) query = query.eq("market", market);
 
   const { data, error } = await query;
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error("suggestions:", error.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 
   // Filter excluded tickers and limit
   const filtered = (data || [])
@@ -78,3 +80,5 @@ function generateHighlights(d) {
   if (d.risk === "low") tags.push("Låg risk");
   return tags.slice(0, 3);
 }
+
+export default withCors(handler);

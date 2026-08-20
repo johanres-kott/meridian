@@ -1,10 +1,13 @@
+/* global process */
 import Stripe from "stripe";
 import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
+  if (rateLimit(req, res, 30)) return;
 
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(200).json({ premium: false });

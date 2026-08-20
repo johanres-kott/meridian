@@ -75,7 +75,7 @@ export default function Privacy({ onBack }) {
 
       <Section title="9. Kontakt">
         Har du frågor om din data eller vill utöva dina rättigheter? Kontakta oss
-        på <strong>privacy@thesion.tech</strong>.
+        på <strong>info@thesion.tech</strong>.
       </Section>
     </div>
   );

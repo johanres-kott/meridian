@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabase.js";
 
-export default function Login({ onShowPrivacy, defaultMode = "login" }) {
+export default function Login({ onShowPrivacy, onShowTerms, defaultMode = "login" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState(defaultMode); // "login" | "signup" | "magic"
@@ -167,6 +167,26 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
           </button>
         </form>
 
+        {mode === "signup" && (
+          <p style={{ fontSize: 11, color: "#787b86", marginTop: 12, lineHeight: 1.5, textAlign: "center" }}>
+            Genom att skapa ett konto godkänner du{" "}
+            <button
+              onClick={onShowTerms}
+              style={{ fontSize: 11, color: "var(--brand)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}
+            >
+              användarvillkoren
+            </button>
+            {" "}och{" "}
+            <button
+              onClick={onShowPrivacy}
+              style={{ fontSize: 11, color: "var(--brand)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}
+            >
+              integritetspolicyn
+            </button>
+            .
+          </p>
+        )}
+
         <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid #f0f3fa", paddingTop: 20 }}>
           {mode === "login" && (
             <button
@@ -198,14 +218,24 @@ export default function Login({ onShowPrivacy, defaultMode = "login" }) {
         </div>
       </div>
 
-      {onShowPrivacy && (
-        <button
-          onClick={onShowPrivacy}
-          style={{ marginTop: 16, fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-        >
-          Integritetspolicy
-        </button>
-      )}
+      <div style={{ marginTop: 16, display: "flex", gap: 16 }}>
+        {onShowTerms && (
+          <button
+            onClick={onShowTerms}
+            style={{ fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            Användarvillkor
+          </button>
+        )}
+        {onShowPrivacy && (
+          <button
+            onClick={onShowPrivacy}
+            style={{ fontSize: 11, color: "#787b86", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            Integritetspolicy
+          </button>
+        )}
+      </div>
     </div>
   );
 }

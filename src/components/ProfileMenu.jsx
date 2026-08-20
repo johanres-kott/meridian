@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
-import { usePremium } from "../hooks/usePremium.js";
 import { useTheme } from "../hooks/useTheme.js";
 import { sanitizeInput } from "../lib/sanitize.js";
 import { LANGUAGES, setLanguage } from "../i18n/index.js";
@@ -15,11 +14,9 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
   const { preferences, updatePreferences, displayName, session } = useUser();
   const { t, i18n } = useTranslation();
   const { toggleTheme, isDark } = useTheme();
-  const { premium, loading: premiumLoading } = usePremium();
   const [open, setOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
-  const [portalLoading, setPortalLoading] = useState(false);
   const ref = useRef(null);
 
   const displayInitial = (preferences.display_name?.[0] || session?.user?.email?.[0] || "?").toUpperCase();
@@ -49,22 +46,6 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
   function changeLanguage(code) {
     setLanguage(code);
     updatePreferences({ language: code });
-  }
-
-  async function openStripePortal() {
-    setPortalLoading(true);
-    try {
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      const res = await fetch("/api/stripe-portal", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${authSession?.access_token}` },
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch (err) {
-      console.error("ProfileMenu: stripe portal failed:", err);
-    }
-    setPortalLoading(false);
   }
 
   function go(tab) {
@@ -174,38 +155,11 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
             </div>
           )}
 
-          <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500 }}>Prenumeration</div>
-              {premium && (
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 3, background: "rgba(15,154,108,0.1)", color: "var(--pos)", fontWeight: 600 }}>
-                  ★ Premium
-                </span>
-              )}
-            </div>
-            {premiumLoading ? (
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Laddar...</div>
-            ) : premium ? (
-              <button
-                onClick={openStripePortal}
-                disabled={portalLoading}
-                style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: portalLoading ? "default" : "pointer", fontFamily: "inherit", padding: 0, marginTop: 4 }}
-              >
-                {portalLoading ? "Öppnar..." : "Hantera prenumeration →"}
-              </button>
-            ) : (
-              <button
-                onClick={() => go("analysis")}
-                style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginTop: 4 }}
-              >
-                Uppgradera till Premium →
-              </button>
-            )}
-          </div>
-
           <button onClick={() => go("profile")} style={itemStyle} {...hover}>Profil & inställningar</button>
           <button onClick={() => go("docs")} style={itemStyle} {...hover}>Dokumentation</button>
           <button onClick={() => go("security")} style={itemStyle} {...hover}>Din data & säkerhet</button>
+          <button onClick={() => go("terms")} style={itemStyle} {...hover}>Användarvillkor</button>
+          <button onClick={() => go("privacy")} style={itemStyle} {...hover}>Integritetspolicy</button>
           <button onClick={() => go("about")} style={itemStyle} {...hover}>Om Thesion</button>
 
           <div style={{ padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>

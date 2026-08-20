@@ -23,7 +23,7 @@ const DRIVERS = [
   { key: "dividend", label: "Utdelning", hint: "Utdelningens nivå och stabilitet" },
 ];
 
-export default function HealthSignal({ ticker, investorProfile }) {
+export default function HealthSignal({ ticker }) {
   const [result, setResult] = useState(null);
 
   useEffect(() => {
@@ -39,8 +39,9 @@ export default function HealthSignal({ ticker, investorProfile }) {
   const scoreData = result?.ticker === ticker ? result.data : null;
   if (!scoreData?.composite) return null;
 
-  const profileType = investorProfile?.investorType || "mixed";
-  const composite = scoreData.composite[profileType] ?? scoreData.composite.mixed;
+  // Signalen är medvetet samma för alla användare — en profilviktad poäng vore
+  // ett steg mot en personlig rekommendation (se COMPLIANCE.md).
+  const composite = scoreData.composite.mixed;
   if (composite == null) return null;
 
   const verdict = verdictFor(composite);

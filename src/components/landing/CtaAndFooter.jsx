@@ -3,7 +3,7 @@ import { btnPrimary } from "./buttons.js";
 
 // Avslutande CTA (mörkgrön sektion, guld-CTA enligt designsystemet) + footer.
 
-export default function CtaAndFooter({ isMobile, onSignup, onShowPrivacy }) {
+export default function CtaAndFooter({ isMobile, onSignup, onShowPrivacy, onShowTerms }) {
   return (
     <>
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: `${isMobile ? 56 : 96}px ${isMobile ? 20 : 40}px` }}>
@@ -30,6 +30,9 @@ export default function CtaAndFooter({ isMobile, onSignup, onShowPrivacy }) {
           </div>
           <div style={{ display: "flex", gap: 20, alignItems: "center", fontSize: 13, color: "var(--text-secondary)" }}>
             <span>Kurser: Yahoo Finance · Fonder: Morningstar</span>
+            <button onClick={onShowTerms} style={{ fontSize: 13, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, borderRadius: 0 }}>
+              Användarvillkor
+            </button>
             <button onClick={onShowPrivacy} style={{ fontSize: 13, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, borderRadius: 0 }}>
               Integritetspolicy
             </button>

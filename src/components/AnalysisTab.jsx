@@ -1,12 +1,10 @@
 import { useState } from "react";
 import GapAnalysis from "./GapAnalysis.jsx";
-import PremiumAnalyses from "./PremiumAnalyses.jsx";
 import OwnershipOverlay from "./OwnershipOverlay.jsx";
 
 const SUB_TABS = [
   { id: "nyckeltal", label: "Nyckeltal" },
   { id: "agarstruktur", label: "Ägarstruktur" },
-  { id: "rapporter", label: "Rapporter ★" },
 ];
 
 export default function AnalysisTab({ onNavigate, isMobile }) {
@@ -44,7 +42,6 @@ export default function AnalysisTab({ onNavigate, isMobile }) {
           isMobile={isMobile}
         />
       )}
-      {sub === "rapporter" && <PremiumAnalyses isMobile={isMobile} />}
     </div>
   );
 }

@@ -137,11 +137,11 @@
   },
   "feeScan": {
     "title": "Avgiftskoll",
-    "intro": "Dina aktiva fonder jämfört med billigaste globala indexfonden i vår lista ({{name}}, {{fee}} % avgift):",
+    "intro": "Så här skiljer sig avgiften på dina aktiva fonder mot billigaste globala indexfonden i vår lista ({{name}}, {{fee}} % avgift):",
     "perYear": "kr/år i skillnad",
     "feeLabel": "avgift",
     "total": "Totalt ≈ {{amount}} kr per år i avgiftsskillnad",
-    "disclaimer": "Räknat på nuvarande innehavsvärde och avgifter (källa: Morningstar). Fonder skiljer sig i inriktning och risk — generell information, inte personlig rådgivning."
+    "disclaimer": "Räkneexempel på nuvarande innehavsvärde och avgifter (källa: Morningstar), inte ett byt-förslag. Fonder skiljer sig i inriktning och risk — generell information, inte personlig rådgivning."
   },
   "myFinances": {
     "title": "Min ekonomi",

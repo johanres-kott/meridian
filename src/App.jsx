@@ -11,6 +11,7 @@ import CompanySearch from "./components/CompanySearch.jsx";
 import MarketsView from "./components/MarketsView.jsx";
 import NotificationBell from "./components/NotificationBell.jsx";
 import Privacy from "./components/Privacy.jsx";
+import Terms from "./components/Terms.jsx";
 import InvestmentCompanies from "./components/InvestmentCompanies.jsx";
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import QuickGuide from "./components/QuickGuide.jsx";
@@ -59,6 +60,7 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -80,7 +82,8 @@ export default function App() {
   }
 
   if (showPrivacy) return <Privacy onBack={() => setShowPrivacy(false)} />;
-  if (!session) return <LandingPage onShowPrivacy={() => setShowPrivacy(true)} />;
+  if (showTerms) return <Terms onBack={() => setShowTerms(false)} />;
+  if (!session) return <LandingPage onShowPrivacy={() => setShowPrivacy(true)} onShowTerms={() => setShowTerms(true)} />;
 
   return (
     <UserProvider session={session}>
@@ -142,6 +145,8 @@ function AppContent() {
       {tab === "docs" && <Documentation />}
       {tab === "about" && <AboutPage onNavigate={navigate} />}
       {tab === "security" && <SecurityPage />}
+      {tab === "terms" && <Terms onBack={() => setTab("markets")} />}
+      {tab === "privacy" && <Privacy onBack={() => setTab("markets")} />}
     </>
   );
 

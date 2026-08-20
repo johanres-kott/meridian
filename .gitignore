@@ -25,5 +25,4 @@ dist-ssr
 *.sw?
 .claude/worktrees/
 .claude/plans/
-ARCHITECTURE.md
 .vercel

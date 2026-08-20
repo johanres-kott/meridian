@@ -1,3 +1,4 @@
+/* global process */
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 

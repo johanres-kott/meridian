@@ -1,3 +1,4 @@
+/* global global, process */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock fetch globally

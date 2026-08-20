@@ -1,3 +1,4 @@
+/* global process */
 /**
  * Shared Supabase client for API routes.
  * Reads credentials from environment variables.

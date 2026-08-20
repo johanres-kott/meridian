@@ -1,5 +1,7 @@
+/* global process */
 import Stripe from "stripe";
 import { setCors } from "./_cors.js";
+import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
 /**
@@ -9,6 +11,7 @@ import { getSupabase } from "./_supabase.js";
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
+  if (rateLimit(req, res, 30)) return;
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
   const { slug } = req.query;
@@ -41,7 +44,7 @@ export default async function handler(req, res) {
           const subs = await stripe.subscriptions.list({ customer: customers.data[0].id, status: "active", limit: 1 });
           if (subs.data.length > 0) isPremium = true;
         }
-      } catch {}
+      } catch { /* premiumkoll får aldrig blockera svaret */ }
     }
   }
 

@@ -53,6 +53,7 @@ export default async function handler(req, res) {
         };
       })
     );
+    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=30");
     res.status(200).json(results);
   } catch (err) {
     console.error("Indices error:", err.message);

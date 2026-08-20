@@ -39,6 +39,27 @@ function rowTexts(container) {
 }
 
 describe("NetWorthCard", () => {
+  it("groups a bolan with a dangling linkedAssetId under the only bostad", () => {
+    const data = makeData({
+      assets: [{ id: "h2", kind: "bostad", label: "huset", value_sek: 4618000, metadata: {} }],
+      debts: [{ id: "l1", kind: "bolan", label: "Huset", value_sek: 3828724, metadata: { linkedAssetId: "raderad-rad" } }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[0]).toContain("huset");
+    expect(rows[1]).toContain("Huset");
+  });
+
+  it("labels the portfolio row by its contents", () => {
+    const stocksOnly = makeData({ portfolioSek: 200000, stocksSek: 200000, fundsSek: 0 });
+    const { container, unmount } = render(<NetWorthCard data={stocksOnly} />);
+    expect([...container.querySelectorAll("span")].map(e => e.textContent)).toContain("myFinances.stocksOnly");
+    unmount();
+    const fundsOnly = makeData({ portfolioSek: 200000, stocksSek: 0, fundsSek: 200000 });
+    const r2 = render(<NetWorthCard data={fundsOnly} />);
+    expect([...r2.container.querySelectorAll("span")].map(e => e.textContent)).toContain("myFinances.fundsOnly");
+  });
+
   it("splits the portfolio row into stocks and funds when both exist", () => {
     const data = makeData({ portfolioSek: 300000, stocksSek: 200000, fundsSek: 100000 });
     const { container } = render(<NetWorthCard data={data} />);

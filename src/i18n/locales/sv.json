@@ -146,7 +146,9 @@
   "myFinances": {
     "title": "Min ekonomi",
     "netWorth": "Nettoförmögenhet",
-    "portfolio": "Portfölj",
+    "portfolio": "Aktie- och fondportfölj",
+    "stocksOnly": "Aktieportfölj",
+    "fundsOnly": "Fondportfölj",
     "stocks": "Aktier",
     "funds": "Fonder",
     "pension": "Pension",

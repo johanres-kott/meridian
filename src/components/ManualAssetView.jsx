@@ -5,7 +5,6 @@ import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { KIND_LABELS, VALUE_LABELS, FIELDS_BY_KIND, formatFieldValue, parseFieldInput, fieldToInput } from "./assetFields.js";
 import { summarizeTranches, DEFAULT_LOCK_YEARS } from "./addassets/vinstandel.js";
-import BooliValuation from "./addassets/BooliValuation.jsx";
 
 // SCB:s regioner för småhusindexet (FastpiPSRegKv) — samma lista som
 // api/property-index.js validerar mot.
@@ -65,7 +64,9 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  // Värdeindikation (endast bostad): SCB-indexuppräkning + Booli
+  // Värdeindikation (endast bostad): SCB-indexuppräkning. Booli-uppslaget är
+  // avmonterat i UI:t (ingen nyckel; annan slutpriskälla utreds) — komponenten
+  // BooliValuation och /api/property-valuation finns kvar.
   const [indexRegion, setIndexRegion] = useState(meta.indexRegion || "00");
   const [indexLoading, setIndexLoading] = useState(false);
   const [indexResult, setIndexResult] = useState(null);
@@ -340,7 +341,7 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
         )}
       </div>
 
-      {/* Värdeindikation (endast bostad): SCB-indexuppräkning + Booli.
+      {/* Värdeindikation (endast bostad): SCB-indexuppräkning.
           Statistiska indikationer — skrivs aldrig till värdet utan uttryckligt
           klick på "Använd som värde" (COMPLIANCE.md/PIVOT.md). */}
       {kind === "bostad" && !row.is_debt && !editing && (
@@ -387,19 +388,6 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
               Lägg till köpeskilling och köpdatum (Redigera) för att räkna upp värdet med SCB:s prisindex.
             </div>
           )}
-
-          <details style={{ marginTop: 14 }}>
-            <summary style={{ fontSize: 12, color: "var(--text-secondary)", cursor: "pointer" }}>
-              Värdeindikation från området (Booli)
-            </summary>
-            <div style={{ marginTop: 10 }}>
-              <BooliValuation
-                initialAddress={meta.address || ""}
-                initialSqm={meta.livingArea ? String(meta.livingArea) : ""}
-                onUseEstimate={v => applyEstimate(v, null)}
-              />
-            </div>
-          </details>
 
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 12, lineHeight: 1.5 }}>
             Statistiska indikationer — ingen värdering av just din bostad. Utgör inte finansiell rådgivning.

@@ -28,7 +28,7 @@ export default function Terms({ onBack }) {
 
       <Section title="3. Datakällor och riktighet">
         Kurser, fonddata och annan marknadsinformation kommer från tredje parter (bland
-        annat Yahoo Finance, Morningstar och Booli) och kan vara försenad, ofullständig
+        annat Yahoo Finance, Morningstar och SCB) och kan vara försenad, ofullständig
         eller felaktig. Vi garanterar inte att uppgifterna stämmer, och du bör alltid
         kontrollera dem mot din bank eller mäklare innan du fattar beslut.
       </Section>

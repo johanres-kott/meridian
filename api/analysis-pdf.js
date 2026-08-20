@@ -2,7 +2,7 @@
 import Stripe from "stripe";
 import { setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
-import { getSupabase } from "./_supabase.js";
+import { getServiceSupabase, getSupabase } from "./_supabase.js";
 
 /**
  * GET /api/analysis-pdf?slug=ag-equipment
@@ -24,9 +24,17 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
   if (authError || !user) return res.status(401).json({ error: "Not authenticated" });
 
+  // premium_subscriptions är RLS-låst — läs med service role, filtrerat på
+  // den JWT-verifierade användarens id. Saknas nyckeln: gamla beteendet.
+  let dbClient = getServiceSupabase();
+  if (!dbClient) {
+    console.warn("SUPABASE_SERVICE_ROLE_KEY saknas — läser premium_subscriptions med anon-klienten");
+    dbClient = supabase;
+  }
+
   // Check premium status
   let isPremium = false;
-  const { data: sub } = await supabase
+  const { data: sub } = await dbClient
     .from("premium_subscriptions")
     .select("status")
     .eq("user_id", user.id)

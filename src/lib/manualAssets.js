@@ -1,4 +1,5 @@
 import { supabase } from "../supabase.js";
+import { invalidateValuation } from "./portfolioValue.js";
 
 // Skrivningar mot manual_assets går via vår egen API-proxy (/api/manual-assets)
 // i stället för direkt mot Supabase — Safari avbröt direkta POST:ar mot
@@ -19,6 +20,9 @@ export async function createManualAsset(payload) {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+  // Skrivningarna sker från flera wizards (addassets/*, ManualAssetView) —
+  // libben är enda gemensamma chokepointen, så cache-invalideringen bor här.
+  invalidateValuation();
   return data;
 }
 
@@ -29,6 +33,7 @@ export async function deleteManualAsset(id) {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+  invalidateValuation();
   return data;
 }
 
@@ -64,5 +69,6 @@ export async function updateManualAsset(id, patch) {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+  invalidateValuation();
   return data;
 }

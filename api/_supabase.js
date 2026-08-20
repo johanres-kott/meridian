@@ -16,4 +16,16 @@ export function getSupabase(options) {
   return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, options);
 }
 
+/**
+ * Service role-klient som går förbi RLS — för webhookar och betrodda
+ * server-läsningar (premium_subscriptions m.fl.). Samma env-variabel som
+ * cronjobben använder. Returnerar null om nyckeln saknas; anroparen avgör
+ * om det är ett hårt fel eller om anon-klienten duger som fallback.
+ */
+export function getServiceSupabase() {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SUPABASE_URL || !serviceKey) return null;
+  return createClient(SUPABASE_URL, serviceKey, { auth: { persistSession: false } });
+}
+
 export { SUPABASE_URL, SUPABASE_ANON_KEY };

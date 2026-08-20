@@ -40,7 +40,8 @@ export default function SedanSist({ isMobile, onNavigate }) {
                 ticker: item.ticker,
                 name: item.name || companyRes?.name || item.ticker,
                 price: companyRes?.price || 0,
-                changeSinceLast: companyRes?.changePercent || 0,
+                // API:et ger bara dagsförändringen — kalla den det, inte
+                // "sedan sist" (etiketten i UI:t säger "idag").
                 changeToday: companyRes?.changePercent || 0,
                 news: (companyRes?.news || []).map(n => ({ ...n, ticker: item.ticker, companyName: item.name })),
               };
@@ -54,8 +55,8 @@ export default function SedanSist({ isMobile, onNavigate }) {
         const validCompanies = companyResults.filter(Boolean);
 
         const movers = validCompanies
-          .filter(c => c.changeSinceLast !== null)
-          .sort((a, b) => Math.abs(b.changeSinceLast) - Math.abs(a.changeSinceLast));
+          .filter(c => c.changeToday !== null)
+          .sort((a, b) => Math.abs(b.changeToday) - Math.abs(a.changeToday));
 
         // Store all data - filtering happens at render time based on preferences
         const allIndices = [...(indicesRes || [])].filter(i => i.price > 0);
@@ -132,7 +133,7 @@ export default function SedanSist({ isMobile, onNavigate }) {
 
         {/* Portfolio movers */}
         <div style={{ padding: isMobile ? "12px 12px" : "16px 20px", borderRight: isMobile ? "none" : "1px solid var(--border-light)", borderBottom: isMobile ? "1px solid var(--border-light)" : "none" }}>
-          <div style={sectionHeader}><span>{t("sedanSist.yourPortfolio")}</span></div>
+          <div style={sectionHeader}><span>{t("sedanSist.yourPortfolio")} · {t("sedanSist.today")}</span></div>
           {data.movers.length === 0 ? (
             <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>{t("sedanSist.noCompanies")}</div>
           ) : (
@@ -143,7 +144,7 @@ export default function SedanSist({ isMobile, onNavigate }) {
                   <div style={{ ...subtext, ...mono }}>{c.ticker}</div>
                 </div>
                 <div style={{ ...mono, fontSize: 12 }}>
-                  <Chg value={parseFloat(c.changeSinceLast.toFixed(2))} />
+                  <Chg value={parseFloat(c.changeToday.toFixed(2))} />
                 </div>
               </div>
             ))

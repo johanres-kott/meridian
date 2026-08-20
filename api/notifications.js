@@ -1,8 +1,16 @@
+/* global process */
 import { withCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
 const SCRAPER_API = "https://thesion-scraper.vercel.app";
+
+// Delad hemlighet med scrapern (samma värde i båda Vercel-projekten) — utan
+// den lämnar scrapern inte ut användardata. Skickas bara om env finns.
+function internalHeaders() {
+  const key = process.env.SCRAPER_INTERNAL_KEY;
+  return key ? { "x-internal-key": key } : undefined;
+}
 
 /**
  * Proxy for notifications — keeps user_id server-side.
@@ -27,7 +35,8 @@ async function handler(req, res) {
     }
 
     const upstream = await fetch(
-      `${SCRAPER_API}/api/notifications?user_id=${encodeURIComponent(user.id)}`
+      `${SCRAPER_API}/api/notifications?user_id=${encodeURIComponent(user.id)}`,
+      { headers: internalHeaders() }
     );
     if (!upstream.ok) {
       console.error("Notifications upstream error:", upstream.status);

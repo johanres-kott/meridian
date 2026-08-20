@@ -8,6 +8,7 @@ import {
   addTransaction,
   deleteTransaction,
 } from "../lib/transactions.js";
+import { invalidateValuation } from "../lib/portfolioValue.js";
 
 // Transaktionsvyn för en watchlist-rad: lista över köp/sälj, realiserat
 // resultat och formulär för ny transaktion. Vid varje ändring räknas innehavet
@@ -70,6 +71,9 @@ export default function TransactionsPanel({ item, currency = null, onSynced, onC
     setRows(txs);
     onCountChange?.(txs.length);
     await onSynced?.(holdingToWatchlistUpdates(computeHolding(txs)));
+    // Antal/GAV på watchlist-raden ändrades — släng den cachade värderingen
+    // så Översikten/Portföljen räknar om vid nästa läsning.
+    invalidateValuation();
   }
 
   async function handleAdd(e) {

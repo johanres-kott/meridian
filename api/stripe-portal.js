@@ -1,6 +1,6 @@
 /* global process */
 import Stripe from "stripe";
-import { setCors } from "./_cors.js";
+import { isAllowedOrigin, setCors } from "./_cors.js";
 import { rateLimit } from "./_rateLimit.js";
 import { getSupabase } from "./_supabase.js";
 
@@ -24,18 +24,27 @@ export default async function handler(req, res) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) return res.status(500).json({ error: "Stripe not configured" });
 
-  const stripe = new Stripe(stripeKey, { httpClient: Stripe.createFetchHttpClient() });
+  try {
+    const stripe = new Stripe(stripeKey, { httpClient: Stripe.createFetchHttpClient() });
 
-  // Find customer by email
-  const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-  if (customers.data.length === 0) {
-    return res.status(404).json({ error: "No subscription found" });
+    // Find customer by email
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    if (customers.data.length === 0) {
+      return res.status(404).json({ error: "No subscription found" });
+    }
+
+    // Skicka bara tillbaka användaren till kända origins — en förfalskad
+    // Origin-header ska inte kunna styra vart portalen returnerar.
+    const origin = isAllowedOrigin(req.headers.origin) ? req.headers.origin : "https://thesion.tech";
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customers.data[0].id,
+      return_url: `${origin}/#analysis`,
+    });
+
+    return res.status(200).json({ url: session.url });
+  } catch (err) {
+    console.error("Stripe portal error:", err.message, err.type, err.code);
+    return res.status(500).json({ error: "Internal server error" });
   }
-
-  const session = await stripe.billingPortal.sessions.create({
-    customer: customers.data[0].id,
-    return_url: `${req.headers.origin || "http://localhost:3000"}/#analysis`,
-  });
-
-  return res.status(200).json({ url: session.url });
 }

@@ -15,6 +15,7 @@ export default function useNetWorth() {
   const [dailyChangeSek, setDailyChangeSek] = useState(null);
   const [split, setSplit] = useState({ stocksSek: null, fundsSek: null });
   const [holdingsInfo, setHoldingsInfo] = useState({ holdings: [], priced: [], fxToSek: {} });
+  const [unpricedTickers, setUnpricedTickers] = useState([]);
   const [portfolioLoaded, setPortfolioLoaded] = useState(false);
   const [manualRows, setManualRows] = useState([]);
 
@@ -28,6 +29,7 @@ export default function useNetWorth() {
         setDailyChangeSek(v.dailyChangeSek);
         setSplit({ stocksSek: v.stocksSek ?? null, fundsSek: v.fundsSek ?? null });
         setHoldingsInfo({ holdings: v.holdings || [], priced: v.priced || [], fxToSek: v.fxToSek || {} });
+        setUnpricedTickers(v.unpricedTickers || []);
         setPortfolioLoaded(true);
       })
       .catch(err => {
@@ -72,6 +74,7 @@ export default function useNetWorth() {
     fundsSek: split.fundsSek,
     holdings: holdingsInfo.holdings,
     priced: holdingsInfo.priced,
+    unpricedTickers,
     fxToSek: holdingsInfo.fxToSek,
     pensionLabel: preferences?.pension?.itpType || null,
     portfolioLoaded,

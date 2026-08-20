@@ -60,6 +60,19 @@ describe("NetWorthCard", () => {
     expect([...r2.container.querySelectorAll("span")].map(e => e.textContent)).toContain("myFinances.fundsOnly");
   });
 
+  it("shows the specific unpriced-holdings message when unpricedTickers exist", () => {
+    const data = makeData({ portfolioSek: null, unpricedTickers: ["VOLV-B.ST", "ERIC-B.ST"] });
+    const { container } = render(<NetWorthCard data={data} />);
+    expect(container.textContent).toContain("myFinances.portfolioUnpriced");
+    expect(container.textContent).not.toContain("myFinances.portfolioUnavailable");
+  });
+
+  it("falls back to the generic unavailable message when portfolioSek is null without unpriced holdings", () => {
+    const data = makeData({ portfolioSek: null, unpricedTickers: [] });
+    const { container } = render(<NetWorthCard data={data} />);
+    expect(container.textContent).toContain("myFinances.portfolioUnavailable");
+  });
+
   it("splits the portfolio row into stocks and funds when both exist", () => {
     const data = makeData({ portfolioSek: 300000, stocksSek: 200000, fundsSek: 100000 });
     const { container } = render(<NetWorthCard data={data} />);

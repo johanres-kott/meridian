@@ -21,6 +21,7 @@ import ThesisReview from "./ThesisReview.jsx";
 import AssetBreakdown from "./AssetBreakdown.jsx";
 import AssetTable from "./AssetTable.jsx";
 import useNetWorth from "../hooks/useNetWorth.js";
+import { invalidateValuation } from "../lib/portfolioValue.js";
 import RangeBar from "./RangeBar.jsx";
 import ManualAssetView from "./ManualAssetView.jsx";
 import { DEFAULT_RANGE } from "../lib/portfolioChartConstants.js";
@@ -112,6 +113,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase.from("watchlist").insert({ ticker, name, user_id: user.id, status: "Bevakar", type }).select().single();
     if (!error) {
+      invalidateValuation();
       setItems(prev => [...prev, data]);
       if (activeGroup && data) {
         toggleGroupMember(activeGroup, data.id);
@@ -122,6 +124,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   async function updateItem(id, updates) {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("watchlist").update(updates).eq("id", id).eq("user_id", user.id);
+    invalidateValuation();
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
     if (selected && selected.id === id) setSelected(prev => ({ ...prev, ...updates }));
   }
@@ -129,6 +132,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
   async function deleteItem(id) {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("watchlist").delete().eq("id", id).eq("user_id", user.id);
+    invalidateValuation();
     setItems(prev => prev.filter(i => i.id !== id));
     const updated = groups.map(g => ({
       ...g,
@@ -162,6 +166,7 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
     }));
     const { data, error } = await supabase.from("watchlist").insert(rows).select();
     if (!error && data) {
+      invalidateValuation();
       setItems(prev => [...prev, ...data]);
       if (activeGroup) {
         const newIds = data.map(d => d.id);

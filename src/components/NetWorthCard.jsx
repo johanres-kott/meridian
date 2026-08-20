@@ -111,7 +111,11 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
             </div>
           )}
           {portfolioLoaded && portfolioSek == null && (
-            <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "4px 0" }}>{t("myFinances.portfolioUnavailable")}</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "4px 0" }}>
+              {(data.unpricedTickers?.length ?? 0) > 0
+                ? t("myFinances.portfolioUnpriced", { count: data.unpricedTickers.length })
+                : t("myFinances.portfolioUnavailable")}
+            </div>
           )}
           {pensionValue != null && (
             <div style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("investment", { subTab: "pension" })}>

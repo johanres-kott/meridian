@@ -5,6 +5,10 @@ const UserContext = createContext(null);
 
 export function UserProvider({ session, children }) {
   const [preferences, setPreferences] = useState({});
+  // true när preferences-hämtningen slutförts (även vid fel — då med {}).
+  // Ytor som avgör "ny användare?" (OnboardingModal/QuickGuide) väntar på den
+  // här flaggan så de inte blinkar för befintliga användare på långsamt nät.
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [lastSeenAt, setLastSeenAt] = useState(null);
   const prefsRef = useRef(preferences);
   prefsRef.current = preferences;
@@ -14,13 +18,19 @@ export function UserProvider({ session, children }) {
   useEffect(() => {
     if (!session) return;
     async function trackVisit() {
-      const { data } = await supabase
-        .from("user_prefs")
-        .select("last_seen_at, preferences")
-        .eq("user_id", userId)
-        .single();
-      setLastSeenAt(data?.last_seen_at || null);
-      setPreferences(data?.preferences || {});
+      try {
+        const { data } = await supabase
+          .from("user_prefs")
+          .select("last_seen_at, preferences")
+          .eq("user_id", userId)
+          .single();
+        setLastSeenAt(data?.last_seen_at || null);
+        setPreferences(data?.preferences || {});
+      } catch (err) {
+        console.error("UserContext: kunde inte läsa preferences:", err);
+      } finally {
+        setPrefsLoaded(true);
+      }
       await supabase
         .from("user_prefs")
         .upsert({ user_id: userId, last_seen_at: new Date().toISOString() });
@@ -63,12 +73,15 @@ export function UserProvider({ session, children }) {
   const displayName = preferences.display_name || session?.user?.email?.split("@")[0] || "";
 
   return (
-    <UserContext.Provider value={{ userId, preferences, updatePreferences, lastSeenAt, displayName, session }}>
+    <UserContext.Provider value={{ userId, preferences, prefsLoaded, updatePreferences, lastSeenAt, displayName, session }}>
       {children}
     </UserContext.Provider>
   );
 }
 
+// Hooken bor medvetet ihop med providern (etablerat mönster i appen och hos
+// alla konsumenter); regeln gäller bara HMR-granularitet, inte korrekthet.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useUser() {
   const ctx = useContext(UserContext);
   if (!ctx) throw new Error("useUser must be used within a UserProvider");

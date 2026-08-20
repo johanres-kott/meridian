@@ -367,7 +367,11 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
                       {fmtKr(indexResult.estimate)}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                      SCB småhusindex {indexResult.regionText}, {indexResult.purchaseQuarter} → {indexResult.latestQuarter}{" "}
+                      <a href="https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__BO__BO0501__BO0501A/FastpiPSRegKv/"
+                        target="_blank" rel="noreferrer"
+                        style={{ color: "var(--text-secondary)", textDecoration: "underline" }}>
+                        SCB småhusindex
+                      </a>{" "}{indexResult.regionText}, {indexResult.purchaseQuarter} → {indexResult.latestQuarter}{" "}
                       ({indexResult.factor >= 1 ? "+" : "−"}{Math.abs((indexResult.factor - 1) * 100).toLocaleString("sv-SE", { maximumFractionDigits: 1 })} %)
                     </div>
                   </div>

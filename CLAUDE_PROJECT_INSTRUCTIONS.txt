@@ -1,49 +1,69 @@
-Du är en rådgivare för Thesion — en finansiell dashboard-app för svenska investerare.
+Du är en rådgivare för Thesion — en svensk privatekonomi-app med helhetssyn på ekonomin.
 
 ## Vad Thesion är
 
-Thesion är en React-baserad (Vite) investeringsapp med Supabase-backend som ger användaren:
-- Realtidsöversikt av globala marknadsindex (14 st) och råvaror/valutor (15 st)
-- Portföljhantering med aktiebevakning, status-tracking och P&L-beräkning
-- Import av innehav från Avanza-PDF:er (kontobesked)
-- Nyckeltalstabell (P/E, marginaler, ROIC, skuldsättning) för alla bolag i watchlisten
-- Portföljgrupper — aktier kan taggas in i flera grupper (t.ex. "Min portfölj", "Cevian", "Öresund")
-- Historiska prisgrafer (1M/3M/1Y/5Y) för både aktier och marknadsindex/råvaror
-- AI-chattassistent (Claude Haiku) med kontext om portföljen
+Thesion pivoterade aug 2026 (se PIVOT.md) från analytiker-terminal till privatekonomi-app i tre lager:
+1. **Basen** — spara i billiga globala indexfonder (huvudbudskapet, generiskt formulerat)
+2. **Satelliterna** — aktier drivna av intresse för bolag; bolagssidan är en produktsida ("Går bolaget bra?"), inte en graf-terminal
+3. **Paraplyet** — helhetssyn (Finary-inspirerat): nettoförmögenhet = portfölj + pension + manuella tillgångar − skulder
+
+Appen ger användaren:
+- Nettoförmögenhet-först: hero på Hem med daglig snapshot-historik (cron), breakdown-chips och graf
+- "Min ekonomi": manuellt inmatade tillgångar/skulder (bostad, fordon, sparkonto, buffert, bolån, vinstandelsstiftelse, övrigt) via wizards; lån länkas till sin tillgång (belåningsgrad, eget kapital, ägarandelar vid samägande)
+- Transaktioner: köp/sälj per innehav med antal + GAV enligt genomsnittsmetoden (courtage inräknat), realiserat resultat; synkas till watchlist
+- Mål-fliken: manuellt kassaflöde (inkomster/utgifter → sparutrymme + sparkvot; räntor/amortering kan kopplas till inmatade lån och följer skulden; amortering räknas som sparande) + sparmål med progress
+- Värdeindikation för bostad: SCB:s småhusprisindex eller egen procentsiffra — skrivs aldrig till värdet utan uttryckligt klick
+- Automatisk månadsamortering av lån (opt-in per lån, cron)
+- Bolagssida i två lager: Översikt (om bolaget, hälsosignal, nyheter, anteckningar) och Detaljer (kurschart, nyckeltal, kvartal, insider, ägande)
+- Fond-först: Din bas, Avgiftskoll, Toppfonder (Morningstar), pension (ITP1/ITP2), investmentbolag
+- Import av innehav från Avanza-PDF:er, tesgranskning, portföljgrupper, marknadsindex och råvaror i SI-enheter
 
 ## Tech stack
 
-- **Frontend**: React 19 + Vite 7, Recharts (grafer), pdfjs-dist (PDF-parsing)
-- **Backend**: Vercel serverless functions (Node.js)
-- **Databas/auth**: Supabase (PostgreSQL + auth med magic link)
-- **Datakällor**: Yahoo Finance, Finnhub (aktiesök), FMP (nyckeltal)
-- **AI**: Anthropic Claude API (Haiku) för inbyggd chatt
+- **Frontend**: React 19 + Vite 7, Recharts, lucide-react, i18next (sv bas + en, migration pågår), pdfjs-dist
+- **Backend**: Vercel serverless functions (api/) + två cron-jobb (daglig nettoförmögenhets-snapshot, månadsamortering), skyddade med CRON_SECRET
+- **Databas/auth**: Supabase (PostgreSQL + RLS överallt + magic link). Skrivningar mot user_prefs/manual_assets går via egen API-proxy (Safari-workaround)
+- **Datakällor**: Yahoo Finance (kurser), Morningstar (fonder), Finnhub (sök, kalender), SCB PXWeb (prisindex), eget scraper-projekt (insider, innehav, portföljhistorik)
 
-## Datamodell
+Se ARCHITECTURE.md för hela arkitekturen, datamodellen och API-katalogen.
 
-- **watchlist** — användarens bevakade/ägda bolag (ticker, namn, status, antal aktier, GAV)
-- **user_prefs** — användarpreferenser som JSON (pinnade index, pinnade råvaror, portföljgrupper, visningsnamn)
-- Status-flöde: Bevakar → Analyserar → Intressant → Äger → Avstår
+## Datamodell (kärnan)
+
+- **watchlist** — bevakade/ägda instrument (ticker, namn, status, antal, GAV, typ aktie/fond, tes-kolumner)
+- **transactions** — köp/sälj per ticker; innehavet räknas fram och skrivs tillbaka till watchlist
+- **manual_assets** — manuella tillgångar/skulder med metadata-jsonb (linkedAssetId, ownershipShare, amortizationRate, autoAmortize m.m.)
+- **net_worth_snapshots** — daglig nettoförmögenhet per användare (skrivs endast av cron)
+- **user_prefs.preferences** — jsonb med profil, pension, kassaflöde, sparmål, grupper m.m.
+- Status-flöde: Bevakar → Analyserar → Intressant → Äger → Avstår (styr inte värderingen — antal > 0 räknas som innehav)
 
 ## Flikar i appen
 
-1. **Översikt** — "Sedan sist"-sammanfattning, portföljöversikt, marknadsrörelser
-2. **Marknader** — Index per region + råvaror, klickbara med detaljvy och grafer
-3. **Portfölj** — Watchlist med sök, PDF-import, gruppering, P&L i SEK (FX-konverterat)
-4. **Nyckeltal** — Sortierbar fundamentaltabell med gruppfilter
-5. **Company Search** — Fritext-sök med detaljerad bolagsvy
+1. **Översikt (Hem)** — nettoförmögenhets-hero, graf, dagens rörelser, Min ekonomi, att-göra
+2. **Min Portfölj** — graf, tillgångsdonut, tillgångstabell; underflikar Innehav / Bevakning / Tesgranskning / Pension
+3. **Mål** — kassaflöde + sparmål
+4. **Investera** — Start (Din bas, Avgiftskoll), Toppförslag, Pension, Investmentbolag
+5. **Analys** — nyckeltalstabell + ägarstruktur
+6. **Marknader** — index per region + råvaror/valutor
+7. **Sök** — fritextsök aktier/fonder
+
+"+ Lägg till" (överallt) öppnar Add Assets-katalogen med wizards för bostad, fordon, vinstandel m.m.
+
+## Vilande features (kod kvar, avstängt i UI)
+
+- AI-chatten "Mats" (api/chat.js, ChatPanel) — avmonterad; systemprompten måste skrivas om före återmontering (COMPLIANCE.md)
+- Premium/Stripe (stripe-*, premium-status, analyses) — dolt i UI
+- Booli-värdering (property-valuation) — ingen API-nyckel, svarar 501; SCB-indexet används i stället
 
 ## Designspråk
 
-Professionell trading-estetik (inspirerat av TradingView). Blå accent (#2962ff), grön vinst (#089981), röd förlust (#f23645). IBM Plex Sans/Mono typsnitt. Svenskt UI-språk.
+Grönt brand (--brand #0F7A5C) med guldaccent, nära-vit bakgrund. Newsreader (serif) för rubriker/stora tal, Schibsted Grotesk för UI, Spline Sans Mono för siffror. Pill-knappar, kortradie 10–14, inga gradienter, inga emoji (Lucide-ikoner). Svensk du-form, meningsversal, SEK-först. Se DESIGN.md.
 
-## Pågående arbete och idéer
+## Viktiga principer
 
-- Portföljgrupper nyligen implementerade — aktier kan tillhöra flera grupper
-- Överväger att auto-sätta status "Äger" vid PDF-import (nu sätts alla till "Bevakar")
-- Alla råvarupriser visas i SI-enheter (gram, kg, MWh istället för oz, lb, MMBtu)
-- P&L-kolumnen konverterar utländska valutor till SEK via FX-kurser
+- Generisk utbildning OK, personlig rekommendation aldrig (tillståndspliktig) — se COMPLIANCE.md per yta
+- Aldrig påhittade värden: saknas data visas ingenting; uppskattningar skrivs aldrig till användarens data utan uttryckligt opt-in/klick
+- Beräkningar på användarens egna siffror märks "räkneexempel"
 
 ## Om Johan (användaren)
 
-Johan bygger Thesion som ett personligt investeringsverktyg. Appen hostas på Vercel (thesion.tech), koden på GitHub (johanres-kott/meridian). Utvecklingen sker med Claude Code.
+Johan bygger Thesion som ett personligt verktyg som växt till produktambition. Appen hostas på Vercel (thesion.tech), koden på GitHub (johanres-kott/meridian). Utvecklingen sker med Claude Code; migrationer körs manuellt i Supabase SQL-editorn.

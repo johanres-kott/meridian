@@ -147,6 +147,20 @@ SEK-först-perspektiv.
       hybrid i nettoläge: äkta punkter där de finns, portfölj + offset innan.
       **Deploy-krav:** sätt `CRON_SECRET` (finns i .env.local) som env i
       Vercel — utan den svarar cron-endpointen öppet.
+- [x] Min ekonomi med underrader: aktier/fonder som indragna rader under
+      portföljen (bara när båda finns), och lån grupperade under sin tillgång
+      via metadata.linkedAssetId/resolveLoanTarget (NetWorthCard.jsx);
+      ägarandel visas som dämpad %-badge
+- [x] Transaktionspanelen (TransactionsPanel.jsx i CompanyRow/FundView/
+      bolagssidan): köp/sälj med datum/antal/pris/courtage, genomsnittsmetoden
+      → antal + GAV synkas till watchlist-raden; manuella antal/GAV-fält låses
+      när transaktioner finns (useHasTransactions)
+- [x] Värdeindikation på tillgångssidan (ManualAssetView.jsx): SCB-indexuppräkning
+      (/api/property-index) + egen uppräkning — skrivs aldrig utan klick på
+      "Använd som värde"
+- [x] Automatisk månadsamortering: opt-in per lån (autoAmortize +
+      amortizationRate) via /api/cron/amortize-loans (1:a varje månad);
+      "Senast nedräknad"-stämpel på lånesidan
 
 ## Informationsarkitektur — en fråga per sida (beslut aug 2026)
 

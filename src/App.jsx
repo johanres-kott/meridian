@@ -108,7 +108,7 @@ export default function App() {
 }
 
 function AppContent() {
-  const { preferences, updatePreferences } = useUser();
+  const { preferences, prefsLoaded, updatePreferences } = useUser();
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
 
@@ -167,8 +167,9 @@ function AppContent() {
 
   const modals = (
     <>
-      {/* Onboarding modal for new users */}
-      {!preferences.investorProfile && (
+      {/* Onboarding modal for new users. Gate:ad på prefsLoaded så modalen
+          inte blinkar för befintliga användare medan preferences laddar. */}
+      {prefsLoaded && !preferences.investorProfile && (
         <OnboardingModal onComplete={(profile) => {
           // Ekonomiprofil (v2). Inga starter-aktier längre — appen trattar mot
           // "+ Lägg till" och basen, inte mot fem bevakade aktier.
@@ -177,7 +178,7 @@ function AppContent() {
       )}
 
       {/* Quick guide for new users (after onboarding) */}
-      {preferences.investorProfile && !preferences.guideSeen && (
+      {prefsLoaded && preferences.investorProfile && !preferences.guideSeen && (
         <QuickGuide onComplete={() => updatePreferences({ guideSeen: true })} />
       )}
 

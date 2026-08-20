@@ -1,9 +1,9 @@
 /**
  * Shared lightweight Markdown renderer.
  * Supports: headers (#/##/###), bold (**text**), lists (- / 1.), horizontal rules (---).
- * Used by Portfolio (strategy card) and ChatPanel (AI messages).
+ * Used by Portfolio (strategy card).
  *
- * Accepts an optional `compact` prop for tighter spacing (chat messages).
+ * Accepts an optional `compact` prop for tighter spacing.
  */
 
 function renderInline(text) {

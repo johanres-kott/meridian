@@ -1,5 +1,6 @@
 import { supabase } from "../supabase.js";
 import { parseFxRates } from "../hooks/useFxRates.js";
+import { invalidatePortfolioHistory } from "../hooks/usePortfolioData.js";
 
 // Delad portföljvärdering (utbruten ur PortfolioSummary) så att flera kort på
 // Översikten kan använda samma siffror utan att dubbelhämta priser. Cachas per
@@ -7,6 +8,15 @@ import { parseFxRates } from "../hooks/useFxRates.js";
 
 const TTL_MS = 5 * 60 * 1000;
 let cache = { userId: null, at: 0, promise: null };
+
+// Nollställ värderingscachen (och historikcachen i usePortfolioData) efter
+// skrivningar — nästa läsning hämtar färskt i stället för upp till 5 min
+// gamla siffror. Anropas från Portfolio (add/update/delete/import),
+// TransactionsPanel (efter synk) och manualAssets (create/update/delete).
+export function invalidateValuation() {
+  cache = { userId: null, at: 0, promise: null };
+  invalidatePortfolioHistory();
+}
 
 export function getPortfolioValuation(userId) {
   const now = Date.now();
@@ -29,7 +39,7 @@ async function computeValuation(userId) {
     .order("created_at");
 
   if (!watchlist || watchlist.length === 0) {
-    return { empty: true, watchlist: [], priced: [], holdings: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null, stocksSek: 0, fundsSek: 0, fxToSek: {} };
+    return { empty: true, watchlist: [], priced: [], holdings: [], unpricedTickers: [], currencyGroups: [], totalSek: null, dailyChangeSek: null, portfolioSek: null, stocksSek: 0, fundsSek: 0, fxToSek: {} };
   }
 
   // Prissätt ALLA rader med innehav (shares > 0) + upp till 20 övriga bevakningar.
@@ -42,20 +52,28 @@ async function computeValuation(userId) {
   const [pricedResults, commoditiesRes] = await Promise.all([
     Promise.all(
       toPrice.map(async (item) => {
+        // Vid fel eller pris <= 0: price null + priceError — aldrig 0, så en
+        // rad med innehav inte tyst nollvärderas i summorna nedan.
         try {
           if (item.type === "fund") {
             const res = await fetch(`/api/fund?secId=${encodeURIComponent(item.ticker)}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const d = await res.json();
-            return { ...item, price: d?.nav || 0, changePercent: d?.returnD1 || 0, currency: d?.currency || "SEK" };
+            const nav = Number(d?.nav);
+            if (!(nav > 0)) return { ...item, price: null, priceError: true, changePercent: 0 };
+            return { ...item, price: nav, changePercent: d?.returnD1 || 0, currency: d?.currency || "SEK" };
           }
           const res = await fetch(`/api/company?ticker=${encodeURIComponent(item.ticker)}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const d = await res.json();
           // London noterar i pence (GBp/GBX) — räkna om till pund så FX-kursen stämmer
           const pence = d.currency === "GBp" || d.currency === "GBX";
-          return { ...item, price: pence ? (d.price || 0) / 100 : (d.price || 0), changePercent: d.changePercent || 0, currency: pence ? "GBP" : d.currency };
+          const price = pence ? (Number(d.price) || 0) / 100 : (Number(d.price) || 0);
+          if (!(price > 0)) return { ...item, price: null, priceError: true, changePercent: 0 };
+          return { ...item, price, changePercent: d.changePercent || 0, currency: pence ? "GBP" : d.currency };
         } catch (err) {
           console.error(`portfolioValue: failed to fetch ${item.ticker}:`, err);
-          return { ...item, price: 0, changePercent: 0 };
+          return { ...item, price: null, priceError: true, changePercent: 0 };
         }
       })
     ),
@@ -66,12 +84,17 @@ async function computeValuation(userId) {
   // Build FX rates to SEK from commodities API
   const fxToSek = parseFxRates(commoditiesRes);
 
-  // Innehav = rader med antal > 0 och kurs. Status ("Äger"/"Bevakar") styr inte —
-  // PDF-import och "lägg till" sparar som Bevakar, och har man aktier äger man dem.
-  const holdings = priced.filter(i => Number(i.shares) > 0 && i.price);
+  // Innehav = rader med antal > 0, oavsett om kursen kunde hämtas. Status
+  // ("Äger"/"Bevakar") styr inte — PDF-import och "lägg till" sparar som
+  // Bevakar, och har man aktier äger man dem. Rader utan kurs räknas inte i
+  // värdesummorna; i stället blir portfolioSek null och unpricedTickers listar
+  // dem — samma "never guess"-princip som redan gäller saknade FX-kurser.
+  const holdings = priced.filter(i => Number(i.shares) > 0);
+  const pricedHoldings = holdings.filter(h => h.price > 0);
+  const unpricedTickers = holdings.filter(h => !(h.price > 0)).map(h => h.ticker);
 
   // Fetch missing FX rates from Yahoo Finance
-  const holdingCurrencies = [...new Set(holdings.map(h => h.currency || "SEK"))];
+  const holdingCurrencies = [...new Set(pricedHoldings.map(h => h.currency || "SEK"))];
   const missingCurrencies = holdingCurrencies.filter(c => !fxToSek[c]);
   if (missingCurrencies.length > 0) {
     await Promise.all(missingCurrencies.map(async (cur) => {
@@ -83,7 +106,7 @@ async function computeValuation(userId) {
     }));
   }
   const byCurrency = {};
-  for (const h of holdings) {
+  for (const h of pricedHoldings) {
     const cur = h.currency || "SEK";
     if (!byCurrency[cur]) byCurrency[cur] = { value: 0, dailyChange: 0 };
     byCurrency[cur].value += h.price * h.shares;
@@ -111,12 +134,16 @@ async function computeValuation(userId) {
   }
 
   // Portfolio value in SEK regardless of how many currencies are involved —
-  // used by the net-worth card. Null when a rate is missing (never guess FX).
-  const portfolioSek = totalSek != null
-    ? totalSek
-    : currencyGroups.length === 1 && currencyGroups[0].currency === "SEK"
-      ? currencyGroups[0].value
-      : currencyGroups.length === 0 ? 0 : null;
+  // used by the net-worth card. Null when a rate is missing (never guess FX)
+  // — and null when any holding lacks a price (never guess prices either).
+  const hasUnpriced = unpricedTickers.length > 0;
+  const portfolioSek = hasUnpriced
+    ? null
+    : totalSek != null
+      ? totalSek
+      : currencyGroups.length === 1 && currencyGroups[0].currency === "SEK"
+        ? currencyGroups[0].value
+        : currencyGroups.length === 0 ? 0 : null;
 
   // Aktier vs fonder i SEK (för donuten på Portfölj). Null om någon kurs saknas.
   const toSek = (h) => {
@@ -124,15 +151,17 @@ async function computeValuation(userId) {
     const rate = cur === "SEK" ? 1 : fxToSek[cur];
     return rate != null ? h.price * h.shares * rate : null;
   };
-  let stocksSek = 0, fundsSek = 0, splitOk = true;
-  for (const h of holdings) {
-    const v = toSek(h);
-    if (v == null) { splitOk = false; break; }
-    if (h.type === "fund") fundsSek += v; else stocksSek += v;
+  let stocksSek = 0, fundsSek = 0, splitOk = !hasUnpriced;
+  if (splitOk) {
+    for (const h of pricedHoldings) {
+      const v = toSek(h);
+      if (v == null) { splitOk = false; break; }
+      if (h.type === "fund") fundsSek += v; else stocksSek += v;
+    }
   }
 
   return {
-    empty: false, watchlist, priced, holdings, currencyGroups, totalSek, dailyChangeSek, portfolioSek,
+    empty: false, watchlist, priced, holdings, unpricedTickers, currencyGroups, totalSek, dailyChangeSek, portfolioSek,
     stocksSek: splitOk ? stocksSek : null,
     fundsSek: splitOk ? fundsSek : null,
     fxToSek,

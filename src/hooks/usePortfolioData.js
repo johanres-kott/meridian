@@ -2,67 +2,100 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../supabase.js";
 import { INDEXES, rangeCutoff } from "../lib/portfolioChartConstants.js";
 
+// Historikhämtningen (portfölj- + nettoförmögenhetssnapshots + index) cachas
+// per användare i 5 min — samma promise-cache-mönster med TTL som
+// portfolioValue — så flikbyten inte refetchar allt. invalidateValuation i
+// portfolioValue nollställer även denna cache efter skrivningar.
+
+const TTL_MS = 5 * 60 * 1000;
+let histCache = { userId: null, at: 0, promise: null };
+
+export function invalidatePortfolioHistory() {
+  histCache = { userId: null, at: 0, promise: null };
+}
+
+function getPortfolioHistory(userId) {
+  const now = Date.now();
+  if (histCache.promise && histCache.userId === userId && now - histCache.at < TTL_MS) {
+    return histCache.promise;
+  }
+  const promise = fetchHistory();
+  histCache = { userId, at: now, promise };
+  promise.catch(() => {
+    if (histCache.promise === promise) histCache = { userId: null, at: 0, promise: null };
+  });
+  return promise;
+}
+
+async function fetchHistory() {
+  // Fetch portfolio + net worth history + all indexes in parallel
+  const [[portfolioData, netWorthData], ...indexResults] = await Promise.all([
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      const headers = s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : {};
+      return Promise.all([
+        fetch("/api/portfolio-history", { headers }).then(r => r.ok ? r.json() : null),
+        fetch("/api/net-worth-history", { headers }).then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
+    }),
+    ...INDEXES.map(idx =>
+      fetch(`/api/chart?ticker=${encodeURIComponent(idx.ticker)}&range=1y`).then(r => r.ok ? r.json() : null).catch(() => null)
+    ),
+  ]);
+  return { portfolioData, netWorthData, indexResults };
+}
+
 /**
  * Custom hook that fetches portfolio history and index comparison data,
  * and provides filtered/normalized points based on the selected range.
  */
 export default function usePortfolioData(userId, range) {
-  const [allPoints, setAllPoints] = useState([]);
-  const [netWorthPoints, setNetWorthPoints] = useState([]); // äkta nettoförmögenhets-snapshots (cron)
-  const [indexDataMap, setIndexDataMap] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  // Ett enda resultatobjekt taggat med userId — loading/error deriveras i
+  // stället för att sättas synkront i effekten (react-hooks/set-state-in-effect).
+  const [hist, setHist] = useState(null);
 
   useEffect(() => {
     if (!userId) return;
-    setLoading(true);
-    setError(false);
-
-    // Fetch portfolio + net worth history + all indexes in parallel
-    Promise.all([
-      supabase.auth.getSession().then(({ data: { session: s } }) => {
-        const headers = s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : {};
-        return Promise.all([
-          fetch("/api/portfolio-history", { headers }).then(r => r.ok ? r.json() : null),
-          fetch("/api/net-worth-history", { headers }).then(r => r.ok ? r.json() : null).catch(() => null),
-        ]);
-      }),
-      ...INDEXES.map(idx =>
-        fetch(`/api/chart?ticker=${encodeURIComponent(idx.ticker)}&range=1y`).then(r => r.ok ? r.json() : null).catch(() => null)
-      ),
-    ]).then(([[portfolioData, netWorthData], ...indexResults]) => {
-      setNetWorthPoints((netWorthData?.snapshots || []).map(p => ({ date: p.date, value: p.value })));
-      // Portfolio
-      const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
-      const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
-      const threshold = maxHoldings * 0.5;
-      const pts = raw
-        .filter(p => (p.holdingsCount || 0) >= threshold)
-        .map(p => ({
-          date: p.date,
-          value: p.totalValue ?? p.value ?? 0,
-          estimated: !!p.estimated,
-        }));
-      setAllPoints(pts);
-
-      // Build index data maps
-      const idxMap = {};
-      INDEXES.forEach((idx, i) => {
-        const data = indexResults[i];
-        if (data?.points) {
-          const map = {};
-          data.points.forEach(p => { map[p.date] = p.close; });
-          idxMap[idx.id] = map;
-        }
-      });
-      setIndexDataMap(idxMap);
-
-      setLoading(false);
-    }).catch(() => {
-      setError(true);
-      setLoading(false);
-    });
+    let cancelled = false;
+    getPortfolioHistory(userId)
+      .then(res => { if (!cancelled) setHist({ userId, ...res }); })
+      .catch(() => { if (!cancelled) setHist({ userId, failed: true }); });
+    return () => { cancelled = true; };
   }, [userId]);
+
+  const loading = !hist || hist.userId !== userId;
+  const error = !loading && !!hist.failed;
+
+  const { allPoints, netWorthPoints, indexDataMap } = useMemo(() => {
+    if (loading || hist.failed) return { allPoints: [], netWorthPoints: [], indexDataMap: {} };
+    const { portfolioData, netWorthData, indexResults } = hist;
+
+    const nwPts = (netWorthData?.snapshots || []).map(p => ({ date: p.date, value: p.value }));
+
+    // Portfolio
+    const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
+    const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
+    const threshold = maxHoldings * 0.5;
+    const pts = raw
+      .filter(p => (p.holdingsCount || 0) >= threshold)
+      .map(p => ({
+        date: p.date,
+        value: p.totalValue ?? p.value ?? 0,
+        estimated: !!p.estimated,
+      }));
+
+    // Build index data maps
+    const idxMap = {};
+    INDEXES.forEach((idx, i) => {
+      const data = indexResults[i];
+      if (data?.points) {
+        const map = {};
+        data.points.forEach(p => { map[p.date] = p.close; });
+        idxMap[idx.id] = map;
+      }
+    });
+
+    return { allPoints: pts, netWorthPoints: nwPts, indexDataMap: idxMap };
+  }, [hist, loading]);
 
   const points = useMemo(() => {
     if (allPoints.length === 0) return [];

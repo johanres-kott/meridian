@@ -7,22 +7,25 @@ vi.mock("../../supabase.js", () => ({
   },
 }));
 
-import { getPortfolioValuation } from "../portfolioValue.js";
+import { getPortfolioValuation, invalidateValuation } from "../portfolioValue.js";
 
-function mockFetch() {
-  global.fetch = vi.fn(async (url) => {
+// failTickers: ticker → "http" (res.ok false) eller "zero" (pris 0 i svaret)
+function mockFetch(failTickers = {}) {
+  globalThis.fetch = vi.fn(async (url) => {
     const u = String(url);
-    const json = (body) => ({ json: async () => body });
+    const json = (body, ok = true) => ({ ok, status: ok ? 200 : 502, json: async () => body });
     if (u.startsWith("/api/commodities")) return json([]);
-    if (u.startsWith("/api/fund?")) return json({ nav: 250, currency: "SEK", returnD1: 0.5 });
+    const fail = Object.entries(failTickers).find(([t]) => u.includes(encodeURIComponent(t)))?.[1];
+    if (fail === "http") return json({ error: "upstream" }, false);
+    if (u.startsWith("/api/fund?")) return json(fail === "zero" ? { nav: 0 } : { nav: 250, currency: "SEK", returnD1: 0.5 });
     if (u.includes("SEK=X")) return json({ price: 10 });
     // aktie: alla ger kurs 100 SEK
-    return json({ price: 100, changePercent: 1, currency: "SEK" });
+    return json(fail === "zero" ? { price: 0, currency: "SEK" } : { price: 100, changePercent: 1, currency: "SEK" });
   });
 }
 
 describe("portfolioValue", () => {
-  beforeEach(() => { rows.length = 0; mockFetch(); });
+  beforeEach(() => { rows.length = 0; mockFetch(); invalidateValuation(); });
 
   it("counts holdings with shares regardless of status and prices funds via NAV", async () => {
     rows.push(
@@ -32,6 +35,7 @@ describe("portfolioValue", () => {
     );
     const v = await getPortfolioValuation("u-" + Math.random());
     expect(v.holdings.map(h => h.ticker)).toEqual(["VOLV-B.ST", "F0GBR04M4W"]);
+    expect(v.unpricedTickers).toEqual([]);
     expect(v.portfolioSek).toBe(10 * 100 + 4 * 250);
     expect(v.stocksSek).toBe(1000);
     expect(v.fundsSek).toBe(1000);
@@ -45,5 +49,46 @@ describe("portfolioValue", () => {
     expect(v.portfolioSek).toBe(300);
     // övriga bevakningar prissätts fortfarande med tak 20
     expect(v.priced.length).toBe(21);
+  });
+
+  it("nulls portfolioSek and lists unpricedTickers when a holding's price fetch fails", async () => {
+    mockFetch({ "VOLV-B.ST": "http" });
+    rows.push(
+      { id: 1, ticker: "VOLV-B.ST", status: "Äger", shares: 10, type: "stock" }, // prissättning misslyckas
+      { id: 2, ticker: "ERIC-B.ST", status: "Äger", shares: 5, type: "stock" },  // prissätts OK
+    );
+    const v = await getPortfolioValuation("u-" + Math.random());
+    // innehavet försvinner INTE — det finns kvar men markeras oprissatt
+    expect(v.holdings.map(h => h.ticker)).toEqual(["VOLV-B.ST", "ERIC-B.ST"]);
+    expect(v.unpricedTickers).toEqual(["VOLV-B.ST"]);
+    const failed = v.priced.find(p => p.ticker === "VOLV-B.ST");
+    expect(failed.price).toBeNull();
+    expect(failed.priceError).toBe(true);
+    // never guess: hellre inget värde än ett för lågt
+    expect(v.portfolioSek).toBeNull();
+    expect(v.stocksSek).toBeNull();
+    expect(v.fundsSek).toBeNull();
+  });
+
+  it("treats a price of 0 as unpriced, not as a zero-value holding", async () => {
+    mockFetch({ F0GBR04M4W: "zero" });
+    rows.push({ id: 1, ticker: "F0GBR04M4W", status: "Äger", shares: 4, type: "fund" });
+    const v = await getPortfolioValuation("u-" + Math.random());
+    expect(v.unpricedTickers).toEqual(["F0GBR04M4W"]);
+    expect(v.portfolioSek).toBeNull();
+    expect(v.priced[0].price).toBeNull();
+    expect(v.priced[0].priceError).toBe(true);
+  });
+
+  it("invalidateValuation clears the cache so the next call refetches", async () => {
+    rows.push({ id: 1, ticker: "VOLV-B.ST", status: "Äger", shares: 10, type: "stock" });
+    const userId = "u-cache";
+    await getPortfolioValuation(userId);
+    const callsAfterFirst = globalThis.fetch.mock.calls.length;
+    await getPortfolioValuation(userId); // cachetraff — inga nya anrop
+    expect(globalThis.fetch.mock.calls.length).toBe(callsAfterFirst);
+    invalidateValuation();
+    await getPortfolioValuation(userId);
+    expect(globalThis.fetch.mock.calls.length).toBeGreaterThan(callsAfterFirst);
   });
 });

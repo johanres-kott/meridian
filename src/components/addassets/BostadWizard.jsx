@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
-import { mono, inputStyle, parseAmount, fmtKr } from "./wizardHelpers.js";
+import { mono, inputStyle, parseAmount, fmtKr, suggestedAmortizationRate } from "./wizardHelpers.js";
 import { Field, ChipSelect, StepNav, WizardButtons, SaveError } from "./wizardShared.jsx";
 
 // Bostads-wizard (DESIGN.md): Finarys Add Real Estate-flöde med stegnav till
@@ -31,7 +31,7 @@ export default function BostadWizard({ onSaved, onBack }) {
   const [d, setD] = useState({
     name: "", propertyType: "lagenhet", address: "", livingArea: "", buildYear: "",
     value: "", purchasePrice: "", purchaseDate: "",
-    loanAmount: "", lender: "", interestRate: "", pantbrev: "", downPayment: "",
+    loanAmount: "", lender: "", interestRate: "", amortizationRate: "", pantbrev: "", downPayment: "",
     ownershipShare: "100", loanShare: "",
   });
 
@@ -95,6 +95,7 @@ export default function BostadWizard({ onSaved, onBack }) {
             linkedAssetId: homeRow?.id ?? null,
             lender: d.lender.trim() || null,
             interestRate: parseAmount(d.interestRate),
+            amortizationRate: parseAmount(d.amortizationRate),
             ownershipShare: loanShare ?? ownershipShare,
           },
         });
@@ -195,6 +196,9 @@ export default function BostadWizard({ onSaved, onBack }) {
               <Field label="Ränta" optional>
                 <input value={d.interestRate} onChange={set("interestRate")} placeholder="%" inputMode="decimal" style={{ ...inputStyle, width: 80 }} />
               </Field>
+              <Field label="Amortering" optional>
+                <input value={d.amortizationRate} onChange={set("amortizationRate")} placeholder="% per år" inputMode="decimal" style={{ ...inputStyle, width: 90 }} />
+              </Field>
               <Field label="Din andel av lånet">
                 <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                   <input value={d.loanShare} onChange={set("loanShare")} aria-label="Din andel av lånet" inputMode="decimal" style={{ ...inputStyle, width: 70 }} />
@@ -202,6 +206,19 @@ export default function BostadWizard({ onSaved, onBack }) {
                 </div>
               </Field>
             </div>
+            {(() => {
+              const sug = suggestedAmortizationRate(ltv);
+              if (sug == null || sug <= 0 || d.amortizationRate) return null;
+              return (
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+                  Amorteringskravet motsvarar {sug} % per år vid {ltv.toFixed(0)} % belåningsgrad.{" "}
+                  <button onClick={() => setD({ ...d, amortizationRate: String(sug) })}
+                    style={{ fontSize: 11, color: "var(--brand)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, textDecoration: "underline" }}>
+                    Använd
+                  </button>
+                </div>
+              );
+            })()}
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
               <Field label="Kontantinsats" optional>
                 <input value={d.downPayment} onChange={set("downPayment")} placeholder="kr" inputMode="numeric" style={{ ...inputStyle, width: 180 }} />

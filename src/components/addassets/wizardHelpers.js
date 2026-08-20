@@ -18,3 +18,14 @@ export function parseAmount(v) {
 export function fmtKr(v) {
   return `${v.toLocaleString("sv-SE", { maximumFractionDigits: 0 })} kr`;
 }
+
+// Amorteringskravets grundregel: belåningsgrad över 70 % → 2 %/år,
+// 50–70 % → 1 %, annars 0. Skuldkvotsregeln (+1 % över 4,5 × bruttoinkomst)
+// kräver inkomstuppgift och lämnas utanför förslaget.
+export function suggestedAmortizationRate(ltvPct) {
+  if (ltvPct == null || !Number.isFinite(Number(ltvPct))) return null;
+  const ltv = Number(ltvPct);
+  if (ltv > 70) return 2;
+  if (ltv > 50) return 1;
+  return 0;
+}

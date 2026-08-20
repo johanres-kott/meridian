@@ -85,32 +85,50 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   const [category, setCategory] = useState("boende");
   const [incomeType, setIncomeType] = useState("lon");
   const [period, setPeriod] = useState("month");
-  const [loanId, setLoanId] = useState("");   // utgift kopplad till ett inmatat lån → ränta räknas ut
+  const [loanId, setLoanId] = useState("");   // utgift kopplad till ett inmatat lån → ränta/amortering räknas ut
+  const [loanMode, setLoanMode] = useState("ranta"); // "ranta" | "amortering"
   const [rate, setRate] = useState("");
   const [error, setError] = useState(null);
   const loansById = Object.fromEntries(loans.map(l => [l.id, l]));
   const linkedLoan = loanId ? loansById[loanId] : null;
   const linkedMonthly = linkedLoan ? loanInterestMonthly(linkedLoan.value_sek, parseAmount(rate)) : null;
 
-  // Välj lån: namn + kategori sätts från lånet, räntan förifylls från wizarden om den finns
-  function pickLoan(id) {
-    setLoanId(id);
+  // Välj lån: namn + kategori sätts från lånet och läget (ränta/amortering);
+  // procenten förifylls från wizarden om den finns. Båda räknas som
+  // skuld × procent / 12 och följer lånets aktuella saldo.
+  function applyLoanMode(loan, mode) {
+    setLoanMode(mode);
+    setPeriod("month");
+    const short = loan.label.replace(/^(Bolån|Billån) · /, "");
+    if (mode === "amortering") {
+      setLabel(`Amortering · ${short}`);
+      setCategory("amortering");
+      const known = loan.metadata?.amortizationRate;
+      setRate(known != null ? String(known).replace(".", ",") : "");
+    } else {
+      setLabel(`Ränta · ${short}`);
+      setCategory("lan");
+      const known = loan.metadata?.interestRate;
+      setRate(known != null ? String(known).replace(".", ",") : "");
+    }
+  }
+  function pickLoan(id, mode) {
     const loan = loansById[id];
     if (!loan) return;
-    setLabel(`Ränta · ${loan.label.replace(/^(Bolån|Billån) · /, "")}`);
-    setCategory("lan");
-    setPeriod("month");
-    const known = loan.metadata?.interestRate;
-    setRate(known != null ? String(known).replace(".", ",") : "");
+    setLoanId(id);
+    const used = usedLoanModes.get(id) || new Set();
+    applyLoanMode(loan, mode || (used.has("ranta") ? "amortering" : "ranta"));
   }
 
   function save() {
     if (linkedLoan) {
       const r = parseAmount(rate);
-      if (r == null || r <= 0) { setError("Fyll i räntan i procent."); return; }
+      if (r == null || r <= 0) { setError(loanMode === "amortering" ? "Fyll i amorteringen i procent per år." : "Fyll i räntan i procent."); return; }
       setError(null);
+      const isAmort = loanMode === "amortering";
       onAdd({
-        id: newId(), label: label.trim() || `Ränta · ${linkedLoan.label}`, category: "lan", period: "month",
+        id: newId(), label: label.trim() || `${isAmort ? "Amortering" : "Ränta"} · ${linkedLoan.label}`,
+        category: isAmort ? "amortering" : "lan", period: "month",
         loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(linkedLoan.value_sek, r),
       });
       reset(); setAdding(false);
@@ -131,7 +149,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
     reset();
     setAdding(false);
   }
-  function reset() { setLabel(""); setAmount(""); setPeriod("month"); setLoanId(""); setRate(""); }
+  function reset() { setLabel(""); setAmount(""); setPeriod("month"); setLoanId(""); setLoanMode("ranta"); setRate(""); }
   function cancel() { setAdding(false); setError(null); reset(); }
 
   // Snabbval: förifyll namn + kategori, öppna formuläret med fokus på beloppet.
@@ -148,8 +166,16 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   }
   const usedLabels = new Set(rows.map(r => r.label.toLowerCase()));
   const linkedLoanIds = new Set(rows.map(r => r.loanId).filter(Boolean));
+  // Vilka lägen (ränta/amortering) är redan använda per lån? Ett lån kan ha
+  // en rad av varje sort, men aldrig två av samma.
+  const usedLoanModes = new Map();
+  for (const r of rows) {
+    if (!r.loanId) continue;
+    if (!usedLoanModes.has(r.loanId)) usedLoanModes.set(r.loanId, new Set());
+    usedLoanModes.get(r.loanId).add(r.category === "amortering" ? "amortering" : "ranta");
+  }
   const unusedPresets = presets.filter(p => !usedLabels.has(p.label.toLowerCase()) && !(p.loanKind && loans.some(l => l.kind === p.loanKind && linkedLoanIds.has(l.id))));
-  const linkableLoans = loans.filter(l => !linkedLoanIds.has(l.id));
+  const linkableLoans = loans.filter(l => (usedLoanModes.get(l.id)?.size ?? 0) < 2);
 
   const total = rows.filter(r => !isSaving(r)).reduce((s, r) => s + monthlyAmount(r, loansById), 0);
   const savingPart = rows.filter(isSaving).reduce((s, r) => s + monthlyAmount(r, loansById), 0);
@@ -191,14 +217,27 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
           <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
             {withCategory && linkableLoans.length > 0 && (
               <select value={loanId} onChange={e => e.target.value ? pickLoan(e.target.value) : reset()} title="Koppla till ett lån du lagt in" style={{ ...inputStyle, width: "100%" }}>
-                <option value="">Koppla till lån… (räntan räknas ut automatiskt)</option>
+                <option value="">Koppla till lån… (ränta eller amortering räknas ut)</option>
                 {linkableLoans.map(l => <option key={l.id} value={l.id}>{l.label} — {fmtKr(Number(l.value_sek))}</option>)}
               </select>
             )}
             {linkedLoan ? (
               <>
+                <div style={{ display: "flex", gap: 4, width: "100%" }}>
+                  {["ranta", "amortering"].map(m => {
+                    const usedHere = (usedLoanModes.get(linkedLoan.id) || new Set()).has(m);
+                    const active = loanMode === m;
+                    return (
+                      <button key={m} onClick={() => { if (!usedHere) applyLoanMode(linkedLoan, m); }} disabled={usedHere}
+                        title={usedHere ? "Lånet har redan en sådan rad" : undefined} aria-pressed={active}
+                        style={{ fontSize: 11, fontWeight: 600, padding: "4px 12px", borderRadius: 999, border: "1px solid var(--border)", background: active ? "var(--accent)" : "var(--bg-card)", color: active ? "#fff" : usedHere ? "var(--text-muted)" : "var(--text-secondary)", cursor: usedHere ? "default" : "pointer", fontFamily: "inherit" }}>
+                        {m === "ranta" ? "Ränta" : "Amortering"}
+                      </button>
+                    );
+                  })}
+                </div>
                 <input value={label} onChange={e => setLabel(e.target.value)} style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
-                <input value={rate} onChange={e => setRate(e.target.value)} placeholder="ränta %" inputMode="decimal" autoFocus style={{ ...inputStyle, width: 80 }}
+                <input value={rate} onChange={e => setRate(e.target.value)} placeholder={loanMode === "amortering" ? "% per år" : "ränta %"} inputMode="decimal" autoFocus style={{ ...inputStyle, width: 80 }}
                   onKeyDown={e => { if (e.key === "Enter") save(); }} />
                 <span style={{ ...mono, fontSize: 12, color: "var(--text)", alignSelf: "center", whiteSpace: "nowrap" }}>
                   {linkedMonthly != null ? `= ${fmtKr(linkedMonthly)}/mån` : "= — kr/mån"}

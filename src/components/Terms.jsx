@@ -69,7 +69,7 @@ export default function Terms({ onBack }) {
       </Section>
 
       <Section title="10. Kontakt">
-        Har du frågor om villkoren? Kontakta oss på <strong>kontakt@thesion.tech</strong>.
+        Har du frågor om villkoren? Kontakta oss på <strong>info@thesion.tech</strong>.
       </Section>
     </div>
   );

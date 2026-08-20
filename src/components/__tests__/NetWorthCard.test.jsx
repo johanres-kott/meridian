@@ -1,0 +1,88 @@
+import { describe, it, expect, vi } from "vitest";
+import { render } from "@testing-library/react";
+import NetWorthCard from "../NetWorthCard.jsx";
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: (k) => k, i18n: { language: "sv" } }),
+}));
+
+vi.mock("../../contexts/UserContext.jsx", () => ({
+  useUser: () => ({ preferences: {} }),
+}));
+
+vi.mock("../../lib/manualAssets.js", () => ({
+  deleteManualAsset: vi.fn(),
+}));
+
+function makeData(overrides = {}) {
+  return {
+    portfolioSek: null,
+    portfolioLoaded: true,
+    pensionValue: null,
+    netWorth: 0,
+    hasAnything: true,
+    reloadManual: () => {},
+    assets: [],
+    debts: [],
+    ...overrides,
+  };
+}
+
+function rowTexts(container) {
+  // en enda selektor — jsdom garanterar inte dokumentordning för selektorlistor
+  return [...container.querySelectorAll("[title^='Öppna']")]
+    .map(el => el.textContent.replace(/\u00a0/g, " "));
+}
+
+describe("NetWorthCard", () => {
+  it("renders a loan linked via metadata.linkedAssetId directly under its asset", () => {
+    const data = makeData({
+      assets: [
+        { id: "h1", kind: "bostad", label: "Huset", value_sek: 3000000, metadata: {} },
+        { id: "s1", kind: "sparkonto", label: "Sparkontot", value_sek: 50000, metadata: {} },
+      ],
+      debts: [{ id: "l1", kind: "bolan", label: "Bolån · Huset", value_sek: 2000000, metadata: { linkedAssetId: "h1" } }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[0]).toContain("Huset");
+    expect(rows[1]).toContain("Bolån · Huset");
+    expect(rows[2]).toContain("Sparkontot");
+  });
+
+  it("groups an unlinked bolan under the only bostad asset", () => {
+    const data = makeData({
+      assets: [{ id: "h1", kind: "bostad", label: "huset", value_sek: 3000000, metadata: {} }],
+      debts: [{ id: "l1", kind: "bolan", label: "Huset", value_sek: 7657448, metadata: {} }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[0]).toContain("huset");
+    expect(rows[1]).toContain("Huset");
+    expect(rows[1]).toContain("−7 657 448 SEK");
+  });
+
+  it("leaves an unlinked bolan standalone when there are several bostad assets", () => {
+    const data = makeData({
+      assets: [
+        { id: "h1", kind: "bostad", label: "Villan", value_sek: 3000000, metadata: {} },
+        { id: "h2", kind: "bostad", label: "Stugan", value_sek: 1000000, metadata: {} },
+      ],
+      debts: [{ id: "l1", kind: "bolan", label: "Bolånet", value_sek: 2000000, metadata: {} }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    // fristående skulder listas sist, efter båda bostäderna
+    expect(rows[2]).toContain("Bolånet");
+  });
+
+  it("keeps other debts standalone", () => {
+    const data = makeData({
+      assets: [{ id: "h1", kind: "bostad", label: "Huset", value_sek: 3000000, metadata: {} }],
+      debts: [{ id: "d1", kind: "skuld", label: "CSN", value_sek: 150000, metadata: {} }],
+    });
+    const { container } = render(<NetWorthCard data={data} />);
+    const rows = rowTexts(container);
+    expect(rows[1]).toContain("CSN");
+  });
+});

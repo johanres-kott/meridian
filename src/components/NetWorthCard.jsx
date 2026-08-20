@@ -20,6 +20,24 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
 
   const { portfolioSek, portfolioLoaded, assets, debts, netWorth, hasAnything, pensionValue, reloadManual } = data;
 
+  // Lån hör ihop med sin tillgång: wizardarna länkar via metadata.linkedAssetId,
+  // och ett olänkat bolån läggs under bostaden när det bara finns en (entydigt).
+  // Övriga skulder listas fristående som förut.
+  const bostadAssets = assets.filter(a => a.kind === "bostad");
+  const loansByAsset = new Map();
+  const standaloneDebts = [];
+  for (const d of debts) {
+    const linkId = d.metadata?.linkedAssetId;
+    let target = linkId ? assets.find(a => a.id === linkId) : null;
+    if (!target && !linkId && d.kind === "bolan" && bostadAssets.length === 1) target = bostadAssets[0];
+    if (target) {
+      if (!loansByAsset.has(target.id)) loansByAsset.set(target.id, []);
+      loansByAsset.get(target.id).push(d);
+    } else {
+      standaloneDebts.push(d);
+    }
+  }
+
   async function removeRow(id) {
     setDeleteError(null);
     try {
@@ -70,20 +88,31 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
             </div>
           )}
           {assets.map(r => (
-            <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna tillgången">
-              <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--brand)"} size={26} iconSize={13} />
-              <span style={{ color: "var(--text)", flex: 1, minWidth: 0 }}>
-                {r.label}
-                {r.kind === "vinstandel" && vinstandelHint(r.metadata) && (
-                  <span style={{ display: "block", fontSize: 10.5, color: "var(--text-muted)" }}>{vinstandelHint(r.metadata)}</span>
-                )}
-              </span>
-              <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(Number(r.value_sek))}</span>
-              <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
-                style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
+            <div key={r.id}>
+              <div style={{ ...rowStyle, cursor: "pointer", borderBottom: (loansByAsset.get(r.id) || []).length > 0 ? "none" : rowStyle.borderBottom }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna tillgången">
+                <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--brand)"} size={26} iconSize={13} />
+                <span style={{ color: "var(--text)", flex: 1, minWidth: 0 }}>
+                  {r.label}
+                  {r.kind === "vinstandel" && vinstandelHint(r.metadata) && (
+                    <span style={{ display: "block", fontSize: 10.5, color: "var(--text-muted)" }}>{vinstandelHint(r.metadata)}</span>
+                  )}
+                </span>
+                <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(Number(r.value_sek))}</span>
+                <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
+                  style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
+              </div>
+              {(loansByAsset.get(r.id) || []).map(loan => (
+                <div key={loan.id} style={{ ...rowStyle, cursor: "pointer", paddingLeft: 36, paddingTop: 0 }} onClick={() => onNavigate?.("portfolio", { manualId: loan.id })} title="Öppna lånet">
+                  <IconBadge kind={loan.kind} color={KIND_COLORS[loan.kind] || "var(--neg)"} size={20} iconSize={11} />
+                  <span style={{ color: "var(--text-secondary)", flex: 1, minWidth: 0 }}>{loan.label}</span>
+                  <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(Number(loan.value_sek))}</span>
+                  <button onClick={(e) => { e.stopPropagation(); removeRow(loan.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
+                    style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
+                </div>
+              ))}
             </div>
           ))}
-          {debts.map(r => (
+          {standaloneDebts.map(r => (
             <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna lånet">
               <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--neg)"} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1 }}>{r.label}</span>

@@ -147,6 +147,8 @@
     "title": "My finances",
     "netWorth": "Net worth",
     "portfolio": "Stock & fund portfolio",
+    "stocksOnly": "Stock portfolio",
+    "fundsOnly": "Fund portfolio",
     "stocks": "Stocks",
     "funds": "Funds",
     "pension": "Pension",

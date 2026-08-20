@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useUser } from "../contexts/UserContext.jsx";
-import { deleteManualAsset, effectiveValueSek } from "../lib/manualAssets.js";
+import { deleteManualAsset, effectiveValueSek, resolveLoanTarget } from "../lib/manualAssets.js";
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { vinstandelHint } from "./addassets/vinstandel.js";
@@ -22,17 +22,17 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
   // Aktier/fonder som underrader när portföljen faktiskt innehåller båda —
   // annars är uppdelningen bara brus.
   const showSplit = portfolioSek != null && stocksSek > 0 && fundsSek > 0;
+  const portfolioLabelKey = stocksSek > 0 && !(fundsSek > 0) ? "myFinances.stocksOnly"
+    : fundsSek > 0 && !(stocksSek > 0) ? "myFinances.fundsOnly"
+    : "myFinances.portfolio";
 
   // Lån hör ihop med sin tillgång: wizardarna länkar via metadata.linkedAssetId,
   // och ett olänkat bolån läggs under bostaden när det bara finns en (entydigt).
   // Övriga skulder listas fristående som förut.
-  const bostadAssets = assets.filter(a => a.kind === "bostad");
   const loansByAsset = new Map();
   const standaloneDebts = [];
   for (const d of debts) {
-    const linkId = d.metadata?.linkedAssetId;
-    let target = linkId ? assets.find(a => a.id === linkId) : null;
-    if (!target && !linkId && d.kind === "bolan" && bostadAssets.length === 1) target = bostadAssets[0];
+    const target = resolveLoanTarget(d, assets);
     if (target) {
       if (!loansByAsset.has(target.id)) loansByAsset.set(target.id, []);
       loansByAsset.get(target.id).push(d);
@@ -91,7 +91,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
             <div>
               <div style={{ ...rowStyle, cursor: "pointer", borderBottom: showSplit ? "none" : rowStyle.borderBottom }} onClick={() => onNavigate?.("portfolio")}>
                 <IconBadge kind="portfolio" color={KIND_COLORS.portfolio} size={26} iconSize={13} />
-                <span style={{ color: "var(--text)", flex: 1 }}>{t("myFinances.portfolio")}</span>
+                <span style={{ color: "var(--text)", flex: 1 }}>{t(portfolioLabelKey)}</span>
                 <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(portfolioSek)}</span>
               </div>
               {showSplit && (

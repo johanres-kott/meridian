@@ -35,6 +35,19 @@ export async function deleteManualAsset(id) {
 // Radens värde justerat för användarens ägarandel (metadata.ownershipShare,
 // procent). Saknas andelen räknas hela värdet (100 %); andelen klampas till
 // 1–100 så en felinmatning aldrig nollar eller blåser upp nettoförmögenheten.
+// Vilken tillgång hör ett lån till? I första hand metadata.linkedAssetId;
+// ett bolån utan länk — eller med en dinglande länk till en raderad rad —
+// kopplas till bostaden när det bara finns en (entydigt). Delas av
+// NetWorthCard (gruppering) och ManualAssetView (LÅN & EGET KAPITAL).
+export function resolveLoanTarget(debt, assets) {
+  const linkId = debt?.metadata?.linkedAssetId;
+  const linked = linkId ? assets.find(a => a.id === linkId) : null;
+  if (linked) return linked;
+  if (debt?.kind !== "bolan") return null;
+  const bostad = assets.filter(a => a.kind === "bostad");
+  return bostad.length === 1 ? bostad[0] : null;
+}
+
 export function effectiveValueSek(row) {
   const value = Number(row?.value_sek);
   if (!Number.isFinite(value)) return 0;

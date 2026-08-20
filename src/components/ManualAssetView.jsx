@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
-import { updateManualAsset, deleteManualAsset, effectiveValueSek } from "../lib/manualAssets.js";
+import { updateManualAsset, deleteManualAsset, effectiveValueSek, resolveLoanTarget } from "../lib/manualAssets.js";
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { KIND_LABELS, VALUE_LABELS, FIELDS_BY_KIND, formatFieldValue, parseFieldInput, fieldToInput } from "./assetFields.js";
@@ -84,7 +84,7 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
   }));
 
   // Kopplat lån (bostad/fordon) — lånet pekar på tillgången via metadata.linkedAssetId
-  const linkedLoan = allRows.find(r => r.is_debt && r.metadata?.linkedAssetId === row.id) || null;
+  const linkedLoan = allRows.find(r => r.is_debt && resolveLoanTarget(r, allRows.filter(a => !a.is_debt))?.id === row.id) || null;
   // …och omvänt: lån som pekar på en tillgång
   const linkedAsset = row.is_debt && meta.linkedAssetId ? allRows.find(r => r.id === meta.linkedAssetId) : null;
 

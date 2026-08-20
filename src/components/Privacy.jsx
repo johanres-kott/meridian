@@ -9,11 +9,13 @@ export default function Privacy({ onBack }) {
       </button>
 
       <h1 style={{ fontSize: 22, fontWeight: 600, color: "#131722", marginBottom: 8 }}>Integritetspolicy</h1>
-      <p style={{ fontSize: 12, color: "#787b86", marginBottom: 32 }}>Senast uppdaterad: mars 2026</p>
+      <p style={{ fontSize: 12, color: "#787b86", marginBottom: 32 }}>Senast uppdaterad: augusti 2026</p>
 
       <Section title="1. Vilka vi är">
-        Thesion är en portföljhanteringstjänst för aktieintresserade. Tjänsten drivs som ett
-        hobbyprojekt och tillhandahålls i befintligt skick.
+        Thesion (thesion.tech) är en tjänst för att följa din privatekonomi. Tjänsten drivs
+        i liten skala av en enskild utvecklare, som också är personuppgiftsansvarig för den
+        behandling som beskrivs här. För villkoren som gäller användningen av tjänsten, se
+        användarvillkoren.
       </Section>
 
       <Section title="2. Vilken data vi samlar in">

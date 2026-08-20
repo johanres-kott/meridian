@@ -24,20 +24,21 @@ describe("HealthSignal", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("answers 'Går bolaget bra?' from the composite score", async () => {
-    render(<HealthSignal ticker="AAPL" investorProfile={{ investorType: "mixed" }} />);
+    render(<HealthSignal ticker="AAPL" />);
     expect(await screen.findByText("Går bolaget bra?")).toBeTruthy();
     // mixed composite 66.3 → "Sådär"
     expect(screen.getByText("Sådär")).toBeTruthy();
     expect(screen.getByText("66")).toBeTruthy();
   });
 
-  it("uses the investor profile's composite (value 74.1 → Ja)", async () => {
-    render(<HealthSignal ticker="AAPL" investorProfile={{ investorType: "value" }} />);
-    expect(await screen.findByText("Ja")).toBeTruthy();
+  it("always uses the mixed composite (66.3 → Sådär, not value 74.1 → Ja)", async () => {
+    render(<HealthSignal ticker="AAPL" />);
+    expect(await screen.findByText("Sådär")).toBeTruthy();
+    expect(screen.queryByText("Ja")).toBeNull();
   });
 
   it("shows plain-language drivers", async () => {
-    render(<HealthSignal ticker="AAPL" investorProfile={null} />);
+    render(<HealthSignal ticker="AAPL" />);
     await screen.findByText("Går bolaget bra?");
     expect(screen.getByText("Lönsamhet:")).toBeTruthy();
     expect(screen.getByText("Tillväxt:")).toBeTruthy();
@@ -46,7 +47,7 @@ describe("HealthSignal", () => {
 
   it("renders nothing when no score exists", async () => {
     globalThis.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve(null) }));
-    const { container } = render(<HealthSignal ticker="UNKNOWN" investorProfile={null} />);
+    const { container } = render(<HealthSignal ticker="UNKNOWN" />);
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
     expect(container.innerHTML).toBe("");
   });

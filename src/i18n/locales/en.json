@@ -137,11 +137,11 @@
   },
   "feeScan": {
     "title": "Fee check",
-    "intro": "Your active funds compared with the cheapest global index fund in our list ({{name}}, {{fee}} % fee):",
+    "intro": "How the fees on your active funds compare with the cheapest global index fund in our list ({{name}}, {{fee}} % fee):",
     "perYear": "kr/year difference",
     "feeLabel": "fee",
     "total": "Total ≈ {{amount}} kr per year in fee difference",
-    "disclaimer": "Based on current holding value and fees (source: Morningstar). Funds differ in focus and risk — general information, not personal financial advice."
+    "disclaimer": "An illustrative calculation based on current holding value and fees (source: Morningstar), not a recommendation to switch. Funds differ in focus and risk — general information, not personal financial advice."
   },
   "myFinances": {
     "title": "My finances",

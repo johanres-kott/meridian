@@ -5,7 +5,7 @@ import Hero from "./landing/Hero.jsx";
 import Features from "./landing/Features.jsx";
 import CtaAndFooter from "./landing/CtaAndFooter.jsx";
 
-export default function LandingPage({ onShowPrivacy }) {
+export default function LandingPage({ onShowPrivacy, onShowTerms }) {
   const isMobile = useIsMobile();
   const [showLogin, setShowLogin] = useState(false);
   const [defaultMode, setDefaultMode] = useState("login");
@@ -18,7 +18,7 @@ export default function LandingPage({ onShowPrivacy }) {
             ← Tillbaka
           </button>
         </div>
-        <Login onShowPrivacy={onShowPrivacy} defaultMode={defaultMode} />
+        <Login onShowPrivacy={onShowPrivacy} onShowTerms={onShowTerms} defaultMode={defaultMode} />
       </div>
     );
   }
@@ -35,7 +35,7 @@ export default function LandingPage({ onShowPrivacy }) {
 
       <Hero isMobile={isMobile} onLogin={handleLogin} onSignup={handleSignup} />
       <Features isMobile={isMobile} />
-      <CtaAndFooter isMobile={isMobile} onSignup={handleSignup} onShowPrivacy={onShowPrivacy} />
+      <CtaAndFooter isMobile={isMobile} onSignup={handleSignup} onShowPrivacy={onShowPrivacy} onShowTerms={onShowTerms} />
     </div>
   );
 }

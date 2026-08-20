@@ -75,4 +75,4 @@ Tink/open banking utvärderas först när helhetsvyn har användning. Dyrast, si
 
 ## Regulatorisk princip
 
-Generisk utbildning ("globala indexfonder har låga avgifter") — OK. Personlig rådgivning ("du borde köpa X") — tillståndspliktig, undviks. Alla rekommendationsytor formuleras generiskt och pedagogiskt, med källor. Befintlig disclaimer-praxis ("Utgör inte finansiell rådgivning") behålls och utökas.
+Generisk utbildning ("globala indexfonder har låga avgifter") — OK. Personlig rådgivning ("du borde köpa X") — tillståndspliktig, undviks. Alla rekommendationsytor formuleras generiskt och pedagogiskt, med källor. Befintlig disclaimer-praxis ("Utgör inte finansiell rådgivning") behålls och utökas. Var gränsen går per yta dokumenteras i COMPLIANCE.md.

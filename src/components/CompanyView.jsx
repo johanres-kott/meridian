@@ -164,7 +164,7 @@ export default function CompanyView({ item, onBack, onUpdate }) {
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: isMobile ? 16 : 20, alignItems: "start" }}>
           {/* Left column: vad bolaget är och hur det mår */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <HealthSignal ticker={item.ticker} investorProfile={investorProfile} />
+            <HealthSignal ticker={item.ticker} />
             <AboutCompany company={company} />
 
             {/* News */}

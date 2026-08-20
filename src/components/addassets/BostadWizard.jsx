@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createManualAsset } from "../../lib/manualAssets.js";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
-import BooliValuation from "./BooliValuation.jsx";
 import { mono, inputStyle, parseAmount, fmtKr } from "./wizardHelpers.js";
 import { Field, ChipSelect, StepNav, WizardButtons, SaveError } from "./wizardShared.jsx";
 
@@ -170,11 +169,6 @@ export default function BostadWizard({ onSaved, onBack }) {
             <Field label="Vad är bostaden värd idag?">
               <input value={d.value} onChange={set("value")} placeholder="Värde i kr" inputMode="numeric" autoFocus style={inputStyle} />
             </Field>
-            <BooliValuation
-              initialAddress={d.address}
-              initialSqm={d.livingArea}
-              onUseEstimate={v => setD({ ...d, value: String(v) })}
-            />
             <div style={{ display: "flex", gap: 16 }}>
               <Field label="Köpeskilling" optional>
                 <input value={d.purchasePrice} onChange={set("purchasePrice")} placeholder="Vad du betalade, kr" inputMode="numeric" style={inputStyle} />

@@ -147,6 +147,8 @@
     "title": "Min ekonomi",
     "netWorth": "Nettoförmögenhet",
     "portfolio": "Portfölj",
+    "stocks": "Aktier",
+    "funds": "Fonder",
     "pension": "Pension",
     "assets": "Tillgångar",
     "debts": "Skulder",

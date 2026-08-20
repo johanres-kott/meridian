@@ -39,6 +39,22 @@ function rowTexts(container) {
 }
 
 describe("NetWorthCard", () => {
+  it("splits the portfolio row into stocks and funds when both exist", () => {
+    const data = makeData({ portfolioSek: 300000, stocksSek: 200000, fundsSek: 100000 });
+    const { container } = render(<NetWorthCard data={data} />);
+    const texts = [...container.querySelectorAll("span")].map(e => e.textContent);
+    expect(texts).toContain("myFinances.stocks");
+    expect(texts).toContain("myFinances.funds");
+  });
+
+  it("shows no portfolio split when it is stocks only", () => {
+    const data = makeData({ portfolioSek: 300000, stocksSek: 300000, fundsSek: 0 });
+    const { container } = render(<NetWorthCard data={data} />);
+    const texts = [...container.querySelectorAll("span")].map(e => e.textContent);
+    expect(texts).not.toContain("myFinances.stocks");
+  });
+
+
   it("renders a loan linked via metadata.linkedAssetId directly under its asset", () => {
     const data = makeData({
       assets: [

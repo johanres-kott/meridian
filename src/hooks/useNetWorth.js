@@ -19,6 +19,7 @@ export default function useNetWorth() {
   const [unpricedTickers, setUnpricedTickers] = useState([]);
   const [portfolioLoaded, setPortfolioLoaded] = useState(false);
   const [manualRows, setManualRows] = useState([]);
+  const [manualLoaded, setManualLoaded] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -48,13 +49,14 @@ export default function useNetWorth() {
       .eq("user_id", userId)
       .order("created_at");
     if (!error) setManualRows(data || []);
+    setManualLoaded(true);
   }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
     supabase.from("manual_assets").select("*").eq("user_id", userId).order("created_at")
-      .then(({ data, error }) => { if (!cancelled && !error) setManualRows(data || []); });
+      .then(({ data, error }) => { if (cancelled) return; if (!error) setManualRows(data || []); setManualLoaded(true); });
     return () => { cancelled = true; };
   }, [userId]);
 
@@ -78,6 +80,7 @@ export default function useNetWorth() {
 
   return {
     portfolioSek,
+    manualLoaded,
     dailyChangeSek,
     stocksSek: split.stocksSek,
     fundsSek: split.fundsSek,

@@ -51,13 +51,17 @@ export default function Overview({ onNavigate, onAddAssets }) {
       {userId && (
         <SafeCard>
           <div style={{ marginBottom: isMobile ? 12 : 20 }}>
-            <PortfolioChart
+            {!(netWorthData.portfolioLoaded && netWorthData.manualLoaded) ? (
+              <div style={{ padding: 40, textAlign: "center", color: "var(--text-secondary)", fontSize: 13 }}>Laddar…</div>
+            ) : (
+              <PortfolioChart
               compact
               offsetSek={netWorthData.portfolioLoaded ? (netWorthData.pensionValue ?? 0) + netWorthData.assetSum - netWorthData.debtSum : 0}
               range={range}
               onRangeChange={setRange}
               onPeriodChange={setPeriod}
             />
+            )}
           </div>
         </SafeCard>
       )}

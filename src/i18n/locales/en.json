@@ -173,7 +173,10 @@
       "bolan": "Mortgage",
       "skuld": "Other debt"
     },
-    "todayPortfolio": "today (portfolio)"
+    "todayPortfolio": "today (portfolio)",
+    "viewMine": "My share",
+    "viewHousehold": "Household",
+    "viewToggle": "Show my share or the whole household"
   },
   "assetBreakdown": {
     "title": "Breakdown",

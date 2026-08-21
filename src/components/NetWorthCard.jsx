@@ -5,6 +5,7 @@ import { deleteManualAsset, effectiveValueSek, resolveLoanTarget } from "../lib/
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { vinstandelHint } from "./addassets/vinstandel.js";
+import NetWorthViewToggle from "./NetWorthViewToggle.jsx";
 
 // "Min ekonomi" (PIVOT.md fas 3): listar och raderar manuella tillgångar/
 // skulder. Nya poster läggs till via Add Assets-katalogen (onAddAssets) —
@@ -13,12 +14,18 @@ import { vinstandelHint } from "./addassets/vinstandel.js";
 
 
 export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, showTotal = true }) {
-  const { preferences } = useUser();
+  const { preferences, updatePreferences } = useUser();
   const { t, i18n } = useTranslation();
   const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
   const [deleteError, setDeleteError] = useState(null);
 
   const { portfolioSek, portfolioLoaded, stocksSek, fundsSek, assets, debts, netWorth, hasAnything, pensionValue, reloadManual } = data;
+  // Min del / Hushållet (FAMILY.md): hushållsvyn visar fulla value_sek utan
+  // %-badges; växeln finns bara när den gör skillnad (medlemmar + delad rad).
+  const showToggle = !!data.hasHouseholdView;
+  const householdView = showToggle && preferences.netWorthView === "household";
+  const rowValue = r => householdView ? (Number(r.value_sek) || 0) : effectiveValueSek(r);
+  const shownNetWorth = householdView ? data.householdNetWorth : netWorth;
   // Aktier/fonder som underrader när portföljen faktiskt innehåller båda —
   // annars är uppdelningen bara brus.
   const showSplit = portfolioSek != null && stocksSek > 0 && fundsSek > 0;
@@ -58,6 +65,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
   // Diskret andelsmarkering (samma dämpade stil som vinstandelHint) när
   // användaren bara äger en del av raden — beloppet visar den andelen.
   function shareBadge(r) {
+    if (householdView) return null; // hushållsvyn visar fulla belopp utan badge
     const raw = Number(r.metadata?.ownershipShare);
     if (!Number.isFinite(raw)) return null;
     const share = Math.min(100, Math.max(1, raw));
@@ -77,11 +85,16 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
     <div style={{ marginBottom: isMobile ? 12 : 20, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-card)", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "12px 14px" : "16px 20px" }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{t("myFinances.title")}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{t("myFinances.title")}</span>
+            {showToggle && (
+              <NetWorthViewToggle value={householdView ? "household" : "mine"} onChange={(v) => updatePreferences({ netWorthView: v })} />
+            )}
+          </span>
           {showTotal && hasAnything && portfolioLoaded && (
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("myFinances.netWorth")}</div>
-              <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>{fmtKr(netWorth)}</div>
+              <div style={{ ...mono, fontSize: 20, fontWeight: 500, color: "var(--text)" }}>{fmtKr(shownNetWorth)}</div>
             </div>
           )}
         </div>
@@ -135,7 +148,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
                     <span style={{ display: "block", fontSize: 10.5, color: "var(--text-muted)" }}>{vinstandelHint(r.metadata)}</span>
                   )}
                 </span>
-                <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(effectiveValueSek(r))}</span>
+                <span style={{ ...mono, color: "var(--text)" }}>{fmtKr(rowValue(r))}</span>
                 <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                   style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
               </div>
@@ -143,7 +156,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
                 <div key={loan.id} style={{ ...rowStyle, cursor: "pointer", paddingLeft: 36, paddingTop: 0 }} onClick={() => onNavigate?.("portfolio", { manualId: loan.id })} title="Öppna lånet">
                   <IconBadge kind={loan.kind} color={KIND_COLORS[loan.kind] || "var(--neg)"} size={20} iconSize={11} />
                   <span style={{ color: "var(--text-secondary)", flex: 1, minWidth: 0 }}>{loan.label}{shareBadge(loan)}</span>
-                  <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(effectiveValueSek(loan))}</span>
+                  <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(rowValue(loan))}</span>
                   <button onClick={(e) => { e.stopPropagation(); removeRow(loan.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                     style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
                 </div>
@@ -154,7 +167,7 @@ export default function NetWorthCard({ isMobile, onNavigate, onAddAssets, data, 
             <div key={r.id} style={{ ...rowStyle, cursor: "pointer" }} onClick={() => onNavigate?.("portfolio", { manualId: r.id })} title="Öppna lånet">
               <IconBadge kind={r.kind} color={KIND_COLORS[r.kind] || "var(--neg)"} size={26} iconSize={13} />
               <span style={{ color: "var(--text)", flex: 1 }}>{r.label}{shareBadge(r)}</span>
-              <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(effectiveValueSek(r))}</span>
+              <span style={{ ...mono, color: "var(--neg)" }}>−{fmtKr(rowValue(r))}</span>
               <button onClick={(e) => { e.stopPropagation(); removeRow(r.id); }} title={t("common.delete", { defaultValue: "Ta bort" })}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>

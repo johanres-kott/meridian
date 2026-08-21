@@ -3,6 +3,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 const updateManualAsset = vi.fn(async () => ({}));
 const deleteManualAsset = vi.fn(async () => ({}));
+// Hushållet (familjeläge) läses ur preferences — muterbar per test.
+let mockPrefs = {};
+vi.mock("../../contexts/UserContext.jsx", () => ({
+  useUser: () => ({ preferences: mockPrefs }),
+}));
 // manualAssets.js drar in supabase-klienten — stubba den och behåll den
 // riktiga effectiveValueSek (används för "Din andel av eget kapital").
 vi.mock("../../supabase.js", () => ({ supabase: {} }));
@@ -24,7 +29,7 @@ const loan = {
 };
 
 describe("ManualAssetView", () => {
-  beforeEach(() => { updateManualAsset.mockClear(); deleteManualAsset.mockClear(); });
+  beforeEach(() => { updateManualAsset.mockClear(); deleteManualAsset.mockClear(); mockPrefs = {}; });
 
   it("shows the asset's details, its linked loan, LTV and equity", () => {
     render(<ManualAssetView row={house} allRows={[house, loan]} onBack={() => {}} />);
@@ -173,6 +178,83 @@ describe("ManualAssetView", () => {
   it("hides the lastAmortizedAt stamp when it is missing", () => {
     render(<ManualAssetView row={loan} allRows={[loan]} onBack={() => {}} />);
     expect(screen.queryByText(/Senast nedräknad/)).toBeNull();
+  });
+
+  describe("Ägande-sektionen (familjeläge)", () => {
+    const familyPrefs = {
+      household: { members: [{ id: "p1", name: "Lotten" }], economyType: "gemensam" },
+    };
+
+    it("shows no ownership section without household members", () => {
+      render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} />);
+      fireEvent.click(screen.getByText("Redigera"));
+      expect(screen.queryByText("Ägande")).toBeNull();
+      // gamla Ägarandel-fältet finns kvar (bakåtkompat)
+      expect(screen.getByLabelText("Ägarandel")).toBeTruthy();
+    });
+
+    it("shows one row per member in edit mode, prefilled from the economy type default", () => {
+      mockPrefs = familyPrefs;
+      render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} />);
+      fireEvent.click(screen.getByText("Redigera"));
+      expect(screen.getByText("Ägande")).toBeTruthy();
+      // gemensam ekonomi → 50/50 som default för en rad utan tidigare ägande
+      expect(screen.getByLabelText("Ägarandel Du").value).toBe("50");
+      expect(screen.getByLabelText("Ägarandel Lotten").value).toBe("50");
+      // gamla Ägarandel-fältet döljs när sektionen tar över
+      expect(screen.queryByLabelText("Ägarandel")).toBeNull();
+    });
+
+    it("prefills me from a legacy ownershipShare and others with 0", () => {
+      mockPrefs = familyPrefs;
+      const legacy = { ...house, metadata: { ...house.metadata, ownershipShare: 50 } };
+      render(<ManualAssetView row={legacy} allRows={[legacy]} onBack={() => {}} />);
+      fireEvent.click(screen.getByText("Redigera"));
+      expect(screen.getByLabelText("Ägarandel Du").value).toBe("50");
+      expect(screen.getByLabelText("Ägarandel Lotten").value).toBe("0");
+    });
+
+    it("saves owners AND the mirrored ownershipShare (dual-write)", async () => {
+      mockPrefs = familyPrefs;
+      render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} onChanged={() => {}} />);
+      fireEvent.click(screen.getByText("Redigera"));
+      fireEvent.change(screen.getByLabelText("Ägarandel Du"), { target: { value: "60" } });
+      fireEvent.change(screen.getByLabelText("Ägarandel Lotten"), { target: { value: "40" } });
+      fireEvent.click(screen.getByText("Spara ändringar"));
+      await waitFor(() => expect(updateManualAsset).toHaveBeenCalledTimes(1));
+      const [, patch] = updateManualAsset.mock.calls[0];
+      expect(patch.metadata.owners).toEqual({ me: 60, p1: 40 });
+      expect(patch.metadata.ownershipShare).toBe(60); // spegeln!
+      expect(patch.metadata.address).toBe("Storgatan 1"); // övrig metadata orörd
+    });
+
+    it("refuses to save when the shares sum to more than 100 %", async () => {
+      mockPrefs = familyPrefs;
+      render(<ManualAssetView row={house} allRows={[house]} onBack={() => {}} />);
+      fireEvent.click(screen.getByText("Redigera"));
+      fireEvent.change(screen.getByLabelText("Ägarandel Du"), { target: { value: "80" } });
+      fireEvent.change(screen.getByLabelText("Ägarandel Lotten"), { target: { value: "80" } });
+      fireEvent.click(screen.getByText("Spara ändringar"));
+      expect(await screen.findByText(/summerar till 160 % — högst 100 %/)).toBeTruthy();
+      expect(updateManualAsset).not.toHaveBeenCalled();
+    });
+
+    it("shows the Ägande row instead of the legacy field when owners exist, with unknown ids labeled", () => {
+      mockPrefs = { display_name: "Johan", ...familyPrefs };
+      const owned = { ...house, metadata: { ...house.metadata, owners: { me: 50, p1: 30, borta: 20 }, ownershipShare: 50 } };
+      render(<ManualAssetView row={owned} allRows={[owned]} onBack={() => {}} />);
+      expect(screen.getByText("Ägande")).toBeTruthy();
+      expect(screen.getByText("Johan 50 % · Lotten 30 % · Okänd person 20 %")).toBeTruthy();
+      // gamla fältraden "Ägarandel" dubblas inte
+      expect(screen.queryByText("Ägarandel")).toBeNull();
+    });
+
+    it("keeps the legacy Ägarandel field row in view mode for rows without owners", () => {
+      const legacy = { ...house, metadata: { ...house.metadata, ownershipShare: 50 } };
+      render(<ManualAssetView row={legacy} allRows={[legacy]} onBack={() => {}} />);
+      expect(screen.getByText("Ägarandel")).toBeTruthy();
+      expect(screen.queryByText("Ägande")).toBeNull();
+    });
   });
 
   it("asks before deleting and then calls the proxy", async () => {

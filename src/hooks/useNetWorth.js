@@ -4,6 +4,7 @@ import { useUser } from "../contexts/UserContext.jsx";
 import { getPensionTotalValue } from "../lib/pension.js";
 import { getPortfolioValuation } from "../lib/portfolioValue.js";
 import { effectiveValueSek } from "../lib/manualAssets.js";
+import { getMembers, isSharedRow } from "../lib/household.js";
 
 // Delad nettoförmögenhet: portfölj (via cachad värdering) + pension (ITP i
 // preferences) + manuella tillgångar − skulder (manual_assets). Används av
@@ -65,6 +66,14 @@ export default function useNetWorth() {
   const assetSum = assets.reduce((s, r) => s + effectiveValueSek(r), 0);
   const debtSum = debts.reduce((s, r) => s + effectiveValueSek(r), 0);
   const netWorth = (portfolioSek ?? 0) + (pensionValue ?? 0) + assetSum - debtSum;
+  // Hushållsvyn (FAMILY.md): fulla value_sek utan ägarandel. Portfölj och
+  // pension är personliga i etapp 1 och ingår lika i båda vyerna.
+  const householdAssetSum = assets.reduce((s, r) => s + (Number(r.value_sek) || 0), 0);
+  const householdDebtSum = debts.reduce((s, r) => s + (Number(r.value_sek) || 0), 0);
+  const householdNetWorth = (portfolioSek ?? 0) + (pensionValue ?? 0) + householdAssetSum - householdDebtSum;
+  // Min del/Hushållet-växeln visas bara när det finns familjemedlemmar OCH
+  // minst en rad med delad andel — annars är vyerna identiska.
+  const hasHouseholdView = getMembers(preferences).length > 1 && manualRows.some(isSharedRow);
   const hasAnything = (portfolioSek != null && portfolioSek > 0) || pensionValue != null || manualRows.length > 0;
 
   return {
@@ -83,6 +92,10 @@ export default function useNetWorth() {
     debts,
     assetSum,
     debtSum,
+    householdAssetSum,
+    householdDebtSum,
+    householdNetWorth,
+    hasHouseholdView,
     pensionValue,
     netWorth,
     hasAnything,

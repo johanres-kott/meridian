@@ -173,7 +173,10 @@
       "bolan": "Bolån",
       "skuld": "Övrig skuld"
     },
-    "todayPortfolio": "idag (portföljen)"
+    "todayPortfolio": "idag (portföljen)",
+    "viewMine": "Min del",
+    "viewHousehold": "Hushållet",
+    "viewToggle": "Visa min del eller hela hushållet"
   },
   "assetBreakdown": {
     "title": "Fördelning",

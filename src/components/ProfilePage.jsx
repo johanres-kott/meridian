@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
+import { ECONOMY_TYPES, newMemberId } from "../lib/household.js";
 import { GOAL_LABELS, SITUATION_LABELS } from "./onboarding/steps.js";
 
 const LIFE_LABELS = { starting: "I början", building: "Bygger upp", established: "Etablerad", preRetire: "Närmar mig pension" };
@@ -14,11 +15,67 @@ const RISK_LABELS = { low: "Låg risk", medium: "Medel risk", high: "Hög risk" 
 const EXP_LABELS = { beginner: "Nybörjare", intermediate: "Lite erfarenhet", advanced: "Erfaren" };
 
 export default function ProfilePage({ onResetProfile }) {
-  const { session, preferences, updatePreferences } = useUser();
+  const { session, userId, preferences, updatePreferences } = useUser();
   const isMobile = useIsMobile();
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(preferences.display_name || "");
   const [saved, setSaved] = useState(false);
+
+  // Familj (FAMILY.md): medlemmar som data under det egna kontot — inga
+  // extra logins. Ekonomityp är en default för nytt ägande, aldrig tvingande.
+  const household = preferences.household || {};
+  const householdMembers = Array.isArray(household.members) ? household.members : [];
+  const economyType = household.economyType || "gemensam";
+  const [addingMember, setAddingMember] = useState(false);
+  const [memberInput, setMemberInput] = useState("");
+  const [renamingId, setRenamingId] = useState(null);
+  const [renameInput, setRenameInput] = useState("");
+  const [confirmRemoveId, setConfirmRemoveId] = useState(null);
+  // Rader ur manual_assets för varningen vid borttagning ("står som ägare
+  // på N rader"). Kan hämtningen inte göras visas en generisk varning.
+  const [ownershipRows, setOwnershipRows] = useState(null);
+
+  useEffect(() => {
+    if (!userId || householdMembers.length === 0) return;
+    let cancelled = false;
+    supabase.from("manual_assets").select("id, metadata").eq("user_id", userId)
+      .then(({ data, error }) => { if (!cancelled && !error) setOwnershipRows(data || []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [userId, householdMembers.length]);
+
+  function saveHousehold(patch) {
+    // economyType persisteras med sitt visade default ("gemensam") så att
+    // Ägande-sektionens default-fördelning matchar det pillret som lyser.
+    updatePreferences({ household: { members: householdMembers, economyType, ...patch } });
+  }
+
+  function addMember() {
+    const name = sanitizeInput(memberInput);
+    if (!name) return;
+    saveHousehold({ members: [...householdMembers, { id: newMemberId(), name }] });
+    setMemberInput("");
+    setAddingMember(false);
+  }
+
+  function renameMember(id) {
+    const name = sanitizeInput(renameInput);
+    if (!name) return;
+    saveHousehold({ members: householdMembers.map(m => m.id === id ? { ...m, name } : m) });
+    setRenamingId(null);
+  }
+
+  // Ta bort person: ägandet på raderna lämnas orört — owners-nycklar utan
+  // medlem visas som "Okänd person" i Ägande-sektionen.
+  function removeMember(id) {
+    saveHousehold({ members: householdMembers.filter(m => m.id !== id) });
+    setConfirmRemoveId(null);
+  }
+
+  function ownedRowCount(memberId) {
+    if (!ownershipRows) return null;
+    return ownershipRows.filter(r => Number(r.metadata?.owners?.[memberId]) > 0).length;
+  }
 
   const displayName = preferences.display_name || session?.user?.email?.split("@")[0] || "";
   const email = session?.user?.email || "";
@@ -150,6 +207,101 @@ export default function ProfilePage({ onResetProfile }) {
         ) : (
           <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Ingen profil skapad ännu. Klicka ”Skapa ekonomiprofil” för att komma igång.</div>
         )}
+      </div>
+
+      {/* Familj (FAMILY.md): personer som data, ekonomityp som default för ägande */}
+      <div style={cardStyle}>
+        <div style={labelStyle}>Familj</div>
+        <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12, lineHeight: 1.5 }}>
+          Lägg till personer i ditt hushåll för att ange ägande per tillgång och se både din del och hushållets hela ekonomi. Inga egna inloggningar — allt sparas på ditt konto.
+        </div>
+
+        {householdMembers.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+            {householdMembers.map(m => (
+              <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", border: "1px solid var(--border)", borderRadius: 8 }}>
+                <div style={{
+                  width: 30, height: 30, borderRadius: "50%", background: "var(--bg-raised)", color: "var(--text)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, flexShrink: 0,
+                }}>
+                  {m.name.charAt(0).toUpperCase()}
+                </div>
+                {renamingId === m.id ? (
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1, flexWrap: "wrap" }}>
+                    <input value={renameInput} onChange={e => setRenameInput(e.target.value)} autoFocus aria-label={`Nytt namn för ${m.name}`}
+                      onKeyDown={e => { if (e.key === "Enter") renameMember(m.id); if (e.key === "Escape") setRenamingId(null); }}
+                      style={{ flex: 1, minWidth: 120, maxWidth: 220, padding: "5px 9px", border: "1px solid var(--accent)", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none", background: "var(--bg-card)", color: "var(--text)" }} />
+                    <button onClick={() => renameMember(m.id)} style={{ padding: "5px 12px", fontSize: 12, background: "var(--accent)", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Spara</button>
+                    <button onClick={() => setRenamingId(null)} style={{ padding: "5px 12px", fontSize: 12, background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
+                  </div>
+                ) : confirmRemoveId === m.id ? (
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 12, color: "var(--text-secondary)", flex: 1, minWidth: 180, lineHeight: 1.45 }}>
+                      Ta bort {m.name}?{" "}
+                      {ownedRowCount(m.id) == null
+                        ? "Om personen står som ägare på någon rad lämnas ägandet kvar och visas som ”Okänd person”."
+                        : ownedRowCount(m.id) > 0
+                          ? `${m.name} står som ägare på ${ownedRowCount(m.id)} ${ownedRowCount(m.id) === 1 ? "rad" : "rader"} — ägandet lämnas kvar och visas som ”Okänd person”.`
+                          : "Personen står inte som ägare på någon rad."}
+                    </span>
+                    <button onClick={() => removeMember(m.id)} style={{ padding: "5px 12px", fontSize: 12, background: "var(--bg-card)", color: "var(--neg)", border: "1px solid var(--neg)", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Ja, ta bort</button>
+                    <button onClick={() => setConfirmRemoveId(null)} style={{ padding: "5px 12px", fontSize: 12, background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Nej</button>
+                  </div>
+                ) : (
+                  <>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text)", flex: 1 }}>{m.name}</span>
+                    <button onClick={() => { setRenameInput(m.name); setRenamingId(m.id); setConfirmRemoveId(null); }}
+                      style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                      Ändra
+                    </button>
+                    <button onClick={() => { setConfirmRemoveId(m.id); setRenamingId(null); }} title={`Ta bort ${m.name}`}
+                      style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 14, fontFamily: "inherit", padding: "0 2px" }}>×</button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {addingMember ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 14, flexWrap: "wrap" }}>
+            <input value={memberInput} onChange={e => setMemberInput(e.target.value)} autoFocus placeholder="Namn (t.ex. Lotten)"
+              onKeyDown={e => { if (e.key === "Enter") addMember(); if (e.key === "Escape") setAddingMember(false); }}
+              style={{ flex: 1, minWidth: 140, maxWidth: 250, padding: "6px 10px", border: "1px solid var(--accent)", borderRadius: 4, fontSize: 13, fontFamily: "inherit", outline: "none", background: "var(--bg-card)", color: "var(--text)" }} />
+            <button onClick={addMember} style={{ padding: "6px 14px", fontSize: 12, background: "var(--accent)", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Lägg till</button>
+            <button onClick={() => setAddingMember(false)} style={{ padding: "6px 14px", fontSize: 12, background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" }}>Avbryt</button>
+          </div>
+        ) : (
+          <button onClick={() => setAddingMember(true)}
+            style={{ fontSize: 12, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginBottom: 14 }}>
+            + Lägg till person
+          </button>
+        )}
+
+        <div style={fieldLabel}>Er ekonomi</div>
+        <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 8 }}>
+          Styr bara förslaget när du anger ägande på en tillgång — du kan alltid ändra per rad.
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {ECONOMY_TYPES.map(opt => {
+            const isActive = economyType === opt.value;
+            return (
+              <button key={opt.value}
+                onClick={() => saveHousehold({ economyType: opt.value })}
+                style={{
+                  padding: "8px 14px", borderRadius: 6, fontSize: 12, fontFamily: "inherit", cursor: "pointer", textAlign: "left",
+                  border: isActive ? "1px solid var(--accent)" : "1px solid var(--border)",
+                  background: isActive ? "var(--accent-light)" : "var(--bg-card)",
+                  color: isActive ? "var(--accent)" : "var(--text-secondary)",
+                  fontWeight: isActive ? 600 : 400,
+                }}
+              >
+                {opt.label}
+                <span style={{ display: "block", fontSize: 10, fontWeight: 400, opacity: 0.75, marginTop: 2 }}>{opt.desc}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Pension */}

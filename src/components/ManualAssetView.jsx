@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useIsMobile } from "../hooks/useIsMobile.js";
+import { useUser } from "../contexts/UserContext.jsx";
 import { updateManualAsset, deleteManualAsset, effectiveValueSek, resolveLoanTarget } from "../lib/manualAssets.js";
+import { ME_ID, getMembers, memberName, ownerShare, withOwners, defaultOwnersFor } from "../lib/household.js";
 import { IconBadge } from "./icons.jsx";
 import { KIND_COLORS } from "./iconMaps.js";
 import { KIND_LABELS, VALUE_LABELS, FIELDS_BY_KIND, formatFieldValue, parseFieldInput, fieldToInput } from "./assetFields.js";
@@ -55,11 +57,36 @@ function Row({ label, value, strong, negative }) {
   );
 }
 
+// Typer där Ägande-sektionen (FAMILY.md) kan redigeras per medlem.
+const OWNABLE_KINDS = new Set(["bostad", "fordon", "sparkonto", "buffert", "ovrigt", "bolan", "skuld"]);
+
 export default function ManualAssetView({ row, allRows = [], onBack, onChanged, onOpenRow }) {
   const isMobile = useIsMobile();
+  const { preferences } = useUser();
   const kind = row.kind;
   const fields = FIELDS_BY_KIND[kind] || [];
   const meta = row.metadata || {};
+
+  // Ägande per medlem (FAMILY.md): sektionen visas bara när hushållet har
+  // minst en medlem utöver kontoägaren. Owners-nycklar för borttagna personer
+  // behålls och visas som "Okänd person" — ägandet raderas aldrig i smyg.
+  const members = getMembers(preferences);
+  const showOwnership = members.length > 1 && OWNABLE_KINDS.has(kind);
+  const ownerIds = [
+    ...members.map(m => m.id),
+    ...Object.keys(meta.owners || {}).filter(id => !members.some(m => m.id === id)),
+  ];
+  // Startvärden i redigeringsläget: befintligt ägande, eller — för en rad som
+  // aldrig fått någon andel alls — hushållets ekonomityp som default
+  // (gemensam → delas lika; blandad/enskild → me: 100).
+  function initialOwnersInput() {
+    const fresh = !meta.owners && meta.ownershipShare == null;
+    const defaults = fresh ? defaultOwnersFor(preferences?.household?.economyType || "gemensam", members) : null;
+    return Object.fromEntries(ownerIds.map(id => {
+      const v = defaults ? (defaults[id] ?? 0) : ownerShare(row, id);
+      return [id, String(v).replace(".", ",")];
+    }));
+  }
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -81,6 +108,7 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
     value: String(row.value_sek ?? ""),
     meta: Object.fromEntries(fields.map(f => [f.key, fieldToInput(f, meta[f.key])])),
     tranches: (meta.tranches || []).map(t => ({ year: String(t.year), value: String(t.value) })),
+    owners: initialOwnersInput(),
   }));
 
   // Kopplat lån (bostad/fordon) — lånet pekar på tillgången via metadata.linkedAssetId
@@ -113,16 +141,36 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
       label: row.label, value: String(row.value_sek ?? ""),
       meta: Object.fromEntries(fields.map(f => [f.key, fieldToInput(f, meta[f.key])])),
       tranches: (meta.tranches || []).map(t => ({ year: String(t.year), value: String(t.value) })),
+      owners: initialOwnersInput(),
     });
   }
+
+  // Ägande-inmatningen som siffror (klampade 0–100) + summan, för live-visning
+  // och sparvalidering. Tomt/ogiltigt räknas som 0.
+  const ownersParsed = showOwnership
+    ? Object.fromEntries(ownerIds.map(id => {
+        const n = parseFloat(String(form.owners?.[id] ?? "").replace(/\s/g, "").replace(",", "."));
+        return [id, Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 0];
+      }))
+    : null;
+  const ownersSum = ownersParsed ? Object.values(ownersParsed).reduce((s, v) => s + v, 0) : 0;
 
   async function save() {
     if (saving) return;
     const label = form.label.trim();
     if (!label) { setError("Skriv ett namn."); return; }
     let newValue = parseFloat(String(form.value).replace(/\s/g, "").replace(",", "."));
-    const newMeta = { ...meta };
+    let newMeta = { ...meta };
     for (const f of fields) newMeta[f.key] = parseFieldInput(f, form.meta[f.key]);
+    if (showOwnership) {
+      if (ownersSum > 100) {
+        setError(`Ägarandelarna summerar till ${String(Math.round(ownersSum * 100) / 100).replace(".", ",")} % — högst 100 %.`);
+        return;
+      }
+      // Dual-write (FAMILY.md): owners är sanningen, ownershipShare speglas
+      // så nettoförmögenhet, kassaflöde och cron-snapshot fungerar orört.
+      newMeta = withOwners(newMeta, ownersParsed);
+    }
     if (isVinstandel) {
       if (trancheRows.length === 0) { setError("Lägg in minst en årgång med värde."); return; }
       newMeta.tranches = trancheRows;
@@ -192,7 +240,20 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
     } finally { setSaving(false); }
   }
 
-  const detailFields = fields.filter(f => editing || formatFieldValue(f, meta[f.key]) != null);
+  // Gamla "Ägarandel"-fältet behålls som bakåtkompat för rader utan owners
+  // och utan medlemmar — men döljs när Ägande-sektionen (redigering) eller
+  // Ägande-raden (visning, owners finns) tar över, så inget dubbleras.
+  const hideLegacyShareField = f =>
+    f.key === "ownershipShare" && (editing ? showOwnership : !!meta.owners);
+  const detailFields = fields.filter(f => !hideLegacyShareField(f) && (editing || formatFieldValue(f, meta[f.key]) != null));
+
+  // "Ägande: Du 50 % · Lotten 50 %" i visningsläget när owners-kartan finns.
+  const ownersLabel = meta.owners
+    ? ownerIds
+        .filter(id => ownerShare(row, id) > 0 && (id === ME_ID || meta.owners[id] != null))
+        .map(id => `${memberName(members, id)} ${String(ownerShare(row, id)).replace(".", ",")} %`)
+        .join(" · ")
+    : null;
   const hasIndexBasis = Number(meta.purchasePrice) > 0 && !!meta.purchaseDate;
   const manualBaseValue = manualBase === "purchase" && Number(meta.purchasePrice) > 0
     ? Number(meta.purchasePrice)
@@ -266,6 +327,9 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
           ) : (
             <Row key={f.key} label={f.label} value={formatFieldValue(f, meta[f.key])} />
           ))}
+          {!editing && ownersLabel && (
+            <Row label="Ägande" value={ownersLabel} />
+          )}
           {!editing && (
             <Row label="Tillagd" value={row.created_at ? new Date(row.created_at).toLocaleDateString("sv-SE") : "—"} />
           )}
@@ -311,6 +375,38 @@ export default function ManualAssetView({ row, allRows = [], onBack, onChanged, 
               <Row label={linkedAsset.label} value={fmtKr(linkedAsset.value_sek)} />
             </div>
             {Number(linkedAsset.value_sek) > 0 && <Row label="Belåningsgrad" value={`${((value / Number(linkedAsset.value_sek)) * 100).toFixed(0)} %`} />}
+          </div>
+        )}
+
+        {/* Ägande per medlem (FAMILY.md): en rad per person, summan ≤ 100 %.
+            Sparas via withOwners — owners-kartan + speglad ownershipShare. */}
+        {editing && showOwnership && (
+          <div style={card}>
+            <div style={sectionTitle}>Ägande</div>
+            {ownerIds.map(id => (
+              <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "6px 0", borderBottom: "1px solid var(--border-light)", fontSize: 13 }}>
+                <label style={{ color: "var(--text-secondary)", flexShrink: 0 }}>{memberName(members, id)}</label>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <input value={form.owners?.[id] ?? ""} aria-label={`Ägarandel ${memberName(members, id)}`}
+                    onChange={e => setForm({ ...form, owners: { ...form.owners, [id]: e.target.value } })}
+                    inputMode="decimal" placeholder="0"
+                    style={{ ...inputStyle, ...mono, width: 80, textAlign: "right" }} />
+                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>%</span>
+                </span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 8 }}>
+              <span style={{ color: "var(--text-secondary)" }}>Summa</span>
+              <span style={{ ...mono, fontWeight: 600, color: ownersSum > 100 ? "var(--neg)" : "var(--text)" }}>
+                {String(Math.round(ownersSum * 100) / 100).replace(".", ",")} %
+              </span>
+            </div>
+            {ownersSum > 100 && (
+              <div style={{ fontSize: 11, color: "var(--neg)", marginTop: 4 }}>Summan får högst vara 100 %.</div>
+            )}
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 8, lineHeight: 1.5 }}>
+              Din andel räknas in i din nettoförmögenhet; hushållsvyn visar hela värdet.
+            </div>
           </div>
         )}
 

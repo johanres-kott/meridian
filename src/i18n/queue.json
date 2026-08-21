@@ -1,5 +1,5 @@
 {
-  "_comment": "i18n migration queue. The nightly routine i18n-nightly reads this file, picks the first entry from `pending`, translates it, opens a PR, and moves it to `inReview`. Once a PR is merged, the entry moves to `completed`. Edit by hand to reorder or skip files. Files explicitly listed in `skip` are excluded — typically utility files with no user-facing strings, false-positives from regex scans, or files intentionally untouched.",
+  "_comment": "i18n migration queue. The nightly routine i18n-nightly reads this file, picks the first entry from `pending`, translates it, opens a PR, and moves it to `inReview`. Once a PR is merged, the entry moves to `completed`. Edit by hand to reorder or skip files. Files explicitly listed in `skip` are excluded — typically utility files with no user-facing strings, false-positives from regex scans, or files intentionally untouched. PAUSED: pending emptied 2026-08-21 — these components belonged to the old app. Move items from `paused_pending` back to `pending` to resume.",
   "completed": [
     "src/App.jsx",
     "src/components/Portfolio.jsx",
@@ -11,7 +11,8 @@
     "src/components/PortfolioSummary.jsx"
   ],
   "inReview": [],
-  "pending": [
+  "pending": [],
+  "paused_pending": [
     "src/components/InvestmentPlanTracker.jsx",
     "src/components/AnalysisTab.jsx",
     "src/components/OwnershipOverlay.jsx",

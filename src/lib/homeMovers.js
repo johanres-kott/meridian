@@ -68,3 +68,18 @@ export function dedupeAndSortMovers(priced, fxToSek = {}) {
     })
     .map(x => x.p);
 }
+
+// Etikett när senaste avslut inte är från idag (svensk kalenderdag):
+// "igår", annars "d/M" — null när avslutet är idag eller tidsstämpel saknas.
+// USA-börser före öppning visar gårdagens stängning; det ska synas, inte döljas.
+export function staleLabel(marketTimeSec, now = new Date()) {
+  if (!(marketTimeSec > 0)) return null;
+  const day = (d) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+  const traded = new Date(marketTimeSec * 1000);
+  const today = day(now);
+  const tradedDay = day(traded);
+  if (tradedDay === today) return null;
+  const yesterday = day(new Date(now.getTime() - 24 * 3600 * 1000));
+  if (tradedDay === yesterday) return "igår";
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "numeric" }).format(traded);
+}

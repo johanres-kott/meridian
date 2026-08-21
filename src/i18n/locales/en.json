@@ -209,7 +209,7 @@
     "empty": "No assets yet — click “+ Add assets” at the top right.",
     "noMatch": "Nothing matches the filter."
   },
-  "homeMovers": "Today's movers",
+  "homeMovers": "Market movers",
   "econ": {
     "title": "The economy",
     "policyRate": "Policy rate",

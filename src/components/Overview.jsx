@@ -9,6 +9,7 @@ import TodoList from "./TodoList.jsx";
 import NetWorthCard from "./NetWorthCard.jsx";
 import HomeHero from "./HomeHero.jsx";
 import HomeMovers from "./HomeMovers.jsx";
+import EkonomilagetCard from "./EkonomilagetCard.jsx";
 import useNetWorth from "../hooks/useNetWorth.js";
 
 // Hem enligt Finary-IA (DESIGN.md): en ENKEL dashboard som svarar på
@@ -60,6 +61,7 @@ export default function Overview({ onNavigate, onAddAssets }) {
           </div>
         </SafeCard>
       )}
+      <SafeCard><EkonomilagetCard data={netWorthData} isMobile={isMobile} /></SafeCard>
       <SafeCard><HomeMovers data={netWorthData} isMobile={isMobile} onNavigate={onNavigate} /></SafeCard>
       <SafeCard><NetWorthCard isMobile={isMobile} onNavigate={onNavigate} onAddAssets={onAddAssets} data={netWorthData} showTotal={false} /></SafeCard>
     </div>

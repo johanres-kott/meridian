@@ -210,6 +210,17 @@
     "noMatch": "Inget matchar filtret."
   },
   "homeMovers": "Rörelser idag",
+  "econ": {
+    "title": "Ekonomiläget",
+    "policyRate": "Styrräntan",
+    "unchangedSince": "oförändrad sedan {{date}}",
+    "yourMortgageRate": "Din bolåneränta: {{rate}} %",
+    "housing": "Småhuspriser (Riket)",
+    "housingSub": "{{quarter}}, SCB",
+    "kpif": "KPIF-inflation",
+    "kpifSub": "{{month}}, årstakt",
+    "sources": "Källor:"
+  },
   "range": {
     "periodChange": "{{label}}",
     "labels": {

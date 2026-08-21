@@ -210,6 +210,17 @@
     "noMatch": "Nothing matches the filter."
   },
   "homeMovers": "Today's movers",
+  "econ": {
+    "title": "The economy",
+    "policyRate": "Policy rate",
+    "unchangedSince": "unchanged since {{date}}",
+    "yourMortgageRate": "Your mortgage rate: {{rate}} %",
+    "housing": "House prices (Sweden)",
+    "housingSub": "{{quarter}}, SCB",
+    "kpif": "CPIF inflation",
+    "kpifSub": "{{month}}, yearly rate",
+    "sources": "Sources:"
+  },
   "range": {
     "periodChange": "{{label}}",
     "labels": {

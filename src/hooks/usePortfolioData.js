@@ -73,10 +73,13 @@ export default function usePortfolioData(userId, range) {
 
     // Portfolio
     const raw = portfolioData?.snapshots || portfolioData?.points || portfolioData || [];
-    const maxHoldings = Math.max(...raw.map(p => p.holdingsCount || 0), 1);
-    const threshold = maxHoldings * 0.5;
+    // Inget holdingsCount-tröskelfilter längre: det var en heuristik för att
+    // dölja halv-prissatta snapshots, men gömde även legitima dagar när
+    // portföljen bantats (färre innehav ≠ dålig data) — grafen "slutade" då
+    // veckor bakåt i tiden. Källan är fixad i scraperns snapshot-cron
+    // (oprissatta innehav ⇒ ingen snapshot alls), och gamla giftrader städas
+    // i databasen i stället för att maskeras här.
     const pts = raw
-      .filter(p => (p.holdingsCount || 0) >= threshold)
       .map(p => ({
         date: p.date,
         value: p.totalValue ?? p.value ?? 0,

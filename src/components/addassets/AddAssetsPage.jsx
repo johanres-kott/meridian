@@ -4,6 +4,7 @@ import { useIsMobile } from "../../hooks/useIsMobile.js";
 import BostadWizard from "./BostadWizard.jsx";
 import FordonWizard from "./FordonWizard.jsx";
 import VinstandelWizard from "./VinstandelWizard.jsx";
+import KontoutdragImport from "./KontoutdragImport.jsx";
 import { KindIcon } from "../icons.jsx";
 
 // Helsides "Komplettera din portfölj" — Finary-inspirerad Add Assets-katalog
@@ -17,6 +18,7 @@ import { KindIcon } from "../icons.jsx";
 const CATEGORIES = [
   { id: "sparkonto", kind: "sparkonto", title: "Sparkonto & buffert", desc: "Snabbaste starten — namn och saldo, klart på 30 sekunder" },
   { id: "import", kind: "stocks", title: "Importera från Avanza", desc: "Kontobeskedet som PDF — hela portföljen på en gång" },
+  { id: "kontoutdrag", kind: "sparkonto", title: "Importera kontoutdrag", desc: "CSV från banken (t.ex. Nordea eller SEB) — saldo och månadsflöden, läses lokalt" },
   { id: "stocks", kind: "stocks", title: "Aktier", desc: "Bolag du tror på — med produktsida och hälsosignalen ”Går bolaget bra?”" },
   { id: "funds", kind: "funds", title: "Fonder", desc: "Globala indexfonder och toppfonder med avgifter och betyg från Morningstar" },
   { id: "bostad", kind: "bostad", title: "Bostad", desc: "Lägenhet, hus eller fritidshus — slå upp värdet på Booli eller hitta.se" },
@@ -214,6 +216,8 @@ export default function AddAssetsPage({ onClose, onNavigate, firstRun = false })
           <FordonWizard onSaved={handleSaved} onBack={() => setView(null)} />
         ) : view === "vinstandel" ? (
           <VinstandelWizard onSaved={handleSaved} onBack={() => setView(null)} />
+        ) : view === "kontoutdrag" ? (
+          <KontoutdragImport onSaved={handleSaved} onBack={() => setView(null)} />
         ) : view ? (
           <ManualForm formId={view} onSaved={handleSaved} onBack={() => setView(null)} />
         ) : (

@@ -1,13 +1,15 @@
-import { describe, it, expect, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, fireEvent } from "@testing-library/react";
 import NetWorthCard from "../NetWorthCard.jsx";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (k) => k, i18n: { language: "sv" } }),
 }));
 
+let mockPrefs = {};
+const mockUpdatePreferences = vi.fn();
 vi.mock("../../contexts/UserContext.jsx", () => ({
-  useUser: () => ({ preferences: {} }),
+  useUser: () => ({ preferences: mockPrefs, updatePreferences: mockUpdatePreferences }),
 }));
 
 // manualAssets.js drar in supabase-klienten — stubba den och behåll den
@@ -39,6 +41,8 @@ function rowTexts(container) {
 }
 
 describe("NetWorthCard", () => {
+  beforeEach(() => { mockPrefs = {}; mockUpdatePreferences.mockClear(); });
+
   it("groups a bolan with a dangling linkedAssetId under the only bostad", () => {
     const data = makeData({
       assets: [{ id: "h2", kind: "bostad", label: "huset", value_sek: 4618000, metadata: {} }],
@@ -164,6 +168,49 @@ describe("NetWorthCard", () => {
     const rows = rowTexts(container);
     expect(rows[0]).toContain("3 000 000 SEK");
     expect(rows[0]).not.toContain("100 %");
+  });
+
+  describe("Min del / Hushållet", () => {
+    const sharedData = () => makeData({
+      netWorth: 500000,
+      householdNetWorth: 1000000,
+      hasHouseholdView: true,
+      assets: [{ id: "h1", kind: "bostad", label: "Huset", value_sek: 3000000, metadata: { owners: { me: 50, p1: 50 }, ownershipShare: 50 } }],
+    });
+
+    it("hides the toggle when the household view would be identical", () => {
+      const data = makeData({
+        assets: [{ id: "h1", kind: "bostad", label: "Huset", value_sek: 3000000, metadata: { ownershipShare: 50 } }],
+        hasHouseholdView: false,
+      });
+      const { container } = render(<NetWorthCard data={data} />);
+      expect(container.textContent).not.toContain("myFinances.viewHousehold");
+    });
+
+    it("shows the toggle and my share by default when members and a shared row exist", () => {
+      const { container } = render(<NetWorthCard data={sharedData()} showTotal />);
+      expect(container.textContent).toContain("myFinances.viewMine");
+      expect(container.textContent).toContain("myFinances.viewHousehold");
+      const rows = rowTexts(container);
+      expect(rows[0]).toContain("1 500 000 SEK"); // min del
+      expect(rows[0]).toContain("50 %");
+      expect(container.textContent.replace(/\u00a0/g, " ")).toContain("500 000 SEK"); // total = min del
+    });
+
+    it("shows full amounts without badges in the household view", () => {
+      mockPrefs = { netWorthView: "household" };
+      const { container } = render(<NetWorthCard data={sharedData()} showTotal />);
+      const rows = rowTexts(container);
+      expect(rows[0]).toContain("3 000 000 SEK"); // fulla värdet
+      expect(rows[0]).not.toContain("50 %");      // ingen badge
+      expect(container.textContent.replace(/\u00a0/g, " ")).toContain("1 000 000 SEK"); // householdNetWorth
+    });
+
+    it("saves the chosen view in preferences", () => {
+      const { getByText } = render(<NetWorthCard data={sharedData()} />);
+      fireEvent.click(getByText("myFinances.viewHousehold"));
+      expect(mockUpdatePreferences).toHaveBeenCalledWith({ netWorthView: "household" });
+    });
   });
 
   it("keeps other debts standalone", () => {

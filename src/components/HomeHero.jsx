@@ -1,24 +1,35 @@
 import { useTranslation } from "react-i18next";
+import { useUser } from "../contexts/UserContext.jsx";
+import NetWorthViewToggle from "./NetWorthViewToggle.jsx";
 
 // Hem-sidans hero (DESIGN.md): nettoförmögenheten som stor siffra med
 // dagsförändring och breakdown-chips — Finarys dashboard-mönster.
 // Data kommer från useNetWorth i Overview; ingen egen hämtning här.
+// Med familjemedlemmar och delade rader (FAMILY.md) växlar Min del/Hushållet
+// mellan användarens andel och hushållets fulla värden.
 
 export default function HomeHero({ data, isMobile, onNavigate, period }) {
   const { t, i18n } = useTranslation();
+  const { preferences, updatePreferences } = useUser();
   const numberLocale = i18n.language === "en" ? "en-GB" : "sv-SE";
 
   if (!data.portfolioLoaded || !data.hasAnything) return null;
 
   const { netWorth, dailyChangeSek, portfolioSek, pensionValue, assetSum, debtSum } = data;
+  const showToggle = !!data.hasHouseholdView;
+  const view = showToggle && preferences.netWorthView === "household" ? "household" : "mine";
+  const householdView = view === "household";
+  const shownNetWorth = householdView ? data.householdNetWorth : netWorth;
+  const shownAssetSum = householdView ? data.householdAssetSum : assetSum;
+  const shownDebtSum = householdView ? data.householdDebtSum : debtSum;
   const mono = { fontFamily: "var(--font-mono)" };
   const fmt = v => `${v.toLocaleString(numberLocale, { maximumFractionDigits: 0 })} SEK`;
 
   const chips = [
     portfolioSek != null && portfolioSek > 0 ? { label: t("myFinances.portfolio"), value: portfolioSek, tab: "portfolio" } : null,
     pensionValue != null ? { label: t("myFinances.pension"), value: pensionValue, tab: "investment", detail: { subTab: "pension" } } : null,
-    assetSum > 0 ? { label: t("myFinances.assets"), value: assetSum } : null,
-    debtSum > 0 ? { label: t("myFinances.debts"), value: -debtSum, negative: true } : null,
+    shownAssetSum > 0 ? { label: t("myFinances.assets"), value: shownAssetSum } : null,
+    shownDebtSum > 0 ? { label: t("myFinances.debts"), value: -shownDebtSum, negative: true } : null,
   ].filter(Boolean);
 
   const dateLabel = new Date().toLocaleDateString(numberLocale, { day: "numeric", month: "short", year: "numeric" });
@@ -28,10 +39,15 @@ export default function HomeHero({ data, isMobile, onNavigate, period }) {
       background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)",
       padding: isMobile ? "16px 16px" : "22px 24px", marginBottom: isMobile ? 12 : 20,
     }}>
-      <div style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 6 }}>{dateLabel}</div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
+        <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>{dateLabel}</span>
+        {showToggle && (
+          <NetWorthViewToggle value={view} onChange={(v) => updatePreferences({ netWorthView: v })} />
+        )}
+      </div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
         <span style={{ fontFamily: "var(--font-display)", fontVariantNumeric: "tabular-nums", fontSize: isMobile ? 34 : 44, fontWeight: 500, color: "var(--text)", letterSpacing: "-0.015em", lineHeight: 1.08 }}>
-          {fmt(netWorth)}
+          {fmt(shownNetWorth)}
         </span>
         {period ? (
           // Periodens förändring för valt tidsspann (global RangeBar, Finary-mönstret)
@@ -50,6 +66,7 @@ export default function HomeHero({ data, isMobile, onNavigate, period }) {
       </div>
       <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 2 }}>
         {t("myFinances.netWorth")}
+        {showToggle && <> · {householdView ? t("myFinances.viewHousehold") : t("myFinances.viewMine")}</>}
       </div>
 
       {chips.length > 1 && (

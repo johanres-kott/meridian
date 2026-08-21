@@ -44,6 +44,7 @@ async function getYahooPriceV8(ticker) {
       week52Low: meta.fiftyTwoWeekLow ?? 0,
       changePercent,
       changeAbs: parseFloat(changeAbs.toFixed(2)),
+      marketTime: meta.regularMarketTime ?? null, // epoch (s) för senaste avslut
     };
   } catch {
     return null;
@@ -167,6 +168,7 @@ export default async function handler(req, res) {
       price: priceData?.price ?? 0,
       changePercent: priceData?.changePercent ?? 0,
       changeAbs: priceData?.changeAbs ?? 0,
+      marketTime: priceData?.marketTime ?? null,
       currency: priceData?.currency ?? "USD",
       marketCap: fmpData?.marketCap ?? priceData?.marketCap ?? 0,
       peForward: fmpData?.peForward ?? fundamentals?.peForward ?? 0,

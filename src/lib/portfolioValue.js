@@ -70,7 +70,7 @@ async function computeValuation(userId) {
           const pence = d.currency === "GBp" || d.currency === "GBX";
           const price = pence ? (Number(d.price) || 0) / 100 : (Number(d.price) || 0);
           if (!(price > 0)) return { ...item, price: null, priceError: true, changePercent: 0 };
-          return { ...item, price, changePercent: d.changePercent || 0, currency: pence ? "GBP" : d.currency };
+          return { ...item, price, changePercent: d.changePercent || 0, currency: pence ? "GBP" : d.currency, marketTime: d.marketTime ?? null };
         } catch (err) {
           console.error(`portfolioValue: failed to fetch ${item.ticker}:`, err);
           return { ...item, price: null, priceError: true, changePercent: 0 };

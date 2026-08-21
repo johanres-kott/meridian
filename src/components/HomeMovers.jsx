@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { dedupeAndSortMovers } from "../lib/homeMovers.js";
+import { dedupeAndSortMovers, dailyChangeSek, staleLabel } from "../lib/homeMovers.js";
 
 // Finarys "My Movers" på Hem: de innehav som rört sig mest idag. Data från
 // useNetWorth.priced (redan hämtat för heron) — ingen extra fetch. Ägda
@@ -21,18 +21,30 @@ export default function HomeMovers({ data, isMobile, onNavigate }) {
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--card-border)", borderRadius: "var(--radius-lg)", padding: isMobile ? "14px 16px" : "16px 22px", marginBottom: isMobile ? 12 : 20 }}>
       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>{t("homeMovers")}</div>
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3, 1fr)", gap: 10 }}>
-        {movers.map(m => (
-          <button key={m.ticker} onClick={() => onNavigate?.("portfolio", { ticker: m.ticker })}
-            style={{ textAlign: "left", background: "var(--bg-secondary)", border: "1px solid var(--border-light)", borderRadius: 8, padding: "10px 12px", cursor: "pointer", fontFamily: "inherit" }}>
-            <div style={{ fontSize: 12, fontWeight: 500, color: Number(m.shares) > 0 ? "var(--text)" : "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.name || m.ticker}</div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 2 }}>
-              <span style={{ ...mono, fontSize: 10, color: "var(--text-secondary)" }}>{m.ticker}</span>
-              <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: m.changePercent >= 0 ? "var(--pos)" : "var(--neg)" }}>
-                {m.changePercent >= 0 ? "+" : ""}{m.changePercent.toFixed(2)}%
-              </span>
-            </div>
-          </button>
-        ))}
+        {movers.map(m => {
+          const sek = dailyChangeSek(m, data.fxToSek);
+          const stale = staleLabel(m.marketTime);
+          return (
+            <button key={m.ticker} onClick={() => onNavigate?.("portfolio", { ticker: m.ticker })}
+              style={{ textAlign: "left", background: "var(--bg-secondary)", border: "1px solid var(--border-light)", borderRadius: 8, padding: "10px 12px", cursor: "pointer", fontFamily: "inherit" }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: Number(m.shares) > 0 ? "var(--text)" : "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.name || m.ticker}</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 2 }}>
+                <span style={{ ...mono, fontSize: 10, color: "var(--text-secondary)" }}>
+                  {m.ticker}
+                  {stale && <span style={{ color: "var(--text-muted)" }}> · {stale}</span>}
+                </span>
+                <span style={{ ...mono, fontSize: 13, fontWeight: 600, color: m.changePercent >= 0 ? "var(--pos)" : "var(--neg)" }}>
+                  {m.changePercent >= 0 ? "+" : ""}{m.changePercent.toFixed(2)}%
+                </span>
+              </div>
+              {sek != null && (
+                <div style={{ ...mono, fontSize: 10.5, color: sek >= 0 ? "var(--pos)" : "var(--neg)", textAlign: "right", marginTop: 1 }}>
+                  {sek >= 0 ? "+" : "−"}{Math.abs(Math.round(sek)).toLocaleString("sv-SE")} kr
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

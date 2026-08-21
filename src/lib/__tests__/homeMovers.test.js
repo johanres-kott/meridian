@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { dedupeAndSortMovers, dailyChangeSek, tickerBase } from "../homeMovers.js";
+import { dedupeAndSortMovers, dailyChangeSek, tickerBase, staleLabel } from "../homeMovers.js";
 
 const row = (ticker, { shares = 0, price = 100, changePercent = 1, currency = "SEK", name } = {}) =>
   ({ ticker, shares, price, changePercent, currency, name: name || ticker });
@@ -113,5 +113,25 @@ describe("dedupeAndSortMovers", () => {
       row("ABC.DE", { changePercent: 3 }),
     ]);
     expect(out.map(p => p.ticker)).toEqual(["ABC"]);
+  });
+});
+
+describe("staleLabel", () => {
+  // 21 aug 2026 kl 09:00 svensk tid (CEST = UTC+2)
+  const now = new Date("2026-08-21T07:00:00Z");
+  it("returns null for a trade earlier the same Swedish day", () => {
+    expect(staleLabel(Date.parse("2026-08-21T07:30:00Z") / 1000, now)).toBeNull();
+  });
+  it("says igår for yesterday's close (US market before open)", () => {
+    // Nasdaq-stängning 20 aug 22:00 svensk tid
+    expect(staleLabel(Date.parse("2026-08-20T20:00:00Z") / 1000, now)).toBe("igår");
+  });
+  it("shows the date for older trades (e.g. Friday close on a Monday)", () => {
+    const monday = new Date("2026-08-24T07:00:00Z");
+    expect(staleLabel(Date.parse("2026-08-21T20:00:00Z") / 1000, monday)).toBe("21/8");
+  });
+  it("returns null without a timestamp", () => {
+    expect(staleLabel(null, now)).toBeNull();
+    expect(staleLabel(0, now)).toBeNull();
   });
 });

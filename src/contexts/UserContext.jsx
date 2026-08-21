@@ -6,7 +6,7 @@ const UserContext = createContext(null);
 export function UserProvider({ session, children }) {
   const [preferences, setPreferences] = useState({});
   // true när preferences-hämtningen slutförts (även vid fel — då med {}).
-  // Ytor som avgör "ny användare?" (OnboardingModal/QuickGuide) väntar på den
+  // Ytor som avgör "ny användare?" (OnboardingModal) väntar på den
   // här flaggan så de inte blinkar för befintliga användare på långsamt nät.
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [lastSeenAt, setLastSeenAt] = useState(null);

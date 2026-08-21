@@ -54,6 +54,12 @@ export default function Portfolio({ deepLink, onClearDeepLink, onNavigate }) {
 
   // Deep link till manuell tillgång (från Min ekonomi på Hem)
   useEffect(() => {
+    if (!deepLink?.openPdfImport) return;
+    setShowImport(true);
+    onClearDeepLink?.();
+  }, [deepLink, onClearDeepLink]);
+
+  useEffect(() => {
     if (!deepLink?.manualId) return;
     const match = netWorthData.manualRows.find(r => r.id === deepLink.manualId);
     if (match) { setSelectedManual(match); onClearDeepLink?.(); }

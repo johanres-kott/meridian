@@ -14,7 +14,6 @@ import Privacy from "./components/Privacy.jsx";
 import Terms from "./components/Terms.jsx";
 const InvestmentCompanies = lazy(() => import("./components/InvestmentCompanies.jsx"));
 import OnboardingModal from "./components/OnboardingModal.jsx";
-import QuickGuide from "./components/QuickGuide.jsx";
 const ScoringMethodology = lazy(() => import("./components/ScoringMethodology.jsx"));
 const ProfilePage = lazy(() => import("./components/ProfilePage.jsx"));
 const Documentation = lazy(() => import("./components/Documentation.jsx"));
@@ -125,6 +124,7 @@ function AppContent() {
   const [tab, setTab] = useState("markets");
   const [deepLink, setDeepLink] = useState(null);
   const [showAddAssets, setShowAddAssets] = useState(false);
+  const [addAssetsFirstRun, setAddAssetsFirstRun] = useState(false);
 
   function navigate(targetTab, detail) {
     setDeepLink(detail || null);
@@ -156,7 +156,7 @@ function AppContent() {
       {tab === "search" && <CompanySearch deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
       {tab === "investment" && <InvestmentCompanies onNavigate={navigate} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
       {tab === "methodology" && <ScoringMethodology onBack={() => setTab("markets")} />}
-      {tab === "profile" && <ProfilePage onResetProfile={() => updatePreferences({ investorProfile: null })} />}
+      {tab === "profile" && <ProfilePage onResetProfile={() => updatePreferences({ investorProfile: null, onboardingSkipped: false })} />}
       {tab === "docs" && <Documentation />}
       {tab === "about" && <AboutPage onNavigate={navigate} />}
       {tab === "security" && <SecurityPage />}
@@ -167,25 +167,31 @@ function AppContent() {
 
   const modals = (
     <>
-      {/* Onboarding modal for new users. Gate:ad på prefsLoaded så modalen
-          inte blinkar för befintliga användare medan preferences laddar. */}
-      {prefsLoaded && !preferences.investorProfile && (
-        <OnboardingModal onComplete={(profile) => {
-          // Ekonomiprofil (v2). Inga starter-aktier längre — appen trattar mot
-          // "+ Lägg till" och basen, inte mot fem bevakade aktier.
-          updatePreferences({ investorProfile: profile });
-        }} />
-      )}
-
-      {/* Quick guide for new users (after onboarding) */}
-      {prefsLoaded && preferences.investorProfile && !preferences.guideSeen && (
-        <QuickGuide onComplete={() => updatePreferences({ guideSeen: true })} />
+      {/* Onboarding för nya användare. Gate:ad på prefsLoaded så modalen inte
+          blinkar för befintliga användare medan preferences laddar. Quizen går
+          att hoppa över (onboardingSkipped) — profilen nås senare via
+          profilmenyn. Efter klart/skipp första gången: rakt in i Add
+          Assets-katalogen i stället för guide-slides — första handlingen slår
+          sex slides (superenkelt-principen, se PIVOT.md/Finary). */}
+      {prefsLoaded && !preferences.investorProfile && !preferences.onboardingSkipped && (
+        <OnboardingModal
+          onComplete={(profile) => {
+            const firstRun = !preferences.guideSeen;
+            updatePreferences({ investorProfile: profile, guideSeen: true });
+            if (firstRun) { setAddAssetsFirstRun(true); setShowAddAssets(true); }
+          }}
+          onSkip={() => {
+            const firstRun = !preferences.guideSeen;
+            updatePreferences({ onboardingSkipped: true, guideSeen: true });
+            if (firstRun) { setAddAssetsFirstRun(true); setShowAddAssets(true); }
+          }}
+        />
       )}
 
       {/* Add assets-katalog (helsida, Finary-inspirerad) */}
       {showAddAssets && (
         <Suspense fallback={contentFallback}>
-          <AddAssetsPage onClose={() => setShowAddAssets(false)} onNavigate={navigate} />
+          <AddAssetsPage onClose={() => { setShowAddAssets(false); setAddAssetsFirstRun(false); }} onNavigate={navigate} firstRun={addAssetsFirstRun} />
         </Suspense>
       )}
     </>

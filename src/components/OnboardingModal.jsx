@@ -30,7 +30,7 @@ function firstSteps(answers) {
   return steps.slice(0, 3);
 }
 
-export default function OnboardingModal({ onComplete }) {
+export default function OnboardingModal({ onComplete, onSkip }) {
   const isMobile = useIsMobile();
   const [step, setStep] = useState(-1); // -1 = välkommen, STEPS.length = summering
   const [answers, setAnswers] = useState({});
@@ -93,6 +93,14 @@ export default function OnboardingModal({ onComplete }) {
               })}
             </div>
             <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 18, textAlign: "center" }}>Fyra snabba frågor så anpassar vi appen efter din situation.</div>
+            {onSkip && (
+              <div style={{ textAlign: "center", marginTop: 10 }}>
+                <button onClick={onSkip}
+                  style={{ fontSize: 13, color: "var(--text-secondary)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textDecoration: "underline", padding: 4 }}>
+                  Hoppa över — gör profilen senare
+                </button>
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
               <button onClick={() => setStep(0)} style={primaryBtn}>Kom igång</button>
             </div>

@@ -78,8 +78,9 @@ const EXPENSE_PRESETS = [
   { label: "Semester / resa",     category: "ovrigt",     period: "year" },
 ];
 
-function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = false, withIncomeType = false, presets = [], accent, loans = [] }) {
+function FlowColumn({ title, rows, onAdd, onUpdate, onRemove, placeholder, withCategory = false, withIncomeType = false, presets = [], accent, loans = [] }) {
   const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState(null); // rad under redigering (samma formulär som tillägg)
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("boende");
@@ -126,11 +127,12 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
       if (r == null || r <= 0) { setError(loanMode === "amortering" ? "Fyll i amorteringen i procent per år." : "Fyll i räntan i procent."); return; }
       setError(null);
       const isAmort = loanMode === "amortering";
-      onAdd({
-        id: newId(), label: label.trim() || `${isAmort ? "Amortering" : "Ränta"} · ${linkedLoan.label}`,
+      const linkedRow = {
+        id: editingId || newId(), label: label.trim() || `${isAmort ? "Amortering" : "Ränta"} · ${linkedLoan.label}`,
         category: isAmort ? "amortering" : "lan", period: "month",
         loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(linkedLoan.value_sek, r),
-      });
+      };
+      if (editingId) onUpdate?.(linkedRow); else onAdd(linkedRow);
       reset(); setAdding(false);
       return;
     }
@@ -141,15 +143,35 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
     if (!finalLabel) { setError(withIncomeType ? "Skriv vad det är för inkomst." : "Skriv ett namn på posten."); return; }
     if (parsed == null) { setError(`Fyll i ett belopp i kr per ${PERIOD_BY_ID[period]?.label || "månad"}.`); return; }
     setError(null);
-    onAdd({
-      id: newId(), label: finalLabel, amount: parsed, period,
+    const row = {
+      id: editingId || newId(), label: finalLabel, amount: parsed, period,
       ...(withCategory ? { category } : {}),
       ...(withIncomeType ? { incomeType } : {}),
-    });
+    };
+    if (editingId) onUpdate?.(row); else onAdd(row);
     reset();
     setAdding(false);
   }
-  function reset() { setLabel(""); setAmount(""); setPeriod("month"); setLoanId(""); setLoanMode("ranta"); setRate(""); }
+  function reset() { setLabel(""); setAmount(""); setPeriod("month"); setLoanId(""); setLoanMode("ranta"); setRate(""); setEditingId(null); }
+
+  // Öppna formuläret förifyllt med radens värden — spara skriver om samma id.
+  function startEdit(r) {
+    setEditingId(r.id);
+    setLabel(r.label || "");
+    setAmount(r.amount != null ? String(r.amount) : "");
+    setPeriod(r.period || "month");
+    if (withCategory) setCategory(r.category || "boende");
+    if (withIncomeType) setIncomeType(r.incomeType || "ovrigt");
+    if (r.loanId) {
+      setLoanId(r.loanId);
+      setLoanMode(r.category === "amortering" ? "amortering" : "ranta");
+      setRate(r.rate != null ? String(r.rate).replace(".", ",") : "");
+    } else {
+      setLoanId(""); setLoanMode("ranta"); setRate("");
+    }
+    setError(null);
+    setAdding(true);
+  }
   function cancel() { setAdding(false); setError(null); reset(); }
 
   // Snabbval: förifyll namn + kategori, öppna formuläret med fokus på beloppet.
@@ -170,7 +192,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
   // en rad av varje sort, men aldrig två av samma.
   const usedLoanModes = new Map();
   for (const r of rows) {
-    if (!r.loanId) continue;
+    if (!r.loanId || r.id === editingId) continue; // raden under redigering låser inte sitt eget läge
     if (!usedLoanModes.has(r.loanId)) usedLoanModes.set(r.loanId, new Set());
     usedLoanModes.get(r.loanId).add(r.category === "amortering" ? "amortering" : "ranta");
   }
@@ -195,6 +217,7 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
           <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "8px 0" }}>Inget inlagt ännu</div>
         )}
         {rows.map(r => {
+          if (r.id === editingId) return null; // visas i formuläret nedanför
           const cat = withCategory ? (CAT_BY_ID[r.category] || CAT_BY_ID.ovrigt) : null;
           return (
             <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: "1px solid var(--border-light)", fontSize: 12 }}>
@@ -208,6 +231,8 @@ function FlowColumn({ title, rows, onAdd, onRemove, placeholder, withCategory = 
               )}
               {cat && <span style={{ fontSize: 10, color: "var(--text-secondary)", background: "var(--bg-secondary)", borderRadius: 999, padding: "1px 7px", flexShrink: 0 }}>{cat.label}</span>}
               <span style={{ ...mono, color: "var(--text)", flexShrink: 0, fontSize: 11.5 }}>{fmtRowAmount(r, loansById)}</span>
+              <button onClick={() => startEdit(r)} title="Redigera" aria-label={`Redigera ${r.label}`}
+                style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 11, padding: "0 2px", fontFamily: "inherit" }}>✎</button>
               <button onClick={() => onRemove(r.id)} title="Ta bort"
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 12, padding: "0 2px", fontFamily: "inherit" }}>×</button>
             </div>
@@ -542,6 +567,7 @@ export default function GoalsTab() {
           rows={cashflow.incomes}
           placeholder="T.ex. Lön efter skatt"
           onAdd={row => setCashflow({ ...cashflow, incomes: [...cashflow.incomes, row] })}
+          onUpdate={row => setCashflow({ ...cashflow, incomes: cashflow.incomes.map(r => r.id === row.id ? row : r) })}
           onRemove={id => setCashflow({ ...cashflow, incomes: cashflow.incomes.filter(r => r.id !== id) })}
         />
         <FlowColumn
@@ -553,6 +579,7 @@ export default function GoalsTab() {
           rows={cashflow.expenses}
           placeholder="T.ex. Hyra, bolåneränta, mat"
           onAdd={row => setCashflow({ ...cashflow, expenses: [...cashflow.expenses, row] })}
+          onUpdate={row => setCashflow({ ...cashflow, expenses: cashflow.expenses.map(r => r.id === row.id ? row : r) })}
           onRemove={id => setCashflow({ ...cashflow, expenses: cashflow.expenses.filter(r => r.id !== id) })}
         />
       </div>

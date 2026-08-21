@@ -38,6 +38,50 @@ export function UserProvider({ session, children }) {
     trackVisit();
   }, [session]);
 
+  // Sparstatus för inställningar: "idle" (inget skrivet ännu) | "saving" |
+  // "saved" | "error". Vid fel samlas patchen i pendingRef så att
+  // retrySave() kan skicka om exakt det som aldrig nådde servern — utan
+  // detta såg en misslyckad skrivning sparad ut (optimistisk state) men
+  // försvann vid nästa laddning.
+  const [saveStatus, setSaveStatus] = useState("idle");
+  const pendingRef = useRef(null);
+  const inflightRef = useRef(0);
+
+  // Nätverksdelen: proxy först (Safari), direkt Supabase som fallback —
+  // BÅDA med verklig felkoll. Kastar när ingen väg lyckas.
+  async function pushPatch(patch) {
+    try {
+      const res = await fetch("/api/user-prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify(patch),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { preferences: serverMerged } = await res.json();
+      return serverMerged || null;
+    } catch (err) {
+      console.error("updatePreferences: proxy save failed, falling back to direct write:", err);
+      const { data, error: readErr } = await supabase.from("user_prefs").select("preferences").eq("user_id", userId).single();
+      if (readErr) throw readErr;
+      const serverMerged = { ...(data?.preferences || {}), ...patch };
+      const { error: writeErr } = await supabase.from("user_prefs").update({ preferences: serverMerged }).eq("user_id", userId);
+      if (writeErr) throw writeErr;
+      return serverMerged;
+    }
+  }
+
+  function applyServerMerged(serverMerged) {
+    if (!serverMerged) return;
+    setPreferences(serverMerged);
+    prefsRef.current = serverMerged;
+  }
+
+  function settleStatus() {
+    if (pendingRef.current) setSaveStatus("error");
+    else if (inflightRef.current > 0) setSaveStatus("saving");
+    else setSaveStatus("saved");
+  }
+
   async function updatePreferences(newPrefs) {
     const latest = prefsRef.current;
     const merged = { ...latest, ...newPrefs };
@@ -45,35 +89,45 @@ export function UserProvider({ session, children }) {
     prefsRef.current = merged;
     if (!session) return;
 
-    // Skriv via vår egen proxy (/api/user-prefs) — direkta PATCH:ar mot
-    // supabase.co strups i Safari. Server-side merge med användarens token.
+    inflightRef.current++;
+    setSaveStatus("saving");
     try {
-      const res = await fetch("/api/user-prefs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify(newPrefs),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { preferences: serverMerged } = await res.json();
-      if (serverMerged) {
-        setPreferences(serverMerged);
-        prefsRef.current = serverMerged;
-      }
+      // Skicka även tidigare misslyckade ändringar så inget tappas på vägen
+      const patch = { ...(pendingRef.current || {}), ...newPrefs };
+      const serverMerged = await pushPatch(patch);
+      pendingRef.current = null;
+      applyServerMerged(serverMerged);
     } catch (err) {
-      console.error("updatePreferences: proxy save failed, falling back to direct write:", err);
-      // Fallback: direkt mot Supabase (fungerar i Chrome m.fl.)
-      const { data } = await supabase.from("user_prefs").select("preferences").eq("user_id", userId).single();
-      const serverMerged = { ...(data?.preferences || {}), ...newPrefs };
-      await supabase.from("user_prefs").update({ preferences: serverMerged }).eq("user_id", userId);
-      setPreferences(serverMerged);
-      prefsRef.current = serverMerged;
+      console.error("updatePreferences: kunde inte spara:", err);
+      pendingRef.current = { ...(pendingRef.current || {}), ...newPrefs };
+    } finally {
+      inflightRef.current--;
+      settleStatus();
+    }
+  }
+
+  // Skicka om ändringar som inte nådde servern (Spara igen-knappen).
+  async function retrySave() {
+    const patch = pendingRef.current;
+    if (!patch || !session) return;
+    inflightRef.current++;
+    setSaveStatus("saving");
+    try {
+      const serverMerged = await pushPatch(patch);
+      pendingRef.current = null;
+      applyServerMerged(serverMerged);
+    } catch (err) {
+      console.error("retrySave: kunde inte spara:", err);
+    } finally {
+      inflightRef.current--;
+      settleStatus();
     }
   }
 
   const displayName = preferences.display_name || session?.user?.email?.split("@")[0] || "";
 
   return (
-    <UserContext.Provider value={{ userId, preferences, prefsLoaded, updatePreferences, lastSeenAt, displayName, session }}>
+    <UserContext.Provider value={{ userId, preferences, prefsLoaded, updatePreferences, saveStatus, retrySave, lastSeenAt, displayName, session }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SaveStatus from "./SaveStatus.jsx";
 import { supabase } from "../supabase.js";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { sanitizeInput } from "../lib/sanitize.js";
@@ -98,7 +99,10 @@ export default function ProfilePage({ onResetProfile }) {
 
   return (
     <div>
-      <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", marginBottom: 20 }}>Profil</h1>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
+        <h1 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 500, color: "var(--text)", margin: 0 }}>Profil</h1>
+        <SaveStatus />
+      </div>
 
       {/* Avatar + Name + Email */}
       <div style={cardStyle}>

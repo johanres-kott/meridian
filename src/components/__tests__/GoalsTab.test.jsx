@@ -83,6 +83,39 @@ describe("GoalsTab", () => {
     expect(screen.getByPlaceholderText("% per år")).toBeTruthy();
   });
 
+  it("edits an expense row in place: same id, new amount", () => {
+    prefs = { cashflow: { incomes: [], expenses: [
+      { id: "e1", label: "CSN", amount: 1200, category: "lan", period: "month" },
+    ] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getByLabelText("Redigera CSN"));
+    const amountInput = screen.getByDisplayValue("1200");
+    fireEvent.change(amountInput, { target: { value: "1450" } });
+    fireEvent.click(screen.getByText("Spara"));
+    const expenses = updatePreferences.mock.calls[0][0].cashflow.expenses;
+    expect(expenses).toHaveLength(1);
+    expect(expenses[0].id).toBe("e1");
+    expect(expenses[0].amount).toBe(1450);
+    expect(expenses[0].label).toBe("CSN");
+  });
+
+  it("lets a loan-linked row keep its own mode while being edited", () => {
+    debts = [{ id: "loan-1", kind: "bolan", label: "Bolån · Villan", value_sek: 1500000, metadata: { interestRate: 3.5 } }];
+    prefs = { cashflow: { incomes: [], expenses: [
+      { id: "r1", label: "Ränta · Villan", category: "lan", loanId: "loan-1", rate: 3.5, amount: 4375, period: "month" },
+    ] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getByLabelText("Redigera Ränta · Villan"));
+    // radens eget läge (Ränta) är INTE låst under redigering
+    expect(screen.getByRole("button", { name: "Ränta" }).disabled).toBe(false);
+    fireEvent.change(screen.getByPlaceholderText("ränta %"), { target: { value: "2,9" } });
+    fireEvent.click(screen.getByText("Spara"));
+    const expenses = updatePreferences.mock.calls[0][0].cashflow.expenses;
+    expect(expenses).toHaveLength(1);
+    expect(expenses[0].id).toBe("r1");
+    expect(expenses[0].rate).toBe(2.9);
+  });
+
   it("treats amortering as saving: excluded from 'Pengar ut', included in sparkvot, own stat card", () => {
     prefs = {
       cashflow: {

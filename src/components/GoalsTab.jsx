@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useUser } from "../contexts/UserContext.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import { GOAL_ICONS, Target } from "./icons.jsx";
-import { PERIODS, PERIOD_BY_ID, monthlyAmount, loanInterestMonthly } from "./cashflowPeriods.js";
+import { PERIODS, PERIOD_BY_ID, monthlyAmount, loanInterestMonthly, loanShareValue, loanSharePct } from "./cashflowPeriods.js";
 import useNetWorth from "../hooks/useNetWorth.js";
 import { EXPENSE_CATEGORIES, CAT_BY_ID, isSaving } from "./cashflowCategories.js";
 import CashflowSankey from "./CashflowSankey.jsx";
@@ -92,7 +92,7 @@ function FlowColumn({ title, rows, onAdd, onUpdate, onRemove, placeholder, withC
   const [error, setError] = useState(null);
   const loansById = Object.fromEntries(loans.map(l => [l.id, l]));
   const linkedLoan = loanId ? loansById[loanId] : null;
-  const linkedMonthly = linkedLoan ? loanInterestMonthly(linkedLoan.value_sek, parseAmount(rate)) : null;
+  const linkedMonthly = linkedLoan ? loanInterestMonthly(loanShareValue(linkedLoan), parseAmount(rate)) : null;
 
   // Välj lån: namn + kategori sätts från lånet och läget (ränta/amortering);
   // procenten förifylls från wizarden om den finns. Båda räknas som
@@ -130,7 +130,7 @@ function FlowColumn({ title, rows, onAdd, onUpdate, onRemove, placeholder, withC
       const linkedRow = {
         id: editingId || newId(), label: label.trim() || `${isAmort ? "Amortering" : "Ränta"} · ${linkedLoan.label}`,
         category: isAmort ? "amortering" : "lan", period: "month",
-        loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(linkedLoan.value_sek, r),
+        loanId: linkedLoan.id, rate: r, amount: loanInterestMonthly(loanShareValue(linkedLoan), r),
       };
       if (editingId) onUpdate?.(linkedRow); else onAdd(linkedRow);
       reset(); setAdding(false);
@@ -224,7 +224,7 @@ function FlowColumn({ title, rows, onAdd, onUpdate, onRemove, placeholder, withC
               {cat && <span title={cat.label} style={{ width: 8, height: 8, borderRadius: "50%", background: cat.color, flexShrink: 0 }} />}
               <span style={{ color: "var(--text)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.label}</span>
               {r.loanId && (
-                <span title={loansById[r.loanId] ? `${fmtKr(Number(loansById[r.loanId].value_sek))} × ${r.rate} % — följer lånet` : "Lånet är borttaget — visar senast sparade belopp"}
+                <span title={loansById[r.loanId] ? `${fmtKr(loanShareValue(loansById[r.loanId]))} × ${r.rate} %${loanSharePct(loansById[r.loanId]) < 100 ? ` — din andel (${loanSharePct(loansById[r.loanId])} %) av lånet` : " — följer lånet"}` : "Lånet är borttaget — visar senast sparade belopp"}
                   style={{ fontSize: 10, color: loansById[r.loanId] ? "var(--brand)" : "var(--text-muted)", flexShrink: 0 }}>
                   {loansById[r.loanId] ? `${String(r.rate).replace(".", ",")} %` : "lån saknas"}
                 </span>
@@ -243,7 +243,7 @@ function FlowColumn({ title, rows, onAdd, onUpdate, onRemove, placeholder, withC
             {withCategory && linkableLoans.length > 0 && (
               <select value={loanId} onChange={e => e.target.value ? pickLoan(e.target.value) : reset()} title="Koppla till ett lån du lagt in" style={{ ...inputStyle, width: "100%" }}>
                 <option value="">Koppla till lån… (ränta eller amortering räknas ut)</option>
-                {linkableLoans.map(l => <option key={l.id} value={l.id}>{l.label} — {fmtKr(Number(l.value_sek))}</option>)}
+                {linkableLoans.map(l => <option key={l.id} value={l.id}>{l.label} — {fmtKr(loanShareValue(l))}{loanSharePct(l) < 100 ? ` (din andel, ${loanSharePct(l)} %)` : ""}</option>)}
               </select>
             )}
             {linkedLoan ? (

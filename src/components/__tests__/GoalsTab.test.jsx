@@ -83,6 +83,19 @@ describe("GoalsTab", () => {
     expect(screen.getByPlaceholderText("% per år")).toBeTruthy();
   });
 
+  it("scales loan-linked rows to the user's share of the loan", () => {
+    debts = [{ id: "loan-1", kind: "bolan", label: "Bolån · Villan", value_sek: 1500000,
+      metadata: { interestRate: 3.5, ownershipShare: 50 } }];
+    prefs = { cashflow: { incomes: [], expenses: [] } };
+    render(<GoalsTab />);
+    fireEvent.click(screen.getByText("+ Bolåneränta"));
+    // 1 500 000 × 50 % × 3,5 % / 12 = 2 188 kr/mån (avrundat)
+    expect(screen.getByText("= 2 188 kr/mån")).toBeTruthy();
+    fireEvent.click(screen.getByText("Spara"));
+    const row = updatePreferences.mock.calls[0][0].cashflow.expenses[0];
+    expect(Math.round(row.amount)).toBe(2188);
+  });
+
   it("edits an expense row in place: same id, new amount", () => {
     prefs = { cashflow: { incomes: [], expenses: [
       { id: "e1", label: "CSN", amount: 1200, category: "lan", period: "month" },

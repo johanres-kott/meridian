@@ -47,7 +47,6 @@
     "src/components/NotificationBell.jsx",
     "src/components/NotificationItem.jsx",
     "src/components/OnboardingModal.jsx",
-    "src/components/QuickGuide.jsx",
     "src/components/PdfImportModal.jsx",
     "src/components/ImportGuide.jsx",
     "src/components/PremiumGate.jsx",

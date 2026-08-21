@@ -147,10 +147,19 @@ export default function ProfileMenu({ onNavigate, direction = "down", showName =
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>Gjord med den gamla profilen — gör om den för att få den nya ekonomiprofilen.</div>
               )}
               <button
-                onClick={() => { updatePreferences({ investorProfile: null }); setOpen(false); }}
+                onClick={() => { updatePreferences({ investorProfile: null, onboardingSkipped: false }); setOpen(false); }}
                 style={{ fontSize: 10, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0, marginTop: 6 }}
               >
                 Ändra profil →
+              </button>
+            </div>
+          )}
+          {!preferences.investorProfile && (
+            <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-light)" }}>
+              <button
+                onClick={() => { updatePreferences({ onboardingSkipped: false }); setOpen(false); }}
+                style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                Gör din ekonomiprofil →
               </button>
             </div>
           )}

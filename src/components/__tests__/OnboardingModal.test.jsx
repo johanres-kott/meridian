@@ -34,6 +34,18 @@ describe("OnboardingModal (ekonomiprofil)", () => {
     fireEvent.click(screen.getByText("Nästa →"));
   }
 
+  it("offers a skip link on the welcome step and calls onSkip", () => {
+    const onSkip = vi.fn();
+    render(<OnboardingModal onComplete={() => {}} onSkip={onSkip} />);
+    fireEvent.click(screen.getByText("Hoppa över — gör profilen senare"));
+    expect(onSkip).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders without a skip link when onSkip is not provided", () => {
+    render(<OnboardingModal onComplete={() => {}} />);
+    expect(screen.queryByText("Hoppa över — gör profilen senare")).toBeNull();
+  });
+
   it("asks economy questions, not investor-type questions", () => {
     render(<OnboardingModal onComplete={vi.fn()} />);
     fireEvent.click(screen.getByText("Kom igång"));

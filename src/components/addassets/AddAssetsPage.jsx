@@ -12,12 +12,15 @@ import { KindIcon } from "../icons.jsx";
 // Värden fylls i manuellt — vi hämtar aldrig och hittar aldrig på värderingar.
 // För bostad länkar vi till Booli/hitta.se så användaren kan slå upp värdet själv.
 
+// Ordningen är medveten: de två snabbaste vägarna till en levande app först —
+// sparkontot är tre fält, Avanza-importen är en fil (superenkelt-principen).
 const CATEGORIES = [
+  { id: "sparkonto", kind: "sparkonto", title: "Sparkonto & buffert", desc: "Snabbaste starten — namn och saldo, klart på 30 sekunder" },
+  { id: "import", kind: "stocks", title: "Importera från Avanza", desc: "Kontobeskedet som PDF — hela portföljen på en gång" },
   { id: "stocks", kind: "stocks", title: "Aktier", desc: "Bolag du tror på — med produktsida och hälsosignalen ”Går bolaget bra?”" },
   { id: "funds", kind: "funds", title: "Fonder", desc: "Globala indexfonder och toppfonder med avgifter och betyg från Morningstar" },
   { id: "bostad", kind: "bostad", title: "Bostad", desc: "Lägenhet, hus eller fritidshus — slå upp värdet på Booli eller hitta.se" },
   { id: "fordon", kind: "fordon", title: "Fordon", desc: "Bil, MC, husbil eller båt" },
-  { id: "sparkonto", kind: "sparkonto", title: "Sparkonto & buffert", desc: "Kontanter, sparkonton och din buffert" },
   { id: "lan", kind: "skuld", title: "Bolån & skulder", desc: "Lån dras av från din nettoförmögenhet" },
   { id: "pension", kind: "pension", title: "Pension (ITP)", desc: "Din tjänstepension — följ värdet och jämför fondval" },
   { id: "vinstandel", kind: "vinstandel", title: "Vinstandelsstiftelse", desc: "Vinstandelar från arbetsgivaren (t.ex. via PRI) — årgångar, låstid och när pengarna frisläpps" },
@@ -156,13 +159,16 @@ function ManualForm({ formId, onSaved, onBack }) {
   );
 }
 
-export default function AddAssetsPage({ onClose, onNavigate }) {
+export default function AddAssetsPage({ onClose, onNavigate, firstRun = false }) {
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [view, setView] = useState(null); // null = katalog, annars kategori-id
 
   function openCategory(id) {
-    if (id === "stocks") {
+    if (id === "import") {
+      onNavigate("portfolio", { openPdfImport: true });
+      onClose();
+    } else if (id === "stocks") {
       onNavigate("investment", { subTab: "toppforslag", suggestMode: "stock" });
       onClose();
     } else if (id === "funds") {
@@ -212,9 +218,14 @@ export default function AddAssetsPage({ onClose, onNavigate }) {
           <ManualForm formId={view} onSaved={handleSaved} onBack={() => setView(null)} />
         ) : (
           <>
-            <h1 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>
-              Komplettera din portfölj
+            <h1 style={{ fontSize: isMobile ? 26 : 34, fontWeight: 700, color: "var(--text)", marginBottom: firstRun ? 8 : 20 }}>
+              {firstRun ? "Lägg in din första tillgång" : "Komplettera din portfölj"}
             </h1>
+            {firstRun && (
+              <div style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20 }}>
+                Det tar under en minut — och sen räknar appen ihop din helhet. Du kan alltid lägga till mer senare.
+              </div>
+            )}
             <div style={{ display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid var(--border)", paddingBottom: 10, marginBottom: 28 }}>
               <span style={{ color: "var(--text-muted)", fontSize: 15 }}>⌕</span>
               <input

@@ -83,6 +83,11 @@ HTTP/2 401
 
 **Kunde INTE verifiera utan konto:** faktiska 200-svar med konton/transaktioner, testanvändarnas SSN, samt exakt Client ID/Secret-format. (Enligt dokumentationen genereras transaktionsdata i sandlådan automatiskt över tid och man kan skapa/radera konton och transaktioner via sandbox-endpoints.)
 
+**Uppdatering 2026-08-21 (med riktigt sandbox-konto):** registreringen som privatperson bekräftad — e-post räckte, och en app i konsolen gav Client ID/Secret (32 tecken hex vardera). Verifierat med riktiga nycklar härifrån:
+- Fel nycklar → `401 "Invalid client id or secret."`; giltiga nycklar utan API-prenumeration → `403 "Forbidden" / "Not registered to plan"` på både `/personal/v5/accounts` och `/personal/v5/authorize`.
+- Slutsats: nycklarna autentiserar mot gateway:n, men appen måste dessutom **prenumereras på ett API-product/plan i portalen** (IBM API Connect-modellen) innan anrop släpps igenom. Registreringsflödet i portalen har också ett premium-spår ("Get access to premium") som kräver Nordea-**företagsavtal** (Corporate Access / Corporate Netbank / Web Service customer) — det är fel spår för sandlådan och ska hoppas över.
+- Kvar att verifiera efter plan-prenumeration: token-flödet och faktiska 200-svar med testdata.
+
 ### Auth-flöde
 - OAuth 2.0. Anrop kräver headers: `Authorization: Bearer <token>`, `X-IBM-Client-Id`, `X-IBM-Client-Secret`, samt en `Signature`-header (RSA-SHA256 över bl.a. `Date`-headern) och `Date`.
 - Bärartoken genereras vid inloggning/authorize; Client ID/Secret kommer från app-konsolen.

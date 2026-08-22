@@ -86,7 +86,42 @@ HTTP/2 401
 **Uppdatering 2026-08-21 (med riktigt sandbox-konto):** registreringen som privatperson bekräftad — e-post räckte, och en app i konsolen gav Client ID/Secret (32 tecken hex vardera). Verifierat med riktiga nycklar härifrån:
 - Fel nycklar → `401 "Invalid client id or secret."`; giltiga nycklar utan API-prenumeration → `403 "Forbidden" / "Not registered to plan"` på både `/personal/v5/accounts` och `/personal/v5/authorize`.
 - Slutsats: nycklarna autentiserar mot gateway:n, men appen måste dessutom **prenumereras på ett API-product/plan i portalen** (IBM API Connect-modellen) innan anrop släpps igenom. Registreringsflödet i portalen har också ett premium-spår ("Get access to premium") som kräver Nordea-**företagsavtal** (Corporate Access / Corporate Netbank / Web Service customer) — det är fel spår för sandlådan och ska hoppas över.
-- Kvar att verifiera efter plan-prenumeration: token-flödet och faktiska 200-svar med testdata.
+
+### Uppdatering 2026-08-22: hela flödet verifierat end-to-end ✔
+
+Efter att appen prenumererats på API:erna i portalen kunde hela AIS-flödet köras
+härifrån mot `api.nordeaopenbanking.com` — konton och transaktioner med 200-svar.
+
+**Signering i sandbox.** Utan `Signature`-header: `401 error.signature.invalid
+"Signature header is missing"`. HMAC avvisas ("Only rsa-sha256 is supported"),
+och ett eget självsignerat RSA-cert ger `error.security.invalid` eftersom
+sandboxen bara litar på Nordeas nedladdningsbara test-cert (p12 i API Market,
+keyId ska då vara literalen `"clientId"`). Enklaste vägen, verifierad:
+**`Signature: SKIP_SIGNATURE_VALIDATION_FOR_SANDBOX`** stänger av
+signaturvalideringen helt i sandlådan.
+
+**Token-flödet (personal v5, utan BankID i sandbox):**
+1. `POST /personal/v5/authorize` med headers `X-IBM-Client-Id`,
+   `X-IBM-Client-Secret`, `Signature: SKIP_SIGNATURE_VALIDATION_FOR_SANDBOX`
+   och JSON-body — fältet heter **`scope`** (singular; `scopes` i felmeddelandet
+   är vilseledande): `{"country":"SE","scope":["ACCOUNTS_BASIC",
+   "ACCOUNTS_BALANCES","ACCOUNTS_DETAILS","ACCOUNTS_TRANSACTIONS"],
+   "state":"...","redirect_uri":"...","duration":129600,
+   "maximum_transaction_history":12}`. Sandboxen hoppar över samtyckes-UI:t och
+   svarar direkt `302` med `?code=...&state=...` på redirect_uri:n.
+2. `POST /personal/v5/authorize/token` med form-encoded
+   `code=...&redirect_uri=...&grant_type=authorization_code` →
+   `{access_token, refresh_token, token_type: "Bearer", expires_in: 3599}`.
+3. `GET /personal/v5/accounts` med `Authorization: Bearer ...` (+ IBM-headers
+   och skip-signaturen) → 4 testkonton (PERSONKONTO, SEK/EUR, BBAN + IBAN,
+   booked/available balance). `GET /personal/v5/accounts/{id}/transactions`
+   → 40 transaktioner med `booking_date`, `amount`, `currency`, `narrative`
+   (svenskt innehåll: Swish, BG-betalningar, m.m.).
+
+Datamodellen mappar rakt mot kontoutdrags-importen (etapp 1): samma fält
+(datum, belopp, text, saldo) — en framtida konto-koppling kan återanvända
+sparkonto-uppdateringsflödet. I produktion ersätts skip-signaturen av
+QSeal-signering och samtycket sker via redirect + BankID.
 
 ### Auth-flöde
 - OAuth 2.0. Anrop kräver headers: `Authorization: Bearer <token>`, `X-IBM-Client-Id`, `X-IBM-Client-Secret`, samt en `Signature`-header (RSA-SHA256 över bl.a. `Date`-headern) och `Date`.
